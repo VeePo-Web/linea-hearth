@@ -109,6 +109,47 @@ export type Database = {
           },
         ]
       }
+      product_ugc: {
+        Row: {
+          caption: string | null
+          created_at: string
+          customer_name: string
+          id: string
+          image_url: string
+          instagram_handle: string | null
+          is_approved: boolean
+          product_id: string | null
+        }
+        Insert: {
+          caption?: string | null
+          created_at?: string
+          customer_name: string
+          id?: string
+          image_url: string
+          instagram_handle?: string | null
+          is_approved?: boolean
+          product_id?: string | null
+        }
+        Update: {
+          caption?: string | null
+          created_at?: string
+          customer_name?: string
+          id?: string
+          image_url?: string
+          instagram_handle?: string | null
+          is_approved?: boolean
+          product_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_ugc_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       product_variants: {
         Row: {
           color: string | null
@@ -160,50 +201,68 @@ export type Database = {
         Row: {
           care_instructions: string | null
           category_id: string | null
+          common_questions: Json | null
           created_at: string
           description: string | null
+          fabric_composition: string | null
+          fit_type: string | null
           id: string
           is_featured: boolean
           is_on_sale: boolean
           material: string | null
+          ministry_statement: string | null
+          model_info: string | null
           name: string
           price: number
           sale_price: number | null
           slug: string
           status: Database["public"]["Enums"]["product_status"]
           updated_at: string
+          weight_gsm: number | null
         }
         Insert: {
           care_instructions?: string | null
           category_id?: string | null
+          common_questions?: Json | null
           created_at?: string
           description?: string | null
+          fabric_composition?: string | null
+          fit_type?: string | null
           id?: string
           is_featured?: boolean
           is_on_sale?: boolean
           material?: string | null
+          ministry_statement?: string | null
+          model_info?: string | null
           name: string
           price: number
           sale_price?: number | null
           slug: string
           status?: Database["public"]["Enums"]["product_status"]
           updated_at?: string
+          weight_gsm?: number | null
         }
         Update: {
           care_instructions?: string | null
           category_id?: string | null
+          common_questions?: Json | null
           created_at?: string
           description?: string | null
+          fabric_composition?: string | null
+          fit_type?: string | null
           id?: string
           is_featured?: boolean
           is_on_sale?: boolean
           material?: string | null
+          ministry_statement?: string | null
+          model_info?: string | null
           name?: string
           price?: number
           sale_price?: number | null
           slug?: string
           status?: Database["public"]["Enums"]["product_status"]
           updated_at?: string
+          weight_gsm?: number | null
         }
         Relationships: [
           {
