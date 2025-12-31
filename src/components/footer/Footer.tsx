@@ -1,30 +1,27 @@
 const Footer = () => {
   return (
-    <footer className="w-full bg-white text-black pt-8 pb-2 px-6 border-t border-[#e5e5e5] mt-48">
+    <footer className="w-full bg-stone-900 text-white pt-16 pb-4 px-6">
       <div className="">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-8">
           {/* Brand - Left side */}
           <div>
-            <img 
-              src="/Linea_Jewelry_Inc-2.svg" 
-              alt="Linea Jewelry Inc." 
-              className="mb-4 h-6 w-auto"
-            />
-            <p className="text-sm font-light text-black/70 leading-relaxed max-w-md mb-6">
-              Minimalist jewelry crafted for the modern individual
+            <h2 className="text-2xl font-light mb-4 tracking-wide">
+              LINE OF <span className="text-amber-500">JUDAH</span>
+            </h2>
+            <p className="text-sm font-light text-white/70 leading-relaxed max-w-md mb-6">
+              Premium Christian apparel for the modern believer. Wear your faith. Live your purpose.
             </p>
             
             {/* Contact Information */}
-            <div className="space-y-2 text-sm font-light text-black/70">
+            <div className="space-y-2 text-sm font-light text-white/70">
               <div>
-                <p className="font-normal text-black mb-1">Visit Us</p>
-                <p>123 Madison Avenue</p>
-                <p>New York, NY 10016</p>
+                <p className="font-normal text-white mb-1">Contact Us</p>
+                <p>hello@lineofjudah.com</p>
               </div>
-              <div>
-                <p className="font-normal text-black mb-1 mt-3">Contact</p>
-                <p>+1 (212) 555-0123</p>
-                <p>hello@lineajewelry.com</p>
+              <div className="flex gap-4 mt-4">
+                <a href="https://instagram.com/lineofjudahwear" className="text-white/70 hover:text-amber-500 transition-colors">Instagram</a>
+                <a href="https://tiktok.com/@lineofjudah" className="text-white/70 hover:text-amber-500 transition-colors">TikTok</a>
+                <a href="https://youtube.com/@lineofjudah" className="text-white/70 hover:text-amber-500 transition-colors">YouTube</a>
               </div>
             </div>
           </div>
@@ -33,35 +30,34 @@ const Footer = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Shop */}
             <div>
-              <h4 className="text-sm font-normal mb-4">Shop</h4>
+              <h4 className="text-sm font-normal text-white mb-4">Shop</h4>
               <ul className="space-y-2">
-                <li><a href="#" className="text-sm font-light text-black/70 hover:text-black transition-colors">New In</a></li>
-                <li><a href="#" className="text-sm font-light text-black/70 hover:text-black transition-colors">Rings</a></li>
-                <li><a href="#" className="text-sm font-light text-black/70 hover:text-black transition-colors">Earrings</a></li>
-                <li><a href="#" className="text-sm font-light text-black/70 hover:text-black transition-colors">Bracelets</a></li>
-                <li><a href="#" className="text-sm font-light text-black/70 hover:text-black transition-colors">Necklaces</a></li>
+                <li><a href="/category/new-in" className="text-sm font-light text-white/70 hover:text-amber-500 transition-colors">New Arrivals</a></li>
+                <li><a href="/category/tees" className="text-sm font-light text-white/70 hover:text-amber-500 transition-colors">T-Shirts</a></li>
+                <li><a href="/category/hoodies" className="text-sm font-light text-white/70 hover:text-amber-500 transition-colors">Hoodies</a></li>
+                <li><a href="/category/accessories" className="text-sm font-light text-white/70 hover:text-amber-500 transition-colors">Accessories</a></li>
+                <li><a href="/category/sale" className="text-sm font-light text-white/70 hover:text-amber-500 transition-colors">Sale</a></li>
               </ul>
             </div>
 
             {/* Support */}
             <div>
-              <h4 className="text-sm font-normal mb-4">Support</h4>
+              <h4 className="text-sm font-normal text-white mb-4">Support</h4>
               <ul className="space-y-2">
-                <li><a href="#" className="text-sm font-light text-black/70 hover:text-black transition-colors">Size Guide</a></li>
-                <li><a href="#" className="text-sm font-light text-black/70 hover:text-black transition-colors">Care Instructions</a></li>
-                <li><a href="#" className="text-sm font-light text-black/70 hover:text-black transition-colors">Returns</a></li>
-                <li><a href="#" className="text-sm font-light text-black/70 hover:text-black transition-colors">Shipping</a></li>
-                <li><a href="#" className="text-sm font-light text-black/70 hover:text-black transition-colors">Contact</a></li>
+                <li><a href="/about/size-guide" className="text-sm font-light text-white/70 hover:text-amber-500 transition-colors">Size Guide</a></li>
+                <li><a href="/about/customer-care" className="text-sm font-light text-white/70 hover:text-amber-500 transition-colors">Customer Care</a></li>
+                <li><a href="/about/shipping" className="text-sm font-light text-white/70 hover:text-amber-500 transition-colors">Shipping & Returns</a></li>
+                <li><a href="/about/our-story" className="text-sm font-light text-white/70 hover:text-amber-500 transition-colors">Our Story</a></li>
               </ul>
             </div>
 
-            {/* Connect */}
+            {/* About */}
             <div>
-              <h4 className="text-sm font-normal mb-4">Connect</h4>
+              <h4 className="text-sm font-normal text-white mb-4">About</h4>
               <ul className="space-y-2">
-                <li><a href="#" className="text-sm font-light text-black/70 hover:text-black transition-colors">Instagram</a></li>
-                <li><a href="#" className="text-sm font-light text-black/70 hover:text-black transition-colors">Pinterest</a></li>
-                <li><a href="#" className="text-sm font-light text-black/70 hover:text-black transition-colors">Newsletter</a></li>
+                <li><a href="/about/our-story" className="text-sm font-light text-white/70 hover:text-amber-500 transition-colors">Our Mission</a></li>
+                <li><a href="/about/sustainability" className="text-sm font-light text-white/70 hover:text-amber-500 transition-colors">Faith & Purpose</a></li>
+                <li><a href="/about/store-locator" className="text-sm font-light text-white/70 hover:text-amber-500 transition-colors">Community</a></li>
               </ul>
             </div>
           </div>
@@ -69,16 +65,16 @@ const Footer = () => {
       </div>
 
       {/* Bottom section - edge to edge separator */}
-      <div className="border-t border-[#e5e5e5] -mx-6 px-6 pt-2">
+      <div className="border-t border-white/10 -mx-6 px-6 pt-4">
         <div className="flex flex-col md:flex-row justify-between items-center">
-          <p className="text-sm font-light text-black mb-1 md:mb-0">
-            © 2024 Linea. All rights reserved.
+          <p className="text-sm font-light text-white/50 mb-2 md:mb-0">
+            © 2024 Line of Judah. All rights reserved.
           </p>
           <div className="flex space-x-6">
-            <a href="/privacy-policy" className="text-sm font-light text-black hover:text-black/70 transition-colors">
+            <a href="/privacy-policy" className="text-sm font-light text-white/50 hover:text-amber-500 transition-colors">
               Privacy Policy
             </a>
-            <a href="/terms-of-service" className="text-sm font-light text-black hover:text-black/70 transition-colors">
+            <a href="/terms-of-service" className="text-sm font-light text-white/50 hover:text-amber-500 transition-colors">
               Terms of Service
             </a>
           </div>

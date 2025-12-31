@@ -47,6 +47,30 @@ export type Database = {
         }
         Relationships: []
       }
+      newsletter_subscribers: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          source: string | null
+          subscribed_at: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          source?: string | null
+          subscribed_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          source?: string | null
+          subscribed_at?: string
+        }
+        Relationships: []
+      }
       product_images: {
         Row: {
           alt_text: string | null
@@ -214,6 +238,53 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      reviews: {
+        Row: {
+          created_at: string
+          customer_avatar_url: string | null
+          customer_location: string | null
+          customer_name: string
+          id: string
+          is_approved: boolean
+          is_featured: boolean
+          product_id: string | null
+          rating: number
+          review_text: string
+        }
+        Insert: {
+          created_at?: string
+          customer_avatar_url?: string | null
+          customer_location?: string | null
+          customer_name: string
+          id?: string
+          is_approved?: boolean
+          is_featured?: boolean
+          product_id?: string | null
+          rating: number
+          review_text: string
+        }
+        Update: {
+          created_at?: string
+          customer_avatar_url?: string | null
+          customer_location?: string | null
+          customer_name?: string
+          id?: string
+          is_approved?: boolean
+          is_featured?: boolean
+          product_id?: string | null
+          rating?: number
+          review_text?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
