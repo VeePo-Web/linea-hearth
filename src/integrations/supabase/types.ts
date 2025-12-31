@@ -47,6 +47,68 @@ export type Database = {
         }
         Relationships: []
       }
+      community_stories: {
+        Row: {
+          created_at: string
+          customer_email: string
+          customer_location: string | null
+          customer_name: string
+          customer_photo_url: string | null
+          gender: string | null
+          headline: string
+          id: string
+          instagram_handle: string | null
+          is_approved: boolean
+          is_contactable: boolean
+          is_featured: boolean
+          product_id: string | null
+          story_text: string
+          video_url: string | null
+        }
+        Insert: {
+          created_at?: string
+          customer_email: string
+          customer_location?: string | null
+          customer_name: string
+          customer_photo_url?: string | null
+          gender?: string | null
+          headline: string
+          id?: string
+          instagram_handle?: string | null
+          is_approved?: boolean
+          is_contactable?: boolean
+          is_featured?: boolean
+          product_id?: string | null
+          story_text: string
+          video_url?: string | null
+        }
+        Update: {
+          created_at?: string
+          customer_email?: string
+          customer_location?: string | null
+          customer_name?: string
+          customer_photo_url?: string | null
+          gender?: string | null
+          headline?: string
+          id?: string
+          instagram_handle?: string | null
+          is_approved?: boolean
+          is_contactable?: boolean
+          is_featured?: boolean
+          product_id?: string | null
+          story_text?: string
+          video_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "community_stories_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       newsletter_subscribers: {
         Row: {
           created_at: string
@@ -304,36 +366,48 @@ export type Database = {
           customer_avatar_url: string | null
           customer_location: string | null
           customer_name: string
+          gender: string | null
           id: string
           is_approved: boolean
+          is_contactable: boolean | null
           is_featured: boolean
           product_id: string | null
           rating: number
           review_text: string
+          story_type: string | null
+          video_url: string | null
         }
         Insert: {
           created_at?: string
           customer_avatar_url?: string | null
           customer_location?: string | null
           customer_name: string
+          gender?: string | null
           id?: string
           is_approved?: boolean
+          is_contactable?: boolean | null
           is_featured?: boolean
           product_id?: string | null
           rating: number
           review_text: string
+          story_type?: string | null
+          video_url?: string | null
         }
         Update: {
           created_at?: string
           customer_avatar_url?: string | null
           customer_location?: string | null
           customer_name?: string
+          gender?: string | null
           id?: string
           is_approved?: boolean
+          is_contactable?: boolean | null
           is_featured?: boolean
           product_id?: string | null
           rating?: number
           review_text?: string
+          story_type?: string | null
+          video_url?: string | null
         }
         Relationships: [
           {
