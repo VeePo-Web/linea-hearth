@@ -1,5 +1,6 @@
-import { useState } from 'react';
-import { TryOnProvider, useTryOnState } from '@/hooks/useTryOnState';
+import { useState, useEffect } from 'react';
+import { useSearchParams, Link } from 'react-router-dom';
+import { TryOnProvider, useTryOnState, EquippedItem } from '@/hooks/useTryOnState';
 import { TryOnCanvas } from '@/components/try-on/TryOnCanvas';
 import { TryOnSidebar } from '@/components/try-on/TryOnSidebar';
 import { MobileTryOnBar } from '@/components/try-on/MobileTryOnBar';
@@ -7,12 +8,59 @@ import { ProductDrawer } from '@/components/try-on/ProductDrawer';
 import Header from '@/components/header/Header';
 import Footer from '@/components/footer/Footer';
 import { ArrowLeft } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
 
 const TryOnRoomContent = () => {
+  const [searchParams] = useSearchParams();
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
   const [mobileActiveSlot, setMobileActiveSlot] = useState<'head' | 'top' | 'outerwear' | 'bottom' | 'footwear' | null>(null);
-  const { setActiveSlot } = useTryOnState();
+  const { setActiveSlot, equipItem } = useTryOnState();
+
+  // Handle pre-selected product from URL
+  useEffect(() => {
+    const productSlug = searchParams.get('product');
+    const slot = searchParams.get('slot') as keyof typeof slotMapping | null;
+    
+    const slotMapping = {
+      head: 'head',
+      top: 'top',
+      outerwear: 'outerwear',
+      bottom: 'bottom',
+      footwear: 'footwear',
+    } as const;
+
+    if (productSlug && slot && slotMapping[slot]) {
+      const fetchAndEquipProduct = async () => {
+        const { data: product } = await supabase
+          .from('products')
+          .select(`
+            id, name, slug, price,
+            product_images (image_url, is_primary)
+          `)
+          .eq('slug', productSlug)
+          .eq('status', 'active')
+          .single();
+
+        if (product) {
+          const primaryImage = product.product_images?.find((img: { is_primary: boolean }) => img.is_primary)?.image_url 
+            || product.product_images?.[0]?.image_url;
+
+          const item: EquippedItem = {
+            productId: product.id,
+            name: product.name,
+            price: product.price,
+            size: 'M',
+            color: 'default',
+            imageUrl: primaryImage,
+          };
+
+          equipItem(slotMapping[slot], item);
+        }
+      };
+
+      fetchAndEquipProduct();
+    }
+  }, [searchParams, equipItem]);
 
   const handleOpenSlot = (slot: string) => {
     setMobileActiveSlot(slot as 'head' | 'top' | 'outerwear' | 'bottom' | 'footwear');

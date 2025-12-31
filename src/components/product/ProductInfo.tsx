@@ -15,6 +15,7 @@ import ColorSwatchSelector from "./ColorSwatchSelector";
 import TestimonialSnippet from "./TestimonialSnippet";
 import ProductFAQ from "./ProductFAQ";
 import ShippingReturnsAccordion from "./ShippingReturnsAccordion";
+import TryItOnButton from "./TryItOnButton";
 
 interface ProductVariant {
   id: string;
@@ -248,6 +249,15 @@ const ProductInfo = ({ product, variants = [], onColorChange }: ProductInfoProps
         >
           Add to Bag — ${totalPrice.toFixed(2)}
         </Button>
+
+        {/* Try It On Button */}
+        <TryItOnButton
+          productId={product?.id || ""}
+          productSlug={product?.slug || ""}
+          productName={productName}
+          productPrice={displayPrice}
+          categorySlug={categorySlug}
+        />
 
         {/* Trust Row */}
         <div className="flex items-center justify-center gap-6 py-3 text-xs font-light text-muted-foreground">
