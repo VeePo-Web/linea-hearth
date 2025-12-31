@@ -1,11 +1,13 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTryOnState } from '@/hooks/useTryOnState';
 import { useCart } from '@/hooks/useCart';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { ShoppingBag, ChevronUp, Crown, Shirt, Footprints } from 'lucide-react';
+import { ShoppingBag, ChevronUp, Crown, Shirt, Footprints, CreditCard, Bookmark } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { SaveLookModal } from './SaveLookModal';
 
 // Custom pants icon
 const PantsIcon = () => (
@@ -27,14 +29,16 @@ interface MobileTryOnBarProps {
 }
 
 export const MobileTryOnBar = ({ onOpenSlot }: MobileTryOnBarProps) => {
+  const navigate = useNavigate();
   const { equippedItems, getTotalPrice, getEquippedCount, clearAllItems } = useTryOnState();
   const { addItem, openCart } = useCart();
   const [showSummary, setShowSummary] = useState(false);
+  const [saveModalOpen, setSaveModalOpen] = useState(false);
 
   const totalPrice = Number(getTotalPrice());
   const itemCount = getEquippedCount();
 
-  const handleAddAllToCart = () => {
+  const addAllItemsToCart = () => {
     Object.entries(equippedItems).forEach(([slot, item]) => {
       if (item) {
         addItem({
@@ -49,98 +53,157 @@ export const MobileTryOnBar = ({ onOpenSlot }: MobileTryOnBarProps) => {
         });
       }
     });
+  };
 
+  const handleAddAllToCart = () => {
+    addAllItemsToCart();
     toast.success(`${itemCount} items added to bag!`);
     openCart();
     setShowSummary(false);
   };
 
+  const handleBuyThisLook = () => {
+    addAllItemsToCart();
+    toast.success('Proceeding to checkout...');
+    setShowSummary(false);
+    navigate('/checkout');
+  };
+
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border md:hidden">
-      {/* Slot Quick Access */}
-      <div className="flex items-center justify-around py-2 px-4 border-b border-border">
-        {slots.map(({ id, icon }) => {
-          const isEquipped = !!equippedItems[id];
-          return (
-            <button
-              key={id}
-              onClick={() => onOpenSlot(id)}
-              className={cn(
-                "w-12 h-12 flex items-center justify-center rounded-full border-2 transition-all",
-                isEquipped
-                  ? "border-foreground bg-foreground text-background"
-                  : "border-border text-muted-foreground hover:border-foreground"
-              )}
-            >
-              {icon}
-            </button>
-          );
-        })}
-      </div>
+    <>
+      <div className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border md:hidden">
+        {/* Slot Quick Access */}
+        <div className="flex items-center justify-around py-2 px-4 border-b border-border">
+          {slots.map(({ id, icon }) => {
+            const isEquipped = !!equippedItems[id];
+            return (
+              <button
+                key={id}
+                onClick={() => onOpenSlot(id)}
+                className={cn(
+                  "w-12 h-12 flex items-center justify-center rounded-full border-2 transition-all",
+                  isEquipped
+                    ? "border-foreground bg-foreground text-background"
+                    : "border-border text-muted-foreground hover:border-foreground"
+                )}
+              >
+                {icon}
+              </button>
+            );
+          })}
+        </div>
 
-      {/* Summary Bar */}
-      <div className="flex items-center justify-between p-4">
-        <Sheet open={showSummary} onOpenChange={setShowSummary}>
-          <SheetTrigger asChild>
-            <button className="flex items-center gap-2 text-sm">
-              <ShoppingBag className="w-4 h-4" />
-              <span>{itemCount} items</span>
-              <ChevronUp className={cn("w-4 h-4 transition-transform", showSummary && "rotate-180")} />
-            </button>
-          </SheetTrigger>
-          <SheetContent side="bottom" className="h-[60vh]">
-            <div className="space-y-4 pt-4">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-light">Your Outfit</h3>
-                <button 
-                  onClick={() => {
-                    clearAllItems();
-                    setShowSummary(false);
-                  }}
-                  className="text-xs text-muted-foreground"
-                >
-                  Clear all
-                </button>
-              </div>
+        {/* Summary Bar */}
+        <div className="flex items-center justify-between p-4">
+          <Sheet open={showSummary} onOpenChange={setShowSummary}>
+            <SheetTrigger asChild>
+              <button className="flex items-center gap-2 text-sm">
+                <ShoppingBag className="w-4 h-4" />
+                <span>{itemCount} items</span>
+                <ChevronUp className={cn("w-4 h-4 transition-transform", showSummary && "rotate-180")} />
+              </button>
+            </SheetTrigger>
+            <SheetContent side="bottom" className="h-[70vh]">
+              <div className="space-y-4 pt-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-light">Your Outfit</h3>
+                  <button 
+                    onClick={() => {
+                      clearAllItems();
+                      setShowSummary(false);
+                    }}
+                    className="text-xs text-muted-foreground"
+                  >
+                    Clear all
+                  </button>
+                </div>
 
-              <div className="space-y-3 max-h-[40vh] overflow-y-auto">
-                {Object.entries(equippedItems).map(([slot, item]) => {
-                  if (!item) return null;
-                  return (
-                    <div key={slot} className="flex items-center gap-3 p-3 bg-muted rounded">
-                      {item.imageUrl && (
-                        <img 
-                          src={item.imageUrl} 
-                          alt={item.name}
-                          className="w-12 h-12 object-cover"
-                        />
-                      )}
-                      <div className="flex-1">
-                        <div className="text-sm font-light">{item.name}</div>
-                        <div className="text-xs text-muted-foreground">Size {item.size}</div>
+                <div className="space-y-3 max-h-[30vh] overflow-y-auto">
+                  {Object.entries(equippedItems).map(([slot, item]) => {
+                    if (!item) return null;
+                    return (
+                      <div key={slot} className="flex items-center gap-3 p-3 bg-muted rounded">
+                        {item.imageUrl && (
+                          <img 
+                            src={item.imageUrl} 
+                            alt={item.name}
+                            className="w-12 h-12 object-cover"
+                          />
+                        )}
+                        <div className="flex-1">
+                          <div className="text-sm font-light">{item.name}</div>
+                          <div className="text-xs text-muted-foreground">Size {item.size}</div>
+                        </div>
+                        <div className="text-sm font-medium">€{item.price.toLocaleString()}</div>
                       </div>
-                      <div className="text-sm font-medium">€{item.price.toLocaleString()}</div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </SheetContent>
-        </Sheet>
+                    );
+                  })}
+                </div>
 
-        <div className="flex items-center gap-4">
-          <span className="text-lg font-medium">€{totalPrice.toLocaleString()}</span>
-          <Button 
-            onClick={handleAddAllToCart}
-            disabled={itemCount === 0}
-            size="sm"
-            className="gap-2"
-          >
-            <ShoppingBag className="w-4 h-4" />
-            Add All
-          </Button>
+                {/* Total */}
+                <div className="flex items-center justify-between py-3 border-t border-border">
+                  <span className="text-sm font-light">Total</span>
+                  <span className="text-lg font-medium">€{totalPrice.toLocaleString()}</span>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="space-y-2">
+                  <Button 
+                    onClick={handleBuyThisLook}
+                    disabled={itemCount === 0}
+                    className="w-full gap-2"
+                    size="lg"
+                  >
+                    <CreditCard className="w-4 h-4" />
+                    Buy This Look
+                  </Button>
+                  <Button 
+                    onClick={handleAddAllToCart}
+                    disabled={itemCount === 0}
+                    variant="outline"
+                    className="w-full gap-2"
+                    size="lg"
+                  >
+                    <ShoppingBag className="w-4 h-4" />
+                    Add All to Bag
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      setShowSummary(false);
+                      setSaveModalOpen(true);
+                    }}
+                    disabled={itemCount === 0}
+                    variant="ghost"
+                    className="w-full gap-2"
+                    size="sm"
+                  >
+                    <Bookmark className="w-4 h-4" />
+                    Save & Share Look
+                  </Button>
+                </div>
+              </div>
+            </SheetContent>
+          </Sheet>
+
+          <div className="flex items-center gap-4">
+            <span className="text-lg font-medium">€{totalPrice.toLocaleString()}</span>
+            <Button 
+              onClick={handleBuyThisLook}
+              disabled={itemCount === 0}
+              size="sm"
+              className="gap-2"
+            >
+              <CreditCard className="w-4 h-4" />
+              Buy Now
+            </Button>
+          </div>
         </div>
       </div>
-    </div>
+
+      <SaveLookModal 
+        open={saveModalOpen} 
+        onOpenChange={setSaveModalOpen} 
+      />
+    </>
   );
 };
