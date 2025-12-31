@@ -108,6 +108,12 @@ const Navigation = () => {
       ]
     },
     { 
+      name: "Lookbook", 
+      href: "/lookbook",
+      submenuItems: [],
+      images: []
+    },
+    { 
       name: "New in", 
       href: "/category/new-in",
       submenuItems: [
@@ -121,6 +127,12 @@ const Navigation = () => {
         { src: "/arcus-bracelet.png", alt: "Arcus Bracelet", label: "Arcus Bracelet" },
         { src: "/span-bracelet.png", alt: "Span Bracelet", label: "Span Bracelet" }
       ]
+    },
+    { 
+      name: "Community", 
+      href: "/community",
+      submenuItems: [],
+      images: []
     },
     { 
       name: "About", 
