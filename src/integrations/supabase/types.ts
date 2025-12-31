@@ -271,6 +271,47 @@ export type Database = {
         }
         Relationships: []
       }
+      product_3d_models: {
+        Row: {
+          created_at: string
+          fit_adjustment: Json | null
+          id: string
+          is_active: boolean | null
+          model_url: string
+          product_id: string | null
+          slot_type: string
+          texture_variants: Json | null
+        }
+        Insert: {
+          created_at?: string
+          fit_adjustment?: Json | null
+          id?: string
+          is_active?: boolean | null
+          model_url: string
+          product_id?: string | null
+          slot_type: string
+          texture_variants?: Json | null
+        }
+        Update: {
+          created_at?: string
+          fit_adjustment?: Json | null
+          id?: string
+          is_active?: boolean | null
+          model_url?: string
+          product_id?: string | null
+          slot_type?: string
+          texture_variants?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_3d_models_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       product_images: {
         Row: {
           alt_text: string | null
@@ -556,6 +597,75 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      saved_outfits: {
+        Row: {
+          avatar_body_type: string
+          avatar_gender: string
+          created_at: string
+          equipped_items: Json
+          id: string
+          screenshot_url: string | null
+          user_id: string | null
+        }
+        Insert: {
+          avatar_body_type: string
+          avatar_gender: string
+          created_at?: string
+          equipped_items?: Json
+          id?: string
+          screenshot_url?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          avatar_body_type?: string
+          avatar_gender?: string
+          created_at?: string
+          equipped_items?: Json
+          id?: string
+          screenshot_url?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      try_on_avatars: {
+        Row: {
+          body_type: string
+          created_at: string
+          display_order: number | null
+          gender: string
+          height_cm: number | null
+          id: string
+          is_active: boolean | null
+          model_url: string
+          name: string
+          thumbnail_url: string | null
+        }
+        Insert: {
+          body_type?: string
+          created_at?: string
+          display_order?: number | null
+          gender: string
+          height_cm?: number | null
+          id?: string
+          is_active?: boolean | null
+          model_url: string
+          name: string
+          thumbnail_url?: string | null
+        }
+        Update: {
+          body_type?: string
+          created_at?: string
+          display_order?: number | null
+          gender?: string
+          height_cm?: number | null
+          id?: string
+          is_active?: boolean | null
+          model_url?: string
+          name?: string
+          thumbnail_url?: string | null
+        }
+        Relationships: []
       }
       user_roles: {
         Row: {
