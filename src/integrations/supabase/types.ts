@@ -109,6 +109,144 @@ export type Database = {
           },
         ]
       }
+      fit_guide_models: {
+        Row: {
+          chest_cm: number | null
+          created_at: string
+          display_order: number | null
+          fit_notes: string | null
+          gender: string
+          height_cm: number | null
+          height_imperial: string | null
+          hip_cm: number | null
+          id: string
+          is_active: boolean | null
+          name: string
+          photo_url: string
+          size_worn: string
+          waist_cm: number | null
+          weight_kg: number | null
+        }
+        Insert: {
+          chest_cm?: number | null
+          created_at?: string
+          display_order?: number | null
+          fit_notes?: string | null
+          gender: string
+          height_cm?: number | null
+          height_imperial?: string | null
+          hip_cm?: number | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          photo_url: string
+          size_worn: string
+          waist_cm?: number | null
+          weight_kg?: number | null
+        }
+        Update: {
+          chest_cm?: number | null
+          created_at?: string
+          display_order?: number | null
+          fit_notes?: string | null
+          gender?: string
+          height_cm?: number | null
+          height_imperial?: string | null
+          hip_cm?: number | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          photo_url?: string
+          size_worn?: string
+          waist_cm?: number | null
+          weight_kg?: number | null
+        }
+        Relationships: []
+      }
+      lookbook_look_products: {
+        Row: {
+          created_at: string
+          display_order: number | null
+          id: string
+          look_id: string
+          position: string | null
+          product_id: string
+        }
+        Insert: {
+          created_at?: string
+          display_order?: number | null
+          id?: string
+          look_id: string
+          position?: string | null
+          product_id: string
+        }
+        Update: {
+          created_at?: string
+          display_order?: number | null
+          id?: string
+          look_id?: string
+          position?: string | null
+          product_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lookbook_look_products_look_id_fkey"
+            columns: ["look_id"]
+            isOneToOne: false
+            referencedRelation: "lookbook_looks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lookbook_look_products_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lookbook_looks: {
+        Row: {
+          created_at: string
+          description: string | null
+          display_order: number | null
+          gender: string | null
+          headline: string
+          id: string
+          image_url: string
+          is_active: boolean | null
+          name: string
+          scripture_reference: string | null
+          video_url: string | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          display_order?: number | null
+          gender?: string | null
+          headline: string
+          id?: string
+          image_url: string
+          is_active?: boolean | null
+          name: string
+          scripture_reference?: string | null
+          video_url?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          display_order?: number | null
+          gender?: string | null
+          headline?: string
+          id?: string
+          image_url?: string
+          is_active?: boolean | null
+          name?: string
+          scripture_reference?: string | null
+          video_url?: string | null
+        }
+        Relationships: []
+      }
       newsletter_subscribers: {
         Row: {
           created_at: string
