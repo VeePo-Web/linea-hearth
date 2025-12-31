@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { X } from "lucide-react";
+import { useState, useMemo } from "react";
+import { X, SlidersHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -18,101 +18,258 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
+
+export interface FilterState {
+  sizes: string[];
+  colors: string[];
+  fits: string[];
+  messageTypes: string[];
+  priceRanges: string[];
+  categories: string[];
+}
+
+export type SortOption = "featured" | "newest" | "price-low" | "price-high" | "best-selling";
 
 interface FilterSortBarProps {
   filtersOpen: boolean;
   setFiltersOpen: (open: boolean) => void;
   itemCount: number;
+  filters: FilterState;
+  onFilterChange: (filters: FilterState) => void;
+  sortBy: SortOption;
+  onSortChange: (sort: SortOption) => void;
 }
 
-const FilterSortBar = ({ filtersOpen, setFiltersOpen, itemCount }: FilterSortBarProps) => {
-  const [sortBy, setSortBy] = useState("featured");
+// Apparel-focused filter options
+const filterOptions = {
+  sizes: ["XS", "S", "M", "L", "XL", "2XL", "3XL"],
+  colors: ["Black", "White", "Navy", "Gray", "Natural", "Gold"],
+  fits: ["Regular", "Relaxed", "Slim", "Oversized"],
+  messageTypes: ["Scripture", "Inspirational", "Symbolic", "Bold Statement"],
+  priceRanges: ["Under $30", "$30 - $50", "$50 - $75", "$75 - $100", "Over $100"],
+  categories: ["T-Shirts", "Hoodies", "Sweatshirts", "Accessories", "Hats"],
+};
 
-  const categories = ["Earrings", "Bracelets", "Rings", "Necklaces"];
-  const priceRanges = ["Under €1,000", "€1,000 - €2,000", "€2,000 - €3,000", "Over €3,000"];
-  const materials = ["Gold", "Silver", "Rose Gold", "Platinum"];
+const FilterSortBar = ({
+  filtersOpen,
+  setFiltersOpen,
+  itemCount,
+  filters,
+  onFilterChange,
+  sortBy,
+  onSortChange,
+}: FilterSortBarProps) => {
+  // Count active filters
+  const activeFilterCount = useMemo(() => {
+    return (
+      filters.sizes.length +
+      filters.colors.length +
+      filters.fits.length +
+      filters.messageTypes.length +
+      filters.priceRanges.length +
+      filters.categories.length
+    );
+  }, [filters]);
+
+  // Get all active filter labels for chips
+  const activeFilterLabels = useMemo(() => {
+    const labels: { key: keyof FilterState; value: string }[] = [];
+    (Object.keys(filters) as (keyof FilterState)[]).forEach((key) => {
+      filters[key].forEach((value) => {
+        labels.push({ key, value });
+      });
+    });
+    return labels;
+  }, [filters]);
+
+  const toggleFilter = (key: keyof FilterState, value: string) => {
+    const current = filters[key];
+    const updated = current.includes(value)
+      ? current.filter((v) => v !== value)
+      : [...current, value];
+    onFilterChange({ ...filters, [key]: updated });
+  };
+
+  const removeFilter = (key: keyof FilterState, value: string) => {
+    const updated = filters[key].filter((v) => v !== value);
+    onFilterChange({ ...filters, [key]: updated });
+  };
+
+  const clearAllFilters = () => {
+    onFilterChange({
+      sizes: [],
+      colors: [],
+      fits: [],
+      messageTypes: [],
+      priceRanges: [],
+      categories: [],
+    });
+  };
+
+  const FilterSection = ({
+    title,
+    options,
+    filterKey,
+  }: {
+    title: string;
+    options: string[];
+    filterKey: keyof FilterState;
+  }) => (
+    <div>
+      <h3 className="text-sm font-light mb-4 text-foreground">{title}</h3>
+      <div className="space-y-3">
+        {options.map((option) => (
+          <div key={option} className="flex items-center space-x-3">
+            <Checkbox
+              id={`${filterKey}-${option}`}
+              checked={filters[filterKey].includes(option)}
+              onCheckedChange={() => toggleFilter(filterKey, option)}
+              className="border-border data-[state=checked]:bg-foreground data-[state=checked]:border-foreground"
+            />
+            <Label
+              htmlFor={`${filterKey}-${option}`}
+              className="text-sm font-light text-foreground cursor-pointer"
+            >
+              {option}
+            </Label>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 
   return (
     <>
+      {/* Active Filter Chips */}
+      {activeFilterLabels.length > 0 && (
+        <section className="w-full px-6 mb-4">
+          <div className="flex flex-wrap gap-2 items-center">
+            {activeFilterLabels.map(({ key, value }) => (
+              <Badge
+                key={`${key}-${value}`}
+                variant="secondary"
+                className="px-3 py-1.5 text-xs font-normal bg-muted hover:bg-muted cursor-pointer group"
+                onClick={() => removeFilter(key, value)}
+              >
+                {value}
+                <X className="w-3 h-3 ml-1.5 opacity-50 group-hover:opacity-100" />
+              </Badge>
+            ))}
+            <button
+              onClick={clearAllFilters}
+              className="text-xs text-muted-foreground hover:text-foreground hover:underline ml-2"
+            >
+              Clear all
+            </button>
+          </div>
+        </section>
+      )}
+
+      {/* Filter Bar */}
       <section className="w-full px-6 mb-8 border-b border-border pb-4">
         <div className="flex justify-between items-center">
           <p className="text-sm font-light text-muted-foreground">
-            {itemCount} items
+            {itemCount} {itemCount === 1 ? "item" : "items"}
           </p>
-          
+
           <div className="flex items-center gap-4">
             <Sheet open={filtersOpen} onOpenChange={setFiltersOpen}>
               <SheetTrigger asChild>
-                <Button 
-                  variant="ghost" 
+                <Button
+                  variant="ghost"
                   size="sm"
-                  className="font-light hover:bg-transparent"
+                  className="font-light hover:bg-transparent gap-2"
                 >
+                  <SlidersHorizontal className="w-4 h-4" />
                   Filters
+                  {activeFilterCount > 0 && (
+                    <span className="ml-1 px-1.5 py-0.5 text-[10px] bg-foreground text-background rounded-full">
+                      {activeFilterCount}
+                    </span>
+                  )}
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-80 bg-background border-none shadow-none">
+              <SheetContent
+                side="right"
+                className="w-80 bg-background border-l border-border overflow-y-auto"
+              >
                 <SheetHeader className="mb-6 border-b border-border pb-4">
-                  <SheetTitle className="text-lg font-light">Filters</SheetTitle>
+                  <SheetTitle className="text-lg font-light flex items-center justify-between">
+                    Filters
+                    {activeFilterCount > 0 && (
+                      <span className="text-sm text-muted-foreground font-normal">
+                        ({activeFilterCount} active)
+                      </span>
+                    )}
+                  </SheetTitle>
                 </SheetHeader>
-                
+
                 <div className="space-y-8">
-                  {/* Category Filter */}
-                  <div>
-                    <h3 className="text-sm font-light mb-4 text-foreground">Category</h3>
-                    <div className="space-y-3">
-                      {categories.map((category) => (
-                        <div key={category} className="flex items-center space-x-3">
-                          <Checkbox id={category} className="border-border data-[state=checked]:bg-foreground data-[state=checked]:border-foreground" />
-                          <Label htmlFor={category} className="text-sm font-light text-foreground cursor-pointer">
-                            {category}
-                          </Label>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+                  <FilterSection
+                    title="Category"
+                    options={filterOptions.categories}
+                    filterKey="categories"
+                  />
 
                   <Separator className="border-border" />
 
-                  {/* Price Filter */}
-                  <div>
-                    <h3 className="text-sm font-light mb-4 text-foreground">Price</h3>
-                    <div className="space-y-3">
-                      {priceRanges.map((range) => (
-                        <div key={range} className="flex items-center space-x-3">
-                          <Checkbox id={range} className="border-border data-[state=checked]:bg-foreground data-[state=checked]:border-foreground" />
-                          <Label htmlFor={range} className="text-sm font-light text-foreground cursor-pointer">
-                            {range}
-                          </Label>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+                  <FilterSection
+                    title="Size"
+                    options={filterOptions.sizes}
+                    filterKey="sizes"
+                  />
 
                   <Separator className="border-border" />
 
-                  {/* Material Filter */}
-                  <div>
-                    <h3 className="text-sm font-light mb-4 text-foreground">Material</h3>
-                    <div className="space-y-3">
-                      {materials.map((material) => (
-                        <div key={material} className="flex items-center space-x-3">
-                          <Checkbox id={material} className="border-border data-[state=checked]:bg-foreground data-[state=checked]:border-foreground" />
-                          <Label htmlFor={material} className="text-sm font-light text-foreground cursor-pointer">
-                            {material}
-                          </Label>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+                  <FilterSection
+                    title="Color"
+                    options={filterOptions.colors}
+                    filterKey="colors"
+                  />
 
                   <Separator className="border-border" />
 
-                  <div className="flex flex-col gap-2 pt-4">
-                    <Button variant="ghost" size="sm" className="w-full border-none hover:bg-transparent hover:underline font-normal text-left justify-start">
+                  <FilterSection
+                    title="Fit"
+                    options={filterOptions.fits}
+                    filterKey="fits"
+                  />
+
+                  <Separator className="border-border" />
+
+                  <FilterSection
+                    title="Message Type"
+                    options={filterOptions.messageTypes}
+                    filterKey="messageTypes"
+                  />
+
+                  <Separator className="border-border" />
+
+                  <FilterSection
+                    title="Price"
+                    options={filterOptions.priceRanges}
+                    filterKey="priceRanges"
+                  />
+
+                  <Separator className="border-border" />
+
+                  <div className="flex flex-col gap-2 pt-4 pb-8">
+                    <Button
+                      variant="default"
+                      size="sm"
+                      className="w-full"
+                      onClick={() => setFiltersOpen(false)}
+                    >
                       Apply Filters
                     </Button>
-                    <Button variant="ghost" size="sm" className="w-full border-none hover:bg-transparent hover:underline font-light text-left justify-start">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="w-full hover:bg-transparent hover:underline font-light"
+                      onClick={clearAllFilters}
+                      disabled={activeFilterCount === 0}
+                    >
                       Clear All
                     </Button>
                   </div>
@@ -120,16 +277,41 @@ const FilterSortBar = ({ filtersOpen, setFiltersOpen, itemCount }: FilterSortBar
               </SheetContent>
             </Sheet>
 
-            <Select value={sortBy} onValueChange={setSortBy}>
+            <Select value={sortBy} onValueChange={(value) => onSortChange(value as SortOption)}>
               <SelectTrigger className="w-auto border-none bg-transparent text-sm font-light shadow-none rounded-none pr-2">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="shadow-none border-none rounded-none bg-background">
-                <SelectItem value="featured" className="hover:bg-transparent hover:underline data-[state=checked]:bg-transparent data-[state=checked]:underline pl-2 [&>span:first-child]:hidden">Featured</SelectItem>
-                <SelectItem value="price-low" className="hover:bg-transparent hover:underline data-[state=checked]:bg-transparent data-[state=checked]:underline pl-2 [&>span:first-child]:hidden">Price: Low to High</SelectItem>
-                <SelectItem value="price-high" className="hover:bg-transparent hover:underline data-[state=checked]:bg-transparent data-[state=checked]:underline pl-2 [&>span:first-child]:hidden">Price: High to Low</SelectItem>
-                <SelectItem value="newest" className="hover:bg-transparent hover:underline data-[state=checked]:bg-transparent data-[state=checked]:underline pl-2 [&>span:first-child]:hidden">Newest</SelectItem>
-                <SelectItem value="name" className="hover:bg-transparent hover:underline data-[state=checked]:bg-transparent data-[state=checked]:underline pl-2 [&>span:first-child]:hidden">Name A-Z</SelectItem>
+              <SelectContent className="shadow-sm border border-border rounded-sm bg-background">
+                <SelectItem
+                  value="featured"
+                  className="hover:bg-muted data-[state=checked]:bg-muted pl-3"
+                >
+                  Featured
+                </SelectItem>
+                <SelectItem
+                  value="newest"
+                  className="hover:bg-muted data-[state=checked]:bg-muted pl-3"
+                >
+                  New Arrivals
+                </SelectItem>
+                <SelectItem
+                  value="best-selling"
+                  className="hover:bg-muted data-[state=checked]:bg-muted pl-3"
+                >
+                  Best Selling
+                </SelectItem>
+                <SelectItem
+                  value="price-low"
+                  className="hover:bg-muted data-[state=checked]:bg-muted pl-3"
+                >
+                  Price: Low to High
+                </SelectItem>
+                <SelectItem
+                  value="price-high"
+                  className="hover:bg-muted data-[state=checked]:bg-muted pl-3"
+                >
+                  Price: High to Low
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
