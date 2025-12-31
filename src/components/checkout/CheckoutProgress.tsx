@@ -1,0 +1,67 @@
+import { Check } from "lucide-react";
+import { cn } from "@/lib/utils";
+
+interface CheckoutProgressProps {
+  currentStep: number;
+}
+
+const steps = [
+  { id: 1, name: "Cart" },
+  { id: 2, name: "Details" },
+  { id: 3, name: "Payment" },
+  { id: 4, name: "Complete" }
+];
+
+const CheckoutProgress = ({ currentStep }: CheckoutProgressProps) => {
+  return (
+    <div className="w-full py-6">
+      <div className="flex items-center justify-between max-w-md mx-auto">
+        {steps.map((step, index) => (
+          <div key={step.id} className="flex items-center">
+            {/* Step indicator */}
+            <div className="flex flex-col items-center">
+              <div
+                className={cn(
+                  "w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium transition-all duration-300",
+                  currentStep > step.id
+                    ? "bg-emerald-500 text-white"
+                    : currentStep === step.id
+                    ? "bg-foreground text-background animate-pulse"
+                    : "bg-muted text-muted-foreground"
+                )}
+              >
+                {currentStep > step.id ? (
+                  <Check className="h-4 w-4" />
+                ) : (
+                  step.id
+                )}
+              </div>
+              <span
+                className={cn(
+                  "text-xs mt-2 transition-colors",
+                  currentStep >= step.id
+                    ? "text-foreground"
+                    : "text-muted-foreground"
+                )}
+              >
+                {step.name}
+              </span>
+            </div>
+            
+            {/* Connector line */}
+            {index < steps.length - 1 && (
+              <div
+                className={cn(
+                  "w-12 sm:w-16 h-0.5 mx-2 transition-colors duration-500",
+                  currentStep > step.id ? "bg-emerald-500" : "bg-muted"
+                )}
+              />
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export default CheckoutProgress;
