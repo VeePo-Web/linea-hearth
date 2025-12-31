@@ -55,6 +55,7 @@ const App = () => (
               <Route path="/community" element={<Community />} />
               <Route path="/lookbook" element={<Lookbook />} />
               <Route path="/try-on" element={<TryOnRoom />} />
+              <Route path="/try-on/saved/:outfitId" element={<TryOnRoom />} />
               {/* Admin Routes */}
               <Route path="/admin/login" element={<AdminLogin />} />
               <Route path="/admin" element={<ProtectedRoute requireAdmin><AdminDashboard /></ProtectedRoute>} />

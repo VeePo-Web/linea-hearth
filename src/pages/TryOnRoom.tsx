@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useSearchParams, Link } from 'react-router-dom';
+import { useSearchParams, useParams, Link } from 'react-router-dom';
 import { TryOnProvider, useTryOnState, EquippedItem } from '@/hooks/useTryOnState';
 import { TryOnCanvas } from '@/components/try-on/TryOnCanvas';
 import { TryOnSidebar } from '@/components/try-on/TryOnSidebar';
@@ -7,14 +7,63 @@ import { MobileTryOnBar } from '@/components/try-on/MobileTryOnBar';
 import { ProductDrawer } from '@/components/try-on/ProductDrawer';
 import Header from '@/components/header/Header';
 import Footer from '@/components/footer/Footer';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Share2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
+
+interface SavedOutfitBanner {
+  name: string;
+  isShared: boolean;
+}
 
 const TryOnRoomContent = () => {
   const [searchParams] = useSearchParams();
+  const { outfitId } = useParams<{ outfitId: string }>();
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
   const [mobileActiveSlot, setMobileActiveSlot] = useState<'head' | 'top' | 'outerwear' | 'bottom' | 'footwear' | null>(null);
-  const { setActiveSlot, equipItem } = useTryOnState();
+  const [savedOutfitBanner, setSavedOutfitBanner] = useState<SavedOutfitBanner | null>(null);
+  const { setActiveSlot, equipItem, setAvatarGender, setAvatarBodyType } = useTryOnState();
+
+  // Handle loading saved outfit from URL
+  useEffect(() => {
+    if (outfitId) {
+      const loadSavedOutfit = async () => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { data, error } = await (supabase
+          .from('saved_outfits') as any)
+          .select('*')
+          .eq('share_id', outfitId)
+          .single();
+
+        if (error || !data) {
+          toast.error('Outfit not found');
+          return;
+        }
+
+        // Set avatar properties
+        setAvatarGender(data.avatar_gender);
+        setAvatarBodyType(data.avatar_body_type);
+
+        // Equip all items
+        const items = data.equipped_items as Record<string, EquippedItem | null>;
+        Object.entries(items).forEach(([slot, item]) => {
+          if (item) {
+            equipItem(slot as 'head' | 'top' | 'outerwear' | 'bottom' | 'footwear', item);
+          }
+        });
+
+        // Show banner
+        setSavedOutfitBanner({
+          name: data.name || 'Saved Outfit',
+          isShared: true,
+        });
+
+        toast.success('Outfit loaded!');
+      };
+
+      loadSavedOutfit();
+    }
+  }, [outfitId, equipItem, setAvatarGender, setAvatarBodyType]);
 
   // Handle pre-selected product from URL
   useEffect(() => {
@@ -77,6 +126,26 @@ const TryOnRoomContent = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Header />
+      
+      {/* Saved Outfit Banner */}
+      {savedOutfitBanner && (
+        <div className="bg-muted/50 border-b border-border">
+          <div className="container mx-auto px-4 py-3 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Share2 className="w-4 h-4 text-muted-foreground" />
+              <span className="text-sm font-light">
+                Viewing: <span className="font-medium">{savedOutfitBanner.name}</span>
+              </span>
+            </div>
+            <button
+              onClick={() => setSavedOutfitBanner(null)}
+              className="text-xs text-muted-foreground hover:text-foreground"
+            >
+              Dismiss
+            </button>
+          </div>
+        </div>
+      )}
       
       {/* Page Header */}
       <div className="border-b border-border">

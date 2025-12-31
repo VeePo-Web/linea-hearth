@@ -605,7 +605,9 @@ export type Database = {
           created_at: string
           equipped_items: Json
           id: string
+          name: string | null
           screenshot_url: string | null
+          share_id: string | null
           user_id: string | null
         }
         Insert: {
@@ -614,7 +616,9 @@ export type Database = {
           created_at?: string
           equipped_items?: Json
           id?: string
+          name?: string | null
           screenshot_url?: string | null
+          share_id?: string | null
           user_id?: string | null
         }
         Update: {
@@ -623,7 +627,9 @@ export type Database = {
           created_at?: string
           equipped_items?: Json
           id?: string
+          name?: string | null
           screenshot_url?: string | null
+          share_id?: string | null
           user_id?: string | null
         }
         Relationships: []
