@@ -1,15 +1,16 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { ArrowUpRight } from "lucide-react";
-import ScrollReveal from "@/components/motion/ScrollReveal";
+import TextReveal from "@/components/motion/TextReveal";
 import StaggerContainer from "@/components/motion/StaggerContainer";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
+import { staggerItem } from "@/lib/animations";
 
 interface Category {
   name: string;
   slug: string;
+  subtitle: string;
   image: string;
-  featured?: boolean;
 }
 
 const CategoryTiles = () => {
@@ -19,139 +20,116 @@ const CategoryTiles = () => {
     {
       name: "Hoodies",
       slug: "hoodies",
-      image: "/products/stay-holy-hoodie/flat-full.png",
-      featured: true
+      subtitle: "Premium comfort, bold faith",
+      image: "/products/stay-holy-hoodie/flat-full.png"
     },
     {
       name: "Tops",
       slug: "tops",
+      subtitle: "Elevated everyday essentials",
       image: "/products/heavenly-crewneck/front-model.png"
     },
     {
       name: "Tees",
       slug: "tees",
+      subtitle: "Statements that start conversations",
       image: "/products/heavenly-crewneck/female-model.png"
     },
     {
       name: "Accessories",
       slug: "accessories",
+      subtitle: "Finishing touches with purpose",
       image: "/products/stay-holy-hoodie/female-model-2.png"
     }
   ];
 
-  const tileVariants = {
-    hidden: { opacity: 0, y: 30 },
-    visible: { opacity: 1, y: 0 }
-  };
-
   return (
-    <section className="w-full py-16 md:py-24 bg-background">
+    <section className="w-full py-20 md:py-32 bg-background">
       <div className="max-w-7xl mx-auto px-6">
-        {/* Section Header - Minimal */}
-        <ScrollReveal variant="fadeUp">
-          <div className="mb-8">
-            <p className="text-eyebrow text-muted-foreground">Shop by Category</p>
+        {/* Editorial Section Header */}
+        <div className="mb-12 md:mb-16">
+          <div className="overflow-hidden">
+            <TextReveal 
+              text="SHOP BY" 
+              as="h2"
+              className="text-4xl md:text-5xl lg:text-6xl font-light tracking-tight text-foreground block"
+            />
           </div>
-        </ScrollReveal>
+          <div className="overflow-hidden">
+            <TextReveal 
+              text="CATEGORY" 
+              as="span"
+              className="text-4xl md:text-5xl lg:text-6xl font-light tracking-tight text-foreground block"
+              delay={0.15}
+            />
+          </div>
+          {/* Editorial Divider */}
+          <motion.div 
+            className="w-16 h-px bg-foreground mt-8"
+            initial={{ scaleX: 0, originX: 0 }}
+            whileInView={{ scaleX: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
+          />
+        </div>
 
-        {/* Asymmetric Grid - 032c style */}
-        <StaggerContainer className="grid grid-cols-12 gap-2" staggerDelay={0.1}>
-          {/* Featured Large Tile */}
-          <motion.div
-            className="col-span-12 md:col-span-7"
-            whileHover={prefersReducedMotion ? {} : { scale: 1.01 }}
-            transition={{ type: "spring", stiffness: 300, damping: 20 }}
-          >
-            <Link
-              to={`/category/${categories[0].slug}`}
-              className="block relative aspect-[4/5] md:aspect-[4/3] overflow-hidden group"
+        {/* Balanced 2x2 Editorial Grid */}
+        <StaggerContainer 
+          className="grid grid-cols-2 md:grid-cols-2 gap-3 md:gap-4" 
+          staggerDelay={0.1}
+        >
+          {categories.map((category) => (
+            <motion.div
+              key={category.slug}
+              variants={staggerItem}
+              whileHover={prefersReducedMotion ? {} : { y: -4 }}
+              transition={{ type: "spring", stiffness: 300, damping: 25 }}
+              className="group"
             >
-              <motion.img 
-                src={categories[0].image}
-                alt={categories[0].name}
-                className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
-                whileHover={prefersReducedMotion ? {} : { scale: 1.05 }}
-                transition={{ duration: 0.6 }}
-              />
-              <div className="absolute inset-0 bg-foreground/20 group-hover:bg-transparent transition-colors duration-500" />
-              
-              {/* Category Name Overlay */}
-              <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8">
-                <div className="flex items-end justify-between">
-                  <h3 className="text-hero text-background uppercase">{categories[0].name}</h3>
-                  <motion.div
-                    initial={{ opacity: 0, x: -10 }}
-                    whileHover={{ opacity: 1, x: 0 }}
-                    className="opacity-0 group-hover:opacity-100 transition-opacity"
-                  >
-                    <ArrowUpRight className="w-6 h-6 text-background" />
-                  </motion.div>
-                </div>
-              </div>
-            </Link>
-          </motion.div>
-
-          {/* Stacked Right Tiles */}
-          <div className="col-span-12 md:col-span-5 grid grid-cols-2 md:grid-cols-1 gap-2">
-            {categories.slice(1, 3).map((category) => (
-              <motion.div
-                key={category.slug}
-                variants={tileVariants}
-                whileHover={prefersReducedMotion ? {} : { scale: 1.02 }}
-                transition={{ type: "spring", stiffness: 300, damping: 20 }}
+              <Link
+                to={`/category/${category.slug}`}
+                className="block relative aspect-[3/4] md:aspect-[4/5] overflow-hidden"
               >
-                <Link
-                  to={`/category/${category.slug}`}
-                  className="block relative aspect-square md:aspect-[16/9] overflow-hidden group"
-                >
-                  <motion.img 
-                    src={category.image}
-                    alt={category.name}
-                    className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
-                    whileHover={prefersReducedMotion ? {} : { scale: 1.05 }}
-                    transition={{ duration: 0.6 }}
-                  />
-                  <div className="absolute inset-0 bg-foreground/20 group-hover:bg-transparent transition-colors duration-500" />
-                  
-                  <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6">
-                    <div className="flex items-end justify-between">
-                      <h3 className="text-section text-background uppercase">{category.name}</h3>
-                      <ArrowUpRight className="w-5 h-5 text-background opacity-0 group-hover:opacity-100 transition-opacity" />
+                {/* Image with Ken Burns Effect */}
+                <motion.img 
+                  src={category.image}
+                  alt={category.name}
+                  className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
+                  whileHover={prefersReducedMotion ? {} : { scale: 1.05 }}
+                  transition={{ duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }}
+                />
+                
+                {/* Overlay */}
+                <div className="absolute inset-0 bg-foreground/25 group-hover:bg-foreground/10 transition-colors duration-500" />
+                
+                {/* Content Overlay */}
+                <div className="absolute bottom-0 left-0 right-0 p-5 md:p-8">
+                  <div className="flex items-end justify-between">
+                    <div>
+                      {/* Category Name - Large Editorial */}
+                      <h3 className="text-3xl md:text-4xl lg:text-5xl font-light text-background uppercase tracking-tight">
+                        {category.name}
+                      </h3>
+                      {/* Subtitle - Editorial Context */}
+                      <p className="text-xs md:text-sm text-background/80 tracking-wide mt-1 md:mt-2 font-light">
+                        {category.subtitle}
+                      </p>
                     </div>
+                    
+                    {/* Arrow Icon - Slide In on Hover */}
+                    <motion.div
+                      className="opacity-0 group-hover:opacity-100"
+                      initial={{ x: -10, opacity: 0 }}
+                      whileHover={{ x: 0, opacity: 1 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                    >
+                      <ArrowUpRight className="w-5 h-5 md:w-6 md:h-6 text-background" />
+                    </motion.div>
                   </div>
-                </Link>
-              </motion.div>
-            ))}
-          </div>
-
-          {/* Bottom Full-Width Tile */}
-          <motion.div
-            className="col-span-12"
-            variants={tileVariants}
-            whileHover={prefersReducedMotion ? {} : { scale: 1.01 }}
-            transition={{ type: "spring", stiffness: 300, damping: 20 }}
-          >
-            <Link
-              to={`/category/${categories[3].slug}`}
-              className="block relative aspect-[21/9] overflow-hidden group"
-            >
-              <motion.img 
-                src={categories[3].image}
-                alt={categories[3].name}
-                className="w-full h-full object-cover object-top grayscale group-hover:grayscale-0 transition-all duration-500"
-                whileHover={prefersReducedMotion ? {} : { scale: 1.05 }}
-                transition={{ duration: 0.6 }}
-              />
-              <div className="absolute inset-0 bg-foreground/20 group-hover:bg-transparent transition-colors duration-500" />
-              
-              <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8">
-                <div className="flex items-end justify-between">
-                  <h3 className="text-hero text-background uppercase">{categories[3].name}</h3>
-                  <ArrowUpRight className="w-6 h-6 text-background opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
-              </div>
-            </Link>
-          </motion.div>
+              </Link>
+            </motion.div>
+          ))}
         </StaggerContainer>
       </div>
     </section>
