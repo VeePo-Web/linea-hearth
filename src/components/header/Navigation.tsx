@@ -3,9 +3,6 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useCart } from "@/hooks/useCart";
 import CartDrawer from "@/components/cart/CartDrawer";
-import pantheonImage from "@/assets/pantheon.jpg";
-import eclipseImage from "@/assets/eclipse.jpg";
-import haloImage from "@/assets/halo.jpg";
 
 const Navigation = () => {
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
@@ -21,27 +18,19 @@ const Navigation = () => {
       // Add demo items to cart
       addItem({
         id: 1,
-        name: "Pantheon",
-        price: 2850,
-        priceFormatted: "€2,850",
-        image: pantheonImage,
-        category: "Earrings"
+        name: "Stay Holy Hoodie",
+        price: 79.99,
+        priceFormatted: "$79.99",
+        image: "/products/stay-holy-hoodie/flat-front.png",
+        category: "Hoodies"
       });
       addItem({
         id: 2,
-        name: "Eclipse",
-        price: 3200,
-        priceFormatted: "€3,200",
-        image: eclipseImage,
-        category: "Bracelets"
-      });
-      addItem({
-        id: 3,
-        name: "Halo",
-        price: 1950,
-        priceFormatted: "€1,950",
-        image: haloImage,
-        category: "Earrings"
+        name: "Heavenly Crewneck",
+        price: 49.99,
+        priceFormatted: "$49.99",
+        image: "/products/heavenly-crewneck/flat-lay.png",
+        category: "Tees"
       });
     }
   }, []); // Only run once on mount
@@ -49,10 +38,8 @@ const Navigation = () => {
   // Preload dropdown images for faster display
   useEffect(() => {
     const imagesToPreload = [
-      "/rings-collection.png",
-      "/earrings-collection.png",
-      "/arcus-bracelet.png",
-      "/span-bracelet.png",
+      "/products/stay-holy-hoodie/flat-front.png",
+      "/products/heavenly-crewneck/flat-lay.png",
       "/founders.png"
     ];
 
@@ -63,12 +50,12 @@ const Navigation = () => {
   }, []);
 
   const popularSearches = [
-    "Gold Rings",
-    "Silver Necklaces",
-    "Pearl Earrings",
-    "Designer Bracelets",
-    "Wedding Rings",
-    "Vintage Collection"
+    "Stay Holy",
+    "Heavenly Crewneck",
+    "Black Hoodies",
+    "Premium Tees",
+    "New Arrivals",
+    "Best Sellers"
   ];
 
   const navItems = [
@@ -76,15 +63,15 @@ const Navigation = () => {
       name: "Shop",
       href: "/category/shop",
       submenuItems: [
-        "Rings",
-        "Necklaces",
-        "Earrings",
-        "Bracelets",
-        "Watches"
+        "Bottoms",
+        "Tees",
+        "Hoodies",
+        "Hats",
+        "Accessories"
       ],
       images: [
-        { src: "/rings-collection.png", alt: "Rings Collection", label: "Rings" },
-        { src: "/earrings-collection.png", alt: "Earrings Collection", label: "Earrings" }
+        { src: "/products/stay-holy-hoodie/flat-front.png", alt: "Hoodies Collection", label: "Hoodies" },
+        { src: "/products/heavenly-crewneck/flat-lay.png", alt: "Tees Collection", label: "Tees" }
       ]
     },
     {
@@ -240,8 +227,8 @@ const Navigation = () => {
                     // Determine the link destination based on dropdown and image
                     let linkTo = "/";
                     if (activeDropdown === "Shop") {
-                      if (image.label === "Rings") linkTo = "/category/rings";
-                      else if (image.label === "Earrings") linkTo = "/category/earrings";
+                      if (image.label === "Hoodies") linkTo = "/category/hoodies";
+                      else if (image.label === "Tees") linkTo = "/category/tees";
                     } else if (activeDropdown === "About") {
                       linkTo = "/about/our-story";
                     }
@@ -283,7 +270,7 @@ const Navigation = () => {
                   </svg>
                   <input
                     type="text"
-                    placeholder="Search for jewelry..."
+                    placeholder="Search for apparel..."
                     className="flex-1 bg-transparent text-nav-foreground placeholder:text-nav-foreground/60 outline-none text-lg"
                     autoFocus
                   />
