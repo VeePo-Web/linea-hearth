@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { X, Clock, Sparkles } from "lucide-react";
+import { Clock, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -7,7 +7,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import linkBraceletImage from "@/assets/link-bracelet.png";
 
 interface PostPurchaseOfferProps {
   isOpen: boolean;
@@ -39,8 +38,8 @@ const PostPurchaseOffer = ({ isOpen, onClose, onAddToOrder }: PostPurchaseOfferP
   const minutes = Math.floor(timeLeft / 60);
   const seconds = timeLeft % 60;
 
-  const originalPrice = 2200;
-  const discountedPrice = 1760;
+  const originalPrice = 85;
+  const discountedPrice = 68;
   const discountPercent = 20;
 
   const handleAddToOrder = async () => {
@@ -76,22 +75,22 @@ const PostPurchaseOffer = ({ isOpen, onClose, onAddToOrder }: PostPurchaseOfferP
           <div className="flex gap-4">
             <div className="w-24 h-24 bg-muted overflow-hidden flex-shrink-0">
               <img
-                src={linkBraceletImage}
-                alt="Link Bracelet"
+                src="/products/stay-holy-hoodie/flat-front.png"
+                alt="Stay Holy Hoodie"
                 className="w-full h-full object-cover"
               />
             </div>
             <div className="flex-1">
-              <h3 className="font-medium text-foreground">Lintel Bracelet</h3>
+              <h3 className="font-medium text-foreground">Stay Holy Hoodie</h3>
               <p className="text-xs text-muted-foreground mt-1">
-                18k gold-plated sterling silver
+                Premium heavyweight cotton blend
               </p>
               <div className="mt-2 flex items-baseline gap-2">
                 <span className="text-lg font-medium text-foreground">
-                  €{discountedPrice.toLocaleString()}
+                  ${discountedPrice}
                 </span>
                 <span className="text-sm text-muted-foreground line-through">
-                  €{originalPrice.toLocaleString()}
+                  ${originalPrice}
                 </span>
                 <span className="text-xs bg-emerald-100 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-300 px-2 py-0.5">
                   -{discountPercent}%
@@ -113,7 +112,7 @@ const PostPurchaseOffer = ({ isOpen, onClose, onAddToOrder }: PostPurchaseOfferP
             disabled={isAdding}
             className="w-full h-12 text-base rounded-none"
           >
-            {isAdding ? "Adding to Order..." : `Add to Order — €${discountedPrice.toLocaleString()}`}
+            {isAdding ? "Adding to Order..." : `Add to Order — $${discountedPrice}`}
           </Button>
 
           {/* Dismiss */}

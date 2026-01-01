@@ -18,7 +18,7 @@ const tocSections = [
 
 const PrivacyPolicy = () => {
   useEffect(() => {
-    document.title = "Privacy Policy - Linea Jewelry";
+    document.title = "Privacy Policy - Line of Judah";
   }, []);
 
   return (
@@ -34,7 +34,7 @@ const PrivacyPolicy = () => {
 
       <LegalSection id="introduction" title="Introduction">
         <p>
-          At Linea Jewelry Inc. ("we," "our," or "us"), we respect your privacy and are 
+          At Line of Judah LLC ("we," "our," or "us"), we respect your privacy and are 
           committed to protecting your personal data. This Privacy Policy explains how we 
           collect, use, disclose, and safeguard your information when you visit our website, 
           make a purchase, or interact with our services.
@@ -110,7 +110,7 @@ const PrivacyPolicy = () => {
           <li><strong>Withdrawal</strong> — Withdraw consent where applicable</li>
         </ul>
         <p className="mt-4">
-          To exercise any of these rights, please contact us at privacy@lineajewelry.com.
+          To exercise any of these rights, please contact us at privacy@lineofjudah.com.
         </p>
       </LegalSection>
 
@@ -146,7 +146,7 @@ const PrivacyPolicy = () => {
           please contact us at:
         </p>
         <div className="mt-4 space-y-1">
-          <p className="text-foreground">Email: privacy@lineajewelry.com</p>
+          <p className="text-foreground">Email: privacy@lineofjudah.com</p>
           <p className="text-foreground">Phone: +1 (212) 555-0123</p>
           <p className="text-foreground">Address: 123 Madison Avenue, New York, NY 10016</p>
         </div>

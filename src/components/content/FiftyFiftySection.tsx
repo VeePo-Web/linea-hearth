@@ -1,5 +1,3 @@
-import earringsCollection from "@/assets/earrings-collection.png";
-import linkBracelet from "@/assets/link-bracelet.png";
 import { Link } from "react-router-dom";
 
 const FiftyFiftySection = () => {
@@ -7,41 +5,41 @@ const FiftyFiftySection = () => {
     <section className="w-full mb-16 px-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
-          <Link to="/category/earrings" className="block">
+          <Link to="/category/hoodies" className="block">
             <div className="w-full aspect-square mb-3 overflow-hidden">
               <img 
-                src={earringsCollection} 
-                alt="Earrings collection" 
+                src="/products/stay-holy-hoodie/male-model.png" 
+                alt="Hoodies collection" 
                 className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
               />
             </div>
           </Link>
           <div className="">
             <h3 className="text-sm font-normal text-foreground mb-1">
-              Organic Forms
+              Hoodies
             </h3>
             <p className="text-sm font-light text-foreground">
-              Nature-inspired pieces with fluid, sculptural details
+              Premium comfort with bold faith statements
             </p>
           </div>
         </div>
 
         <div>
-          <Link to="/category/bracelets" className="block">
+          <Link to="/category/tops" className="block">
             <div className="w-full aspect-square mb-3 overflow-hidden">
               <img 
-                src={linkBracelet} 
-                alt="Chain link bracelet" 
+                src="/products/heavenly-crewneck/front-model.png" 
+                alt="Tops collection" 
                 className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
               />
             </div>
           </Link>
           <div className="">
             <h3 className="text-sm font-normal text-foreground mb-1">
-              Chain Collection
+              Crewnecks & Tees
             </h3>
             <p className="text-sm font-light text-foreground">
-              Refined links and connections in precious metals
+              Everyday essentials that make a statement
             </p>
           </div>
         </div>

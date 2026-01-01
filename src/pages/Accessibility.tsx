@@ -7,13 +7,13 @@ import { LegalSection, ImportantCallout } from "@/components/legal/LegalSection"
 
 const Accessibility = () => {
   useEffect(() => {
-    document.title = "Accessibility Statement - Linea Jewelry";
+    document.title = "Accessibility Statement - Line of Judah";
   }, []);
 
   return (
     <LegalPageLayout
       title="ACCESSIBLE TO ALL"
-      subtitle="We're committed to making Linea Jewelry accessible to everyone, regardless of ability or technology."
+      subtitle="We're committed to making Line of Judah accessible to everyone, regardless of ability or technology."
       lastUpdated="January 2025"
     >
       {/* Compliance Status Badge */}
@@ -22,7 +22,7 @@ const Accessibility = () => {
       {/* Our Commitment */}
       <LegalSection id="commitment" title="Our Commitment">
         <p>
-          Linea Jewelry is committed to ensuring digital accessibility for people with 
+          Line of Judah is committed to ensuring digital accessibility for people with
           disabilities. We are continually improving the user experience for everyone and 
           applying the relevant accessibility standards to guarantee we provide equal access 
           to all users.
@@ -96,7 +96,7 @@ const Accessibility = () => {
           For immediate assistance or to report an accessibility issue, please contact us:
         </p>
         <div className="mt-4 space-y-1">
-          <p className="text-foreground">Email: accessibility@lineajewelry.com</p>
+          <p className="text-foreground">Email: accessibility@lineofjudah.com</p>
           <p className="text-foreground">Phone: +1 (212) 555-0123</p>
         </div>
         <p className="mt-4">

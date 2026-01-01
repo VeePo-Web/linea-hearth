@@ -8,27 +8,27 @@ import { cn } from "@/lib/utils";
 const upsellProducts = [
   {
     id: 100,
-    name: "Lintel Ring",
-    price: 1950,
-    priceFormatted: "€1,950",
-    image: "/rings-collection.png",
-    category: "Rings"
+    name: "Heavenly Crewneck",
+    price: 65,
+    priceFormatted: "$65",
+    image: "/products/heavenly-crewneck/flat-lay.png",
+    category: "Tops"
   },
   {
     id: 101,
-    name: "Arc Earrings",
-    price: 1450,
-    priceFormatted: "€1,450",
-    image: "/earrings-collection.png",
-    category: "Earrings"
+    name: "Stay Holy Hoodie",
+    price: 85,
+    priceFormatted: "$85",
+    image: "/products/stay-holy-hoodie/flat-front.png",
+    category: "Hoodies"
   },
   {
     id: 102,
-    name: "Span Bracelet",
-    price: 2200,
-    priceFormatted: "€2,200",
-    image: "/span-bracelet.png",
-    category: "Bracelets"
+    name: "Stay Holy Hoodie",
+    price: 85,
+    priceFormatted: "$85",
+    image: "/products/stay-holy-hoodie/flat-full.png",
+    category: "Hoodies"
   }
 ];
 
@@ -42,7 +42,7 @@ const SmartUpsell = () => {
   const availableUpsells = upsellProducts.filter(p => !cartIds.includes(p.id));
   
   // Find a product that helps reach free shipping threshold
-  let upsellProduct = availableUpsells.find(p => p.price >= amountToFreeShipping && p.price <= amountToFreeShipping + 500);
+  let upsellProduct = availableUpsells.find(p => p.price >= amountToFreeShipping && p.price <= amountToFreeShipping + 50);
   
   // Fallback to first available product
   if (!upsellProduct && availableUpsells.length > 0) {

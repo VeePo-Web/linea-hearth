@@ -18,31 +18,35 @@ const OurStory = () => {
         <main className="w-full lg:w-[70vw] lg:ml-auto px-6">
           <PageHeader 
             title="Our Story" 
-            subtitle="A journey of passion, craftsmanship, and timeless elegance"
+            subtitle="A calling to create clothing that speaks truth"
           />
           
           <ContentSection>
             <ImageTextBlock
-              image="/founders.png"
-              imageAlt="Company founders"
-              title="Founded on Passion"
-              content="LINEA Jewelry was born from a shared vision of creating timeless pieces that transcend fleeting trends. Our founders, united by their passion for exceptional craftsmanship and sustainable practices, established the brand with a commitment to creating jewelry that tells a story - your story."
+              image="/products/heavenly-crewneck/lifestyle.png"
+              imageAlt="Line of Judah founders"
+              title="Founded on Faith"
+              content="Line of Judah was born from a calling to create clothing that speaks truth. We believe that what you wear can be a testament to your faith — a daily reminder of who you are and whose you are. Every piece is designed to inspire conversations and strengthen your walk."
               imagePosition="left"
             />
           </ContentSection>
 
-          <ContentSection title="Our Heritage">
+          <ContentSection title="Our Mission">
             <div className="grid md:grid-cols-2 gap-12">
               <div className="space-y-6">
-                <h3 className="text-xl font-light text-foreground">Traditional Craftsmanship</h3>
+                <h3 className="text-xl font-light text-foreground">Premium Quality</h3>
                 <p className="text-muted-foreground leading-relaxed">
-                  Every piece in our collection is meticulously handcrafted by skilled artisans who have honed their craft over generations. We honor traditional techniques while embracing modern innovation, ensuring each piece meets our exacting standards for quality and beauty.
+                  Every piece in our collection is crafted with intention. We use premium fabrics, 
+                  heavyweight materials, and quality construction that's built to last. When you 
+                  wear Line of Judah, you're wearing your faith in style.
                 </p>
               </div>
               <div className="space-y-6">
-                <h3 className="text-xl font-light text-foreground">Sustainable Future</h3>
+                <h3 className="text-xl font-light text-foreground">Purpose-Driven</h3>
                 <p className="text-muted-foreground leading-relaxed">
-                  We believe luxury and sustainability can coexist beautifully. Our commitment to ethical sourcing, recycled materials, and responsible manufacturing practices ensures that every piece you wear contributes to a more sustainable future.
+                  We believe fashion can be a ministry. Our designs spark conversations, encourage 
+                  connection, and remind both the wearer and those around them of God's love. 
+                  Each purchase supports our mission to spread faith through fashion.
                 </p>
               </div>
             </div>
@@ -51,21 +55,21 @@ const OurStory = () => {
           <ContentSection title="Our Values">
             <div className="grid md:grid-cols-3 gap-8">
               <div className="space-y-4">
-                <h3 className="text-lg font-light text-foreground">Excellence</h3>
+                <h3 className="text-lg font-light text-foreground">Faith</h3>
                 <p className="text-muted-foreground">
-                  We pursue perfection in every detail, from the initial design concept to the final polish.
+                  Everything we create is rooted in our faith and designed to glorify God.
                 </p>
               </div>
               <div className="space-y-4">
-                <h3 className="text-lg font-light text-foreground">Authenticity</h3>
+                <h3 className="text-lg font-light text-foreground">Quality</h3>
                 <p className="text-muted-foreground">
-                  Each piece reflects genuine craftsmanship and tells an authentic story of artistry and care.
+                  We never compromise on materials or craftsmanship. Your faith deserves the best.
                 </p>
               </div>
               <div className="space-y-4">
-                <h3 className="text-lg font-light text-foreground">Innovation</h3>
+                <h3 className="text-lg font-light text-foreground">Community</h3>
                 <p className="text-muted-foreground">
-                  We continuously evolve our designs and techniques while honoring timeless aesthetic principles.
+                  We're building more than a brand — we're building a community of believers.
                 </p>
               </div>
             </div>

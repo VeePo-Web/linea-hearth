@@ -16,7 +16,7 @@ const shippingFAQs = [
   },
   {
     question: "Can I change my shipping address after ordering?",
-    answer: "If your order hasn't shipped yet, contact our customer care team immediately at shipping@lineajewelry.com. Once an order has shipped, we cannot modify the delivery address."
+    answer: "If your order hasn't shipped yet, contact our customer care team immediately at support@lineofjudah.com. Once an order has shipped, we cannot modify the delivery address."
   },
   {
     question: "What if my package is lost or damaged?",
@@ -24,7 +24,7 @@ const shippingFAQs = [
   },
   {
     question: "Do you offer gift wrapping?",
-    answer: "Yes! Every order is beautifully packaged in our signature Linea Jewelry gift box at no additional charge. If you'd like a personalized gift message included, you can add one during checkout."
+    answer: "Yes! Every order is beautifully packaged in our premium packaging at no additional charge. If you'd like a personalized gift message included, you can add one during checkout."
   }
 ];
 
