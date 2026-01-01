@@ -41,8 +41,8 @@ const TestimonySpotlight = () => {
           >
             <div className="aspect-[4/3] overflow-hidden relative group cursor-pointer">
               <img 
-                src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=80"
-                alt="Customer Testimony"
+                src="/products/stay-holy-hoodie/female-model-1.png"
+                alt="Customer wearing Stay Holy Hoodie"
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
               
@@ -90,9 +90,9 @@ const TestimonySpotlight = () => {
             <div className="flex items-center gap-4 mb-8">
               <div className="w-14 h-14 rounded-full overflow-hidden">
                 <img 
-                  src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&q=80"
+                  src="/products/stay-holy-hoodie/female-model-2.png"
                   alt="Marcus T."
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover object-top"
                 />
               </div>
               <div>

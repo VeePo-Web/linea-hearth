@@ -35,45 +35,45 @@ const InstagramFeed = () => {
   const posts: InstagramPost[] = [
     {
       id: '1',
-      image: 'https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=400&q=80',
+      image: '/products/stay-holy-hoodie/flat-front.png',
       likes: 234,
       comments: 12,
-      link: 'https://instagram.com'
+      link: 'https://instagram.com/lineofjudahwear'
     },
     {
       id: '2',
-      image: 'https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?w=400&q=80',
+      image: '/products/heavenly-crewneck/flat-lay.png',
       likes: 567,
       comments: 34,
-      link: 'https://instagram.com'
+      link: 'https://instagram.com/lineofjudahwear'
     },
     {
       id: '3',
-      image: 'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?w=400&q=80',
+      image: '/products/stay-holy-hoodie/female-model-1.png',
       likes: 189,
       comments: 8,
-      link: 'https://instagram.com'
+      link: 'https://instagram.com/lineofjudahwear'
     },
     {
       id: '4',
-      image: 'https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?w=400&q=80',
+      image: '/products/heavenly-crewneck/front-model.png',
       likes: 423,
       comments: 21,
-      link: 'https://instagram.com'
+      link: 'https://instagram.com/lineofjudahwear'
     },
     {
       id: '5',
-      image: 'https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=400&q=80',
+      image: '/products/stay-holy-hoodie/male-model.png',
       likes: 312,
       comments: 15,
-      link: 'https://instagram.com'
+      link: 'https://instagram.com/lineofjudahwear'
     },
     {
       id: '6',
-      image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&q=80',
+      image: '/products/heavenly-crewneck/female-model.png',
       likes: 678,
       comments: 42,
-      link: 'https://instagram.com'
+      link: 'https://instagram.com/lineofjudahwear'
     }
   ];
 

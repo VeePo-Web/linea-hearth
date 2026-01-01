@@ -21,9 +21,9 @@ const HeroBlock = () => {
         <div 
           className="w-full h-full bg-gradient-to-br from-stone-900 via-amber-950 to-stone-800"
           style={{
-            backgroundImage: `url('https://images.unsplash.com/photo-1529139574466-a303027c1d8b?w=1920&q=80')`,
+            backgroundImage: `url('/products/stay-holy-hoodie/male-model.png')`,
             backgroundSize: 'cover',
-            backgroundPosition: 'center',
+            backgroundPosition: 'center top',
           }}
         />
       </div>
