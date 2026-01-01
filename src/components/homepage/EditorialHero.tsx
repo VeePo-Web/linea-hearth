@@ -1,110 +1,236 @@
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowRight } from "lucide-react";
-import ScrollReveal from "@/components/motion/ScrollReveal";
-import TextReveal from "@/components/motion/TextReveal";
-import ImageReveal from "@/components/motion/ImageReveal";
-import { hoverScale, tapScale } from "@/lib/animations";
+import { useRef } from "react";
+import CharacterReveal from "@/components/motion/CharacterReveal";
+import DropBadgeCluster from "./DropBadgeCluster";
+import ScrollInvitation from "./ScrollInvitation";
+import { useReducedMotion } from "@/hooks/useReducedMotion";
 
 const EditorialHero = () => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const prefersReducedMotion = useReducedMotion();
+  
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end start"],
+  });
+
+  // Parallax transforms
+  const mainImageY = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
+  const secondaryImageY = useTransform(scrollYProgress, [0, 1], ["0%", "50%"]);
+  const textOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
+
   return (
-    <section className="relative w-full min-h-screen bg-foreground overflow-hidden">
-      {/* Split Layout Container */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 min-h-screen">
-        
-        {/* Left Content - Text Block */}
-        <div className="lg:col-span-5 flex flex-col justify-center px-6 md:px-12 lg:px-16 py-24 lg:py-0 order-2 lg:order-1 bg-foreground">
-          <div className="max-w-xl">
-            {/* Eyebrow */}
-            <ScrollReveal variant="fadeUp" delay={0.1}>
-              <p className="text-eyebrow text-muted-foreground mb-6">
-                New Collection
-              </p>
-            </ScrollReveal>
+    <section 
+      ref={containerRef}
+      className="relative w-full min-h-screen bg-foreground overflow-hidden hero-noise group"
+    >
+      {/* Index Number - 032c Editorial Watermark */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 2.5, duration: 1 }}
+        className="absolute bottom-8 right-8 z-10 hero-index text-background/5 hidden lg:block"
+      >
+        01
+      </motion.div>
 
-            {/* Main Headline - Oversized 032c style with word reveal */}
-            <div className="mb-8">
-              <TextReveal 
-                text="WEAR YOUR" 
-                className="text-display text-background block"
-                as="h1"
-                delay={0.2}
+      {/* Main Image Layer - Brave Crop */}
+      <motion.div
+        className="absolute inset-0 z-0"
+        style={{ y: prefersReducedMotion ? 0 : mainImageY }}
+      >
+        <motion.div
+          initial={{ clipPath: "inset(100% 0% 0% 0%)" }}
+          animate={{ clipPath: "inset(0% 0% 0% 0%)" }}
+          transition={{ delay: 0.3, duration: 1.2, ease: [0.25, 0.46, 0.45, 0.94] }}
+          className="absolute inset-0"
+        >
+          <img
+            src="/products/stay-holy-hoodie/male-model.png"
+            alt="Stay Holy Hoodie - Male Model"
+            className="w-full h-full object-cover object-top hero-image-grayscale"
+          />
+          {/* Gradient overlays for text readability */}
+          <div className="absolute inset-0 bg-gradient-to-r from-foreground via-foreground/70 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-foreground/80 via-transparent to-foreground/40" />
+        </motion.div>
+      </motion.div>
+
+      {/* Secondary Image - Offset Collage Layer */}
+      <motion.div
+        className="absolute bottom-[10%] right-[5%] w-[35vw] max-w-[400px] h-[45vh] z-[5] hidden lg:block"
+        style={{ y: prefersReducedMotion ? 0 : secondaryImageY }}
+      >
+        <motion.div
+          initial={{ clipPath: "inset(0% 100% 0% 0%)" }}
+          animate={{ clipPath: "inset(0% 0% 0% 0%)" }}
+          transition={{ delay: 0.5, duration: 1, ease: [0.25, 0.46, 0.45, 0.94] }}
+          className="w-full h-full"
+        >
+          <img
+            src="/products/stay-holy-hoodie/female-model-1.png"
+            alt="Stay Holy Hoodie - Female Model"
+            className="w-full h-full object-cover object-center hero-image-grayscale"
+          />
+        </motion.div>
+      </motion.div>
+
+      {/* Floating Product - Small Detail Layer */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9, rotate: -5 }}
+        animate={{ opacity: 1, scale: 1, rotate: -5 }}
+        transition={{ delay: 1.8, duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
+        className="absolute top-[15%] right-[8%] w-[12vw] max-w-[140px] z-[6] hidden xl:block"
+      >
+        <img
+          src="/products/stay-holy-hoodie/flat-front.png"
+          alt="Stay Holy Hoodie - Product"
+          className="w-full h-auto drop-shadow-2xl"
+        />
+      </motion.div>
+
+      {/* Content Container */}
+      <motion.div
+        className="relative z-10 min-h-screen flex flex-col justify-between px-6 md:px-12 lg:px-16 py-12 lg:py-16"
+        style={{ opacity: prefersReducedMotion ? 1 : textOpacity }}
+      >
+        {/* Top Section - Eyebrow */}
+        <div className="pt-8">
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.4, duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
+            className="text-[10px] md:text-xs font-light tracking-[0.4em] uppercase text-muted-foreground"
+          >
+            Issue 001 — Drop Season
+          </motion.p>
+        </div>
+
+        {/* Center Section - Massive Typography */}
+        <div className="flex-1 flex flex-col justify-center -mt-16 lg:-mt-24">
+          {/* Mobile Typography */}
+          <div className="block lg:hidden">
+            <h1 className="text-hero-massive-mobile text-background leading-[0.85]">
+              <CharacterReveal 
+                text="WEAR" 
+                className="block"
+                delay={0.7}
+                staggerDelay={0.04}
               />
-              <motion.span 
-                className="text-display text-accent block"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5, duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }}
+              <CharacterReveal 
+                text="YOUR" 
+                className="block"
+                delay={0.9}
+                staggerDelay={0.04}
+              />
+              <CharacterReveal 
+                text="FAITH." 
+                className="block text-accent"
+                delay={1.1}
+                staggerDelay={0.04}
+              />
+            </h1>
+          </div>
+
+          {/* Desktop Typography - Offset Layout */}
+          <div className="hidden lg:block">
+            <h1 className="text-hero-massive text-background leading-[0.85]">
+              <CharacterReveal 
+                text="WEAR" 
+                className="block"
+                delay={0.7}
+                staggerDelay={0.025}
+              />
+              <CharacterReveal 
+                text="YOUR" 
+                className="block ml-[15vw]"
+                delay={0.9}
+                staggerDelay={0.025}
+              />
+              <CharacterReveal 
+                text="FAITH." 
+                className="block text-accent"
+                delay={1.1}
+                staggerDelay={0.025}
+              />
+            </h1>
+          </div>
+
+          {/* Tagline */}
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.6, duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }}
+            className="mt-8 lg:mt-12 max-w-md text-base md:text-lg font-light leading-relaxed text-muted-foreground"
+          >
+            Premium streetwear for the modern believer. Bold statements. Timeless purpose.
+          </motion.p>
+        </div>
+
+        {/* Bottom Section - CTA + Drop Badge */}
+        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-8 pb-8">
+          {/* Left - CTA */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.8, duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
+            className="flex flex-col gap-6"
+          >
+            <Link
+              to="/category/shop"
+              className="editorial-link text-background inline-flex items-center gap-3 group/cta"
+            >
+              Enter the Drop
+              <motion.span
+                className="inline-block"
+                initial={{ x: 0 }}
+                whileHover={{ x: 6 }}
+                transition={{ duration: 0.3 }}
               >
-                FAITH.
+                <ArrowRight className="w-4 h-4" />
               </motion.span>
-            </div>
+            </Link>
 
-            {/* Tagline */}
-            <ScrollReveal variant="fadeUp" delay={0.4}>
-              <p className="text-editorial text-muted-foreground max-w-md mb-12">
-                Premium streetwear for the modern believer. Bold statements. Timeless purpose.
-              </p>
-            </ScrollReveal>
+            {/* Secondary CTA */}
+            <Link
+              to="/about/our-story"
+              className="text-[10px] font-light tracking-[0.2em] uppercase text-muted-foreground hover:text-background transition-colors duration-300"
+            >
+              Read Our Story
+            </Link>
+          </motion.div>
 
-            {/* CTA */}
-            <ScrollReveal variant="fadeUp" delay={0.6}>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <motion.div whileHover={hoverScale} whileTap={tapScale}>
-                  <Link 
-                    to="/category/shop"
-                    className="inline-flex items-center gap-3 bg-background text-foreground px-8 py-4 text-sm font-medium tracking-wide hover:bg-accent hover:text-foreground transition-colors group"
-                  >
-                    Shop Now
-                    <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-                  </Link>
-                </motion.div>
-              </div>
-            </ScrollReveal>
-
-            {/* Floating Badge - Hypebeast style */}
-            <ScrollReveal variant="fadeIn" delay={0.8}>
-              <div className="mt-16 inline-flex items-center gap-2">
-                <motion.span 
-                  className="w-2 h-2 bg-destructive rounded-full"
-                  animate={{ opacity: [1, 0.5, 1] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                />
-                <span className="text-caption text-muted-foreground uppercase">
-                  New Drop • Stay Holy Hoodie
-                </span>
-              </div>
-            </ScrollReveal>
+          {/* Right - Drop Badge Cluster */}
+          <div className="md:text-right">
+            <DropBadgeCluster 
+              dropNumber="001"
+              collectionName="Stay Holy Collection"
+              limitedPieces={250}
+              isLive={true}
+              delay={1.6}
+            />
           </div>
         </div>
+      </motion.div>
 
-        {/* Right Content - Hero Image */}
-        <div className="lg:col-span-7 relative order-1 lg:order-2 min-h-[60vh] lg:min-h-screen">
-          <ImageReveal 
-            src="/products/stay-holy-hoodie/male-model.png"
-            alt="Stay Holy Hoodie"
-            className="absolute inset-0"
-            direction="right"
-          />
-          
-          {/* Subtle gradient overlay */}
-          <motion.div 
-            className="absolute inset-0 bg-gradient-to-l from-transparent via-transparent to-foreground/20 lg:to-foreground/40"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5, duration: 1 }}
-          />
+      {/* Product Tag - Editorial Float */}
+      <motion.div
+        initial={{ opacity: 0, x: 20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ delay: 2, duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
+        className="absolute bottom-24 right-8 z-20 bg-background/95 backdrop-blur-sm px-5 py-4 hidden lg:block"
+      >
+        <p className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground mb-1">
+          Featured
+        </p>
+        <p className="text-sm font-medium text-foreground">Stay Holy Hoodie</p>
+        <p className="text-sm font-light text-foreground/80">$79</p>
+      </motion.div>
 
-          {/* Product Tag - Editorial style */}
-          <ScrollReveal variant="fadeUp" delay={1}>
-            <div className="absolute bottom-8 right-8 bg-background px-4 py-3">
-              <p className="text-caption text-muted-foreground uppercase mb-1">Featured</p>
-              <p className="text-sm font-medium text-foreground">Stay Holy Hoodie</p>
-              <p className="text-sm text-foreground">$79</p>
-            </div>
-          </ScrollReveal>
-        </div>
-      </div>
+      {/* Scroll Invitation */}
+      <ScrollInvitation delay={2.2} />
     </section>
   );
 };

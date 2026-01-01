@@ -178,7 +178,7 @@
     @apply grid gap-1 md:gap-2;
   }
   
-  /* Hide scrollbar */
+/* Hide scrollbar */
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
@@ -186,5 +186,64 @@
   .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;
+  }
+
+  /* Hero Massive Typography - 032c Industrial */
+  .text-hero-massive {
+    @apply text-[18vw] md:text-[14vw] lg:text-[12vw] font-extralight tracking-[-0.04em] leading-[0.85];
+  }
+
+  .text-hero-massive-mobile {
+    @apply text-[22vw] font-extralight tracking-[-0.04em] leading-[0.8];
+  }
+
+  /* Film Grain / Noise Texture Overlay */
+  .hero-noise::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    opacity: 0.03;
+    pointer-events: none;
+    mix-blend-mode: overlay;
+  }
+
+  /* Editorial Index Number */
+  .hero-index {
+    @apply text-[15vw] md:text-[12vw] font-extralight tracking-[-0.02em] leading-none opacity-[0.04] select-none pointer-events-none;
+  }
+
+  /* Editorial Link with Animated Underline */
+  .editorial-link {
+    @apply relative inline-block text-sm md:text-base font-light tracking-[0.25em] uppercase;
+  }
+
+  .editorial-link::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background-color: currentColor;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  .editorial-link:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+
+  /* Grayscale to Color Image Effect */
+  .hero-image-grayscale {
+    filter: grayscale(60%) contrast(1.1);
+    transition: filter 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  .hero-image-grayscale:hover,
+  .group:hover .hero-image-grayscale {
+    filter: grayscale(0%) contrast(1);
   }
 }
