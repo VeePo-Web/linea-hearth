@@ -22,6 +22,8 @@ import TermsOfService from "./pages/TermsOfService";
 import Community from "./pages/Community";
 import FAQ from "./pages/FAQ";
 import ReturnsExchanges from "./pages/ReturnsExchanges";
+import ShippingInfo from "./pages/ShippingInfo";
+import Accessibility from "./pages/Accessibility";
 import Lookbook from "./pages/Lookbook";
 import TryOnRoom from "./pages/TryOnRoom";
 import AdminLogin from "./pages/admin/AdminLogin";
@@ -56,6 +58,8 @@ const App = () => (
               <Route path="/terms-of-service" element={<TermsOfService />} />
               <Route path="/faq" element={<FAQ />} />
               <Route path="/returns" element={<ReturnsExchanges />} />
+              <Route path="/shipping" element={<ShippingInfo />} />
+              <Route path="/accessibility" element={<Accessibility />} />
               <Route path="/community" element={<Community />} />
               <Route path="/lookbook" element={<Lookbook />} />
               <Route path="/try-on" element={<TryOnRoom />} />

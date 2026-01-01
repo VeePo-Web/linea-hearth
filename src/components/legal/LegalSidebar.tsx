@@ -15,7 +15,7 @@ const legalPages = [
   { name: "Returns & Exchanges", path: "/returns", icon: RotateCcw },
   { name: "Terms of Service", path: "/terms-of-service", icon: FileText },
   { name: "Privacy Policy", path: "/privacy-policy", icon: Shield },
-  { name: "Accessibility", path: "/accessibility", icon: Accessibility },
+  { name: "Accessibility", path: "/accessibility", icon: Accessibility as typeof HelpCircle },
 ];
 
 const LegalSidebar = () => {
