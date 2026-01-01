@@ -9,7 +9,7 @@ const Footer = () => {
               LINE OF <span className="text-amber-500">JUDAH</span>
             </h2>
             <p className="text-sm font-light text-white/70 leading-relaxed max-w-md mb-6">
-              Premium Christian apparel for the modern believer. Wear your faith. Live your purpose.
+              For those who walk different. If you're not for us, that's okay — this isn't for everyone.
             </p>
             
             {/* Contact Information */}

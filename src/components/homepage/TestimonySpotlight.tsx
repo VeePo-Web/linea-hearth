@@ -43,6 +43,7 @@ const TestimonySpotlight = () => {
             {/* Customer Info - Minimal */}
             <ScrollReveal variant="fadeUp" delay={0.6}>
               <div className="mb-8">
+                <p className="text-xs uppercase tracking-[0.2em] text-accent mb-2">From the tribe</p>
                 <p className="text-sm font-medium text-foreground">Marcus T.</p>
                 <p className="text-caption text-muted-foreground">Youth Pastor • Atlanta, GA</p>
               </div>

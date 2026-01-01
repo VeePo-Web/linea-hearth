@@ -82,8 +82,8 @@ const FeaturedCollection = () => {
         <ScrollReveal variant="fadeUp">
           <div className="flex justify-between items-end mb-8">
             <div>
-              <p className="text-eyebrow text-muted-foreground mb-2">Bestsellers</p>
-              <h2 className="text-section text-foreground">Most Wanted</h2>
+              <p className="text-eyebrow text-muted-foreground mb-2">Community picks</p>
+              <h2 className="text-section text-foreground">Tribe Approved</h2>
             </div>
             <motion.div
               whileHover={{ x: 4 }}

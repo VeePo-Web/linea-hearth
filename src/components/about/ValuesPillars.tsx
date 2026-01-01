@@ -4,17 +4,17 @@ const pillars = [
   {
     icon: Megaphone,
     title: 'Evangelism',
-    description: 'Every piece is a conversation starter. Our apparel creates opportunities to share the Gospel — in gyms, on campuses, in streets. Your outfit becomes your outreach.',
+    description: "Every outfit is an open door. You don't preach — you spark curiosity. They ask. You answer. That's how it works.",
   },
   {
     icon: Crown,
     title: 'Identity',
-    description: 'We remind believers who they are: chosen, called, and commissioned. What you wear reinforces what you believe. Walk in your royal lineage.',
+    description: "You're not confused about who you are. Chosen. Called. Commissioned. Your clothes should reflect that. Not hide it.",
   },
   {
     icon: Flame,
     title: 'Conviction',
-    description: 'Bold designs for bold believers. No apologies. No compromise. Stand firm in your faith with every thread. Let your style declare your stance.',
+    description: "No apologies. No compromise. You believe what you believe. Now dress like it. If that offends someone — good.",
   },
 ];
 
@@ -25,10 +25,10 @@ const ValuesPillars = () => {
         {/* Header */}
         <div className="text-center mb-16">
           <p className="text-xs uppercase tracking-[0.3em] text-amber-600 mb-4">
-            What We Stand For
+            We don't stand for: Hiding. Blending in. Playing it safe.
           </p>
           <h2 className="text-3xl md:text-4xl font-light text-foreground">
-            Three Pillars of Mission
+            What We Do Stand For
           </h2>
         </div>
 

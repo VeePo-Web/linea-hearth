@@ -26,9 +26,11 @@ const FounderLetter = () => {
 
             {/* Quote */}
             <blockquote className="text-xl md:text-2xl font-light italic text-foreground leading-relaxed -mt-8">
-              Every thread carries a message. Every garment is a declaration.
-              We started Line of Judah because we believe what you wear should 
-              reflect who you are — and whose you are.
+              I got tired of hiding.<br /><br />
+              Not my faith — I never hid that. But I was tired of my clothes 
+              not matching my conviction. Everything in the market was either 
+              corny Christian or watered-down safe.<br /><br />
+              So I built what I wanted to wear.
             </blockquote>
 
             {/* Signature */}
@@ -41,10 +43,9 @@ const FounderLetter = () => {
 
             {/* Bio */}
             <p className="text-muted-foreground font-light leading-relaxed">
-              Founded in Calgary, 2022. What started as a vision to combine 
-              streetwear with Scripture has grown into a global community of 
-              believers wearing their faith boldly. From campus to city streets, 
-              Line of Judah is more than a brand — it's a movement.
+              For the believer who won't apologize. Who starts conversations. 
+              Who knows that if you're not for us, you're against us.<br /><br />
+              This is Line of Judah. You're here because you're supposed to be.
             </p>
           </div>
         </div>
