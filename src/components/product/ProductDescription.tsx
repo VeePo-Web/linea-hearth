@@ -43,14 +43,16 @@ const ProductDescription = () => {
         {isDescriptionOpen && (
           <div className="pb-6 space-y-4">
             <p className="text-sm font-light text-muted-foreground leading-relaxed">
-              The Pantheon earrings embody architectural elegance with their clean, geometric design. 
-              Inspired by classical Roman architecture, these statement pieces feature a sophisticated 
-              interplay of curves and angles that catch and reflect light beautifully.
+              This premium piece is designed to be worn as a statement of faith. 
+              Crafted with intention, every detail reflects our commitment to quality 
+              and purpose. The relaxed fit offers all-day comfort while the bold design 
+              sparks meaningful conversations.
             </p>
             <p className="text-sm font-light text-muted-foreground leading-relaxed">
-              Each earring is meticulously crafted from premium sterling silver with an 18k gold 
-              plating, ensuring both durability and luxury. The minimalist aesthetic makes them 
-              perfect for both everyday wear and special occasions.
+              Made from heavyweight cotton blend fabric that feels substantial yet 
+              comfortable. Pre-shrunk to maintain its perfect fit wash after wash. 
+              The print is designed to last, using premium techniques that won't 
+              crack or fade over time.
             </p>
           </div>
         )}
@@ -73,20 +75,20 @@ const ProductDescription = () => {
         {isDetailsOpen && (
           <div className="pb-6 space-y-3">
             <div className="flex justify-between">
-              <span className="text-sm font-light text-muted-foreground">SKU</span>
-              <span className="text-sm font-light text-foreground">LE-PTH-001</span>
+              <span className="text-sm font-light text-muted-foreground">Fabric</span>
+              <span className="text-sm font-light text-foreground">80% Cotton, 20% Polyester</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-sm font-light text-muted-foreground">Collection</span>
-              <span className="text-sm font-light text-foreground">Architectural Series</span>
+              <span className="text-sm font-light text-muted-foreground">Weight</span>
+              <span className="text-sm font-light text-foreground">320 GSM Heavyweight</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-sm font-light text-muted-foreground">Closure</span>
-              <span className="text-sm font-light text-foreground">Post and butterfly back</span>
+              <span className="text-sm font-light text-muted-foreground">Fit</span>
+              <span className="text-sm font-light text-foreground">Relaxed / Oversized</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-sm font-light text-muted-foreground">Hypoallergenic</span>
-              <span className="text-sm font-light text-foreground">Yes</span>
+              <span className="text-sm font-light text-muted-foreground">Made In</span>
+              <span className="text-sm font-light text-foreground">USA</span>
             </div>
           </div>
         )}
@@ -99,7 +101,7 @@ const ProductDescription = () => {
           onClick={() => setIsCareOpen(!isCareOpen)}
           className="w-full h-14 px-0 justify-between hover:bg-transparent font-light rounded-none"
         >
-          <span>Care & Cleaning</span>
+          <span>Care Instructions</span>
           {isCareOpen ? (
             <ChevronUp className="h-4 w-4" />
           ) : (
@@ -109,13 +111,13 @@ const ProductDescription = () => {
         {isCareOpen && (
           <div className="pb-6 space-y-4">
             <ul className="space-y-2">
-              <li className="text-sm font-light text-muted-foreground">• Clean with a soft, dry cloth after each wear</li>
-              <li className="text-sm font-light text-muted-foreground">• Avoid contact with perfumes, lotions, and cleaning products</li>
-              <li className="text-sm font-light text-muted-foreground">• Store in the provided jewelry pouch when not wearing</li>
-              <li className="text-sm font-light text-muted-foreground">• Remove before swimming, exercising, or showering</li>
+              <li className="text-sm font-light text-muted-foreground">• Machine wash cold with like colors</li>
+              <li className="text-sm font-light text-muted-foreground">• Turn inside out before washing</li>
+              <li className="text-sm font-light text-muted-foreground">• Tumble dry low or hang dry</li>
+              <li className="text-sm font-light text-muted-foreground">• Do not bleach or iron directly on print</li>
             </ul>
             <p className="text-sm font-light text-muted-foreground">
-              For professional cleaning, visit your local jeweler or contact our customer service team.
+              Following these care instructions will help maintain the quality and longevity of your garment.
             </p>
           </div>
         )}
@@ -163,11 +165,11 @@ const ProductDescription = () => {
                       />
                     ))}
                   </div>
-                  <span className="text-sm font-light text-muted-foreground">Sarah M.</span>
+                  <span className="text-sm font-light text-muted-foreground">Marcus J.</span>
                 </div>
                 <p className="text-sm font-light text-muted-foreground leading-relaxed">
-                  "Absolutely stunning earrings! The quality is exceptional and they go with everything. 
-                  The architectural design is so unique and I get compliments every time I wear them."
+                  "This hoodie is exactly what I was looking for. The quality is incredible and I love being 
+                  able to wear my faith proudly. Already ordered two more colors!"
                 </p>
               </div>
 
@@ -181,11 +183,11 @@ const ProductDescription = () => {
                       />
                     ))}
                   </div>
-                  <span className="text-sm font-light text-muted-foreground">Emma T.</span>
+                  <span className="text-sm font-light text-muted-foreground">Sarah T.</span>
                 </div>
                 <p className="text-sm font-light text-muted-foreground leading-relaxed">
-                  "Beautiful craftsmanship and comfortable to wear all day. The gold plating has held up 
-                  perfectly after months of regular wear. Highly recommend!"
+                  "Super comfortable and the fit is perfect. I've gotten so many compliments and 
+                  it's opened up some great conversations about faith."
                 </p>
               </div>
 
@@ -199,11 +201,11 @@ const ProductDescription = () => {
                       />
                     ))}
                   </div>
-                  <span className="text-sm font-light text-muted-foreground">Jessica R.</span>
+                  <span className="text-sm font-light text-muted-foreground">David R.</span>
                 </div>
                 <p className="text-sm font-light text-muted-foreground leading-relaxed">
-                  "These earrings are a work of art. The minimalist design is elegant and sophisticated. 
-                  Perfect weight and the packaging was beautiful too."
+                  "The heavyweight fabric is no joke - this thing is built to last. Love the 
+                  message and the quality. Will definitely be back for more."
                 </p>
               </div>
             </div>

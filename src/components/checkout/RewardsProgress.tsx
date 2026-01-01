@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 import { useCart } from "@/hooks/useCart";
 
 const milestones = [
-  { threshold: 50, icon: Gift, label: "Free Gift", reward: "Jewelry pouch" },
+  { threshold: 50, icon: Gift, label: "Free Gift", reward: "Sticker pack" },
   { threshold: 100, icon: Truck, label: "Free Ship", reward: "Free shipping" },
   { threshold: 200, icon: Zap, label: "Priority", reward: "Priority shipping" }
 ];
@@ -70,7 +70,7 @@ const RewardsProgress = () => {
                     {milestone.label}
                   </div>
                   <div className="text-[9px] text-muted-foreground">
-                    €{milestone.threshold}
+                    ${milestone.threshold}
                   </div>
                 </div>
               </div>
@@ -91,7 +91,7 @@ const RewardsProgress = () => {
             const amountNeeded = nextMilestone.threshold - subtotal;
             return (
               <span>
-                Add <span className="font-medium text-foreground">€{amountNeeded.toFixed(0)}</span> to unlock{" "}
+                Add <span className="font-medium text-foreground">${amountNeeded.toFixed(0)}</span> to unlock{" "}
                 <span className="text-amber-600 dark:text-amber-400">{nextMilestone.reward}</span>
               </span>
             );

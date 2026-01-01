@@ -8,7 +8,7 @@ import { LegalSection } from "@/components/legal/LegalSection";
 
 const ShippingInfo = () => {
   useEffect(() => {
-    document.title = "Shipping Information - Linea Jewelry";
+    document.title = "Shipping Information - Line of Judah";
   }, []);
 
   return (
@@ -69,7 +69,7 @@ const ShippingInfo = () => {
           delivery address, please contact our customer care team.
         </p>
         <div className="mt-4 space-y-1">
-          <p className="text-foreground">Email: shipping@lineajewelry.com</p>
+          <p className="text-foreground">Email: shipping@lineofjudah.com</p>
           <p className="text-foreground">Phone: +1 (212) 555-0123</p>
         </div>
       </LegalSection>

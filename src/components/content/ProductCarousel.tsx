@@ -5,14 +5,6 @@ import {
 } from "@/components/ui/carousel";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "react-router-dom";
-import pantheonImage from "@/assets/pantheon.jpg";
-import eclipseImage from "@/assets/eclipse.jpg";
-import haloImage from "@/assets/halo.jpg";
-import obliqueImage from "@/assets/oblique.jpg";
-import lintelImage from "@/assets/lintel.jpg";
-import shadowlineImage from "@/assets/shadowline.jpg";
-import organicEarring from "@/assets/organic-earring.png";
-import linkBracelet from "@/assets/link-bracelet.png";
 
 interface Product {
   id: number;
@@ -20,50 +12,60 @@ interface Product {
   category: string;
   price: string;
   image: string;
+  hoverImage: string;
+  isNew?: boolean;
 }
 
 const products: Product[] = [
   {
     id: 1,
-    name: "Pantheon",
-    category: "Earrings",
-    price: "€2,850",
-    image: pantheonImage,
+    name: "Heavenly Crewneck",
+    category: "Tops",
+    price: "$65",
+    image: "/products/heavenly-crewneck/front-model.png",
+    hoverImage: "/products/heavenly-crewneck/flat-lay.png",
+    isNew: true,
   },
   {
     id: 2,
-    name: "Eclipse",
-    category: "Bracelets",
-    price: "€3,200",
-    image: eclipseImage,
+    name: "Stay Holy Hoodie",
+    category: "Hoodies",
+    price: "$85",
+    image: "/products/stay-holy-hoodie/male-model.png",
+    hoverImage: "/products/stay-holy-hoodie/flat-front.png",
+    isNew: true,
   },
   {
     id: 3,
-    name: "Halo",
-    category: "Earrings",
-    price: "€1,950",
-    image: haloImage,
+    name: "Heavenly Crewneck",
+    category: "Tops",
+    price: "$65",
+    image: "/products/heavenly-crewneck/female-model.png",
+    hoverImage: "/products/heavenly-crewneck/lifestyle.png",
   },
   {
     id: 4,
-    name: "Oblique",
-    category: "Earrings",
-    price: "€1,650",
-    image: obliqueImage,
+    name: "Stay Holy Hoodie",
+    category: "Hoodies",
+    price: "$85",
+    image: "/products/stay-holy-hoodie/female-model-1.png",
+    hoverImage: "/products/stay-holy-hoodie/female-model-2.png",
   },
   {
     id: 5,
-    name: "Lintel",
-    category: "Earrings",
-    price: "€2,250",
-    image: lintelImage,
+    name: "Heavenly Crewneck",
+    category: "Tops",
+    price: "$65",
+    image: "/products/heavenly-crewneck/side-view.png",
+    hoverImage: "/products/heavenly-crewneck/front-model.png",
   },
   {
     id: 6,
-    name: "Shadowline",
-    category: "Bracelets",
-    price: "€3,950",
-    image: shadowlineImage,
+    name: "Stay Holy Hoodie",
+    category: "Hoodies",
+    price: "$85",
+    image: "/products/stay-holy-hoodie/flat-full.png",
+    hoverImage: "/products/stay-holy-hoodie/male-model.png",
   },
 ];
 
@@ -93,12 +95,12 @@ const ProductCarousel = () => {
                           className="w-full h-full object-cover transition-all duration-300 group-hover:opacity-0"
                         />
                         <img
-                          src={product.category === "Earrings" ? organicEarring : linkBracelet}
-                          alt={`${product.name} lifestyle`}
+                          src={product.hoverImage}
+                          alt={`${product.name} alternate view`}
                           className="absolute inset-0 w-full h-full object-cover transition-all duration-300 opacity-0 group-hover:opacity-100"
                         />
                         <div className="absolute inset-0 bg-black/[0.03]"></div>
-                        {(product.id === 1 || product.id === 3) && (
+                        {product.isNew && (
                           <div className="absolute top-2 left-2 px-2 py-1 text-xs font-medium text-black">
                             NEW
                           </div>
