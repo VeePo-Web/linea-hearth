@@ -2,108 +2,103 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Linea E-commerce Design System - Minimalist & Modern */
+/* Line of Judah - Editorial Streetwear Design System */
+/* Inspired by DAZED / i-D / 032c / Hypebeast */
 
 @layer base {
   :root {
-    /* Core neutral palette */
-    --background: 0 0% 100%;
-    --foreground: 0 0% 9%;
+    /* Core palette - Deep blacks, warm off-whites */
+    --background: 30 6% 98%;
+    --foreground: 0 0% 4%;
     
     /* Status bar */
     --status-bar: 0 0% 0%;
     --status-bar-foreground: 0 0% 100%;
     
     /* Navigation */
-    --nav-background: 0 0% 100%;
-    --nav-foreground: 0 0% 20%;
-    --nav-hover: 0 0% 5%;
+    --nav-background: 30 6% 98%;
+    --nav-foreground: 0 0% 15%;
+    --nav-hover: 0 0% 4%;
     
     /* Interactive elements */
-    --primary: 0 0% 9%;
-    --primary-foreground: 0 0% 98%;
-    --primary-hover: 0 0% 15%;
+    --primary: 0 0% 4%;
+    --primary-foreground: 30 6% 98%;
+    --primary-hover: 0 0% 12%;
     
     /* Subtle elements */
-    --secondary: 0 0% 96%;
-    --secondary-foreground: 0 0% 20%;
+    --secondary: 30 4% 94%;
+    --secondary-foreground: 0 0% 15%;
     
-    --muted: 0 0% 96%;
-    --muted-foreground: 0 0% 45%;
+    --muted: 30 4% 92%;
+    --muted-foreground: 0 0% 40%;
     
-    --accent: 0 0% 96%;
-    --accent-foreground: 0 0% 9%;
+    --accent: 36 92% 50%;
+    --accent-foreground: 0 0% 4%;
     
-    --border: 0 0% 90%;
-    --input: 0 0% 90%;
-    --ring: 0 0% 9%;
-    
-    /* Cards and surfaces */
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 9%;
-    
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 9%;
-    
-    --destructive: 0 84% 60%;
+    /* 032c-inspired red accent */
+    --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 98%;
     
-    --radius: 0.375rem;
+    --border: 30 4% 88%;
+    --input: 30 4% 88%;
+    --ring: 0 0% 4%;
     
-    /* Transitions */
-    --transition-smooth: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-bounce: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    /* Cards and surfaces */
+    --card: 30 6% 98%;
+    --card-foreground: 0 0% 4%;
+    
+    --popover: 30 6% 98%;
+    --popover-foreground: 0 0% 4%;
+    
+    --radius: 0rem;
+    
+    /* Transitions - Editorial timing */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-editorial: all 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 
-    --sidebar-background: 0 0% 98%;
-
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-background: 30 4% 96%;
+    --sidebar-foreground: 0 0% 20%;
+    --sidebar-primary: 0 0% 4%;
+    --sidebar-primary-foreground: 30 6% 98%;
+    --sidebar-accent: 30 4% 94%;
+    --sidebar-accent-foreground: 0 0% 4%;
+    --sidebar-border: 30 4% 88%;
+    --sidebar-ring: 36 92% 50%;
   }
 
   .dark {
-    --background: 0 0% 9%;
-    --foreground: 0 0% 98%;
+    --background: 0 0% 4%;
+    --foreground: 30 6% 98%;
     
     --status-bar: 0 0% 0%;
     --status-bar-foreground: 0 0% 100%;
     
-    --nav-background: 0 0% 9%;
+    --nav-background: 0 0% 4%;
     --nav-foreground: 0 0% 80%;
-    --nav-hover: 0 0% 95%;
+    --nav-hover: 30 6% 98%;
     
-    --primary: 0 0% 98%;
-    --primary-foreground: 0 0% 9%;
-    --primary-hover: 0 0% 90%;
+    --primary: 30 6% 98%;
+    --primary-foreground: 0 0% 4%;
+    --primary-hover: 0 0% 85%;
     
-    --secondary: 0 0% 15%;
+    --secondary: 0 0% 12%;
     --secondary-foreground: 0 0% 80%;
     
-    --muted: 0 0% 15%;
-    --muted-foreground: 0 0% 60%;
+    --muted: 0 0% 12%;
+    --muted-foreground: 0 0% 55%;
     
-    --accent: 0 0% 15%;
-    --accent-foreground: 0 0% 98%;
+    --accent: 36 92% 50%;
+    --accent-foreground: 0 0% 4%;
     
-    --border: 0 0% 20%;
-    --input: 0 0% 20%;
-    --ring: 0 0% 98%;
+    --border: 0 0% 18%;
+    --input: 0 0% 18%;
+    --ring: 30 6% 98%;
     
-    --card: 0 0% 9%;
-    --card-foreground: 0 0% 98%;
+    --card: 0 0% 6%;
+    --card-foreground: 30 6% 98%;
     
-    --popover: 0 0% 9%;
-    --popover-foreground: 0 0% 98%;
+    --popover: 0 0% 6%;
+    --popover-foreground: 30 6% 98%;
     
     --destructive: 0 62% 50%;
     --destructive-foreground: 0 0% 98%;
@@ -116,6 +111,74 @@
   }
 
   body {
-    @apply bg-background text-foreground font-light;
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-weight: 300;
+  }
+}
+
+/* Editorial Typography Classes */
+@layer components {
+  /* Display - 032c oversized headlines */
+  .text-display {
+    @apply text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-light tracking-tighter leading-[0.9];
+  }
+  
+  .text-display-sm {
+    @apply text-5xl md:text-6xl lg:text-7xl font-light tracking-tight leading-[0.95];
+  }
+  
+  /* Hero Headlines */
+  .text-hero {
+    @apply text-4xl md:text-5xl lg:text-6xl font-light tracking-tight leading-[1.1];
+  }
+  
+  /* Section Headers */
+  .text-section {
+    @apply text-2xl md:text-3xl lg:text-4xl font-light tracking-tight leading-tight;
+  }
+  
+  /* Eyebrow / Labels */
+  .text-eyebrow {
+    @apply text-[10px] md:text-xs font-medium tracking-[0.2em] uppercase;
+  }
+  
+  /* Editorial Body */
+  .text-editorial {
+    @apply text-base md:text-lg font-light leading-relaxed;
+  }
+  
+  /* Caption */
+  .text-caption {
+    @apply text-xs font-light tracking-wide;
+  }
+  
+  /* Marquee Animation */
+  @keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+  
+  .animate-marquee {
+    animation: marquee 30s linear infinite;
+  }
+  
+  .animate-marquee:hover {
+    animation-play-state: paused;
+  }
+  
+  /* Editorial Grid Layouts */
+  .grid-editorial {
+    @apply grid gap-1 md:gap-2;
+  }
+  
+  /* Hide scrollbar */
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
 }
