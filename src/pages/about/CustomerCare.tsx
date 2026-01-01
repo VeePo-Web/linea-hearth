@@ -1,5 +1,4 @@
-import Header from "../../components/header/Header";
-import Footer from "../../components/footer/Footer";
+import Layout from "@/components/layout/Layout";
 import PageHeader from "../../components/about/PageHeader";
 import ContentSection from "../../components/about/ContentSection";
 import { Button } from "../../components/ui/button";
@@ -10,9 +9,7 @@ import AboutSidebar from "../../components/about/AboutSidebar";
 
 const CustomerCare = () => {
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      
+    <Layout>
       <div className="flex">
         <div className="hidden lg:block">
           <AboutSidebar />
@@ -144,9 +141,7 @@ const CustomerCare = () => {
         </ContentSection>
         </main>
       </div>
-      
-      <Footer />
-    </div>
+    </Layout>
   );
 };
 

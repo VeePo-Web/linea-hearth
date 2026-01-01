@@ -1,6 +1,5 @@
 import { useEffect } from "react";
-import Header from "@/components/header/Header";
-import Footer from "@/components/footer/Footer";
+import Layout from "@/components/layout/Layout";
 import LegalSidebar from "@/components/legal/LegalSidebar";
 import ReturnFlowSteps from "@/components/returns/ReturnFlowSteps";
 import { Button } from "@/components/ui/button";
@@ -19,11 +18,9 @@ const ReturnsExchanges = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      
+    <Layout>
       {/* Hero */}
-      <section className="bg-stone-900 text-white pt-32 pb-20 px-6">
+      <section className="bg-stone-900 text-white pt-12 pb-20 px-6">
         <div className="max-w-4xl mx-auto text-center">
           <span className="inline-block text-xs font-medium tracking-widest text-amber-500 mb-4">
             HASSLE-FREE RETURNS
@@ -227,9 +224,7 @@ const ReturnsExchanges = () => {
           </div>
         </div>
       </main>
-
-      <Footer />
-    </div>
+    </Layout>
   );
 };
 

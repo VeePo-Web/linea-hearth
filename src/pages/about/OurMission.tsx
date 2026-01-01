@@ -1,5 +1,4 @@
-import Header from '@/components/header/Header';
-import Footer from '@/components/footer/Footer';
+import Layout from '@/components/layout/Layout';
 import BrandFilmHero from '@/components/about/BrandFilmHero';
 import FounderLetter from '@/components/about/FounderLetter';
 import OriginStory from '@/components/about/OriginStory';
@@ -10,34 +9,28 @@ import WearTheMissionCTA from '@/components/about/WearTheMissionCTA';
 
 const OurMission = () => {
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      
-      <main>
-        {/* Hero: Brand Film with Overlay */}
-        <BrandFilmHero />
+    <Layout>
+      {/* Hero: Brand Film with Overlay */}
+      <BrandFilmHero />
 
-        {/* Founder Letter: Personal Story */}
-        <FounderLetter />
+      {/* Founder Letter: Personal Story */}
+      <FounderLetter />
 
-        {/* Origin Story: Lion of Judah */}
-        <OriginStory />
+      {/* Origin Story: Lion of Judah */}
+      <OriginStory />
 
-        {/* Ministry in Motion: UGC Carousel */}
-        <MinistryInMotion />
+      {/* Ministry in Motion: UGC Carousel */}
+      <MinistryInMotion />
 
-        {/* Impact Map: Stats + Cities */}
-        <ImpactMap />
+      {/* Impact Map: Stats + Cities */}
+      <ImpactMap />
 
-        {/* Values Pillars: Evangelism, Identity, Conviction */}
-        <ValuesPillars />
+      {/* Values Pillars: Evangelism, Identity, Conviction */}
+      <ValuesPillars />
 
-        {/* CTA: Wear the Mission */}
-        <WearTheMissionCTA />
-      </main>
-      
-      <Footer />
-    </div>
+      {/* CTA: Wear the Mission */}
+      <WearTheMissionCTA />
+    </Layout>
   );
 };
 
