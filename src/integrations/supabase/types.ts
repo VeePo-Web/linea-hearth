@@ -14,6 +14,72 @@ export type Database = {
   }
   public: {
     Tables: {
+      ambassador_applications: {
+        Row: {
+          admin_notes: string | null
+          agreed_to_terms: boolean
+          content_frequency: string
+          content_types: string[]
+          created_at: string
+          email: string
+          faith_in_content: string
+          follower_count_range: string
+          full_name: string
+          id: string
+          instagram_handle: string | null
+          location: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          tiktok_handle: string | null
+          twitter_handle: string | null
+          why_represent: string
+          youtube_handle: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          agreed_to_terms?: boolean
+          content_frequency: string
+          content_types?: string[]
+          created_at?: string
+          email: string
+          faith_in_content: string
+          follower_count_range: string
+          full_name: string
+          id?: string
+          instagram_handle?: string | null
+          location?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          tiktok_handle?: string | null
+          twitter_handle?: string | null
+          why_represent: string
+          youtube_handle?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          agreed_to_terms?: boolean
+          content_frequency?: string
+          content_types?: string[]
+          created_at?: string
+          email?: string
+          faith_in_content?: string
+          follower_count_range?: string
+          full_name?: string
+          id?: string
+          instagram_handle?: string | null
+          location?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          tiktok_handle?: string | null
+          twitter_handle?: string | null
+          why_represent?: string
+          youtube_handle?: string | null
+        }
+        Relationships: []
+      }
       categories: {
         Row: {
           created_at: string

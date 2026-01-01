@@ -26,6 +26,7 @@ import ShippingInfo from "./pages/ShippingInfo";
 import Accessibility from "./pages/Accessibility";
 import Lookbook from "./pages/Lookbook";
 import TryOnRoom from "./pages/TryOnRoom";
+import Ambassador from "./pages/Ambassador";
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminProducts from "./pages/admin/AdminProducts";
@@ -59,6 +60,7 @@ const AnimatedRoutes = () => {
         <Route path="/lookbook" element={<PageTransition><Lookbook /></PageTransition>} />
         <Route path="/try-on" element={<PageTransition><TryOnRoom /></PageTransition>} />
         <Route path="/try-on/saved/:outfitId" element={<PageTransition><TryOnRoom /></PageTransition>} />
+        <Route path="/ambassador" element={<PageTransition><Ambassador /></PageTransition>} />
         {/* Admin Routes */}
         <Route path="/admin/login" element={<PageTransition><AdminLogin /></PageTransition>} />
         <Route path="/admin" element={<ProtectedRoute requireAdmin><PageTransition><AdminDashboard /></PageTransition></ProtectedRoute>} />
