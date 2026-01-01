@@ -22,8 +22,8 @@ const LegalPageLayout = ({
     <div className="min-h-screen bg-background">
       <Header />
       
-      {/* Hero Section */}
-      <section className="bg-stone-900 text-white pt-32 pb-16 px-6">
+      {/* Hero Section - pt-[var(--header-height)] for header offset + additional padding */}
+      <section className="bg-stone-900 text-white pt-[calc(var(--header-height)+2rem)] pb-16 px-6">
         <div className="max-w-7xl mx-auto">
           <div className="max-w-3xl">
             {lastUpdated && (

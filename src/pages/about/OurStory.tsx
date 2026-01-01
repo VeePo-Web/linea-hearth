@@ -1,5 +1,4 @@
-import Header from "../../components/header/Header";
-import Footer from "../../components/footer/Footer";
+import Layout from "@/components/layout/Layout";
 import PageHeader from "../../components/about/PageHeader";
 import ContentSection from "../../components/about/ContentSection";
 import ImageTextBlock from "../../components/about/ImageTextBlock";
@@ -7,9 +6,7 @@ import AboutSidebar from "../../components/about/AboutSidebar";
 
 const OurStory = () => {
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      
+    <Layout>
       <div className="flex">
         <div className="hidden lg:block">
           <AboutSidebar />
@@ -76,9 +73,7 @@ const OurStory = () => {
           </ContentSection>
         </main>
       </div>
-      
-      <Footer />
-    </div>
+    </Layout>
   );
 };
 

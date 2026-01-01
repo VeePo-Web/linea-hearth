@@ -124,7 +124,7 @@ const TryOnRoomContent = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col pt-[var(--header-height)]">
       <Header />
       
       {/* Saved Outfit Banner */}

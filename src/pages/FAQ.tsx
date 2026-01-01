@@ -1,7 +1,6 @@
 import { useState, useMemo } from "react";
 import { useEffect } from "react";
-import Header from "@/components/header/Header";
-import Footer from "@/components/footer/Footer";
+import Layout from "@/components/layout/Layout";
 import FAQHero from "@/components/faq/FAQHero";
 import FAQCategoryNav from "@/components/faq/FAQCategoryNav";
 import FAQAccordionGroup from "@/components/faq/FAQAccordionGroup";
@@ -228,9 +227,7 @@ const FAQ = () => {
   const hasNoResults = searchQuery.trim() && filteredFAQs.length === 0;
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      
+    <Layout>
       <FAQHero 
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
@@ -295,13 +292,11 @@ const FAQ = () => {
         )}
       </main>
 
-      <Footer />
-
       <AskUsModal 
         isOpen={isAskModalOpen}
         onClose={() => setIsAskModalOpen(false)}
       />
-    </div>
+    </Layout>
   );
 };
 

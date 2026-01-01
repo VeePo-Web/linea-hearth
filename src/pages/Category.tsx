@@ -1,7 +1,6 @@
 import { useState, useCallback } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
-import Header from "../components/header/Header";
-import Footer from "../components/footer/Footer";
+import Layout from "@/components/layout/Layout";
 import CollectionHero from "../components/category/CollectionHero";
 import FilterSortBar, { FilterState, SortOption } from "../components/category/FilterSortBar";
 import ProductGrid from "../components/category/ProductGrid";
@@ -79,39 +78,33 @@ const Category = () => {
   }, [searchParams, setSearchParams]);
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
+    <Layout>
+      <CollectionHero 
+        category={category || "Shop"} 
+        productCount={totalCount}
+      />
       
-      <main>
-        <CollectionHero 
-          category={category || "Shop"} 
-          productCount={totalCount}
+      <div className="pt-8">
+        <FilterSortBar 
+          filtersOpen={filtersOpen}
+          setFiltersOpen={setFiltersOpen}
+          itemCount={totalCount}
+          filters={filters}
+          onFilterChange={handleFilterChange}
+          sortBy={sortBy}
+          onSortChange={handleSortChange}
         />
         
-        <div className="pt-8">
-          <FilterSortBar 
-            filtersOpen={filtersOpen}
-            setFiltersOpen={setFiltersOpen}
-            itemCount={totalCount}
-            filters={filters}
-            onFilterChange={handleFilterChange}
-            sortBy={sortBy}
-            onSortChange={handleSortChange}
-          />
-          
-          <ProductGrid 
-            categorySlug={category}
-            filters={filters}
-            sortBy={sortBy}
-            page={page}
-            pageSize={12}
-            onTotalCountChange={setTotalCount}
-          />
-        </div>
-      </main>
-      
-      <Footer />
-    </div>
+        <ProductGrid 
+          categorySlug={category}
+          filters={filters}
+          sortBy={sortBy}
+          page={page}
+          pageSize={12}
+          onTotalCountChange={setTotalCount}
+        />
+      </div>
+    </Layout>
   );
 };
 
