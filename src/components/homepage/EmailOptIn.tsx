@@ -38,7 +38,6 @@ const EmailOptIn = () => {
     e.preventDefault();
     setError("");
 
-    // Validate email
     const validation = emailSchema.safeParse(email.trim());
     if (!validation.success) {
       setError(validation.error.errors[0].message);
@@ -57,8 +56,7 @@ const EmailOptIn = () => {
 
       if (insertError) {
         if (insertError.code === '23505') {
-          // Duplicate email
-          setError("You're already subscribed! Check your inbox for updates.");
+          setError("You're already subscribed!");
         } else {
           throw insertError;
         }
@@ -66,8 +64,8 @@ const EmailOptIn = () => {
         setIsSuccess(true);
         setEmail("");
         toast({
-          title: "Welcome to the tribe! 🙌",
-          description: "Check your email for your 15% discount code.",
+          title: "Welcome to the movement.",
+          description: "Check your email for your discount code.",
         });
       }
     } catch (err) {
@@ -81,91 +79,70 @@ const EmailOptIn = () => {
   return (
     <section 
       ref={sectionRef}
-      className="w-full py-16 md:py-24 bg-stone-900"
+      className="w-full py-24 md:py-32 bg-foreground"
     >
-      <div className="max-w-3xl mx-auto px-6 text-center">
+      <div className="max-w-4xl mx-auto px-6 text-center">
         <div 
           className={`transition-all duration-700 ${
             isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
           }`}
         >
-          {/* Eyebrow */}
-          <p className="text-amber-500 text-xs tracking-[0.3em] uppercase mb-4">
-            Newsletter
-          </p>
-
-          {/* Headline */}
-          <h2 className="text-white text-3xl md:text-4xl lg:text-5xl font-light mb-4">
-            Join the Tribe
+          {/* Oversized Headline - Editorial impact */}
+          <h2 className="text-display-sm text-background mb-6">
+            JOIN THE
+            <br />
+            <span className="text-accent">MOVEMENT.</span>
           </h2>
 
           {/* Subtext */}
-          <p className="text-white/70 text-lg font-light mb-8 max-w-lg mx-auto">
-            Get <span className="text-amber-400 font-medium">15% off</span> your first order, 
-            plus exclusive drops, faith inspiration, and early access to new collections.
+          <p className="text-editorial text-background/60 mb-10 max-w-md mx-auto">
+            Get 15% off your first order. Early access to drops. Faith inspiration weekly.
           </p>
 
-          {/* Form */}
+          {/* Form - Single line */}
           {isSuccess ? (
-            <div 
-              className={`flex items-center justify-center gap-3 text-amber-400 transition-all duration-500 ${
-                isSuccess ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
-              }`}
-            >
-              <CheckCircle className="w-6 h-6" />
-              <span className="text-lg font-light">You're in! Check your inbox.</span>
+            <div className="flex items-center justify-center gap-3 text-accent">
+              <CheckCircle className="w-5 h-5" />
+              <span className="text-sm font-light">You're in. Check your inbox.</span>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="max-w-md mx-auto">
-              <div className="flex flex-col sm:flex-row gap-3">
-                <div className="flex-1">
-                  <Input 
-                    type="email"
-                    placeholder="Enter your email"
-                    value={email}
-                    onChange={(e) => {
-                      setEmail(e.target.value);
-                      setError("");
-                    }}
-                    className="bg-white/10 border-white/20 text-white placeholder:text-white/50 h-12 rounded-none focus:border-amber-500 focus:ring-amber-500"
-                    disabled={isSubmitting}
-                  />
-                </div>
+              <div className="flex gap-2">
+                <Input 
+                  type="email"
+                  placeholder="Enter your email"
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    setError("");
+                  }}
+                  className="flex-1 bg-transparent border-background/30 text-background placeholder:text-background/40 h-12 rounded-none focus:border-accent focus:ring-accent"
+                  disabled={isSubmitting}
+                />
                 <Button 
                   type="submit"
                   size="lg"
-                  className="bg-amber-500 hover:bg-amber-400 text-black font-medium h-12 px-8 rounded-none group"
+                  className="bg-background text-foreground hover:bg-accent hover:text-foreground h-12 px-6 rounded-none font-medium"
                   disabled={isSubmitting}
                 >
                   {isSubmitting ? (
-                    <span className="flex items-center">
-                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      Joining...
-                    </span>
+                    <span className="w-4 h-4 border-2 border-foreground/30 border-t-foreground rounded-full animate-spin" />
                   ) : (
-                    <>
-                      Subscribe
-                      <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-                    </>
+                    <ArrowRight className="w-4 h-4" />
                   )}
                 </Button>
               </div>
 
-              {/* Error Message */}
               {error && (
-                <p className="text-red-400 text-sm mt-3 text-left">{error}</p>
+                <p className="text-destructive text-sm mt-3 text-left">{error}</p>
               )}
             </form>
           )}
 
-          {/* Privacy Note */}
-          <p className="text-white/40 text-xs font-light mt-6">
+          {/* Privacy Note - Minimal */}
+          <p className="text-caption text-background/30 mt-8">
             By subscribing, you agree to our{" "}
-            <a href="/privacy-policy" className="underline hover:text-white/60">Privacy Policy</a>.
-            Unsubscribe anytime.
+            <a href="/privacy-policy" className="underline hover:text-background/50">Privacy Policy</a>.
           </p>
         </div>
       </div>

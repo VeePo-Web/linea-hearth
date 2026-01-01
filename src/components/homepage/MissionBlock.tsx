@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 
 const MissionBlock = () => {
@@ -27,92 +26,53 @@ const MissionBlock = () => {
   return (
     <section 
       ref={sectionRef}
-      className="w-full py-16 md:py-24 bg-stone-50"
+      className="relative w-full min-h-[70vh] overflow-hidden"
     >
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
-          {/* Image */}
-          <div 
-            className={`order-2 lg:order-1 transition-all duration-1000 ${
-              isVisible 
-                ? 'opacity-100 translate-x-0' 
-                : 'opacity-0 -translate-x-8'
-            }`}
+      {/* Full-bleed Background Image */}
+      <div 
+        className={`absolute inset-0 transition-all duration-1000 ${
+          isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
+        }`}
+      >
+        <img 
+          src="/products/stay-holy-hoodie/female-model-1.png"
+          alt="Line of Judah Community"
+          className="w-full h-full object-cover object-center"
+        />
+        <div className="absolute inset-0 bg-foreground/40" />
+      </div>
+
+      {/* Content Overlay - Magazine ad style */}
+      <div className="relative z-10 min-h-[70vh] flex items-center justify-center px-6">
+        <div 
+          className={`bg-background p-8 md:p-12 lg:p-16 max-w-2xl text-center transition-all duration-1000 ${
+            isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+          }`}
+          style={{ transitionDelay: '200ms' }}
+        >
+          {/* Eyebrow */}
+          <p className="text-eyebrow text-accent mb-6">Our Mission</p>
+
+          {/* Headline */}
+          <h2 className="text-hero text-foreground mb-6">
+            MORE THAN
+            <br />
+            CLOTHING.
+          </h2>
+
+          {/* Quote */}
+          <p className="text-editorial text-muted-foreground mb-8 max-w-md mx-auto">
+            A movement of believers wearing their faith boldly. Every piece designed with intention, rooted in Scripture.
+          </p>
+
+          {/* CTA */}
+          <Link 
+            to="/about/our-story"
+            className="inline-flex items-center gap-2 text-foreground text-sm font-medium tracking-wide hover:text-accent transition-colors group"
           >
-            <div className="aspect-[4/5] overflow-hidden">
-              <img 
-                src="/products/heavenly-crewneck/lifestyle.png"
-                alt="Heavenly Crewneck - Line of Judah"
-                className="w-full h-full object-cover"
-              />
-            </div>
-          </div>
-
-          {/* Content */}
-          <div 
-            className={`order-1 lg:order-2 transition-all duration-1000 ${
-              isVisible 
-                ? 'opacity-100 translate-x-0' 
-                : 'opacity-0 translate-x-8'
-            }`}
-            style={{ transitionDelay: '200ms' }}
-          >
-            {/* Eyebrow */}
-            <p className="text-amber-600 text-xs tracking-[0.2em] uppercase mb-6">
-              Our Mission
-            </p>
-
-            {/* Headline */}
-            <h2 className="text-foreground text-3xl md:text-4xl lg:text-5xl font-light leading-tight mb-6">
-              More Than Clothing.
-              <br />
-              <span className="text-amber-600">A Movement.</span>
-            </h2>
-
-            {/* Body Copy */}
-            <div className="space-y-4 text-muted-foreground font-light mb-8">
-              <p>
-                Line of Judah was born from a simple belief: your wardrobe should reflect 
-                your values. We create premium apparel that empowers believers to boldly 
-                express their faith in everyday life.
-              </p>
-              <p>
-                Every piece is designed with intention, crafted with excellence, and 
-                rooted in Scripture. When you wear Line of Judah, you're not just wearing 
-                clothes — you're joining a community of believers committed to living 
-                out their purpose.
-              </p>
-            </div>
-
-            {/* Stats */}
-            <div className="grid grid-cols-3 gap-6 mb-8 pb-8 border-b border-border">
-              <div>
-                <p className="text-amber-600 text-2xl md:text-3xl font-light mb-1">10K+</p>
-                <p className="text-muted-foreground text-xs uppercase tracking-wider">Community Members</p>
-              </div>
-              <div>
-                <p className="text-amber-600 text-2xl md:text-3xl font-light mb-1">50+</p>
-                <p className="text-muted-foreground text-xs uppercase tracking-wider">Unique Designs</p>
-              </div>
-              <div>
-                <p className="text-amber-600 text-2xl md:text-3xl font-light mb-1">$25K</p>
-                <p className="text-muted-foreground text-xs uppercase tracking-wider">Given Back</p>
-              </div>
-            </div>
-
-            {/* CTA */}
-            <Button 
-              asChild
-              variant="outline"
-              size="lg"
-              className="border-foreground text-foreground hover:bg-foreground hover:text-background rounded-none px-8 group"
-            >
-              <Link to="/about/our-story">
-                Why Line of Judah
-                <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-              </Link>
-            </Button>
-          </div>
+            Our Story
+            <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+          </Link>
         </div>
       </div>
     </section>

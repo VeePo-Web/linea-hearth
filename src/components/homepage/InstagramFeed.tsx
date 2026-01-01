@@ -1,13 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import { Instagram, Heart, MessageCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Instagram } from "lucide-react";
 
 interface InstagramPost {
   id: string;
   image: string;
-  likes: number;
-  comments: number;
-  link: string;
 }
 
 const InstagramFeed = () => {
@@ -31,50 +27,14 @@ const InstagramFeed = () => {
     return () => observer.disconnect();
   }, []);
 
-  // Mock Instagram posts - replace with actual API integration
+  // Mock Instagram posts
   const posts: InstagramPost[] = [
-    {
-      id: '1',
-      image: '/products/stay-holy-hoodie/flat-front.png',
-      likes: 234,
-      comments: 12,
-      link: 'https://instagram.com/lineofjudahwear'
-    },
-    {
-      id: '2',
-      image: '/products/heavenly-crewneck/flat-lay.png',
-      likes: 567,
-      comments: 34,
-      link: 'https://instagram.com/lineofjudahwear'
-    },
-    {
-      id: '3',
-      image: '/products/stay-holy-hoodie/female-model-1.png',
-      likes: 189,
-      comments: 8,
-      link: 'https://instagram.com/lineofjudahwear'
-    },
-    {
-      id: '4',
-      image: '/products/heavenly-crewneck/front-model.png',
-      likes: 423,
-      comments: 21,
-      link: 'https://instagram.com/lineofjudahwear'
-    },
-    {
-      id: '5',
-      image: '/products/stay-holy-hoodie/male-model.png',
-      likes: 312,
-      comments: 15,
-      link: 'https://instagram.com/lineofjudahwear'
-    },
-    {
-      id: '6',
-      image: '/products/heavenly-crewneck/female-model.png',
-      likes: 678,
-      comments: 42,
-      link: 'https://instagram.com/lineofjudahwear'
-    }
+    { id: '1', image: '/products/stay-holy-hoodie/flat-front.png' },
+    { id: '2', image: '/products/heavenly-crewneck/flat-lay.png' },
+    { id: '3', image: '/products/stay-holy-hoodie/female-model-1.png' },
+    { id: '4', image: '/products/heavenly-crewneck/front-model.png' },
+    { id: '5', image: '/products/stay-holy-hoodie/male-model.png' },
+    { id: '6', image: '/products/heavenly-crewneck/female-model.png' },
   ];
 
   return (
@@ -83,87 +43,94 @@ const InstagramFeed = () => {
       className="w-full py-16 md:py-24 bg-background"
     >
       <div className="max-w-7xl mx-auto px-6">
-        {/* Section Header */}
+        {/* Section Header - Minimal */}
         <div 
-          className={`text-center mb-10 transition-all duration-700 ${
+          className={`flex items-center justify-between mb-8 transition-all duration-700 ${
             isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
           }`}
         >
-          <div className="flex items-center justify-center gap-2 mb-3">
-            <Instagram className="w-5 h-5 text-amber-600" />
-            <p className="text-amber-600 text-xs tracking-[0.2em] uppercase">
-              Join the Movement
-            </p>
+          <div className="flex items-center gap-3">
+            <Instagram className="w-5 h-5 text-foreground" />
+            <span className="text-sm font-light text-foreground">@lineofjudahwear</span>
           </div>
-          <h2 className="text-foreground text-3xl md:text-4xl font-light">
-            @lineofjudahwear
-          </h2>
+          <a 
+            href="https://instagram.com/lineofjudahwear" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-caption text-muted-foreground hover:text-foreground transition-colors uppercase"
+          >
+            Follow
+          </a>
         </div>
 
-        {/* Instagram Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-4 mb-10">
-          {posts.map((post, index) => (
+        {/* Collage Grid - DAZED asymmetric offset style */}
+        <div className="grid grid-cols-12 gap-2">
+          {/* Large left image */}
+          <a
+            href="https://instagram.com/lineofjudahwear"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`col-span-6 md:col-span-4 row-span-2 relative aspect-[3/4] overflow-hidden group transition-all duration-700 ${
+              isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+            }`}
+          >
+            <img 
+              src={posts[0].image}
+              alt="Instagram post"
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+          </a>
+
+          {/* Top right small images */}
+          {posts.slice(1, 3).map((post, index) => (
             <a
               key={post.id}
-              href={post.link}
+              href="https://instagram.com/lineofjudahwear"
               target="_blank"
               rel="noopener noreferrer"
-              className={`group relative aspect-square overflow-hidden transition-all duration-700 ${
-                isVisible 
-                  ? 'opacity-100 translate-y-0' 
-                  : 'opacity-0 translate-y-8'
+              className={`col-span-6 md:col-span-4 relative aspect-square overflow-hidden group transition-all duration-700 ${
+                isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
               }`}
-              style={{ transitionDelay: `${index * 100}ms` }}
+              style={{ transitionDelay: `${(index + 1) * 100}ms` }}
             >
               <img 
                 src={post.image}
                 alt="Instagram post"
-                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
-              
-              {/* Hover Overlay */}
-              <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                <div className="flex items-center gap-6 text-white">
-                  <div className="flex items-center gap-2">
-                    <Heart className="w-5 h-5" fill="white" />
-                    <span className="font-light">{post.likes}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <MessageCircle className="w-5 h-5" fill="white" />
-                    <span className="font-light">{post.comments}</span>
-                  </div>
-                </div>
-              </div>
+            </a>
+          ))}
+
+          {/* Bottom images - offset */}
+          {posts.slice(3, 6).map((post, index) => (
+            <a
+              key={post.id}
+              href="https://instagram.com/lineofjudahwear"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`col-span-4 relative aspect-square overflow-hidden group transition-all duration-700 ${
+                isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+              }`}
+              style={{ transitionDelay: `${(index + 3) * 100}ms` }}
+            >
+              <img 
+                src={post.image}
+                alt="Instagram post"
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+              />
             </a>
           ))}
         </div>
 
-        {/* CTA */}
-        <div 
-          className={`text-center transition-all duration-700 ${
-            isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+        {/* Tag CTA */}
+        <p 
+          className={`text-center text-caption text-muted-foreground mt-8 transition-all duration-700 ${
+            isVisible ? 'opacity-100' : 'opacity-0'
           }`}
           style={{ transitionDelay: '600ms' }}
         >
-          <Button 
-            asChild
-            variant="outline"
-            size="lg"
-            className="border-foreground text-foreground hover:bg-foreground hover:text-background rounded-none px-8"
-          >
-            <a 
-              href="https://instagram.com/lineofjudahwear" 
-              target="_blank" 
-              rel="noopener noreferrer"
-            >
-              <Instagram className="w-4 h-4 mr-2" />
-              Follow Us on Instagram
-            </a>
-          </Button>
-          <p className="text-muted-foreground text-sm font-light mt-4">
-            Tag us in your photos for a chance to be featured
-          </p>
-        </div>
+          Tag us for a chance to be featured
+        </p>
       </div>
     </section>
   );

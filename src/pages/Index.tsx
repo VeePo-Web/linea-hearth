@@ -1,32 +1,55 @@
 import Header from "../components/header/Header";
 import Footer from "../components/footer/Footer";
-import HeroBlock from "../components/homepage/HeroBlock";
+import EditorialHero from "../components/homepage/EditorialHero";
 import ValueStackBanner from "../components/homepage/ValueStackBanner";
-import FeaturedCollection from "../components/homepage/FeaturedCollection";
+import FeaturedDrop from "../components/homepage/FeaturedDrop";
+import CategoryTiles from "../components/homepage/CategoryTiles";
+import MarqueeStrip from "../components/homepage/MarqueeStrip";
 import MissionBlock from "../components/homepage/MissionBlock";
-import ReviewsCarousel from "../components/homepage/ReviewsCarousel";
-import ProductGridTeaser from "../components/homepage/ProductGridTeaser";
+import DropGrid from "../components/homepage/DropGrid";
+import FeaturedCollection from "../components/homepage/FeaturedCollection";
 import TestimonySpotlight from "../components/homepage/TestimonySpotlight";
 import InstagramFeed from "../components/homepage/InstagramFeed";
 import EmailOptIn from "../components/homepage/EmailOptIn";
-import SecondaryCTAStrip from "../components/homepage/SecondaryCTAStrip";
 import MobileStickyBar from "../components/homepage/MobileStickyBar";
 
 const Index = () => {
   return (
     <div className="min-h-screen bg-background">
-      <SecondaryCTAStrip />
       <Header />
       
       <main>
-        <HeroBlock />
+        {/* Editorial Hero - Asymmetric split layout */}
+        <EditorialHero />
+        
+        {/* Value Strip - Compressed single line */}
         <ValueStackBanner />
+        
+        {/* Featured Drop - Magazine spread */}
+        <FeaturedDrop />
+        
+        {/* Category Tiles - 032c asymmetric grid */}
+        <CategoryTiles />
+        
+        {/* Social Proof Marquee */}
+        <MarqueeStrip />
+        
+        {/* Bestsellers Grid */}
         <FeaturedCollection />
+        
+        {/* Mission Block - Full-bleed editorial */}
         <MissionBlock />
-        <ReviewsCarousel />
-        <ProductGridTeaser />
+        
+        {/* New Arrivals - Drop culture grid */}
+        <DropGrid />
+        
+        {/* Testimony - i-D portrait style */}
         <TestimonySpotlight />
+        
+        {/* Instagram Collage */}
         <InstagramFeed />
+        
+        {/* Newsletter - Bold full-width */}
         <EmailOptIn />
       </main>
       

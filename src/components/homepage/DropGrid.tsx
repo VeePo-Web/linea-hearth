@@ -14,7 +14,7 @@ interface Product {
   sale_price: number | null;
 }
 
-const FeaturedCollection = () => {
+const DropGrid = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
   const sectionRef = useRef<HTMLElement>(null);
@@ -48,13 +48,13 @@ const FeaturedCollection = () => {
             price,
             is_on_sale,
             sale_price,
-            is_featured,
+            created_at,
             categories!products_category_id_fkey(name),
             product_images(image_url, is_primary)
           `)
           .eq('status', 'active')
-          .eq('is_featured', true)
-          .limit(8);
+          .order('created_at', { ascending: false })
+          .limit(4);
 
         if (error) throw error;
 
@@ -72,19 +72,19 @@ const FeaturedCollection = () => {
 
         setProducts(formattedProducts);
       } catch (error) {
-        console.error('Error fetching featured products:', error);
+        console.error('Error fetching products:', error);
       }
     };
 
     fetchProducts();
   }, []);
 
-  // Placeholder products
+  // Placeholder products with apparel focus
   const placeholderProducts: Product[] = [
-    { id: '1', name: 'Stay Holy Hoodie', slug: 'stay-holy-hoodie', price: 79, category_name: 'Hoodies', is_on_sale: false, sale_price: null },
-    { id: '2', name: 'Heavenly Crewneck', slug: 'heavenly-crewneck', price: 65, category_name: 'Tops', is_on_sale: false, sale_price: null },
-    { id: '3', name: 'Faith Over Fear Tee', slug: 'faith-over-fear-tee', price: 45, category_name: 'T-Shirts', is_on_sale: true, sale_price: 35 },
-    { id: '4', name: 'Kingdom Joggers', slug: 'kingdom-joggers', price: 75, category_name: 'Bottoms', is_on_sale: false, sale_price: null },
+    { id: '1', name: 'Grace Oversized Tee', slug: 'grace-oversized-tee', price: 48, category_name: 'T-Shirts', is_on_sale: false, sale_price: null },
+    { id: '2', name: 'Covenant Joggers', slug: 'covenant-joggers', price: 75, category_name: 'Pants', is_on_sale: false, sale_price: null },
+    { id: '3', name: 'Psalms Beanie', slug: 'psalms-beanie', price: 28, category_name: 'Accessories', is_on_sale: true, sale_price: 22 },
+    { id: '4', name: 'Glory Bomber Jacket', slug: 'glory-bomber-jacket', price: 120, category_name: 'Jackets', is_on_sale: false, sale_price: null },
   ];
 
   const displayProducts = products.length > 0 ? products : placeholderProducts;
@@ -95,28 +95,35 @@ const FeaturedCollection = () => {
       className="w-full py-16 md:py-24 bg-background"
     >
       <div className="max-w-7xl mx-auto px-6">
-        {/* Section Header - Editorial minimal */}
+        {/* Section Header - Hypebeast style */}
         <div 
           className={`flex justify-between items-end mb-8 transition-all duration-700 ${
             isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
           }`}
         >
           <div>
-            <p className="text-eyebrow text-muted-foreground mb-2">Bestsellers</p>
-            <h2 className="text-section text-foreground">Most Wanted</h2>
+            <div className="flex items-center gap-3 mb-2">
+              <span className="bg-destructive text-destructive-foreground text-[10px] font-bold tracking-wider uppercase px-2 py-0.5">
+                Just Dropped
+              </span>
+              <span className="text-caption text-muted-foreground">
+                {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+              </span>
+            </div>
+            <h2 className="text-section text-foreground">New Arrivals</h2>
           </div>
           <Link 
-            to="/category/shop"
+            to="/category/new-in"
             className="text-foreground text-sm font-light flex items-center gap-2 hover:text-accent transition-colors group"
           >
-            Shop All
+            View All
             <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
           </Link>
         </div>
 
-        {/* Product Grid - Clean, large images */}
+        {/* Product Grid - Editorial with index numbers */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4">
-          {displayProducts.slice(0, 4).map((product, index) => (
+          {displayProducts.map((product, index) => (
             <Link
               key={product.id}
               to={`/product/${product.slug}`}
@@ -143,9 +150,14 @@ const FeaturedCollection = () => {
                   </div>
                 )}
 
+                {/* Index Number - 032c style */}
+                <div className="absolute top-3 left-3 text-[10px] font-medium text-foreground bg-background px-2 py-1">
+                  #{String(index + 1).padStart(2, '0')}
+                </div>
+
                 {/* Sale Badge */}
                 {product.is_on_sale && (
-                  <div className="absolute top-3 left-3 bg-destructive text-destructive-foreground text-[10px] font-bold tracking-wider uppercase px-2 py-1">
+                  <div className="absolute top-3 right-3 bg-destructive text-destructive-foreground text-[10px] font-bold tracking-wider uppercase px-2 py-1">
                     Sale
                   </div>
                 )}
@@ -184,4 +196,4 @@ const FeaturedCollection = () => {
   );
 };
 
-export default FeaturedCollection;
+export default DropGrid;
