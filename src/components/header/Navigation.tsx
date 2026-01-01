@@ -94,21 +94,6 @@ const Navigation = () => {
       images: []
     },
     {
-      name: "New in",
-      href: "/category/new-in",
-      submenuItems: [
-        "This Week's Arrivals",
-        "Spring Collection",
-        "Featured Designers",
-        "Limited Edition",
-        "Pre-Orders"
-      ],
-      images: [
-        { src: "/arcus-bracelet.png", alt: "Arcus Bracelet", label: "Arcus Bracelet" },
-        { src: "/span-bracelet.png", alt: "Span Bracelet", label: "Span Bracelet" }
-      ]
-    },
-    {
       name: "Community",
       href: "/community",
       submenuItems: [],
@@ -119,10 +104,8 @@ const Navigation = () => {
       href: "/about/our-story",
       submenuItems: [
         "Our Story",
-        "Sustainability",
         "Size Guide",
-        "Customer Care",
-        "Store Locator"
+        "Customer Care"
       ],
       images: [
         { src: "/founders.png", alt: "Company Founders", label: "Read our story" }
@@ -259,9 +242,6 @@ const Navigation = () => {
                     if (activeDropdown === "Shop") {
                       if (image.label === "Rings") linkTo = "/category/rings";
                       else if (image.label === "Earrings") linkTo = "/category/earrings";
-                    } else if (activeDropdown === "New in") {
-                      if (image.label === "Arcus Bracelet") linkTo = "/product/arcus-bracelet";
-                      else if (image.label === "Span Bracelet") linkTo = "/product/span-bracelet";
                     } else if (activeDropdown === "About") {
                       linkTo = "/about/our-story";
                     }
@@ -273,7 +253,7 @@ const Navigation = () => {
                           alt={image.alt}
                           className="w-full h-full object-cover transition-opacity duration-200 group-hover:opacity-90"
                         />
-                        {(activeDropdown === "Shop" || activeDropdown === "New in" || activeDropdown === "About") && (
+                        {(activeDropdown === "Shop" || activeDropdown === "About") && (
                           <div className="absolute bottom-2 left-2 text-white text-xs font-light flex items-center gap-1">
                             <span>{image.label}</span>
                             <ArrowRight size={12} />
