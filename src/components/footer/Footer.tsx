@@ -32,7 +32,6 @@ const Footer = () => {
             <div>
               <h4 className="text-sm font-normal text-white mb-4">Shop</h4>
               <ul className="space-y-2">
-                <li><a href="/category/new-in" className="text-sm font-light text-white/70 hover:text-amber-500 transition-colors">New Arrivals</a></li>
                 <li><a href="/category/tees" className="text-sm font-light text-white/70 hover:text-amber-500 transition-colors">T-Shirts</a></li>
                 <li><a href="/category/hoodies" className="text-sm font-light text-white/70 hover:text-amber-500 transition-colors">Hoodies</a></li>
                 <li><a href="/category/accessories" className="text-sm font-light text-white/70 hover:text-amber-500 transition-colors">Accessories</a></li>
@@ -57,8 +56,7 @@ const Footer = () => {
               <h4 className="text-sm font-normal text-white mb-4">About</h4>
               <ul className="space-y-2">
                 <li><a href="/about/our-story" className="text-sm font-light text-white/70 hover:text-amber-500 transition-colors">Our Mission</a></li>
-                <li><a href="/about/sustainability" className="text-sm font-light text-white/70 hover:text-amber-500 transition-colors">Faith & Purpose</a></li>
-                <li><a href="/about/store-locator" className="text-sm font-light text-white/70 hover:text-amber-500 transition-colors">Community</a></li>
+                <li><a href="/about/customer-care" className="text-sm font-light text-white/70 hover:text-amber-500 transition-colors">Customer Care</a></li>
               </ul>
             </div>
           </div>
