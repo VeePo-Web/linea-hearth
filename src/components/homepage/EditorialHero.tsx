@@ -104,7 +104,7 @@ const EditorialHero = () => {
             transition={{ delay: 1.4, duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
             className="text-[10px] md:text-xs font-light tracking-[0.4em] uppercase text-muted-foreground"
           >
-            Issue 001 — Drop Season
+            Not a costume. Armor.
           </motion.p>
         </div>
 
@@ -165,7 +165,9 @@ const EditorialHero = () => {
             transition={{ delay: 1.6, duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }}
             className="mt-8 lg:mt-12 max-w-md text-base md:text-lg font-light leading-relaxed text-muted-foreground"
           >
-            Premium streetwear for the modern believer. Bold statements. Timeless purpose.
+            Some people wear crosses as accessories.<br />
+            You wear yours as a declaration.<br />
+            <span className="text-background">This is for you.</span>
           </motion.p>
         </div>
 

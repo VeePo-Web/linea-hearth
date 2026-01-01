@@ -12,159 +12,159 @@ interface CollectionContent {
 }
 
 const collectionData: Record<string, CollectionContent> = {
-  // Parent Categories
+  // Parent Categories - Polarizing conviction language
   "bottoms": {
     title: "Bottoms",
-    tagline: "Move in Faith",
+    tagline: "Run your race. Look good doing it.",
     bgClass: "bg-gradient-to-br from-stone-800 to-neutral-900",
   },
   "tees": {
     title: "Tees",
-    tagline: "Wear Your Faith Daily",
+    tagline: "You'll start conversations. Be ready.",
     bgClass: "bg-gradient-to-br from-stone-800 to-stone-900",
   },
   "hoodies": {
     title: "Hoodies",
-    tagline: "Comfort Meets Conviction",
+    tagline: "For the ones who don't apologize for their faith.",
     bgClass: "bg-gradient-to-br from-zinc-800 to-zinc-900",
   },
   "hats": {
     title: "Hats",
-    tagline: "Crown Your Style",
+    tagline: "Cover your head. Declare your King.",
     bgClass: "bg-gradient-to-br from-slate-800 to-slate-900",
   },
   "accessories": {
     title: "Accessories",
-    tagline: "Complete the Look",
+    tagline: "Finishing touches for the set apart.",
     bgClass: "bg-gradient-to-br from-amber-900/80 to-stone-900",
   },
 
   // Bottoms Subcategories
   "shorts": {
     title: "Shorts",
-    tagline: "Warm Weather Ministry",
+    tagline: "Light armor. Same conviction.",
     bgClass: "bg-gradient-to-br from-amber-800/60 to-stone-900",
   },
   "joggers": {
     title: "Joggers",
-    tagline: "Run Your Race",
+    tagline: "Run your race. No looking back.",
     bgClass: "bg-gradient-to-br from-stone-700 to-neutral-900",
   },
   "sweatpants": {
     title: "Sweatpants",
-    tagline: "Rest in Purpose",
+    tagline: "Rest days. Faith stays.",
     bgClass: "bg-gradient-to-br from-neutral-700 to-stone-900",
   },
 
   // Tees Subcategories
   "short-sleeve": {
     title: "Short Sleeve",
-    tagline: "Classic Faith Forward",
+    tagline: "The conversation starter.",
     bgClass: "bg-gradient-to-br from-stone-700 to-stone-900",
   },
   "long-sleeve": {
     title: "Long Sleeve",
-    tagline: "Extended Grace",
+    tagline: "All season. No season off.",
     bgClass: "bg-gradient-to-br from-zinc-700 to-stone-900",
   },
   "cropped": {
     title: "Cropped",
-    tagline: "Bold & Set Apart",
+    tagline: "Bold moves only.",
     bgClass: "bg-gradient-to-br from-amber-700/60 to-neutral-900",
   },
 
-  // Hoodies Subcategories (Professional Structure)
+  // Hoodies Subcategories
   "pullover-hoodies": {
     title: "Pullover Hoodies",
-    tagline: "Classic Comfort",
+    tagline: "No compromise. No apologies.",
     bgClass: "bg-gradient-to-br from-zinc-700 to-zinc-900",
   },
   "zip-up-hoodies": {
     title: "Zip-Up Hoodies",
-    tagline: "Versatile Devotion",
+    tagline: "Layer up. Stand out.",
     bgClass: "bg-gradient-to-br from-neutral-700 to-zinc-900",
   },
   "crewnecks": {
     title: "Crewnecks",
-    tagline: "Clean & Called",
+    tagline: "Clean lines. Clear message.",
     bgClass: "bg-gradient-to-br from-stone-600 to-zinc-900",
   },
   "quarter-zips": {
     title: "Quarter Zips",
-    tagline: "Athletic Heritage",
+    tagline: "Refined. Relentless.",
     bgClass: "bg-gradient-to-br from-slate-700 to-stone-900",
   },
   "lightweight-hoodies": {
     title: "Lightweight Hoodies",
-    tagline: "Layered in Light",
+    tagline: "Travel light. Carry weight.",
     bgClass: "bg-gradient-to-br from-zinc-600 to-neutral-900",
   },
 
   // Hats Subcategories
   "snapbacks": {
     title: "Snapbacks",
-    tagline: "Street Ministry",
+    tagline: "Streets know. You know.",
     bgClass: "bg-gradient-to-br from-stone-700 to-slate-900",
   },
   "dad-hats": {
     title: "Dad Hats",
-    tagline: "Relaxed & Righteous",
+    tagline: "Relaxed fit. Unrelaxed faith.",
     bgClass: "bg-gradient-to-br from-neutral-700 to-slate-900",
   },
   "beanies": {
     title: "Beanies",
-    tagline: "Covered in Faith",
+    tagline: "Cold world. Warm conviction.",
     bgClass: "bg-gradient-to-br from-zinc-700 to-slate-900",
   },
 
   // Accessories Subcategories
   "bags": {
     title: "Bags",
-    tagline: "Carry the Message",
+    tagline: "Carry the message wherever you go.",
     bgClass: "bg-gradient-to-br from-amber-800/70 to-stone-900",
   },
   "socks": {
     title: "Socks",
-    tagline: "Grounded in Truth",
+    tagline: "Grounded. Every step.",
     bgClass: "bg-gradient-to-br from-stone-700 to-amber-900/50",
   },
   "stickers": {
     title: "Stickers",
-    tagline: "Spread the Word",
+    tagline: "Mark your territory.",
     bgClass: "bg-gradient-to-br from-amber-700/50 to-neutral-900",
   },
 
   // Special Collections
   "t-shirts": {
     title: "T-Shirts",
-    tagline: "Wear Your Faith Daily",
+    tagline: "You'll start conversations. Be ready.",
     bgClass: "bg-gradient-to-br from-stone-800 to-stone-900",
   },
   "sweatshirts": {
     title: "Sweatshirts",
-    tagline: "Bold Warmth, Timeless Message",
+    tagline: "Warm body. Warmer purpose.",
     bgClass: "bg-gradient-to-br from-neutral-800 to-neutral-900",
   },
   "new-arrivals": {
     title: "New Arrivals",
-    tagline: "Fresh Drops, Timeless Truth",
+    tagline: "New fire. Same conviction.",
     bgClass: "bg-gradient-to-br from-stone-700 to-zinc-900",
   },
   "best-sellers": {
     title: "Best Sellers",
-    tagline: "Community Favorites",
+    tagline: "Tribe approved. Field tested.",
     bgClass: "bg-gradient-to-br from-amber-800/60 to-stone-900",
   },
   "sale": {
     title: "Sale",
-    tagline: "Faith at a Blessing",
+    tagline: "Same message. Better price.",
     bgClass: "bg-gradient-to-br from-red-900/40 to-stone-900",
   },
 };
 
 const defaultContent: CollectionContent = {
   title: "Shop All",
-  tagline: "Faith-Forward Apparel",
+  tagline: "For those who walk different.",
   bgClass: "bg-gradient-to-br from-stone-700 to-stone-900",
 };
 

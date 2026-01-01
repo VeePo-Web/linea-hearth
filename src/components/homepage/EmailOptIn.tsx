@@ -67,7 +67,7 @@ const EmailOptIn = ({ variant = "default" }: EmailOptInProps) => {
   const editorialEase: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
   // Character animation for headline
-  const headlineWords = ["NEVER", "MISS A", "DROP."];
+  const headlineWords = ["THE", "TRIBE", "LIST."];
   
   const getCharacterTransition = (delay: number): Transition => ({
     type: "spring" as const,
@@ -127,7 +127,7 @@ const EmailOptIn = ({ variant = "default" }: EmailOptInProps) => {
               transition={getFadeUpTransition(0.2)}
               className="text-xs uppercase tracking-[0.3em] text-background/50 mb-8"
             >
-              Issue 024 — Exclusive Access
+              Only for those who are serious
             </motion.p>
 
             {/* Massive headline with character animation */}
@@ -264,7 +264,7 @@ const EmailOptIn = ({ variant = "default" }: EmailOptInProps) => {
                     disabled={isLoading}
                     className="group relative text-xs uppercase tracking-[0.2em] text-background/80 hover:text-background transition-colors duration-300 flex items-center gap-2 mt-8"
                   >
-                    <span>{isLoading ? "SUBSCRIBING..." : "SUBSCRIBE TO THE DROP"}</span>
+                    <span>{isLoading ? "JOINING..." : "GET EARLY ACCESS"}</span>
                     <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
                     {/* Animated underline */}
                     <span className="absolute -bottom-1 left-0 h-px bg-background origin-left transition-transform duration-300 scale-x-0 group-hover:scale-x-100 w-full" />
@@ -278,7 +278,7 @@ const EmailOptIn = ({ variant = "default" }: EmailOptInProps) => {
                   transition={getFadeUpTransition(1.6)}
                   className="text-xs text-background/40 uppercase tracking-[0.15em] pt-4"
                 >
-                  15% off your first order. Drops before anyone else.
+                  First to know. First to shop. 15% off your first order.
                 </motion.p>
               </motion.form>
             )}

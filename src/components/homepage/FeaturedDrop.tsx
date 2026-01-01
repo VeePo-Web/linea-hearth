@@ -36,10 +36,10 @@ const FeaturedDrop = () => {
             <ScrollReveal variant="fadeUp" delay={0.1}>
               <div className="inline-flex items-center gap-2 mb-8">
                 <span className="bg-destructive text-destructive-foreground text-[10px] font-bold tracking-wider uppercase px-3 py-1">
-                  New Drop
+                  Drop 002
                 </span>
                 <span className="text-caption text-background/60 uppercase">
-                  Limited Edition
+                  For the set apart
                 </span>
               </div>
             </ScrollReveal>
@@ -54,7 +54,8 @@ const FeaturedDrop = () => {
             {/* Description */}
             <ScrollReveal variant="fadeUp" delay={0.5}>
               <p className="text-editorial text-background/70 mb-8 max-w-md">
-                Premium heavyweight cotton. Oversized fit. A statement piece for the bold believer.
+                You'll get asked about this.<br />
+                What you say next is up to you.
               </p>
             </ScrollReveal>
 
@@ -70,7 +71,7 @@ const FeaturedDrop = () => {
                     to="/product/heavenly-crewneck"
                     className="inline-flex items-center gap-3 text-background text-sm font-medium tracking-wide hover:text-accent transition-colors group"
                   >
-                    Shop Now
+                    Carry the Message
                     <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-2" />
                   </Link>
                 </motion.div>

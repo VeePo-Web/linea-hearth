@@ -40,13 +40,13 @@ const MissionBlock = () => {
               whileInView={{ opacity: 1 }}
               transition={{ delay: 0.3, duration: 0.5 }}
             >
-              Our Mission
+              The line in the sand
             </motion.p>
 
             {/* Headline */}
             <div className="mb-6">
               <TextReveal 
-                text="MORE THAN CLOTHING." 
+                text="NOT FOR EVERYONE." 
                 className="text-hero text-foreground"
                 as="h2"
                 delay={0.4}
@@ -60,7 +60,7 @@ const MissionBlock = () => {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6, duration: 0.6 }}
             >
-              A movement of believers wearing their faith boldly. Every piece designed with intention, rooted in Scripture.
+              We make clothes for those who answer a higher call. The ones who start conversations, not confrontations. If that's you — welcome. If not — that's okay too.
             </motion.p>
 
             {/* CTA */}
