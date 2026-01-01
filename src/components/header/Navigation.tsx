@@ -63,11 +63,53 @@ const Navigation = () => {
       name: "Shop",
       href: "/category/shop",
       submenuItems: [
-        "Bottoms",
-        "Tees",
-        "Hoodies",
-        "Hats",
-        "Accessories"
+        { 
+          name: "Bottoms", 
+          href: "/category/bottoms",
+          subcategories: [
+            { name: "Shorts", href: "/category/shorts" },
+            { name: "Joggers", href: "/category/joggers" },
+            { name: "Sweatpants", href: "/category/sweatpants" }
+          ]
+        },
+        { 
+          name: "Tees", 
+          href: "/category/tees",
+          subcategories: [
+            { name: "Short Sleeve", href: "/category/short-sleeve" },
+            { name: "Long Sleeve", href: "/category/long-sleeve" },
+            { name: "Cropped", href: "/category/cropped" }
+          ]
+        },
+        { 
+          name: "Hoodies", 
+          href: "/category/hoodies",
+          subcategories: [
+            { name: "Pullover Hoodies", href: "/category/pullover-hoodies" },
+            { name: "Zip-Up Hoodies", href: "/category/zip-up-hoodies" },
+            { name: "Crewnecks", href: "/category/crewnecks" },
+            { name: "Quarter Zips", href: "/category/quarter-zips" },
+            { name: "Lightweight Hoodies", href: "/category/lightweight-hoodies" }
+          ]
+        },
+        { 
+          name: "Hats", 
+          href: "/category/hats",
+          subcategories: [
+            { name: "Snapbacks", href: "/category/snapbacks" },
+            { name: "Dad Hats", href: "/category/dad-hats" },
+            { name: "Beanies", href: "/category/beanies" }
+          ]
+        },
+        { 
+          name: "Accessories", 
+          href: "/category/accessories",
+          subcategories: [
+            { name: "Bags", href: "/category/bags" },
+            { name: "Socks", href: "/category/socks" },
+            { name: "Stickers", href: "/category/stickers" }
+          ]
+        }
       ],
       images: [
         { src: "/products/stay-holy-hoodie/flat-front.png", alt: "Hoodies Collection", label: "Hoodies" },
@@ -90,9 +132,9 @@ const Navigation = () => {
       name: "About",
       href: "/about/our-story",
       submenuItems: [
-        "Our Story",
-        "Size Guide",
-        "Customer Care"
+        { name: "Our Story", href: "/about/our-story", subcategories: [] },
+        { name: "Size Guide", href: "/about/size-guide", subcategories: [] },
+        { name: "Customer Care", href: "/about/customer-care", subcategories: [] }
       ],
       images: [
         { src: "/founders.png", alt: "Company Founders", label: "Read our story" }
@@ -201,22 +243,36 @@ const Navigation = () => {
         >
           <div className="px-6 py-8">
             <div className="flex justify-between w-full">
-              {/* Left side - Menu items */}
+              {/* Left side - Menu items with subcategories */}
               <div className="flex-1">
-                <ul className="space-y-2">
+                <div className="flex gap-12">
                   {navItems
                     .find(item => item.name === activeDropdown)
                     ?.submenuItems.map((subItem, index) => (
-                      <li key={index}>
+                      <div key={index} className="min-w-[140px]">
                         <Link
-                          to={activeDropdown === "About" ? `/about/${subItem.toLowerCase().replace(/\s+/g, '-')}` : `/category/${subItem.toLowerCase()}`}
-                          className="text-nav-foreground hover:text-nav-hover transition-colors duration-200 text-sm font-light block py-2"
+                          to={subItem.href}
+                          className="text-nav-foreground hover:text-nav-hover transition-colors duration-200 text-sm font-medium block pb-3 border-b border-border/30 mb-3"
                         >
-                          {subItem}
+                          {subItem.name}
                         </Link>
-                      </li>
+                        {subItem.subcategories && subItem.subcategories.length > 0 && (
+                          <ul className="space-y-2">
+                            {subItem.subcategories.map((sub, subIndex) => (
+                              <li key={subIndex}>
+                                <Link
+                                  to={sub.href}
+                                  className="text-nav-foreground/70 hover:text-nav-hover transition-colors duration-200 text-sm font-light block py-1"
+                                >
+                                  {sub.name}
+                                </Link>
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
                     ))}
-                </ul>
+                </div>
               </div>
 
               {/* Right side - Images */}
@@ -234,7 +290,7 @@ const Navigation = () => {
                     }
 
                     return (
-                      <Link key={index} to={linkTo} className="w-[400px] h-[280px] cursor-pointer group relative overflow-hidden block">
+                      <Link key={index} to={linkTo} className="w-[280px] h-[200px] cursor-pointer group relative overflow-hidden block">
                         <img
                           src={image.src}
                           alt={image.alt}
@@ -298,7 +354,7 @@ const Navigation = () => {
 
       {/* Mobile navigation menu */}
       {isMobileMenuOpen && (
-        <div className="lg:hidden absolute top-full left-0 right-0 bg-nav border-b border-border z-50">
+        <div className="lg:hidden absolute top-full left-0 right-0 bg-nav border-b border-border z-50 max-h-[80vh] overflow-y-auto">
           <div className="px-6 py-8">
             <div className="space-y-6">
               {navItems.map((item) => (
@@ -310,16 +366,31 @@ const Navigation = () => {
                   >
                     {item.name}
                   </Link>
-                  <div className="mt-3 pl-4 space-y-2">
+                  <div className="mt-3 pl-4 space-y-4">
                     {item.submenuItems.map((subItem, subIndex) => (
-                      <Link
-                        key={subIndex}
-                        to={item.name === "About" ? `/about/${subItem.toLowerCase().replace(/\s+/g, '-')}` : `/category/${subItem.toLowerCase()}`}
-                        className="text-nav-foreground/70 hover:text-nav-hover text-sm font-light block py-1"
-                        onClick={() => setIsMobileMenuOpen(false)}
-                      >
-                        {subItem}
-                      </Link>
+                      <div key={subIndex}>
+                        <Link
+                          to={subItem.href}
+                          className="text-nav-foreground hover:text-nav-hover text-sm font-medium block py-1"
+                          onClick={() => setIsMobileMenuOpen(false)}
+                        >
+                          {subItem.name}
+                        </Link>
+                        {subItem.subcategories && subItem.subcategories.length > 0 && (
+                          <div className="pl-3 mt-2 space-y-1">
+                            {subItem.subcategories.map((sub, idx) => (
+                              <Link
+                                key={idx}
+                                to={sub.href}
+                                className="text-nav-foreground/60 hover:text-nav-hover text-xs font-light block py-1"
+                                onClick={() => setIsMobileMenuOpen(false)}
+                              >
+                                {sub.name}
+                              </Link>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     ))}
                   </div>
                 </div>

@@ -12,8 +12,14 @@ interface CollectionContent {
 }
 
 const collectionData: Record<string, CollectionContent> = {
-  "t-shirts": {
-    title: "T-Shirts",
+  // Parent Categories
+  "bottoms": {
+    title: "Bottoms",
+    tagline: "Move in Faith",
+    bgClass: "bg-gradient-to-br from-stone-800 to-neutral-900",
+  },
+  "tees": {
+    title: "Tees",
     tagline: "Wear Your Faith Daily",
     bgClass: "bg-gradient-to-br from-stone-800 to-stone-900",
   },
@@ -22,20 +28,122 @@ const collectionData: Record<string, CollectionContent> = {
     tagline: "Comfort Meets Conviction",
     bgClass: "bg-gradient-to-br from-zinc-800 to-zinc-900",
   },
-  "sweatshirts": {
-    title: "Sweatshirts",
-    tagline: "Bold Warmth, Timeless Message",
-    bgClass: "bg-gradient-to-br from-neutral-800 to-neutral-900",
+  "hats": {
+    title: "Hats",
+    tagline: "Crown Your Style",
+    bgClass: "bg-gradient-to-br from-slate-800 to-slate-900",
   },
   "accessories": {
     title: "Accessories",
     tagline: "Complete the Look",
     bgClass: "bg-gradient-to-br from-amber-900/80 to-stone-900",
   },
-  "hats": {
-    title: "Hats",
-    tagline: "Crown Your Style",
-    bgClass: "bg-gradient-to-br from-slate-800 to-slate-900",
+
+  // Bottoms Subcategories
+  "shorts": {
+    title: "Shorts",
+    tagline: "Warm Weather Ministry",
+    bgClass: "bg-gradient-to-br from-amber-800/60 to-stone-900",
+  },
+  "joggers": {
+    title: "Joggers",
+    tagline: "Run Your Race",
+    bgClass: "bg-gradient-to-br from-stone-700 to-neutral-900",
+  },
+  "sweatpants": {
+    title: "Sweatpants",
+    tagline: "Rest in Purpose",
+    bgClass: "bg-gradient-to-br from-neutral-700 to-stone-900",
+  },
+
+  // Tees Subcategories
+  "short-sleeve": {
+    title: "Short Sleeve",
+    tagline: "Classic Faith Forward",
+    bgClass: "bg-gradient-to-br from-stone-700 to-stone-900",
+  },
+  "long-sleeve": {
+    title: "Long Sleeve",
+    tagline: "Extended Grace",
+    bgClass: "bg-gradient-to-br from-zinc-700 to-stone-900",
+  },
+  "cropped": {
+    title: "Cropped",
+    tagline: "Bold & Set Apart",
+    bgClass: "bg-gradient-to-br from-amber-700/60 to-neutral-900",
+  },
+
+  // Hoodies Subcategories (Professional Structure)
+  "pullover-hoodies": {
+    title: "Pullover Hoodies",
+    tagline: "Classic Comfort",
+    bgClass: "bg-gradient-to-br from-zinc-700 to-zinc-900",
+  },
+  "zip-up-hoodies": {
+    title: "Zip-Up Hoodies",
+    tagline: "Versatile Devotion",
+    bgClass: "bg-gradient-to-br from-neutral-700 to-zinc-900",
+  },
+  "crewnecks": {
+    title: "Crewnecks",
+    tagline: "Clean & Called",
+    bgClass: "bg-gradient-to-br from-stone-600 to-zinc-900",
+  },
+  "quarter-zips": {
+    title: "Quarter Zips",
+    tagline: "Athletic Heritage",
+    bgClass: "bg-gradient-to-br from-slate-700 to-stone-900",
+  },
+  "lightweight-hoodies": {
+    title: "Lightweight Hoodies",
+    tagline: "Layered in Light",
+    bgClass: "bg-gradient-to-br from-zinc-600 to-neutral-900",
+  },
+
+  // Hats Subcategories
+  "snapbacks": {
+    title: "Snapbacks",
+    tagline: "Street Ministry",
+    bgClass: "bg-gradient-to-br from-stone-700 to-slate-900",
+  },
+  "dad-hats": {
+    title: "Dad Hats",
+    tagline: "Relaxed & Righteous",
+    bgClass: "bg-gradient-to-br from-neutral-700 to-slate-900",
+  },
+  "beanies": {
+    title: "Beanies",
+    tagline: "Covered in Faith",
+    bgClass: "bg-gradient-to-br from-zinc-700 to-slate-900",
+  },
+
+  // Accessories Subcategories
+  "bags": {
+    title: "Bags",
+    tagline: "Carry the Message",
+    bgClass: "bg-gradient-to-br from-amber-800/70 to-stone-900",
+  },
+  "socks": {
+    title: "Socks",
+    tagline: "Grounded in Truth",
+    bgClass: "bg-gradient-to-br from-stone-700 to-amber-900/50",
+  },
+  "stickers": {
+    title: "Stickers",
+    tagline: "Spread the Word",
+    bgClass: "bg-gradient-to-br from-amber-700/50 to-neutral-900",
+  },
+
+  // Special Collections
+  "t-shirts": {
+    title: "T-Shirts",
+    tagline: "Wear Your Faith Daily",
+    bgClass: "bg-gradient-to-br from-stone-800 to-stone-900",
+  },
+  "sweatshirts": {
+    title: "Sweatshirts",
+    tagline: "Bold Warmth, Timeless Message",
+    bgClass: "bg-gradient-to-br from-neutral-800 to-neutral-900",
   },
   "new-arrivals": {
     title: "New Arrivals",
