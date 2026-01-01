@@ -1,7 +1,12 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import FitGuideModal from "./FitGuideModal";
+import TextReveal from "@/components/motion/TextReveal";
+import ScrollReveal from "@/components/motion/ScrollReveal";
+import StaggerContainer from "@/components/motion/StaggerContainer";
+import { easing, timing } from "@/lib/animations";
 
 interface FitModel {
   id: string;
@@ -21,6 +26,7 @@ interface FitModel {
 const FitGuideSection = () => {
   const [selectedGender, setSelectedGender] = useState<'male' | 'female'>('male');
   const [selectedModel, setSelectedModel] = useState<FitModel | null>(null);
+  const prefersReducedMotion = useReducedMotion();
 
   const { data: models = [], isLoading } = useQuery({
     queryKey: ['fit-guide-models'],
@@ -156,6 +162,8 @@ const FitGuideSection = () => {
 
   const displayModels = filteredModels.length > 0 ? filteredModels : demoModels.filter(m => m.gender === selectedGender);
 
+  const springConfig = { type: "spring" as const, stiffness: 400, damping: 25 };
+
   return (
     <>
       <section 
@@ -165,42 +173,71 @@ const FitGuideSection = () => {
         <div className="max-w-6xl mx-auto">
           {/* Section Header */}
           <div className="text-center mb-12">
-            <p className="text-xs uppercase tracking-[0.25em] text-amber-500 mb-4 font-light">
-              How It Fits
-            </p>
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-extralight text-white mb-4">
-              Find Your Perfect Size
-            </h2>
-            <p className="text-white/60 font-light">
-              Real models. Real measurements.
-            </p>
+            <ScrollReveal variant="fadeUp">
+              <p className="text-[10px] uppercase tracking-[0.3em] text-amber-500 mb-6 font-light">
+                How It Fits
+              </p>
+            </ScrollReveal>
+            
+            <TextReveal 
+              text="Find Your Perfect Size"
+              as="h2"
+              className="text-3xl md:text-4xl lg:text-5xl font-extralight text-white mb-4"
+              delay={0.2}
+            />
+            
+            <ScrollReveal variant="fadeUp" delay={0.4}>
+              <p className="text-white/50 font-light">
+                Real models. Real measurements.
+              </p>
+            </ScrollReveal>
           </div>
 
-          {/* Gender Toggle */}
-          <div className="flex justify-center mb-12">
-            <div className="inline-flex bg-stone-800 rounded-full p-1">
-              <button
+          {/* Gender Toggle - Pill Style with Spring Animation */}
+          <ScrollReveal variant="fadeUp" delay={0.5} className="flex justify-center mb-12">
+            <div className="inline-flex bg-stone-800/50 rounded-full p-1 backdrop-blur-sm border border-white/5">
+              <motion.button
                 onClick={() => setSelectedGender('male')}
-                className={`px-6 py-2 rounded-full text-sm font-light transition-all ${
+                className={`relative px-8 py-2.5 rounded-full text-sm font-light transition-colors ${
                   selectedGender === 'male'
-                    ? 'bg-amber-600 text-white'
-                    : 'text-white/60 hover:text-white'
+                    ? 'text-white'
+                    : 'text-white/50 hover:text-white/70'
                 }`}
+                whileHover={prefersReducedMotion ? {} : { scale: 1.02 }}
+                whileTap={prefersReducedMotion ? {} : { scale: 0.98 }}
+                transition={springConfig}
               >
-                Men
-              </button>
-              <button
+                {selectedGender === 'male' && (
+                  <motion.div
+                    className="absolute inset-0 bg-amber-600 rounded-full"
+                    layoutId="genderToggle"
+                    transition={springConfig}
+                  />
+                )}
+                <span className="relative z-10">Men</span>
+              </motion.button>
+              <motion.button
                 onClick={() => setSelectedGender('female')}
-                className={`px-6 py-2 rounded-full text-sm font-light transition-all ${
+                className={`relative px-8 py-2.5 rounded-full text-sm font-light transition-colors ${
                   selectedGender === 'female'
-                    ? 'bg-amber-600 text-white'
-                    : 'text-white/60 hover:text-white'
+                    ? 'text-white'
+                    : 'text-white/50 hover:text-white/70'
                 }`}
+                whileHover={prefersReducedMotion ? {} : { scale: 1.02 }}
+                whileTap={prefersReducedMotion ? {} : { scale: 0.98 }}
+                transition={springConfig}
               >
-                Women
-              </button>
+                {selectedGender === 'female' && (
+                  <motion.div
+                    className="absolute inset-0 bg-amber-600 rounded-full"
+                    layoutId="genderToggle"
+                    transition={springConfig}
+                  />
+                )}
+                <span className="relative z-10">Women</span>
+              </motion.button>
             </div>
-          </div>
+          </ScrollReveal>
 
           {/* Models Grid */}
           {isLoading ? (
@@ -210,52 +247,88 @@ const FitGuideSection = () => {
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
-              {displayModels.map((model) => (
-                <button
-                  key={model.id}
-                  onClick={() => setSelectedModel(model)}
-                  className="group relative aspect-[3/4] overflow-hidden rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={selectedGender}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3 }}
+              >
+                <StaggerContainer 
+                  className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6"
+                  staggerDelay={0.08}
+                  delayChildren={0.1}
                 >
-                  <img
-                    src={model.photo_url}
-                    alt={model.name}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                  
-                  {/* Overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 group-hover:opacity-100 transition-opacity" />
-                  
-                  {/* Info */}
-                  <div className="absolute bottom-0 left-0 right-0 p-4 text-left">
-                    <p className="text-white font-light text-lg mb-1">
-                      {model.name}
-                    </p>
-                    <p className="text-white/70 text-sm font-light">
-                      {model.height_imperial} • Size {model.size_worn}
-                    </p>
-                  </div>
+                  {displayModels.map((model) => (
+                    <motion.button
+                      key={model.id}
+                      onClick={() => setSelectedModel(model)}
+                      className="group relative aspect-[3/4] overflow-hidden rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:ring-offset-stone-900"
+                      whileHover={prefersReducedMotion ? {} : { y: -6 }}
+                      whileTap={prefersReducedMotion ? {} : { scale: 0.98 }}
+                      transition={springConfig}
+                    >
+                      <motion.img
+                        src={model.photo_url}
+                        alt={model.name}
+                        className="w-full h-full object-cover"
+                        whileHover={prefersReducedMotion ? {} : { scale: 1.05 }}
+                        transition={{ duration: 0.5, ease: easing.editorial }}
+                      />
+                      
+                      {/* Overlay */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-70 group-hover:opacity-90 transition-opacity duration-300" />
+                      
+                      {/* Info */}
+                      <div className="absolute bottom-0 left-0 right-0 p-4 text-left">
+                        <motion.p 
+                          className="text-white font-light text-lg mb-1"
+                          initial={{ y: 0 }}
+                          whileHover={{ y: -4 }}
+                          transition={springConfig}
+                        >
+                          {model.name}
+                        </motion.p>
+                        <p className="text-white/60 text-sm font-light">
+                          {model.height_imperial} • Size {model.size_worn}
+                        </p>
+                      </div>
 
-                  {/* Hover indicator */}
-                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                    <span className="text-xs uppercase tracking-wider text-white bg-amber-600 px-4 py-2 rounded-full">
-                      View Details
-                    </span>
-                  </div>
-                </button>
-              ))}
-            </div>
+                      {/* Hover indicator */}
+                      <motion.div 
+                        className="absolute inset-0 flex items-center justify-center"
+                        initial={{ opacity: 0 }}
+                        whileHover={{ opacity: 1 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <motion.span 
+                          className="text-[10px] uppercase tracking-wider text-white bg-amber-600 px-4 py-2 rounded-full"
+                          initial={{ scale: 0.8, opacity: 0 }}
+                          whileHover={{ scale: 1, opacity: 1 }}
+                          transition={springConfig}
+                        >
+                          View Details
+                        </motion.span>
+                      </motion.div>
+                    </motion.button>
+                  ))}
+                </StaggerContainer>
+              </motion.div>
+            </AnimatePresence>
           )}
         </div>
       </section>
 
       {/* Modal */}
-      {selectedModel && (
-        <FitGuideModal 
-          model={selectedModel} 
-          onClose={() => setSelectedModel(null)} 
-        />
-      )}
+      <AnimatePresence>
+        {selectedModel && (
+          <FitGuideModal 
+            model={selectedModel} 
+            onClose={() => setSelectedModel(null)} 
+          />
+        )}
+      </AnimatePresence>
     </>
   );
 };

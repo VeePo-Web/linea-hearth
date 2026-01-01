@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 
 interface Look {
   id: string;
@@ -13,6 +14,7 @@ interface LookNavigationProps {
 const LookNavigation = ({ looks, onNavigate }: LookNavigationProps) => {
   const [activeIndex, setActiveIndex] = useState(-1);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const prefersReducedMotion = useReducedMotion();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -61,80 +63,135 @@ const LookNavigation = ({ looks, onNavigate }: LookNavigationProps) => {
 
   if (looks.length === 0) return null;
 
+  const springConfig = { type: "spring" as const, stiffness: 400, damping: 25 };
+
   return (
-    <nav 
-      className="fixed right-6 top-1/2 -translate-y-1/2 z-40 hidden lg:flex flex-col items-end gap-3"
+    <motion.nav 
+      className="fixed right-6 top-1/2 -translate-y-1/2 z-40 hidden lg:flex flex-col items-end gap-4"
+      initial={prefersReducedMotion ? {} : { opacity: 0, x: 20 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.5, delay: 1.5 }}
       aria-label="Look navigation"
     >
+      {/* Progress line */}
+      <div className="absolute right-[5px] top-0 bottom-0 w-px bg-white/10" />
+
       {/* Hero dot */}
-      <button
+      <motion.button
         onClick={scrollToHero}
         onMouseEnter={() => setHoveredIndex(-2)}
         onMouseLeave={() => setHoveredIndex(null)}
-        className="flex items-center gap-3 group"
+        className="flex items-center gap-3 group relative"
         aria-label="Scroll to top"
+        whileHover={prefersReducedMotion ? {} : { scale: 1.1 }}
+        whileTap={prefersReducedMotion ? {} : { scale: 0.95 }}
+        transition={springConfig}
       >
-        <span 
-          className={`text-xs uppercase tracking-wider text-white/60 transition-opacity ${
-            hoveredIndex === -2 ? 'opacity-100' : 'opacity-0'
-          }`}
-        >
-          Top
-        </span>
-        <span 
-          className={`w-2 h-2 rounded-full border transition-all ${
+        {/* Label */}
+        <AnimatePresence>
+          {(hoveredIndex === -2 || activeIndex === -1) && (
+            <motion.span 
+              className="text-[10px] uppercase tracking-[0.2em] text-white/70 whitespace-nowrap"
+              initial={{ opacity: 0, x: 10 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 10 }}
+              transition={{ duration: 0.2 }}
+            >
+              Top
+            </motion.span>
+          )}
+        </AnimatePresence>
+        
+        {/* Dot */}
+        <motion.span 
+          className={`w-2.5 h-2.5 rounded-full border relative z-10 ${
             activeIndex === -1 
-              ? 'bg-amber-500 border-amber-500 w-3 h-3' 
-              : 'border-white/40 hover:border-white'
+              ? 'bg-amber-500 border-amber-500' 
+              : 'border-white/30 bg-stone-900'
           }`}
+          animate={activeIndex === -1 ? { scale: 1.3 } : { scale: 1 }}
+          transition={springConfig}
         />
-      </button>
+      </motion.button>
 
       {/* Look dots */}
       {looks.map((look, index) => (
-        <button
+        <motion.button
           key={look.id}
           onClick={() => scrollToSection(index)}
           onMouseEnter={() => setHoveredIndex(index)}
           onMouseLeave={() => setHoveredIndex(null)}
-          className="flex items-center gap-3 group"
+          className="flex items-center gap-3 group relative"
           aria-label={`Scroll to ${look.name}`}
+          whileHover={prefersReducedMotion ? {} : { scale: 1.1 }}
+          whileTap={prefersReducedMotion ? {} : { scale: 0.95 }}
+          transition={springConfig}
         >
-          <span 
-            className={`text-xs uppercase tracking-wider text-white/60 transition-opacity whitespace-nowrap ${
-              hoveredIndex === index ? 'opacity-100' : 'opacity-0'
-            }`}
-          >
-            {look.name}
-          </span>
-          <span 
-            className={`w-2 h-2 rounded-full border transition-all ${
+          {/* Label */}
+          <AnimatePresence>
+            {(hoveredIndex === index || activeIndex === index) && (
+              <motion.span 
+                className="text-[10px] uppercase tracking-[0.2em] text-white/70 whitespace-nowrap"
+                initial={{ opacity: 0, x: 10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 10 }}
+                transition={{ duration: 0.2 }}
+              >
+                {look.name}
+              </motion.span>
+            )}
+          </AnimatePresence>
+
+          {/* Dot */}
+          <motion.span 
+            className={`w-2.5 h-2.5 rounded-full border relative z-10 ${
               activeIndex === index 
-                ? 'bg-amber-500 border-amber-500 w-3 h-3' 
-                : 'border-white/40 hover:border-white'
+                ? 'bg-amber-500 border-amber-500' 
+                : 'border-white/30 bg-stone-900'
             }`}
+            animate={activeIndex === index ? { scale: 1.3 } : { scale: 1 }}
+            transition={springConfig}
           />
-        </button>
+        </motion.button>
       ))}
 
+      {/* Divider */}
+      <div className="w-4 h-px bg-white/10 mr-[3px]" />
+
       {/* Fit Guide dot */}
-      <button
+      <motion.button
         onClick={scrollToFitGuide}
         onMouseEnter={() => setHoveredIndex(-3)}
         onMouseLeave={() => setHoveredIndex(null)}
-        className="flex items-center gap-3 group mt-2 pt-2 border-t border-white/10"
+        className="flex items-center gap-3 group relative"
         aria-label="Scroll to fit guide"
+        whileHover={prefersReducedMotion ? {} : { scale: 1.1 }}
+        whileTap={prefersReducedMotion ? {} : { scale: 0.95 }}
+        transition={springConfig}
       >
-        <span 
-          className={`text-xs uppercase tracking-wider text-white/60 transition-opacity ${
-            hoveredIndex === -3 ? 'opacity-100' : 'opacity-0'
-          }`}
-        >
-          Fit Guide
-        </span>
-        <span className="w-2 h-2 rounded-full border border-white/40 hover:border-white transition-all" />
-      </button>
-    </nav>
+        {/* Label */}
+        <AnimatePresence>
+          {hoveredIndex === -3 && (
+            <motion.span 
+              className="text-[10px] uppercase tracking-[0.2em] text-white/70 whitespace-nowrap"
+              initial={{ opacity: 0, x: 10 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 10 }}
+              transition={{ duration: 0.2 }}
+            >
+              Fit Guide
+            </motion.span>
+          )}
+        </AnimatePresence>
+
+        {/* Dot */}
+        <motion.span 
+          className="w-2.5 h-2.5 rounded-full border border-white/30 bg-stone-900 relative z-10"
+          whileHover={{ borderColor: 'rgba(255,255,255,0.6)' }}
+          transition={springConfig}
+        />
+      </motion.button>
+    </motion.nav>
   );
 };
 

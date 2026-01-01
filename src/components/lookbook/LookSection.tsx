@@ -1,5 +1,9 @@
-import { useEffect, useRef, useState } from "react";
+import { motion, useInView, useReducedMotion } from "framer-motion";
+import { useRef } from "react";
 import ShopTheLook from "./ShopTheLook";
+import TextReveal from "@/components/motion/TextReveal";
+import ScrollReveal from "@/components/motion/ScrollReveal";
+import { easing, timing } from "@/lib/animations";
 
 interface LookProduct {
   id: string;
@@ -34,101 +38,170 @@ interface LookSectionProps {
 
 const LookSection = ({ look, index }: LookSectionProps) => {
   const sectionRef = useRef<HTMLElement>(null);
-  const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-        }
-      },
-      { threshold: 0.3 }
-    );
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, []);
+  const isInView = useInView(sectionRef, { once: true, amount: 0.3 });
+  const prefersReducedMotion = useReducedMotion();
 
   // Alternate layout for visual interest
   const isReversed = index % 2 === 1;
+  
+  // Format index as 01, 02, 03, etc.
+  const lookIndex = String(index + 1).padStart(2, '0');
+  
+  // Gender badge label
+  const genderLabel = look.gender === 'male' ? "MEN'S" : look.gender === 'female' ? "WOMEN'S" : "UNISEX";
+
+  // Image reveal direction based on layout
+  const imageClipPath = {
+    hidden: isReversed ? "inset(0% 0% 0% 100%)" : "inset(0% 100% 0% 0%)",
+    visible: "inset(0% 0% 0% 0%)"
+  };
 
   return (
     <section
       ref={sectionRef}
       data-look-index={index}
-      className="h-screen w-full snap-start relative flex flex-col lg:flex-row"
+      className="h-screen w-full snap-start relative flex flex-col lg:flex-row overflow-hidden"
     >
+      {/* Oversized Look Index - Background Element */}
+      <motion.div
+        className={`absolute ${isReversed ? 'left-8' : 'right-8'} top-1/2 -translate-y-1/2 pointer-events-none z-0 hidden lg:block`}
+        initial={prefersReducedMotion ? {} : { opacity: 0, scale: 0.8 }}
+        animate={isInView ? { opacity: 0.03, scale: 1 } : {}}
+        transition={{ duration: timing.cinematic, ease: easing.editorial, delay: 0.2 }}
+      >
+        <span 
+          className="text-[20rem] font-extralight text-white leading-none select-none"
+          style={{ fontFamily: 'system-ui, sans-serif', letterSpacing: '-0.05em' }}
+        >
+          {lookIndex}
+        </span>
+      </motion.div>
+
       {/* Image Side */}
       <div 
         className={`w-full lg:w-3/5 h-[50vh] lg:h-full relative overflow-hidden ${
           isReversed ? 'lg:order-2' : ''
         }`}
       >
-        <img
-          src={look.image_url}
-          alt={look.name}
-          className={`w-full h-full object-cover transition-transform duration-[10000ms] ease-out ${
-            isVisible ? 'scale-105' : 'scale-100'
-          }`}
-          style={{
-            transformOrigin: isReversed ? 'right center' : 'left center'
-          }}
-        />
+        {/* Image with mask reveal */}
+        <motion.div
+          className="w-full h-full"
+          initial={prefersReducedMotion ? {} : { clipPath: imageClipPath.hidden }}
+          animate={isInView ? { clipPath: imageClipPath.visible } : {}}
+          transition={{ duration: timing.cinematic, ease: easing.editorial }}
+        >
+          <motion.img
+            src={look.image_url}
+            alt={look.name}
+            className="w-full h-full object-cover"
+            initial={prefersReducedMotion ? {} : { scale: 1.15 }}
+            animate={isInView ? { scale: 1.02 } : {}}
+            transition={{ 
+              duration: timing.cinematic * 1.5, 
+              ease: easing.editorial 
+            }}
+            style={{
+              transformOrigin: isReversed ? 'right center' : 'left center'
+            }}
+          />
+        </motion.div>
         
         {/* Gradient overlay */}
         <div 
           className={`absolute inset-0 ${
             isReversed 
-              ? 'bg-gradient-to-l from-stone-900/80 via-stone-900/20 to-transparent lg:bg-gradient-to-l' 
-              : 'bg-gradient-to-r from-transparent via-stone-900/20 to-stone-900/80 lg:bg-gradient-to-r'
-          } lg:from-transparent lg:via-transparent lg:to-stone-900`}
+              ? 'bg-gradient-to-l from-stone-900/80 via-stone-900/20 to-transparent' 
+              : 'bg-gradient-to-r from-transparent via-stone-900/20 to-stone-900/80'
+          }`}
         />
 
         {/* Mobile gradient for content readability */}
         <div className="absolute inset-0 bg-gradient-to-t from-stone-900 via-stone-900/50 to-transparent lg:hidden" />
+
+        {/* Look Index Badge - Mobile */}
+        <motion.div
+          className="absolute top-4 left-4 lg:hidden"
+          initial={prefersReducedMotion ? {} : { opacity: 0, y: -10 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: timing.slow, ease: easing.editorial, delay: 0.3 }}
+        >
+          <span className="text-4xl font-extralight text-white/20">
+            {lookIndex}
+          </span>
+        </motion.div>
       </div>
 
       {/* Content Side */}
       <div 
-        className={`w-full lg:w-2/5 h-[50vh] lg:h-full flex items-center justify-center bg-stone-900 px-6 lg:px-12 py-8 ${
+        className={`w-full lg:w-2/5 h-[50vh] lg:h-full flex items-center justify-center bg-stone-900 px-6 lg:px-12 py-8 relative z-10 ${
           isReversed ? 'lg:order-1' : ''
         }`}
       >
-        <div 
-          className={`max-w-md transition-all duration-700 ${
-            isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-          }`}
-        >
+        <div className="max-w-md w-full">
+          {/* Gender Badge */}
+          <motion.div
+            initial={prefersReducedMotion ? {} : { opacity: 0, y: 10 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: timing.slow, ease: easing.editorial, delay: 0.4 }}
+            className="mb-4"
+          >
+            <span className="text-[10px] uppercase tracking-[0.25em] text-white/30 font-light border border-white/10 px-3 py-1 rounded-full">
+              {genderLabel}
+            </span>
+          </motion.div>
+
           {/* Scripture Reference */}
           {look.scripture_reference && (
-            <p className="text-xs uppercase tracking-[0.25em] text-amber-500 mb-4 font-light">
+            <motion.p 
+              className="text-xs uppercase tracking-[0.25em] text-amber-500 mb-4 font-light"
+              initial={prefersReducedMotion ? {} : { opacity: 0, y: 10 }}
+              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: timing.slow, ease: easing.editorial, delay: 0.5 }}
+            >
               {look.scripture_reference}
-            </p>
+            </motion.p>
           )}
 
-          {/* Headline (Faith Statement) */}
-          <h2 className="text-2xl md:text-3xl lg:text-4xl font-extralight italic text-white mb-3 leading-tight">
-            "{look.headline}"
-          </h2>
+          {/* Headline (Faith Statement) - Word by Word */}
+          <div className="mb-3">
+            <TextReveal 
+              text={`"${look.headline}"`}
+              as="h2"
+              className="text-2xl md:text-3xl lg:text-4xl font-extralight italic text-white leading-tight"
+              delay={0.6}
+            />
+          </div>
 
           {/* Look Name */}
-          <h3 className="text-lg md:text-xl font-light text-white/80 mb-4">
+          <motion.h3 
+            className="text-lg md:text-xl font-light text-white/80 mb-4"
+            initial={prefersReducedMotion ? {} : { opacity: 0, y: 15 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: timing.slow, ease: easing.editorial, delay: 0.8 }}
+          >
             {look.name}
-          </h3>
+          </motion.h3>
 
           {/* Description */}
           {look.description && (
-            <p className="text-sm text-white/60 font-light leading-relaxed mb-8">
+            <motion.p 
+              className="text-sm text-white/60 font-light leading-relaxed mb-8"
+              initial={prefersReducedMotion ? {} : { opacity: 0, y: 15 }}
+              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: timing.slow, ease: easing.editorial, delay: 0.9 }}
+            >
               {look.description}
-            </p>
+            </motion.p>
           )}
 
           {/* Shop the Look */}
-          <ShopTheLook products={look.products} lookName={look.name} />
+          <motion.div
+            initial={prefersReducedMotion ? {} : { opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: timing.slow, ease: easing.editorial, delay: 1.0 }}
+          >
+            <ShopTheLook products={look.products} lookName={look.name} />
+          </motion.div>
         </div>
       </div>
     </section>
