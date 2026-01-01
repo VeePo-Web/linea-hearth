@@ -41,8 +41,8 @@ const MissionBlock = () => {
           >
             <div className="aspect-[4/5] overflow-hidden">
               <img 
-                src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&q=80"
-                alt="Line of Judah - Faith Forward Fashion"
+                src="/products/heavenly-crewneck/lifestyle.png"
+                alt="Heavenly Crewneck - Line of Judah"
                 className="w-full h-full object-cover"
               />
             </div>
