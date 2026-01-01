@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
-import { X, Search, Heart, Instagram, Mail } from "lucide-react";
+import { X, Search, Heart, Instagram, Mail, ChevronDown, User } from "lucide-react";
+import { useState } from "react";
 
 interface SubCategory {
   name: string;
@@ -35,7 +36,7 @@ const backdropVariants = {
   },
   exit: {
     opacity: 0,
-    transition: { duration: 0.3, delay: 0.2 },
+    transition: { duration: 0.3, delay: 0.1 },
   },
 };
 
@@ -47,8 +48,8 @@ const panelVariants = {
       type: "spring" as const,
       stiffness: 300,
       damping: 30,
-      staggerChildren: 0.08,
-      delayChildren: 0.2,
+      staggerChildren: 0.06,
+      delayChildren: 0.15,
     },
   },
   exit: {
@@ -62,11 +63,10 @@ const panelVariants = {
 };
 
 const navItemVariants = {
-  hidden: { opacity: 0, x: 40, letterSpacing: "0.3em" },
+  hidden: { opacity: 0, x: 30 },
   visible: {
     opacity: 1,
     x: 0,
-    letterSpacing: "0.15em",
     transition: {
       type: "spring" as const,
       stiffness: 300,
@@ -75,7 +75,7 @@ const navItemVariants = {
   },
   exit: {
     opacity: 0,
-    x: 40,
+    x: 30,
     transition: { duration: 0.15 },
   },
 };
@@ -84,7 +84,7 @@ const secondaryVariants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: { delay: 0.5, duration: 0.3 },
+    transition: { delay: 0.4, duration: 0.3 },
   },
 };
 
@@ -95,6 +95,12 @@ const MobileMenu = ({
   onSearchOpen,
   onFavoritesOpen,
 }: MobileMenuProps) => {
+  const [expandedItem, setExpandedItem] = useState<string | null>(null);
+
+  const toggleExpand = (name: string) => {
+    setExpandedItem(expandedItem === name ? null : name);
+  };
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -111,119 +117,184 @@ const MobileMenu = ({
 
           {/* Panel */}
           <motion.div
-            className="fixed right-0 top-0 h-screen w-full max-w-md bg-background z-50 flex flex-col"
+            className="fixed right-0 top-0 h-screen w-full max-w-md bg-background z-50 flex flex-col shadow-2xl"
             variants={panelVariants}
             initial="hidden"
             animate="visible"
             exit="exit"
           >
-            {/* Close button */}
-            <motion.button
-              className="absolute top-6 right-6 p-2 text-foreground hover:text-muted-foreground transition-colors"
-              onClick={onClose}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <X size={24} strokeWidth={1} />
-            </motion.button>
+            {/* Header with logo and close */}
+            <div className="flex items-center justify-between px-6 py-5 border-b border-border">
+              <img src="/LINEA-1.svg" alt="LINEA" className="h-5 w-auto" />
+              <motion.button
+                className="p-2 text-foreground hover:text-muted-foreground transition-colors relative group"
+                onClick={onClose}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <motion.span 
+                  className="absolute inset-0 rounded-full bg-muted scale-0 group-hover:scale-100 transition-transform duration-200"
+                  initial={false}
+                />
+                <X size={22} strokeWidth={1.5} className="relative z-10" />
+              </motion.button>
+            </div>
 
             {/* Main navigation */}
-            <div className="flex-1 flex flex-col justify-center px-8">
-              <nav className="space-y-6">
+            <div className="flex-1 overflow-y-auto px-6 py-8">
+              <nav className="space-y-2">
                 {navItems.map((item) => (
                   <motion.div key={item.name} variants={navItemVariants}>
-                    <Link
-                      to={item.href}
-                      className="block text-3xl font-extralight text-foreground hover:text-muted-foreground transition-colors uppercase tracking-[0.2em]"
-                      onClick={onClose}
-                    >
-                      {item.name}
-                    </Link>
+                    {item.submenuItems.length > 0 ? (
+                      <div>
+                        <button
+                          onClick={() => toggleExpand(item.name)}
+                          className="w-full flex items-center justify-between text-2xl font-light text-foreground hover:text-muted-foreground transition-colors uppercase tracking-[0.15em] py-3"
+                        >
+                          <span>{item.name}</span>
+                          <motion.span
+                            animate={{ rotate: expandedItem === item.name ? 180 : 0 }}
+                            transition={{ duration: 0.2 }}
+                          >
+                            <ChevronDown size={20} strokeWidth={1.5} />
+                          </motion.span>
+                        </button>
+                        
+                        <AnimatePresence>
+                          {expandedItem === item.name && (
+                            <motion.div
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: "auto", opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
+                              className="overflow-hidden"
+                            >
+                              <div className="pl-4 pb-4 space-y-3">
+                                {item.submenuItems.map((subItem, idx) => (
+                                  <motion.div
+                                    key={subItem.name}
+                                    initial={{ opacity: 0, x: -10 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ delay: idx * 0.05 }}
+                                  >
+                                    <Link
+                                      to={subItem.href}
+                                      className="block text-base font-light text-muted-foreground hover:text-foreground transition-colors py-2"
+                                      onClick={onClose}
+                                    >
+                                      {subItem.name}
+                                    </Link>
+                                  </motion.div>
+                                ))}
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
+                    ) : (
+                      <Link
+                        to={item.href}
+                        className="block text-2xl font-light text-foreground hover:text-muted-foreground transition-colors uppercase tracking-[0.15em] py-3"
+                        onClick={onClose}
+                      >
+                        {item.name}
+                      </Link>
+                    )}
                   </motion.div>
                 ))}
               </nav>
 
               {/* Divider */}
               <motion.div
-                className="w-16 h-px bg-border my-10"
+                className="w-16 h-px bg-border my-8"
                 variants={secondaryVariants}
               />
 
               {/* Secondary links */}
               <motion.div
-                className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted-foreground"
+                className="space-y-3"
                 variants={secondaryVariants}
               >
                 <Link
                   to="/about/our-story"
-                  className="hover:text-foreground transition-colors"
+                  className="block text-sm text-muted-foreground hover:text-foreground transition-colors"
                   onClick={onClose}
                 >
                   Our Story
                 </Link>
-                <span className="text-border">·</span>
                 <Link
                   to="/about/size-guide"
-                  className="hover:text-foreground transition-colors"
+                  className="block text-sm text-muted-foreground hover:text-foreground transition-colors"
                   onClick={onClose}
                 >
                   Size Guide
                 </Link>
-                <span className="text-border">·</span>
                 <Link
                   to="/about/customer-care"
-                  className="hover:text-foreground transition-colors"
+                  className="block text-sm text-muted-foreground hover:text-foreground transition-colors"
                   onClick={onClose}
                 >
-                  Care
+                  Customer Care
                 </Link>
               </motion.div>
             </div>
 
             {/* Bottom actions */}
             <motion.div
-              className="px-8 py-8 border-t border-border"
+              className="px-6 py-6 border-t border-border bg-secondary/30"
               variants={secondaryVariants}
             >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <button
-                    className="p-3 border border-border hover:border-foreground transition-colors"
-                    onClick={() => {
-                      onClose();
-                      setTimeout(onSearchOpen, 300);
-                    }}
-                    aria-label="Search"
-                  >
-                    <Search size={18} strokeWidth={1} />
-                  </button>
-                  <button
-                    className="p-3 border border-border hover:border-foreground transition-colors"
-                    onClick={() => {
-                      onClose();
-                      setTimeout(onFavoritesOpen, 300);
-                    }}
-                    aria-label="Favorites"
-                  >
-                    <Heart size={18} strokeWidth={1} />
-                  </button>
-                </div>
-                <div className="flex items-center gap-4">
+              {/* Action buttons */}
+              <div className="flex items-center gap-3 mb-4">
+                <button
+                  className="flex-1 flex items-center justify-center gap-2 py-3 border border-border hover:border-foreground hover:bg-muted/50 transition-all text-sm"
+                  onClick={() => {
+                    onClose();
+                    setTimeout(onSearchOpen, 300);
+                  }}
+                  aria-label="Search"
+                >
+                  <Search size={16} strokeWidth={1.5} />
+                  <span>Search</span>
+                </button>
+                <button
+                  className="flex-1 flex items-center justify-center gap-2 py-3 border border-border hover:border-foreground hover:bg-muted/50 transition-all text-sm"
+                  onClick={() => {
+                    onClose();
+                    setTimeout(onFavoritesOpen, 300);
+                  }}
+                  aria-label="Favorites"
+                >
+                  <Heart size={16} strokeWidth={1.5} />
+                  <span>Favorites</span>
+                </button>
+              </div>
+
+              {/* Account + Social row */}
+              <div className="flex items-center justify-between pt-4 border-t border-border">
+                <button 
+                  className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  onClick={onClose}
+                >
+                  <User size={16} strokeWidth={1.5} />
+                  <span>Account</span>
+                </button>
+                <div className="flex items-center gap-3">
                   <a
                     href="https://instagram.com"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="p-3 text-muted-foreground hover:text-foreground transition-colors"
+                    className="p-2 text-muted-foreground hover:text-foreground transition-colors"
                     aria-label="Instagram"
                   >
-                    <Instagram size={18} strokeWidth={1} />
+                    <Instagram size={18} strokeWidth={1.5} />
                   </a>
                   <a
                     href="mailto:hello@linea.com"
-                    className="p-3 text-muted-foreground hover:text-foreground transition-colors"
+                    className="p-2 text-muted-foreground hover:text-foreground transition-colors"
                     aria-label="Email"
                   >
-                    <Mail size={18} strokeWidth={1} />
+                    <Mail size={18} strokeWidth={1.5} />
                   </a>
                 </div>
               </div>

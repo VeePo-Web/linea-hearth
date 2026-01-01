@@ -1,5 +1,6 @@
 import { X } from "lucide-react";
 import { Link } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "@/hooks/useCart";
 import { Button } from "@/components/ui/button";
 import FreeShippingBar from "./FreeShippingBar";
@@ -8,11 +9,55 @@ import SmartUpsell from "./SmartUpsell";
 import TrustRow from "./TrustRow";
 import AffirmationStrip from "./AffirmationStrip";
 import { useEffect, useRef } from "react";
-import { cn } from "@/lib/utils";
 
 interface CartDrawerProps {
   onViewFavorites?: () => void;
 }
+
+const backdropVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { duration: 0.3 } },
+  exit: { opacity: 0, transition: { duration: 0.2, delay: 0.1 } },
+};
+
+const drawerVariants = {
+  hidden: { x: "100%" },
+  visible: {
+    x: 0,
+    transition: {
+      type: "spring" as const,
+      stiffness: 300,
+      damping: 30,
+    },
+  },
+  exit: {
+    x: "100%",
+    transition: {
+      type: "spring" as const,
+      stiffness: 400,
+      damping: 40,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, x: 20 },
+  visible: (i: number) => ({
+    opacity: 1,
+    x: 0,
+    transition: {
+      delay: i * 0.05 + 0.2,
+      duration: 0.3,
+      ease: [0.4, 0, 0.2, 1] as const,
+    },
+  }),
+  exit: {
+    opacity: 0,
+    x: -20,
+    scale: 0.95,
+    transition: { duration: 0.2 },
+  },
+};
 
 const CartDrawer = ({ onViewFavorites }: CartDrawerProps) => {
   const { items, itemCount, subtotal, isCartOpen, closeCart } = useCart();
@@ -35,164 +80,229 @@ const CartDrawer = ({ onViewFavorites }: CartDrawerProps) => {
     };
   }, [isCartOpen, closeCart]);
 
-  if (!isCartOpen) return null;
-
   return (
-    <div className="fixed inset-0 z-50 h-screen">
-      {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-black/50 h-screen transition-opacity"
-        onClick={closeCart}
-        aria-hidden="true"
-      />
-
-      {/* Drawer panel */}
-      <div
-        ref={drawerRef}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="cart-title"
-        className={cn(
-          "absolute right-0 top-0 h-screen w-full max-w-md bg-background border-l border-border flex flex-col",
-          "animate-slide-in-right"
-        )}
-      >
-        {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-border">
-          <h2 id="cart-title" className="text-lg font-light text-foreground">
-            Your Bag ({itemCount})
-          </h2>
-          <button
+    <AnimatePresence>
+      {isCartOpen && (
+        <div className="fixed inset-0 z-50 h-screen">
+          {/* Backdrop */}
+          <motion.div
+            className="absolute inset-0 bg-black/50 h-screen"
+            variants={backdropVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
             onClick={closeCart}
-            className="p-2 text-foreground hover:text-muted-foreground transition-colors -mr-2"
-            aria-label="Close cart"
+            aria-hidden="true"
+          />
+
+          {/* Drawer panel */}
+          <motion.div
+            ref={drawerRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="cart-title"
+            className="absolute right-0 top-0 h-screen w-full max-w-md bg-background border-l border-border flex flex-col shadow-2xl"
+            variants={drawerVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
           >
-            <X size={20} />
-          </button>
-        </div>
-
-        {/* Free Shipping Progress - Sticky */}
-        {items.length > 0 && <FreeShippingBar />}
-
-        {/* Content area */}
-        <div className="flex-1 overflow-y-auto">
-          {items.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full px-6 py-12">
-              <div className="w-16 h-16 mb-4 rounded-full bg-muted/50 flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1" stroke="currentColor" className="w-8 h-8 text-muted-foreground">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
-                </svg>
-              </div>
-              <p className="text-muted-foreground text-sm text-center mb-6">
-                Your shopping bag is empty.<br />
-                Discover our curated collections.
-              </p>
-              <Button
-                asChild
-                variant="outline"
-                className="rounded-none"
-                onClick={closeCart}
+            {/* Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-border">
+              <motion.h2 
+                id="cart-title" 
+                className="text-lg font-light text-foreground"
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.2 }}
               >
-                <Link to="/category/shop">Explore Collection</Link>
-              </Button>
+                Your Bag ({itemCount})
+              </motion.h2>
+              <motion.button
+                onClick={closeCart}
+                className="p-2 text-foreground hover:text-muted-foreground transition-colors -mr-2 relative group"
+                aria-label="Close cart"
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <motion.span 
+                  className="absolute inset-0 rounded-full bg-muted scale-0 group-hover:scale-100 transition-transform duration-200"
+                  initial={false}
+                />
+                <X size={20} className="relative z-10" />
+              </motion.button>
+            </div>
 
-              {/* Mobile favorites toggle */}
-              {onViewFavorites && (
-                <button
-                  onClick={() => {
-                    closeCart();
-                    onViewFavorites();
-                  }}
-                  className="mt-4 flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors md:hidden"
+            {/* Free Shipping Progress - Sticky */}
+            {items.length > 0 && <FreeShippingBar />}
+
+            {/* Content area */}
+            <div className="flex-1 overflow-y-auto">
+              {items.length === 0 ? (
+                <motion.div 
+                  className="flex flex-col items-center justify-center h-full px-6 py-12"
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.2 }}
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-5 h-5">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
-                  </svg>
-                  View Favorites
-                </button>
-              )}
-            </div>
-          ) : (
-            <>
-              {/* Cart items */}
-              <div className="px-6 divide-y divide-border">
-                {items.map(item => (
-                  <CartItem key={`${item.id}-${item.size}-${item.color}`} item={item} />
-                ))}
-              </div>
-
-              {/* Smart upsell */}
-              <SmartUpsell />
-
-              {/* Mobile favorites link */}
-              {onViewFavorites && (
-                <div className="px-6 py-4 border-t border-border md:hidden">
-                  <button
-                    onClick={() => {
-                      closeCart();
-                      onViewFavorites();
-                    }}
-                    className="w-full flex items-center justify-center gap-2 py-3 border border-border text-sm text-muted-foreground hover:text-foreground hover:border-foreground transition-colors"
+                  <motion.div 
+                    className="w-16 h-16 mb-4 rounded-full bg-muted/50 flex items-center justify-center"
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: "spring" as const, stiffness: 300, damping: 20, delay: 0.3 }}
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-5 h-5">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1" stroke="currentColor" className="w-8 h-8 text-muted-foreground">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
                     </svg>
-                    View Favorites
-                  </button>
-                </div>
+                  </motion.div>
+                  <motion.p 
+                    className="text-muted-foreground text-sm text-center mb-6"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.4 }}
+                  >
+                    Your shopping bag is empty.<br />
+                    Discover our curated collections.
+                  </motion.p>
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5 }}
+                  >
+                    <Button
+                      asChild
+                      variant="outline"
+                      className="rounded-none"
+                      onClick={closeCart}
+                    >
+                      <Link to="/category/shop">Explore Collection</Link>
+                    </Button>
+                  </motion.div>
+
+                  {/* Mobile favorites toggle */}
+                  {onViewFavorites && (
+                    <motion.button
+                      onClick={() => {
+                        closeCart();
+                        onViewFavorites();
+                      }}
+                      className="mt-4 flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors md:hidden"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.6 }}
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-5 h-5">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+                      </svg>
+                      View Favorites
+                    </motion.button>
+                  )}
+                </motion.div>
+              ) : (
+                <>
+                  {/* Cart items with stagger */}
+                  <div className="px-6 divide-y divide-border">
+                    <AnimatePresence mode="popLayout">
+                      {items.map((item, index) => (
+                        <motion.div
+                          key={`${item.id}-${item.size}-${item.color}`}
+                          custom={index}
+                          variants={itemVariants}
+                          initial="hidden"
+                          animate="visible"
+                          exit="exit"
+                          layout
+                        >
+                          <CartItem item={item} />
+                        </motion.div>
+                      ))}
+                    </AnimatePresence>
+                  </div>
+
+                  {/* Smart upsell */}
+                  <SmartUpsell />
+
+                  {/* Mobile favorites link */}
+                  {onViewFavorites && (
+                    <div className="px-6 py-4 border-t border-border md:hidden">
+                      <button
+                        onClick={() => {
+                          closeCart();
+                          onViewFavorites();
+                        }}
+                        className="w-full flex items-center justify-center gap-2 py-3 border border-border text-sm text-muted-foreground hover:text-foreground hover:border-foreground transition-colors"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-5 h-5">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+                        </svg>
+                        View Favorites
+                      </button>
+                    </div>
+                  )}
+                </>
               )}
-            </>
-          )}
-        </div>
-
-        {/* Footer - Sticky at bottom when cart has items */}
-        {items.length > 0 && (
-          <div className="border-t border-border bg-background">
-            {/* Affirmation strip */}
-            <AffirmationStrip />
-
-            {/* Subtotal + CTA */}
-            <div className="px-6 py-4 space-y-4">
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">Subtotal</span>
-                <span className="text-lg font-medium text-foreground">
-                  €{subtotal.toLocaleString('en-EU', { minimumFractionDigits: 2 })}
-                </span>
-              </div>
-
-              <p className="text-xs text-muted-foreground">
-                Shipping and taxes calculated at checkout
-              </p>
-
-              <Button
-                asChild
-                className="w-full rounded-none h-12 text-sm uppercase tracking-wider"
-                size="lg"
-                onClick={closeCart}
-              >
-                <Link to="/checkout">
-                  Proceed to Checkout
-                </Link>
-              </Button>
-
-              <Button
-                variant="ghost"
-                className="w-full rounded-none text-sm"
-                onClick={closeCart}
-                asChild
-              >
-                <Link to="/category/shop">
-                  Continue Shopping
-                </Link>
-              </Button>
             </div>
 
-            {/* Trust row */}
-            <TrustRow />
-          </div>
-        )}
-      </div>
-    </div>
+            {/* Footer - Sticky at bottom when cart has items */}
+            {items.length > 0 && (
+              <motion.div 
+                className="border-t border-border bg-background"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+              >
+                {/* Affirmation strip */}
+                <AffirmationStrip />
+
+                {/* Subtotal + CTA */}
+                <div className="px-6 py-4 space-y-4">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-muted-foreground">Subtotal</span>
+                    <span className="text-lg font-medium text-foreground">
+                      €{subtotal.toLocaleString('en-EU', { minimumFractionDigits: 2 })}
+                    </span>
+                  </div>
+
+                  <p className="text-xs text-muted-foreground">
+                    Shipping and taxes calculated at checkout
+                  </p>
+
+                  <motion.div
+                    whileHover={{ scale: 1.01 }}
+                    whileTap={{ scale: 0.99 }}
+                  >
+                    <Button
+                      asChild
+                      className="w-full rounded-none h-12 text-sm uppercase tracking-wider"
+                      size="lg"
+                      onClick={closeCart}
+                    >
+                      <Link to="/checkout">
+                        Proceed to Checkout
+                      </Link>
+                    </Button>
+                  </motion.div>
+
+                  <Button
+                    variant="ghost"
+                    className="w-full rounded-none text-sm"
+                    onClick={closeCart}
+                    asChild
+                  >
+                    <Link to="/category/shop">
+                      Continue Shopping
+                    </Link>
+                  </Button>
+                </div>
+
+                {/* Trust row */}
+                <TrustRow />
+              </motion.div>
+            )}
+          </motion.div>
+        </div>
+      )}
+    </AnimatePresence>
   );
 };
 

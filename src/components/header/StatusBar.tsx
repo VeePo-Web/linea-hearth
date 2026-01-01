@@ -1,39 +1,76 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Truck, Shield, Users, RotateCcw } from "lucide-react";
+
+interface USP {
+  text: string;
+  icon: React.ReactNode;
+}
 
 const StatusBar = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
 
-  const usps = [
-    "Free shipping over €50",
-    "365 days warranty",
-    "+100,000 happy customers",
-    "Free returns within 30 days",
+  const usps: USP[] = [
+    { text: "Free shipping over €50", icon: <Truck size={14} strokeWidth={1.5} /> },
+    { text: "365 days warranty", icon: <Shield size={14} strokeWidth={1.5} /> },
+    { text: "+100,000 happy customers", icon: <Users size={14} strokeWidth={1.5} /> },
+    { text: "Free returns within 30 days", icon: <RotateCcw size={14} strokeWidth={1.5} /> },
   ];
 
   useEffect(() => {
+    if (isPaused) return;
+    
     const interval = setInterval(() => {
       setCurrentIndex((prevIndex) => (prevIndex + 1) % usps.length);
     }, 4000);
 
     return () => clearInterval(interval);
-  }, [usps.length]);
+  }, [usps.length, isPaused]);
 
   return (
-    <div className="bg-status-bar text-status-bar-foreground py-2 overflow-hidden">
-      <div className="container mx-auto px-4 text-center h-5 relative">
+    <div 
+      className="bg-status-bar text-status-bar-foreground h-[var(--status-bar-height)] overflow-hidden"
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
+    >
+      <div className="container mx-auto px-4 h-full flex items-center justify-center relative">
         <AnimatePresence mode="wait">
-          <motion.p
+          <motion.div
             key={currentIndex}
-            className="text-sm font-light absolute inset-0 flex items-center justify-center"
+            className="flex items-center gap-2 text-[13px] font-light"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
           >
-            {usps[currentIndex]}
-          </motion.p>
+            <motion.span 
+              className="opacity-80"
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 0.8 }}
+              transition={{ duration: 0.3, delay: 0.1 }}
+            >
+              {usps[currentIndex].icon}
+            </motion.span>
+            <span>{usps[currentIndex].text}</span>
+          </motion.div>
         </AnimatePresence>
+        
+        {/* Progress dots */}
+        <div className="absolute right-4 flex gap-1.5">
+          {usps.map((_, index) => (
+            <motion.div
+              key={index}
+              className="w-1 h-1 rounded-full bg-status-bar-foreground"
+              initial={false}
+              animate={{
+                opacity: index === currentIndex ? 1 : 0.3,
+                scale: index === currentIndex ? 1.2 : 1,
+              }}
+              transition={{ duration: 0.2 }}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );

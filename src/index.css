@@ -7,6 +7,12 @@
 
 @layer base {
   :root {
+    /* Header Height System */
+    --status-bar-height: 36px;
+    --nav-height: 64px;
+    --header-height: 100px;
+    --header-height-scrolled: 64px;
+    
     /* Core palette - Deep blacks, warm off-whites */
     --background: 30 6% 98%;
     --foreground: 0 0% 4%;
