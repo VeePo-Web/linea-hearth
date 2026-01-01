@@ -1,7 +1,9 @@
 import { useEffect } from "react";
 import { X, Ruler } from "lucide-react";
+import { motion, useReducedMotion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { easing, timing } from "@/lib/animations";
 
 interface FitModel {
   id: string;
@@ -24,6 +26,8 @@ interface FitGuideModalProps {
 }
 
 const FitGuideModal = ({ model, onClose }: FitGuideModalProps) => {
+  const prefersReducedMotion = useReducedMotion();
+
   // Lock body scroll and trap focus
   useEffect(() => {
     document.body.style.overflow = 'hidden';
@@ -51,111 +55,181 @@ const FitGuideModal = ({ model, onClose }: FitGuideModalProps) => {
     { label: 'Hips', value: model.hip_cm ? `${cmToInches(model.hip_cm)}" (${model.hip_cm}cm)` : null },
   ].filter(m => m.value);
 
+  const springConfig = { type: "spring" as const, stiffness: 400, damping: 30 };
+
   return (
-    <div 
+    <motion.div 
       className="fixed inset-0 z-50 flex items-center justify-center"
       role="dialog"
       aria-modal="true"
       aria-labelledby="fit-model-name"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
     >
       {/* Backdrop */}
-      <div 
-        className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+      <motion.div 
+        className="absolute inset-0 bg-black/85 backdrop-blur-md"
         onClick={onClose}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
       />
 
       {/* Modal Content */}
-      <div className="relative w-full max-w-4xl max-h-[90vh] m-4 bg-stone-900 rounded-lg overflow-hidden flex flex-col lg:flex-row">
+      <motion.div 
+        className="relative w-full max-w-4xl max-h-[90vh] m-4 bg-stone-900 rounded-xl overflow-hidden flex flex-col lg:flex-row shadow-2xl"
+        initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.95, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.95, y: 20 }}
+        transition={springConfig}
+      >
         {/* Close Button */}
-        <button
+        <motion.button
           onClick={onClose}
-          className="absolute top-4 right-4 z-10 w-10 h-10 bg-black/40 hover:bg-black/60 rounded-full flex items-center justify-center text-white transition-colors"
+          className="absolute top-4 right-4 z-10 w-10 h-10 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center text-white transition-colors"
           aria-label="Close modal"
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          transition={springConfig}
         >
           <X className="w-5 h-5" />
-        </button>
+        </motion.button>
 
         {/* Image Side */}
-        <div className="w-full lg:w-1/2 h-64 lg:h-auto">
-          <img
+        <motion.div 
+          className="w-full lg:w-1/2 h-64 lg:h-auto overflow-hidden"
+          initial={prefersReducedMotion ? {} : { clipPath: "inset(100% 0% 0% 0%)" }}
+          animate={{ clipPath: "inset(0% 0% 0% 0%)" }}
+          transition={{ duration: timing.slow, ease: easing.editorial, delay: 0.1 }}
+        >
+          <motion.img
             src={model.photo_url}
             alt={model.name}
             className="w-full h-full object-cover"
+            initial={prefersReducedMotion ? {} : { scale: 1.1 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: timing.cinematic, ease: easing.editorial }}
           />
-        </div>
+        </motion.div>
 
         {/* Info Side */}
         <div className="w-full lg:w-1/2 p-6 lg:p-10 overflow-y-auto">
           {/* Name & Size Badge */}
-          <div className="flex items-center gap-3 mb-6">
+          <motion.div 
+            className="flex items-center gap-3 mb-8"
+            initial={prefersReducedMotion ? {} : { opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: timing.slow, ease: easing.editorial, delay: 0.2 }}
+          >
             <h2 id="fit-model-name" className="text-2xl lg:text-3xl font-extralight text-white">
               {model.name}
             </h2>
-            <span className="text-xs uppercase tracking-wider bg-amber-600 text-white px-3 py-1 rounded-full">
+            <span className="text-[10px] uppercase tracking-wider bg-amber-600 text-white px-3 py-1.5 rounded-full">
               Size {model.size_worn}
             </span>
-          </div>
+          </motion.div>
 
           {/* Measurements Table */}
-          <div className="mb-8">
-            <h3 className="text-xs uppercase tracking-wider text-white/50 mb-4 flex items-center gap-2">
-              <Ruler className="w-4 h-4" />
+          <motion.div 
+            className="mb-8"
+            initial={prefersReducedMotion ? {} : { opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: timing.slow, ease: easing.editorial, delay: 0.3 }}
+          >
+            <h3 className="text-[10px] uppercase tracking-[0.2em] text-white/40 mb-4 flex items-center gap-2">
+              <Ruler className="w-3.5 h-3.5" />
               Measurements
             </h3>
             <div className="space-y-3">
-              {measurements.map((m) => (
-                <div 
+              {measurements.map((m, index) => (
+                <motion.div 
                   key={m.label}
-                  className="flex justify-between items-center py-2 border-b border-white/10"
+                  className="flex justify-between items-center py-2 border-b border-white/5"
+                  initial={prefersReducedMotion ? {} : { opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ 
+                    duration: timing.medium, 
+                    ease: easing.editorial, 
+                    delay: 0.35 + (index * 0.05) 
+                  }}
                 >
-                  <span className="text-white/60 font-light">{m.label}</span>
-                  <span className="text-white font-light">{m.value}</span>
-                </div>
+                  <span className="text-white/50 font-light text-sm">{m.label}</span>
+                  <span className="text-white font-light text-sm">{m.value}</span>
+                </motion.div>
               ))}
             </div>
-          </div>
+          </motion.div>
 
           {/* Size Worn */}
-          <div className="mb-8 p-4 bg-stone-800 rounded-lg">
-            <p className="text-xs uppercase tracking-wider text-amber-500 mb-2">
+          <motion.div 
+            className="mb-8 p-4 bg-stone-800/50 rounded-lg border border-white/5"
+            initial={prefersReducedMotion ? {} : { opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: timing.slow, ease: easing.editorial, delay: 0.5 }}
+          >
+            <p className="text-[10px] uppercase tracking-[0.2em] text-amber-500 mb-2">
               Size Worn in Photo
             </p>
-            <p className="text-2xl font-light text-white">
+            <p className="text-2xl font-extralight text-white">
               {model.size_worn}
             </p>
-          </div>
+          </motion.div>
 
           {/* Fit Notes */}
           {model.fit_notes && (
-            <div className="mb-8">
-              <h3 className="text-xs uppercase tracking-wider text-white/50 mb-3">
+            <motion.div 
+              className="mb-8"
+              initial={prefersReducedMotion ? {} : { opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: timing.slow, ease: easing.editorial, delay: 0.55 }}
+            >
+              <h3 className="text-[10px] uppercase tracking-[0.2em] text-white/40 mb-3">
                 Fit Notes
               </h3>
-              <p className="text-white/80 font-light leading-relaxed">
+              <p className="text-white/70 font-light leading-relaxed text-sm">
                 {model.fit_notes}
               </p>
-            </div>
+            </motion.div>
           )}
 
           {/* Actions */}
-          <div className="space-y-3">
+          <motion.div 
+            className="space-y-3"
+            initial={prefersReducedMotion ? {} : { opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: timing.slow, ease: easing.editorial, delay: 0.6 }}
+          >
             <Link to="/about/size-guide">
-              <Button 
-                variant="outline" 
-                className="w-full border-white/20 text-white hover:bg-white/10"
+              <motion.div
+                whileHover={prefersReducedMotion ? {} : { scale: 1.02 }}
+                whileTap={prefersReducedMotion ? {} : { scale: 0.98 }}
+                transition={springConfig}
               >
-                View Full Size Chart
-              </Button>
+                <Button 
+                  variant="outline" 
+                  className="w-full border-white/10 text-white hover:bg-white/5 h-11"
+                >
+                  View Full Size Chart
+                </Button>
+              </motion.div>
             </Link>
             <Link to={`/category/all?size=${model.size_worn}`}>
-              <Button className="w-full bg-amber-600 hover:bg-amber-700 text-white">
-                Shop in Size {model.size_worn}
-              </Button>
+              <motion.div
+                whileHover={prefersReducedMotion ? {} : { scale: 1.02 }}
+                whileTap={prefersReducedMotion ? {} : { scale: 0.98 }}
+                transition={springConfig}
+              >
+                <Button className="w-full bg-amber-600 hover:bg-amber-500 text-white h-11">
+                  Shop in Size {model.size_worn}
+                </Button>
+              </motion.div>
             </Link>
-          </div>
+          </motion.div>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };
 
