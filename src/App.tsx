@@ -20,6 +20,8 @@ import StoreLocator from "./pages/about/StoreLocator";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import Community from "./pages/Community";
+import FAQ from "./pages/FAQ";
+import ReturnsExchanges from "./pages/ReturnsExchanges";
 import Lookbook from "./pages/Lookbook";
 import TryOnRoom from "./pages/TryOnRoom";
 import AdminLogin from "./pages/admin/AdminLogin";
@@ -52,6 +54,8 @@ const App = () => (
               <Route path="/about/store-locator" element={<StoreLocator />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
               <Route path="/terms-of-service" element={<TermsOfService />} />
+              <Route path="/faq" element={<FAQ />} />
+              <Route path="/returns" element={<ReturnsExchanges />} />
               <Route path="/community" element={<Community />} />
               <Route path="/lookbook" element={<Lookbook />} />
               <Route path="/try-on" element={<TryOnRoom />} />
