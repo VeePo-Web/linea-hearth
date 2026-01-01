@@ -1,7 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Play, Star, MapPin, Users, MessageCircle } from "lucide-react";
-import { useState } from "react";
+import { Play, MapPin, MessageCircle, Users, Globe, ArrowDown } from "lucide-react";
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { wordReveal, wordItem, fadeUp, staggerContainer, staggerItem } from "@/lib/animations";
 
 interface FeaturedStory {
   id: string;
@@ -12,6 +14,36 @@ interface FeaturedStory {
   story_text: string;
   video_url: string | null;
 }
+
+// Counter animation hook
+function useCounter(target: number, duration: number = 2000) {
+  const [count, setCount] = useState(0);
+  
+  useEffect(() => {
+    let start = 0;
+    const end = target;
+    const incrementTime = duration / end;
+    
+    const timer = setInterval(() => {
+      start += 1;
+      setCount(start);
+      if (start >= end) clearInterval(timer);
+    }, incrementTime);
+    
+    return () => clearInterval(timer);
+  }, [target, duration]);
+  
+  return count;
+}
+
+// Manifesto lines with stagger animation
+const manifestoLines = [
+  "Pray before you post.",
+  "Walk different because you answer to a higher call.",
+  "Wear your faith like armor, not a costume.",
+  "Start conversations, not confrontations.",
+  "Move in silence but let your clothes speak.",
+];
 
 export default function CommunityHero() {
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
@@ -42,130 +74,278 @@ export default function CommunityHero() {
     video_url: null,
   };
 
+  // Counter values
+  const storiesCount = useCounter(500, 2500);
+  const citiesCount = useCounter(45, 2000);
+  const tribeCount = useCounter(10, 1500);
+
   return (
-    <section className="relative min-h-[70vh] bg-stone-900 flex items-center overflow-hidden">
-      {/* Background gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-r from-stone-900 via-stone-900/95 to-stone-900/70" />
-      
-      {/* Decorative lion pattern */}
-      <div className="absolute right-0 top-0 bottom-0 w-1/2 opacity-5">
-        <div className="absolute inset-0 bg-[url('/founders.png')] bg-cover bg-center" />
-      </div>
+    <>
+      {/* SECTION 1: The Manifesto - Full Viewport */}
+      <section className="relative min-h-screen bg-stone-950 flex items-center overflow-hidden">
+        {/* Noise texture overlay */}
+        <div 
+          className="absolute inset-0 opacity-[0.03]"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
+          }}
+        />
+        
+        {/* Decorative image collage - i-D style asymmetric */}
+        <div className="absolute right-0 top-0 bottom-0 w-1/2 lg:w-2/5 opacity-20 lg:opacity-30">
+          <div className="absolute inset-0 bg-gradient-to-l from-transparent via-stone-950/50 to-stone-950 z-10" />
+          <motion.div 
+            initial={{ scale: 1.1, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 1.2, ease: [0.25, 0.46, 0.45, 0.94] }}
+            className="absolute inset-0"
+          >
+            <img 
+              src="/founders.png" 
+              alt="" 
+              className="w-full h-full object-cover grayscale"
+              aria-hidden="true"
+            />
+          </motion.div>
+        </div>
 
-      <div className="container mx-auto px-4 lg:px-8 relative z-10">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-          {/* Left: Content */}
-          <div className="space-y-8">
-            <div className="space-y-4">
-              <p className="text-xs uppercase tracking-[0.25em] text-amber-500 font-medium">
-                Stories From The Tribe
-              </p>
-              <h1 className="text-4xl lg:text-5xl xl:text-6xl font-light text-white leading-[1.1]">
-                "{displayStory.headline}"
+        <div className="container mx-auto px-4 lg:px-8 relative z-10">
+          <div className="max-w-4xl">
+            {/* Eyebrow - 032c industrial */}
+            <motion.p 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="text-[10px] uppercase tracking-[0.4em] text-amber-500 font-medium mb-8"
+            >
+              Not For Everyone
+            </motion.p>
+
+            {/* THE TRIBE - Massive Typography */}
+            <motion.div
+              variants={wordReveal}
+              initial="hidden"
+              animate="visible"
+              className="mb-12"
+            >
+              <h1 className="text-[18vw] md:text-[12vw] lg:text-[10vw] font-extralight text-white leading-[0.85] tracking-[-0.04em] uppercase">
+                <motion.span variants={wordItem} className="block">The</motion.span>
+                <motion.span variants={wordItem} className="block text-amber-500">Tribe</motion.span>
               </h1>
-            </div>
+            </motion.div>
 
-            <blockquote className="text-lg lg:text-xl text-white/80 font-light leading-relaxed max-w-lg">
-              {displayStory.story_text}
-            </blockquote>
+            {/* Brand Manifesto - Exclusive Language */}
+            <motion.div 
+              variants={staggerContainer}
+              initial="hidden"
+              animate="visible"
+              className="space-y-2 mb-16 max-w-xl"
+            >
+              <motion.p 
+                variants={staggerItem}
+                className="text-[11px] uppercase tracking-[0.3em] text-white/40 mb-6"
+              >
+                If you...
+              </motion.p>
+              {manifestoLines.map((line, index) => (
+                <motion.p
+                  key={index}
+                  variants={staggerItem}
+                  className="text-white/80 text-base md:text-lg font-light leading-relaxed"
+                >
+                  {line}
+                </motion.p>
+              ))}
+              <motion.p 
+                variants={staggerItem}
+                className="text-amber-500 text-xl md:text-2xl font-light italic pt-6"
+              >
+                You belong here.
+              </motion.p>
+            </motion.div>
 
-            <div className="flex items-center gap-4">
-              {displayStory.customer_photo_url ? (
-                <img
-                  src={displayStory.customer_photo_url}
-                  alt={displayStory.customer_name}
-                  className="w-12 h-12 rounded-full object-cover grayscale"
-                />
-              ) : (
-                <div className="w-12 h-12 rounded-full bg-amber-500/20 flex items-center justify-center">
-                  <span className="text-amber-500 font-medium text-lg">
-                    {displayStory.customer_name.charAt(0)}
-                  </span>
-                </div>
-              )}
-              <div>
-                <p className="text-white font-medium">{displayStory.customer_name}</p>
-                {displayStory.customer_location && (
-                  <p className="text-white/60 text-sm flex items-center gap-1">
-                    <MapPin className="w-3 h-3" />
-                    {displayStory.customer_location}
-                  </p>
-                )}
-              </div>
-            </div>
-
-            {/* Stats Row */}
-            <div className="flex flex-wrap gap-8 pt-4 border-t border-white/10">
-              <div className="flex items-center gap-2">
-                <MessageCircle className="w-5 h-5 text-amber-500" />
-                <span className="text-white font-light">
-                  <span className="font-medium">500+</span> Stories
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <MapPin className="w-5 h-5 text-amber-500" />
-                <span className="text-white font-light">
-                  <span className="font-medium">45</span> Cities
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Users className="w-5 h-5 text-amber-500" />
-                <span className="text-white font-light">
-                  <span className="font-medium">10K+</span> Tribe Members
-                </span>
-              </div>
-            </div>
+            {/* Stats Row - Counter Animation */}
+            <motion.div 
+              variants={staggerContainer}
+              initial="hidden"
+              animate="visible"
+              className="flex flex-wrap gap-10 md:gap-16 pt-8 border-t border-white/10"
+            >
+              <motion.div variants={staggerItem} className="text-center">
+                <p className="text-3xl md:text-4xl font-light text-white">
+                  {storiesCount}+
+                </p>
+                <p className="text-[10px] uppercase tracking-[0.2em] text-white/40 mt-1">
+                  Stories
+                </p>
+              </motion.div>
+              <motion.div variants={staggerItem} className="text-center">
+                <p className="text-3xl md:text-4xl font-light text-white">
+                  {citiesCount}
+                </p>
+                <p className="text-[10px] uppercase tracking-[0.2em] text-white/40 mt-1">
+                  Cities
+                </p>
+              </motion.div>
+              <motion.div variants={staggerItem} className="text-center">
+                <p className="text-3xl md:text-4xl font-light text-white">
+                  {tribeCount}K+
+                </p>
+                <p className="text-[10px] uppercase tracking-[0.2em] text-white/40 mt-1">
+                  Tribe Members
+                </p>
+              </motion.div>
+            </motion.div>
           </div>
+        </div>
 
-          {/* Right: Featured Video/Image */}
-          <div className="relative">
-            <div className="aspect-[4/5] rounded-lg overflow-hidden bg-stone-800">
-              {displayStory.video_url && !isVideoPlaying ? (
-                <>
-                  <div className="absolute inset-0 bg-gradient-to-t from-stone-900/60 to-transparent z-10" />
-                  <button
-                    onClick={() => setIsVideoPlaying(true)}
-                    className="absolute inset-0 z-20 flex items-center justify-center group"
-                    aria-label="Play video"
-                  >
-                    <div className="w-20 h-20 rounded-full bg-amber-500 flex items-center justify-center transition-transform group-hover:scale-110">
-                      <Play className="w-8 h-8 text-stone-900 ml-1" fill="currentColor" />
-                    </div>
-                  </button>
+        {/* Scroll indicator */}
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 2, duration: 0.6 }}
+          className="absolute bottom-8 left-1/2 -translate-x-1/2"
+        >
+          <motion.div
+            animate={{ y: [0, 8, 0] }}
+            transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
+          >
+            <ArrowDown className="w-5 h-5 text-white/30" />
+          </motion.div>
+        </motion.div>
+      </section>
+
+      {/* SECTION 2: Featured Story - Magazine Spread */}
+      <section className="relative bg-background py-20 lg:py-32">
+        {/* Rotated badge - 032c style */}
+        <div className="absolute left-0 top-1/2 -translate-y-1/2 hidden lg:block">
+          <p className="text-[10px] uppercase tracking-[0.4em] text-amber-500 font-medium -rotate-90 origin-left whitespace-nowrap">
+            Featured Story
+          </p>
+        </div>
+
+        <div className="container mx-auto px-4 lg:px-8">
+          <div className="grid lg:grid-cols-5 gap-8 lg:gap-16 items-center">
+            {/* Left: Large Portrait Image (60%) */}
+            <motion.div 
+              initial={{ opacity: 0, x: -40 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
+              className="lg:col-span-3 relative"
+            >
+              <div className="aspect-[3/4] rounded-sm overflow-hidden bg-muted relative group">
+                {displayStory.video_url && !isVideoPlaying ? (
+                  <>
+                    <div className="absolute inset-0 bg-gradient-to-t from-stone-900/60 to-transparent z-10" />
+                    <button
+                      onClick={() => setIsVideoPlaying(true)}
+                      className="absolute inset-0 z-20 flex items-center justify-center group/play"
+                      aria-label="Play video"
+                    >
+                      <motion.div 
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.95 }}
+                        className="w-24 h-24 rounded-full bg-amber-500 flex items-center justify-center"
+                      >
+                        <Play className="w-10 h-10 text-stone-900 ml-1" fill="currentColor" />
+                      </motion.div>
+                    </button>
+                    <img
+                      src={displayStory.customer_photo_url || "/founders.png"}
+                      alt="Featured story"
+                      className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
+                    />
+                  </>
+                ) : displayStory.video_url && isVideoPlaying ? (
+                  <iframe
+                    src={displayStory.video_url}
+                    className="w-full h-full"
+                    allow="autoplay; fullscreen"
+                    allowFullScreen
+                  />
+                ) : (
                   <img
                     src={displayStory.customer_photo_url || "/founders.png"}
                     alt="Featured story"
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
                   />
-                </>
-              ) : displayStory.video_url && isVideoPlaying ? (
-                <iframe
-                  src={displayStory.video_url}
-                  className="w-full h-full"
-                  allow="autoplay; fullscreen"
-                  allowFullScreen
-                />
-              ) : (
-                <div className="w-full h-full bg-gradient-to-br from-stone-800 to-stone-900 flex items-center justify-center">
-                  <div className="text-center space-y-4 p-8">
-                    <div className="w-24 h-24 mx-auto rounded-full bg-amber-500/20 flex items-center justify-center">
-                      <Star className="w-12 h-12 text-amber-500" />
-                    </div>
-                    <p className="text-white/60 text-sm max-w-xs">
-                      Real stories from real believers wearing their faith boldly
-                    </p>
-                  </div>
-                </div>
-              )}
-            </div>
+                )}
+              </div>
 
-            {/* Floating badge */}
-            <div className="absolute -bottom-4 -left-4 bg-amber-500 px-6 py-3 rounded-sm">
-              <p className="text-stone-900 font-medium text-sm">Featured Story</p>
-            </div>
+              {/* Mobile featured badge */}
+              <div className="absolute -bottom-3 left-4 lg:hidden bg-amber-500 px-4 py-2">
+                <p className="text-stone-900 font-medium text-xs uppercase tracking-wider">Featured Story</p>
+              </div>
+            </motion.div>
+
+            {/* Right: Story Content (40%) */}
+            <motion.div 
+              initial={{ opacity: 0, x: 40 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, delay: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
+              className="lg:col-span-2 space-y-8"
+            >
+              {/* Decorative quote marks */}
+              <div className="text-[120px] leading-none text-amber-500/10 font-serif absolute -top-8 -left-4 select-none hidden lg:block">
+                "
+              </div>
+
+              <div className="space-y-6">
+                <p className="text-[10px] uppercase tracking-[0.3em] text-amber-500 font-medium">
+                  ——— Featured
+                </p>
+
+                <h2 className="text-3xl lg:text-4xl xl:text-5xl font-light leading-[1.15] italic">
+                  "{displayStory.headline}"
+                </h2>
+              </div>
+
+              <blockquote className="text-lg text-muted-foreground font-light leading-relaxed">
+                {displayStory.story_text}
+              </blockquote>
+
+              <div className="flex items-center gap-4 pt-4">
+                {displayStory.customer_photo_url ? (
+                  <img
+                    src={displayStory.customer_photo_url}
+                    alt={displayStory.customer_name}
+                    className="w-14 h-14 rounded-full object-cover grayscale"
+                  />
+                ) : (
+                  <div className="w-14 h-14 rounded-full bg-amber-500/20 flex items-center justify-center">
+                    <span className="text-amber-500 font-medium text-xl">
+                      {displayStory.customer_name.charAt(0)}
+                    </span>
+                  </div>
+                )}
+                <div>
+                  <p className="font-medium text-lg">{displayStory.customer_name}</p>
+                  {displayStory.customer_location && (
+                    <p className="text-muted-foreground text-sm flex items-center gap-1.5">
+                      <MapPin className="w-3.5 h-3.5" />
+                      {displayStory.customer_location}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              {displayStory.video_url && !isVideoPlaying && (
+                <motion.button
+                  whileHover={{ x: 4 }}
+                  onClick={() => setIsVideoPlaying(true)}
+                  className="text-amber-500 text-sm uppercase tracking-[0.2em] font-medium flex items-center gap-2 group"
+                >
+                  <Play className="w-4 h-4" />
+                  Watch Video
+                  <span className="group-hover:translate-x-1 transition-transform">→</span>
+                </motion.button>
+              )}
+            </motion.div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </>
   );
 }

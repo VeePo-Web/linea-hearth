@@ -8,7 +8,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { X } from "lucide-react";
+import { X, SlidersHorizontal } from "lucide-react";
+import { motion } from "framer-motion";
 
 interface StoryFiltersProps {
   selectedProduct: string;
@@ -22,17 +23,10 @@ interface StoryFiltersProps {
 }
 
 const storyTypes = [
-  { value: "all", label: "All Stories" },
+  { value: "all", label: "All" },
   { value: "product_review", label: "Reviews" },
   { value: "testimony", label: "Testimonies" },
   { value: "transformation", label: "Transformations" },
-];
-
-const genderOptions = [
-  { value: "all", label: "All" },
-  { value: "male", label: "Men" },
-  { value: "female", label: "Women" },
-  { value: "non-binary", label: "Non-binary" },
 ];
 
 const sortOptions = [
@@ -75,89 +69,123 @@ export default function StoryFilters({
   };
 
   return (
-    <div className="sticky top-0 z-30 bg-background/95 backdrop-blur-sm border-b border-border">
-      <div className="container mx-auto px-4 lg:px-8 py-4">
-        <div className="flex flex-wrap items-center gap-4">
-          {/* Product Filter */}
-          <Select value={selectedProduct} onValueChange={setSelectedProduct}>
-            <SelectTrigger className="w-[160px] bg-background border-border">
-              <SelectValue placeholder="All Products" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Products</SelectItem>
-              {categories?.map((category) => (
-                <SelectItem key={category.id} value={category.slug}>
-                  {category.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          {/* Story Type Pills */}
-          <div className="flex items-center gap-2">
+    <div className="sticky top-[var(--header-height)] z-30 bg-background border-b border-border">
+      <div className="container mx-auto px-4 lg:px-8">
+        {/* Desktop: Magazine-style navigation */}
+        <div className="hidden md:flex items-center justify-between py-5">
+          {/* Story Type Tabs - Editorial text navigation */}
+          <div className="flex items-center gap-10">
             {storyTypes.map((type) => (
-              <Button
+              <button
                 key={type.value}
-                variant={selectedType === type.value ? "default" : "outline"}
-                size="sm"
                 onClick={() => setSelectedType(type.value)}
-                className={
-                  selectedType === type.value
-                    ? "bg-amber-500 text-stone-900 hover:bg-amber-600 border-amber-500"
-                    : "border-border hover:border-amber-500 hover:text-amber-600"
-                }
+                className="relative group"
               >
-                {type.label}
-              </Button>
+                <span 
+                  className={`text-xs uppercase tracking-[0.2em] font-medium transition-colors ${
+                    selectedType === type.value 
+                      ? "text-foreground" 
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {type.label}
+                </span>
+                {/* Underline indicator */}
+                {selectedType === type.value && (
+                  <motion.div
+                    layoutId="activeFilter"
+                    className="absolute -bottom-5 left-0 right-0 h-[2px] bg-amber-500"
+                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                  />
+                )}
+              </button>
             ))}
           </div>
 
-          {/* Gender Pills - Hidden on mobile */}
-          <div className="hidden md:flex items-center gap-2">
-            <span className="text-sm text-muted-foreground mr-1">Gender:</span>
-            {genderOptions.map((option) => (
-              <Button
-                key={option.value}
-                variant={selectedGender === option.value ? "default" : "ghost"}
-                size="sm"
-                onClick={() => setSelectedGender(option.value)}
-                className={
-                  selectedGender === option.value
-                    ? "bg-foreground text-background hover:bg-foreground/90"
-                    : "text-muted-foreground hover:text-foreground"
-                }
-              >
-                {option.label}
-              </Button>
-            ))}
-          </div>
+          {/* Right side: Product filter + Sort */}
+          <div className="flex items-center gap-6">
+            {/* Product Filter */}
+            <Select value={selectedProduct} onValueChange={setSelectedProduct}>
+              <SelectTrigger className="w-[140px] bg-transparent border-0 shadow-none text-xs uppercase tracking-[0.15em] text-muted-foreground hover:text-foreground focus:ring-0">
+                <SelectValue placeholder="All Products" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all" className="text-xs uppercase tracking-wider">
+                  All Products
+                </SelectItem>
+                {categories?.map((category) => (
+                  <SelectItem 
+                    key={category.id} 
+                    value={category.slug}
+                    className="text-xs uppercase tracking-wider"
+                  >
+                    {category.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
 
-          {/* Sort + Clear */}
-          <div className="flex items-center gap-3 ml-auto">
+            {/* Divider */}
+            <div className="w-px h-4 bg-border" />
+
+            {/* Sort */}
             <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="w-[140px] bg-background border-border">
+              <SelectTrigger className="w-[130px] bg-transparent border-0 shadow-none text-xs uppercase tracking-[0.15em] text-muted-foreground hover:text-foreground focus:ring-0">
                 <SelectValue placeholder="Sort by" />
               </SelectTrigger>
               <SelectContent>
                 {sortOptions.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
+                  <SelectItem 
+                    key={option.value} 
+                    value={option.value}
+                    className="text-xs uppercase tracking-wider"
+                  >
                     {option.label}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
 
+            {/* Clear Filters */}
             {hasActiveFilters && (
-              <Button
-                variant="ghost"
-                size="sm"
+              <button
                 onClick={clearFilters}
-                className="text-muted-foreground hover:text-foreground"
+                className="text-xs uppercase tracking-[0.15em] text-muted-foreground hover:text-foreground flex items-center gap-1.5 transition-colors"
               >
-                <X className="w-4 h-4 mr-1" />
+                <X className="w-3 h-3" />
                 Clear
-              </Button>
+              </button>
             )}
+          </div>
+        </div>
+
+        {/* Mobile: Horizontal scroll */}
+        <div className="md:hidden py-4">
+          <div className="flex items-center gap-3 overflow-x-auto scrollbar-hide pb-2 -mx-4 px-4">
+            {/* Filter toggle */}
+            <Button
+              variant="outline"
+              size="sm"
+              className="shrink-0 text-xs uppercase tracking-wider border-border"
+            >
+              <SlidersHorizontal className="w-3.5 h-3.5 mr-1.5" />
+              Filters
+            </Button>
+
+            {/* Type pills - horizontal scroll */}
+            {storyTypes.map((type) => (
+              <button
+                key={type.value}
+                onClick={() => setSelectedType(type.value)}
+                className={`shrink-0 px-4 py-2 text-xs uppercase tracking-[0.15em] font-medium transition-colors rounded-full ${
+                  selectedType === type.value
+                    ? "bg-foreground text-background"
+                    : "bg-muted text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {type.label}
+              </button>
+            ))}
           </div>
         </div>
       </div>

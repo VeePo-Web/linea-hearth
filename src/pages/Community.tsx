@@ -1,6 +1,5 @@
 import { useState } from "react";
-import Header from "@/components/header/Header";
-import Footer from "@/components/footer/Footer";
+import Layout from "@/components/layout/Layout";
 import CommunityHero from "@/components/community/CommunityHero";
 import StoryFilters from "@/components/community/StoryFilters";
 import StoryGrid from "@/components/community/StoryGrid";
@@ -14,36 +13,30 @@ export default function Community() {
   const [sortBy, setSortBy] = useState("recent");
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
+    <Layout>
+      <CommunityHero />
       
-      <main>
-        <CommunityHero />
-        
-        <StoryFilters
-          selectedProduct={selectedProduct}
-          setSelectedProduct={setSelectedProduct}
-          selectedType={selectedType}
-          setSelectedType={setSelectedType}
-          selectedGender={selectedGender}
-          setSelectedGender={setSelectedGender}
-          sortBy={sortBy}
-          setSortBy={setSortBy}
-        />
-        
-        <StoryGrid
-          selectedProduct={selectedProduct}
-          selectedType={selectedType}
-          selectedGender={selectedGender}
-          sortBy={sortBy}
-        />
-        
-        <SocialFeed />
-        
-        <SubmitStoryCTA />
-      </main>
+      <StoryFilters
+        selectedProduct={selectedProduct}
+        setSelectedProduct={setSelectedProduct}
+        selectedType={selectedType}
+        setSelectedType={setSelectedType}
+        selectedGender={selectedGender}
+        setSelectedGender={setSelectedGender}
+        sortBy={sortBy}
+        setSortBy={setSortBy}
+      />
       
-      <Footer />
-    </div>
+      <StoryGrid
+        selectedProduct={selectedProduct}
+        selectedType={selectedType}
+        selectedGender={selectedGender}
+        sortBy={sortBy}
+      />
+      
+      <SocialFeed />
+      
+      <SubmitStoryCTA />
+    </Layout>
   );
 }

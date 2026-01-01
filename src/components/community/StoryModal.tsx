@@ -5,10 +5,11 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Star, MapPin, MessageCircle, Instagram, ExternalLink, Share2, Copy } from "lucide-react";
+import { Star, MapPin, MessageCircle, Instagram, ExternalLink, Share2 } from "lucide-react";
 import { StoryCardData } from "./StoryCard";
 import { Link } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface StoryModalProps {
   story: StoryCardData | null;
@@ -24,7 +25,7 @@ export default function StoryModal({ story, onClose }: StoryModalProps) {
       await navigator.clipboard.writeText(url);
       toast({
         title: "Link copied!",
-        description: "Share this story with your community.",
+        description: "Share this testimony with your community.",
       });
     } catch {
       toast({
@@ -37,10 +38,15 @@ export default function StoryModal({ story, onClose }: StoryModalProps) {
 
   return (
     <Dialog open={!!story} onOpenChange={() => onClose()}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0">
-        <div className="grid md:grid-cols-2 gap-0">
-          {/* Left: Image/Video */}
-          <div className="relative aspect-square md:aspect-auto md:min-h-[500px] bg-stone-100 dark:bg-stone-800">
+      <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto p-0 gap-0">
+        <div className="grid md:grid-cols-5 gap-0">
+          {/* Left: Image/Video (60%) */}
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
+            className="md:col-span-3 relative aspect-[3/4] md:aspect-auto md:min-h-[600px] bg-muted"
+          >
             {story.video_url ? (
               <iframe
                 src={story.video_url}
@@ -55,20 +61,39 @@ export default function StoryModal({ story, onClose }: StoryModalProps) {
                 className="w-full h-full object-cover"
               />
             ) : (
-              <div className="w-full h-full flex items-center justify-center">
-                <span className="text-8xl font-light text-stone-300 dark:text-stone-600">
+              <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-stone-100 to-stone-200 dark:from-stone-800 dark:to-stone-900">
+                <span className="text-[120px] font-extralight text-stone-300/50 dark:text-stone-700/50 uppercase">
                   {story.customer_name.charAt(0)}
                 </span>
               </div>
             )}
-          </div>
 
-          {/* Right: Content */}
-          <div className="p-6 lg:p-8 flex flex-col">
-            <DialogHeader className="text-left mb-6">
+            {/* Type badge - Rotated */}
+            <div className="absolute left-0 top-1/2 -translate-y-1/2 hidden md:block">
+              <div className="bg-amber-500 px-3 py-1.5 -rotate-90 origin-left">
+                <span className="text-[9px] uppercase tracking-[0.2em] text-stone-900 font-medium whitespace-nowrap">
+                  {story.type === "review" ? "Review" : "Testimony"}
+                </span>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Right: Content (40%) */}
+          <motion.div 
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.4, delay: 0.1, ease: [0.25, 0.46, 0.45, 0.94] }}
+            className="md:col-span-2 p-6 lg:p-10 flex flex-col relative"
+          >
+            {/* Decorative quote marks */}
+            <div className="absolute -top-4 -left-2 text-[100px] leading-none text-amber-500/10 font-serif select-none pointer-events-none hidden md:block">
+              "
+            </div>
+
+            <DialogHeader className="text-left mb-8 relative z-10">
               {/* Rating */}
               {story.rating && (
-                <div className="flex items-center gap-1 mb-3">
+                <div className="flex items-center gap-1 mb-4">
                   {[...Array(5)].map((_, i) => (
                     <Star
                       key={i}
@@ -85,31 +110,31 @@ export default function StoryModal({ story, onClose }: StoryModalProps) {
                 </div>
               )}
 
-              <DialogTitle className="text-2xl lg:text-3xl font-light leading-tight">
-                {story.headline || `"${story.story_text.slice(0, 50)}..."`}
+              <DialogTitle className="text-2xl lg:text-3xl font-light leading-tight italic">
+                {story.headline ? `"${story.headline}"` : `"${story.story_text.slice(0, 60)}..."`}
               </DialogTitle>
             </DialogHeader>
 
             {/* Customer Info */}
-            <div className="flex items-center gap-4 mb-6 pb-6 border-b border-border">
+            <div className="flex items-center gap-4 mb-8 pb-8 border-b border-border">
               {story.customer_photo_url ? (
                 <img
                   src={story.customer_photo_url}
                   alt={story.customer_name}
-                  className="w-12 h-12 rounded-full object-cover"
+                  className="w-14 h-14 rounded-full object-cover grayscale"
                 />
               ) : (
-                <div className="w-12 h-12 rounded-full bg-amber-500/20 flex items-center justify-center">
-                  <span className="text-amber-500 font-medium text-lg">
+                <div className="w-14 h-14 rounded-full bg-amber-500/10 flex items-center justify-center">
+                  <span className="text-amber-500 font-medium text-xl">
                     {story.customer_name.charAt(0)}
                   </span>
                 </div>
               )}
               <div className="flex-1">
-                <p className="font-medium">{story.customer_name}</p>
+                <p className="font-medium text-lg">{story.customer_name}</p>
                 {story.customer_location && (
-                  <p className="text-sm text-muted-foreground flex items-center gap-1">
-                    <MapPin className="w-3 h-3" />
+                  <p className="text-sm text-muted-foreground flex items-center gap-1.5">
+                    <MapPin className="w-3.5 h-3.5" />
                     {story.customer_location}
                   </p>
                 )}
@@ -127,23 +152,23 @@ export default function StoryModal({ story, onClose }: StoryModalProps) {
             </div>
 
             {/* Full Story */}
-            <div className="flex-1 mb-6">
-              <p className="text-foreground/80 leading-relaxed whitespace-pre-line">
+            <div className="flex-1 mb-8">
+              <p className="text-foreground/80 leading-relaxed whitespace-pre-line text-[15px]">
                 {story.story_text}
               </p>
             </div>
 
             {/* Product Link */}
             {story.product_name && story.product_slug && (
-              <div className="mb-6 p-4 bg-muted/50 rounded-sm">
-                <p className="text-xs text-muted-foreground uppercase tracking-wide mb-2">
+              <div className="mb-8 p-5 bg-muted/50 border border-border">
+                <p className="text-[10px] text-muted-foreground uppercase tracking-[0.2em] mb-3">
                   Featured Product
                 </p>
                 <div className="flex items-center justify-between">
                   <p className="font-medium">{story.product_name}</p>
-                  <Button variant="outline" size="sm" asChild>
+                  <Button variant="outline" size="sm" asChild className="rounded-none text-xs uppercase tracking-wider">
                     <Link to={`/product/${story.product_slug}`}>
-                      View Product
+                      View
                       <ExternalLink className="w-3 h-3 ml-2" />
                     </Link>
                   </Button>
@@ -152,18 +177,23 @@ export default function StoryModal({ story, onClose }: StoryModalProps) {
             )}
 
             {/* Actions */}
-            <div className="flex items-center gap-3 pt-4 border-t border-border">
+            <div className="flex items-center gap-3 pt-6 border-t border-border">
               {story.is_contactable && (
-                <Button className="flex-1 bg-amber-500 text-stone-900 hover:bg-amber-600">
+                <Button className="flex-1 bg-amber-500 text-stone-900 hover:bg-amber-600 rounded-none text-xs uppercase tracking-wider">
                   <MessageCircle className="w-4 h-4 mr-2" />
                   Ask Me Anything
                 </Button>
               )}
-              <Button variant="outline" size="icon" onClick={handleShare}>
-                <Share2 className="w-4 h-4" />
+              <Button 
+                variant="outline" 
+                onClick={handleShare}
+                className="rounded-none text-xs uppercase tracking-wider"
+              >
+                <Share2 className="w-4 h-4 mr-2" />
+                Share
               </Button>
             </div>
-          </div>
+          </motion.div>
         </div>
       </DialogContent>
     </Dialog>

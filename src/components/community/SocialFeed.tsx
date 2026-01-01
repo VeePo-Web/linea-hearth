@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Instagram, ExternalLink, Heart, MessageCircle } from "lucide-react";
+import { Instagram, ExternalLink, ArrowRight } from "lucide-react";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { staggerContainer, staggerItem } from "@/lib/animations";
 
 // TikTok icon component
 const TikTokIcon = ({ className }: { className?: string }) => (
@@ -29,7 +31,7 @@ const placeholderPosts: SocialPost[] = [
     username: "faithfulwarrior",
     likes: 234,
     comments: 18,
-    caption: "Wearing my faith boldly 🦁 #LineOfJudah",
+    caption: "Wearing my faith boldly 🦁",
     postUrl: "#",
   },
   {
@@ -79,132 +81,137 @@ const placeholderPosts: SocialPost[] = [
     username: "anointed.apparel",
     likes: 567,
     comments: 45,
-    caption: "Tribe worldwide 🌍 #LineOfJudah",
+    caption: "Tribe worldwide 🌍",
+    postUrl: "#",
+  },
+  {
+    id: "7",
+    platform: "instagram",
+    imageUrl: "/founders.png",
+    username: "boldbelievers",
+    likes: 892,
+    comments: 67,
+    caption: "Sunday ready 🙏",
+    postUrl: "#",
+  },
+  {
+    id: "8",
+    platform: "tiktok",
+    imageUrl: "/founders.png",
+    username: "faithfit",
+    likes: 3400,
+    comments: 234,
+    caption: "Walking different 🦁",
     postUrl: "#",
   },
 ];
 
 export default function SocialFeed() {
-  const [activePlatform, setActivePlatform] = useState<"instagram" | "tiktok">("instagram");
-
-  const filteredPosts = placeholderPosts.filter(
-    (post) => activePlatform === "instagram" || post.platform === activePlatform
-  );
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   return (
-    <section className="py-20 bg-muted/30">
-      <div className="container mx-auto px-4 lg:px-8">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <p className="text-xs uppercase tracking-[0.25em] text-amber-600 mb-3">
-            Join The Movement
-          </p>
-          <h2 className="text-3xl lg:text-4xl font-light mb-4">
-            #LineOfJudah Worldwide
-          </h2>
-          <p className="text-muted-foreground max-w-md mx-auto">
-            Tag us in your photos to be featured. Join thousands wearing their faith boldly.
-          </p>
-        </div>
+    <section className="py-20 lg:py-28 bg-muted/30 overflow-hidden">
+      {/* Header */}
+      <motion.div 
+        variants={staggerContainer}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        className="container mx-auto px-4 lg:px-8 mb-12"
+      >
+        <motion.p 
+          variants={staggerItem}
+          className="text-[10px] uppercase tracking-[0.4em] text-amber-600 mb-4"
+        >
+          Join The Movement
+        </motion.p>
+        <motion.h2 
+          variants={staggerItem}
+          className="text-4xl lg:text-5xl font-extralight mb-4"
+        >
+          #LineOfJudah
+        </motion.h2>
+        <motion.p 
+          variants={staggerItem}
+          className="text-muted-foreground max-w-lg"
+        >
+          Tag us. Get featured. Join 10K+ believers wearing bold.
+        </motion.p>
+      </motion.div>
 
-        {/* Platform Toggle */}
-        <div className="flex items-center justify-center gap-4 mb-10">
-          <Button
-            variant={activePlatform === "instagram" ? "default" : "outline"}
-            onClick={() => setActivePlatform("instagram")}
-            className={
-              activePlatform === "instagram"
-                ? "bg-gradient-to-r from-purple-500 to-pink-500 border-0"
-                : ""
-            }
-          >
-            <Instagram className="w-4 h-4 mr-2" />
-            Instagram
-          </Button>
-          <Button
-            variant={activePlatform === "tiktok" ? "default" : "outline"}
-            onClick={() => setActivePlatform("tiktok")}
-            className={
-              activePlatform === "tiktok"
-                ? "bg-foreground text-background"
-                : ""
-            }
-          >
-            <TikTokIcon className="w-4 h-4 mr-2" />
-            TikTok
-          </Button>
-        </div>
-
-        {/* Posts Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-          {filteredPosts.map((post, index) => (
-            <a
+      {/* Horizontal Scroll Gallery */}
+      <div className="relative">
+        <div 
+          ref={scrollRef}
+          className="flex gap-4 overflow-x-auto scrollbar-hide px-4 lg:px-8 pb-4 cursor-grab active:cursor-grabbing"
+          style={{ scrollSnapType: "x mandatory" }}
+        >
+          {placeholderPosts.map((post, index) => (
+            <motion.a
               key={post.id}
               href={post.postUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="group relative aspect-square rounded-sm overflow-hidden animate-in fade-in"
-              style={{ animationDelay: `${index * 50}ms` }}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: index * 0.08, duration: 0.5 }}
+              whileHover={{ rotate: index % 2 === 0 ? 2 : -2, scale: 1.02 }}
+              className="group relative shrink-0 w-[280px] aspect-square overflow-hidden bg-muted"
+              style={{ scrollSnapAlign: "start" }}
             >
               <img
                 src={post.imageUrl}
                 alt={`Post by @${post.username}`}
-                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
               />
               
-              {/* Hover Overlay */}
-              <div className="absolute inset-0 bg-stone-900/70 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2">
-                <div className="flex items-center gap-4 text-white text-sm">
-                  <span className="flex items-center gap-1">
-                    <Heart className="w-4 h-4" />
-                    {post.likes.toLocaleString()}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <MessageCircle className="w-4 h-4" />
-                    {post.comments}
-                  </span>
+              {/* Hover Overlay - Username slides up */}
+              <div className="absolute inset-0 bg-gradient-to-t from-stone-950/90 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <div className="absolute bottom-0 left-0 right-0 p-5 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                  <p className="text-white text-sm font-medium">@{post.username}</p>
+                  <p className="text-white/60 text-xs mt-1 line-clamp-1">{post.caption}</p>
                 </div>
-                <p className="text-white/80 text-xs">@{post.username}</p>
               </div>
 
-              {/* Platform Badge */}
-              <div className="absolute top-2 right-2">
+              {/* Platform Badge - Corner */}
+              <div className="absolute top-3 right-3 opacity-60">
                 {post.platform === "instagram" ? (
                   <Instagram className="w-4 h-4 text-white drop-shadow-md" />
                 ) : (
                   <TikTokIcon className="w-4 h-4 text-white drop-shadow-md" />
                 )}
               </div>
-            </a>
+            </motion.a>
           ))}
         </div>
 
-        {/* Follow CTAs */}
-        <div className="flex flex-wrap items-center justify-center gap-4 mt-10">
-          <Button variant="outline" asChild>
-            <a
-              href="https://instagram.com/lineofjudah"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <Instagram className="w-4 h-4 mr-2" />
-              Follow on Instagram
-              <ExternalLink className="w-3 h-3 ml-2" />
-            </a>
-          </Button>
-          <Button variant="outline" asChild>
-            <a
-              href="https://tiktok.com/@lineofjudah"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <TikTokIcon className="w-4 h-4 mr-2" />
-              Follow on TikTok
-              <ExternalLink className="w-3 h-3 ml-2" />
-            </a>
-          </Button>
-        </div>
+        {/* Scroll hint gradient */}
+        <div className="absolute right-0 top-0 bottom-4 w-24 bg-gradient-to-l from-muted/30 to-transparent pointer-events-none hidden lg:block" />
       </div>
+
+      {/* Single Follow CTA */}
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        className="container mx-auto px-4 lg:px-8 mt-12"
+      >
+        <Button 
+          variant="outline" 
+          asChild
+          className="rounded-none border-foreground text-foreground hover:bg-foreground hover:text-background text-xs uppercase tracking-[0.2em] px-8"
+        >
+          <a
+            href="https://instagram.com/lineofjudah"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Follow @lineofjudah
+            <ArrowRight className="w-4 h-4 ml-2" />
+          </a>
+        </Button>
+      </motion.div>
     </section>
   );
 }
