@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import StoryCard, { StoryCardData } from "./StoryCard";
 import StoryModal from "./StoryModal";
+import { motion } from "framer-motion";
 
 interface StoryGridProps {
   selectedProduct: string;
@@ -84,10 +85,6 @@ export default function StoryGrid({
         `)
         .eq("is_approved", true);
 
-      if (selectedType !== "all" && selectedType !== "testimony" && selectedType !== "transformation") {
-        // Only fetch reviews if type is "all" or "product_review"
-      }
-
       if (selectedGender !== "all") {
         query = query.eq("gender", selectedGender);
       }
@@ -148,13 +145,28 @@ export default function StoryGrid({
 
   const isLoading = storiesLoading || reviewsLoading;
 
+  // Determine card sizes for bento layout
+  const getCardSize = (index: number): "regular" | "large" | "wide" => {
+    // First card is always large
+    if (index === 0) return "large";
+    // Every 6th card is large
+    if (index % 6 === 0) return "large";
+    // Every 5th card is wide
+    if (index % 5 === 0 && index > 0) return "wide";
+    return "regular";
+  };
+
   if (isLoading) {
     return (
       <section className="py-16 bg-background">
         <div className="container mx-auto px-4 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-6">
+          {/* Bento skeleton */}
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-5 auto-rows-[200px]">
             {[...Array(8)].map((_, i) => (
-              <Skeleton key={i} className="aspect-[4/5] rounded-sm" />
+              <Skeleton 
+                key={i} 
+                className={`${i === 0 ? "row-span-2" : ""}`}
+              />
             ))}
           </div>
         </div>
@@ -203,37 +215,47 @@ export default function StoryGrid({
   ];
 
   return (
-    <section className="py-16 bg-background">
+    <section className="py-16 lg:py-24 bg-background">
       <div className="container mx-auto px-4 lg:px-8">
-        {/* Results count */}
-        <p className="text-sm text-muted-foreground mb-8">
-          Showing {displayStories.length} {displayStories.length === 1 ? "story" : "stories"}
-        </p>
+        {/* Results count - Editorial style */}
+        <motion.p 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground mb-10"
+        >
+          Showing {displayStories.length} {displayStories.length === 1 ? "story" : "stories"} from the tribe
+        </motion.p>
 
-        {/* Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-6">
+        {/* Bento Grid - Asymmetric layout */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-5 auto-rows-[180px] md:auto-rows-[220px]">
           {displayStories.map((story, index) => (
             <StoryCard
               key={story.id}
               story={story}
               onOpenStory={setSelectedStory}
               index={index}
+              size={getCardSize(index)}
             />
           ))}
         </div>
 
-        {/* Load More */}
+        {/* Load More - Industrial button */}
         {hasMore && (
-          <div className="flex justify-center mt-12">
+          <motion.div 
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            className="flex justify-center mt-16"
+          >
             <Button
               variant="outline"
               size="lg"
               onClick={() => setVisibleCount((prev) => prev + ITEMS_PER_PAGE)}
-              className="border-foreground text-foreground hover:bg-foreground hover:text-background"
+              className="border-foreground text-foreground hover:bg-foreground hover:text-background rounded-none px-12 text-xs uppercase tracking-[0.2em]"
             >
               Load More Stories
             </Button>
-          </div>
+          </motion.div>
         )}
 
         {/* Story Modal */}
