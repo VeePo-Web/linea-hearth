@@ -9,7 +9,6 @@ import DropGrid from "../components/homepage/DropGrid";
 import FeaturedCollection from "../components/homepage/FeaturedCollection";
 import TestimonySpotlight from "../components/homepage/TestimonySpotlight";
 import InstagramFeed from "../components/homepage/InstagramFeed";
-import EmailOptIn from "../components/homepage/EmailOptIn";
 import MobileStickyBar from "../components/homepage/MobileStickyBar";
 
 const Index = () => {
@@ -44,9 +43,6 @@ const Index = () => {
       
       {/* Instagram Collage */}
       <InstagramFeed />
-      
-      {/* Newsletter - Bold full-width */}
-      <EmailOptIn />
       
       <MobileStickyBar />
     </Layout>
