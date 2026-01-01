@@ -1,7 +1,11 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import ScrollReveal from "@/components/motion/ScrollReveal";
+import StaggerContainer from "@/components/motion/StaggerContainer";
+import { useReducedMotion } from "@/hooks/useReducedMotion";
 
 interface Product {
   id: string;
@@ -15,26 +19,8 @@ interface Product {
 }
 
 const DropGrid = () => {
-  const [isVisible, setIsVisible] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
-  const sectionRef = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, []);
+  const prefersReducedMotion = useReducedMotion();
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -90,107 +76,109 @@ const DropGrid = () => {
   const displayProducts = products.length > 0 ? products : placeholderProducts;
 
   return (
-    <section 
-      ref={sectionRef}
-      className="w-full py-16 md:py-24 bg-background"
-    >
+    <section className="w-full py-16 md:py-24 bg-background">
       <div className="max-w-7xl mx-auto px-6">
         {/* Section Header - Hypebeast style */}
-        <div 
-          className={`flex justify-between items-end mb-8 transition-all duration-700 ${
-            isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-          }`}
-        >
-          <div>
-            <div className="flex items-center gap-3 mb-2">
-              <span className="bg-destructive text-destructive-foreground text-[10px] font-bold tracking-wider uppercase px-2 py-0.5">
-                Just Dropped
-              </span>
-              <span className="text-caption text-muted-foreground">
-                {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
-              </span>
+        <ScrollReveal variant="slideInLeft">
+          <div className="flex justify-between items-end mb-8">
+            <div>
+              <div className="flex items-center gap-3 mb-2">
+                <span className="bg-destructive text-destructive-foreground text-[10px] font-bold tracking-wider uppercase px-2 py-0.5">
+                  Just Dropped
+                </span>
+                <span className="text-caption text-muted-foreground">
+                  {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                </span>
+              </div>
+              <h2 className="text-section text-foreground">New Arrivals</h2>
             </div>
-            <h2 className="text-section text-foreground">New Arrivals</h2>
+            <motion.div
+              whileHover={{ x: 4 }}
+              transition={{ type: "spring", stiffness: 400, damping: 20 }}
+            >
+              <Link 
+                to="/category/new-in"
+                className="text-foreground text-sm font-light flex items-center gap-2 hover:text-accent transition-colors group"
+              >
+                View All
+                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+              </Link>
+            </motion.div>
           </div>
-          <Link 
-            to="/category/new-in"
-            className="text-foreground text-sm font-light flex items-center gap-2 hover:text-accent transition-colors group"
-          >
-            View All
-            <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-          </Link>
-        </div>
+        </ScrollReveal>
 
         {/* Product Grid - Editorial with index numbers */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4">
+        <StaggerContainer className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4" staggerDelay={0.1}>
           {displayProducts.map((product, index) => (
-            <Link
+            <motion.div
               key={product.id}
-              to={`/product/${product.slug}`}
-              className={`group block transition-all duration-700 ${
-                isVisible 
-                  ? 'opacity-100 translate-y-0' 
-                  : 'opacity-0 translate-y-8'
-              }`}
-              style={{ transitionDelay: `${index * 100}ms` }}
+              whileHover={prefersReducedMotion ? {} : { y: -4 }}
+              transition={{ type: "spring", stiffness: 300, damping: 20 }}
             >
-              {/* Product Image */}
-              <div className="aspect-[3/4] bg-muted mb-4 overflow-hidden relative">
-                {product.primary_image ? (
-                  <img 
-                    src={product.primary_image}
-                    alt={product.name}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-102"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-muted to-secondary">
-                    <span className="text-muted-foreground text-caption uppercase">
-                      {product.category_name}
-                    </span>
-                  </div>
-                )}
-
-                {/* Index Number - 032c style */}
-                <div className="absolute top-3 left-3 text-[10px] font-medium text-foreground bg-background px-2 py-1">
-                  #{String(index + 1).padStart(2, '0')}
-                </div>
-
-                {/* Sale Badge */}
-                {product.is_on_sale && (
-                  <div className="absolute top-3 right-3 bg-destructive text-destructive-foreground text-[10px] font-bold tracking-wider uppercase px-2 py-1">
-                    Sale
-                  </div>
-                )}
-              </div>
-
-              {/* Product Info - Minimal */}
-              <div>
-                <p className="text-caption text-muted-foreground uppercase mb-1">
-                  {product.category_name}
-                </p>
-                <h3 className="text-sm font-light text-foreground mb-1 group-hover:text-accent transition-colors">
-                  {product.name}
-                </h3>
-                <div className="flex items-center gap-2">
-                  {product.is_on_sale && product.sale_price ? (
-                    <>
-                      <span className="text-sm font-light text-foreground">
-                        ${product.sale_price}
-                      </span>
-                      <span className="text-sm font-light text-muted-foreground line-through">
-                        ${product.price}
-                      </span>
-                    </>
+              <Link
+                to={`/product/${product.slug}`}
+                className="group block"
+              >
+                {/* Product Image */}
+                <div className="aspect-[3/4] bg-muted mb-4 overflow-hidden relative">
+                  {product.primary_image ? (
+                    <motion.img 
+                      src={product.primary_image}
+                      alt={product.name}
+                      className="w-full h-full object-cover"
+                      whileHover={prefersReducedMotion ? {} : { scale: 1.03 }}
+                      transition={{ duration: 0.5 }}
+                    />
                   ) : (
-                    <span className="text-sm font-light text-foreground">
-                      ${product.price}
-                    </span>
+                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-muted to-secondary">
+                      <span className="text-muted-foreground text-caption uppercase">
+                        {product.category_name}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Index Number - 032c style */}
+                  <div className="absolute top-3 left-3 text-[10px] font-medium text-foreground bg-background px-2 py-1">
+                    #{String(index + 1).padStart(2, '0')}
+                  </div>
+
+                  {/* Sale Badge */}
+                  {product.is_on_sale && (
+                    <div className="absolute top-3 right-3 bg-destructive text-destructive-foreground text-[10px] font-bold tracking-wider uppercase px-2 py-1">
+                      Sale
+                    </div>
                   )}
                 </div>
-              </div>
-            </Link>
+
+                {/* Product Info - Minimal */}
+                <div>
+                  <p className="text-caption text-muted-foreground uppercase mb-1">
+                    {product.category_name}
+                  </p>
+                  <h3 className="text-sm font-light text-foreground mb-1 group-hover:text-accent transition-colors">
+                    {product.name}
+                  </h3>
+                  <div className="flex items-center gap-2">
+                    {product.is_on_sale && product.sale_price ? (
+                      <>
+                        <span className="text-sm font-light text-foreground">
+                          ${product.sale_price}
+                        </span>
+                        <span className="text-sm font-light text-muted-foreground line-through">
+                          ${product.price}
+                        </span>
+                      </>
+                    ) : (
+                      <span className="text-sm font-light text-foreground">
+                        ${product.price}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </Link>
+            </motion.div>
           ))}
-        </div>
+        </StaggerContainer>
       </div>
     </section>
   );
