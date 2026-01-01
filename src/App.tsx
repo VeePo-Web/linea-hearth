@@ -2,10 +2,12 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { AnimatePresence } from "framer-motion";
 import { AuthProvider } from "@/hooks/useAuth";
 import { CartProvider } from "@/hooks/useCart";
 import ScrollToTop from "./components/ScrollToTop";
+import PageTransition from "./components/motion/PageTransition";
 import Index from "./pages/Index";
 import Category from "./pages/Category";
 import ProductDetail from "./pages/ProductDetail";
@@ -32,6 +34,43 @@ import ProtectedRoute from "./components/admin/ProtectedRoute";
 
 const queryClient = new QueryClient();
 
+// Animated Routes component that uses location for AnimatePresence
+const AnimatedRoutes = () => {
+  const location = useLocation();
+  
+  return (
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        <Route path="/" element={<PageTransition><Index /></PageTransition>} />
+        <Route path="/category/:category" element={<PageTransition><Category /></PageTransition>} />
+        <Route path="/product/:productId" element={<PageTransition><ProductDetail /></PageTransition>} />
+        <Route path="/checkout" element={<PageTransition><Checkout /></PageTransition>} />
+        <Route path="/about/our-story" element={<PageTransition><OurStory /></PageTransition>} />
+        <Route path="/about/our-mission" element={<PageTransition><OurMission /></PageTransition>} />
+        <Route path="/about/size-guide" element={<PageTransition><SizeGuide /></PageTransition>} />
+        <Route path="/about/customer-care" element={<PageTransition><CustomerCare /></PageTransition>} />
+        <Route path="/privacy-policy" element={<PageTransition><PrivacyPolicy /></PageTransition>} />
+        <Route path="/terms-of-service" element={<PageTransition><TermsOfService /></PageTransition>} />
+        <Route path="/faq" element={<PageTransition><FAQ /></PageTransition>} />
+        <Route path="/returns" element={<PageTransition><ReturnsExchanges /></PageTransition>} />
+        <Route path="/shipping" element={<PageTransition><ShippingInfo /></PageTransition>} />
+        <Route path="/accessibility" element={<PageTransition><Accessibility /></PageTransition>} />
+        <Route path="/community" element={<PageTransition><Community /></PageTransition>} />
+        <Route path="/lookbook" element={<PageTransition><Lookbook /></PageTransition>} />
+        <Route path="/try-on" element={<PageTransition><TryOnRoom /></PageTransition>} />
+        <Route path="/try-on/saved/:outfitId" element={<PageTransition><TryOnRoom /></PageTransition>} />
+        {/* Admin Routes */}
+        <Route path="/admin/login" element={<PageTransition><AdminLogin /></PageTransition>} />
+        <Route path="/admin" element={<ProtectedRoute requireAdmin><PageTransition><AdminDashboard /></PageTransition></ProtectedRoute>} />
+        <Route path="/admin/products" element={<ProtectedRoute requireAdmin><PageTransition><AdminProducts /></PageTransition></ProtectedRoute>} />
+        <Route path="/admin/categories" element={<ProtectedRoute requireAdmin><PageTransition><AdminCategories /></PageTransition></ProtectedRoute>} />
+        {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+        <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
+      </Routes>
+    </AnimatePresence>
+  );
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
@@ -41,33 +80,7 @@ const App = () => (
           <Sonner />
           <BrowserRouter>
             <ScrollToTop />
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/category/:category" element={<Category />} />
-              <Route path="/product/:productId" element={<ProductDetail />} />
-              <Route path="/checkout" element={<Checkout />} />
-              <Route path="/about/our-story" element={<OurStory />} />
-              <Route path="/about/our-mission" element={<OurMission />} />
-              <Route path="/about/size-guide" element={<SizeGuide />} />
-              <Route path="/about/customer-care" element={<CustomerCare />} />
-              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-              <Route path="/terms-of-service" element={<TermsOfService />} />
-              <Route path="/faq" element={<FAQ />} />
-              <Route path="/returns" element={<ReturnsExchanges />} />
-              <Route path="/shipping" element={<ShippingInfo />} />
-              <Route path="/accessibility" element={<Accessibility />} />
-              <Route path="/community" element={<Community />} />
-              <Route path="/lookbook" element={<Lookbook />} />
-              <Route path="/try-on" element={<TryOnRoom />} />
-              <Route path="/try-on/saved/:outfitId" element={<TryOnRoom />} />
-              {/* Admin Routes */}
-              <Route path="/admin/login" element={<AdminLogin />} />
-              <Route path="/admin" element={<ProtectedRoute requireAdmin><AdminDashboard /></ProtectedRoute>} />
-              <Route path="/admin/products" element={<ProtectedRoute requireAdmin><AdminProducts /></ProtectedRoute>} />
-              <Route path="/admin/categories" element={<ProtectedRoute requireAdmin><AdminCategories /></ProtectedRoute>} />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
+            <AnimatedRoutes />
           </BrowserRouter>
         </TooltipProvider>
       </CartProvider>
