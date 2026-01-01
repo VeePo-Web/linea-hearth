@@ -52,17 +52,36 @@ const ProductGrid = ({
         )
         .eq("status", "active");
 
-      // Filter by category
+      // Filter by category (including subcategories for parent categories)
       if (categorySlug && categorySlug !== "all" && categorySlug !== "shop") {
-        // Get category ID from slug
+        // Get category by slug
         const { data: categoryData } = await supabase
           .from("categories")
-          .select("id")
+          .select("id, parent_id")
           .eq("slug", categorySlug)
-          .single();
+          .maybeSingle();
 
         if (categoryData) {
-          query = query.eq("category_id", categoryData.id);
+          // Check if this is a parent category (has no parent_id)
+          if (!categoryData.parent_id) {
+            // Get all subcategories of this parent
+            const { data: subcategories } = await supabase
+              .from("categories")
+              .select("id")
+              .eq("parent_id", categoryData.id);
+
+            if (subcategories && subcategories.length > 0) {
+              // Filter by parent category OR any of its subcategories
+              const allCategoryIds = [categoryData.id, ...subcategories.map(s => s.id)];
+              query = query.in("category_id", allCategoryIds);
+            } else {
+              // No subcategories, just filter by the parent
+              query = query.eq("category_id", categoryData.id);
+            }
+          } else {
+            // This is a subcategory, filter directly
+            query = query.eq("category_id", categoryData.id);
+          }
         }
       }
 
