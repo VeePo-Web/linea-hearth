@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { 
   Breadcrumb, 
@@ -9,13 +10,16 @@ import {
   BreadcrumbPage, 
   BreadcrumbSeparator 
 } from "@/components/ui/breadcrumb";
-import { Minus, Plus, Check, Truck, RotateCcw, Heart } from "lucide-react";
+import { Minus, Plus, Truck, RotateCcw, Heart } from "lucide-react";
 import SizeSelector from "./SizeSelector";
 import ColorSwatchSelector from "./ColorSwatchSelector";
 import TestimonialSnippet from "./TestimonialSnippet";
 import ProductFAQ from "./ProductFAQ";
 import ShippingReturnsAccordion from "./ShippingReturnsAccordion";
 import TryItOnButton from "./TryItOnButton";
+import TextReveal from "@/components/motion/TextReveal";
+import { useReducedMotion } from "@/hooks/useReducedMotion";
+import { easing } from "@/lib/animations";
 
 interface ProductVariant {
   id: string;
@@ -68,6 +72,7 @@ const ProductInfo = ({ product, variants = [], onColorChange }: ProductInfoProps
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
+  const prefersReducedMotion = useReducedMotion();
 
   // Extract unique sizes with stock
   const sizes = useMemo(() => {
@@ -137,10 +142,149 @@ const ProductInfo = ({ product, variants = [], onColorChange }: ProductInfoProps
   const categoryName = product?.categories?.name || "Collection";
   const categorySlug = product?.categories?.slug || "all";
 
+  // Animation variants
+  const fadeUpVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: (delay: number) => ({
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.5,
+        delay,
+        ease: easing.editorial,
+      }
+    })
+  };
+
+  const staggerContainerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.05,
+        delayChildren: 0.3,
+      }
+    }
+  };
+
+  const staggerItemVariants = {
+    hidden: { opacity: 0, scale: 0.8 },
+    visible: {
+      opacity: 1,
+      scale: 1,
+      transition: {
+        type: "spring" as const,
+        stiffness: 400,
+        damping: 20,
+      }
+    }
+  };
+
+  const trustSignals = [
+    { icon: Truck, label: "Free shipping $75+" },
+    { icon: RotateCcw, label: "Easy 30-day returns" },
+    { icon: Heart, label: "Made with purpose" },
+  ];
+
+  if (prefersReducedMotion) {
+    return (
+      <div className="space-y-6">
+        {/* Breadcrumb - Show only on desktop */}
+        <div className="hidden lg:block">
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink asChild>
+                  <Link to="/" className="text-xs font-light">Home</Link>
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbLink asChild>
+                  <Link to={`/category/${categorySlug}`} className="text-xs font-light">
+                    {categoryName}
+                  </Link>
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbPage className="text-xs font-light">{productName}</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+        </div>
+
+        {/* Static content for reduced motion */}
+        <div className="space-y-3">
+          <p className="text-xs font-light text-muted-foreground uppercase tracking-[0.15em]">
+            {categoryName}
+          </p>
+          <div className="flex justify-between items-start gap-4">
+            <h1 className="text-2xl lg:text-3xl font-light text-foreground leading-tight">
+              {productName}
+            </h1>
+            <div className="text-right flex-shrink-0">
+              {product?.is_on_sale && product?.sale_price ? (
+                <div className="space-y-0.5">
+                  <p className="text-xl font-light text-foreground">${product.sale_price.toFixed(2)}</p>
+                  <p className="text-sm font-light text-muted-foreground line-through">${product.price.toFixed(2)}</p>
+                </div>
+              ) : (
+                <p className="text-xl font-light text-foreground">${(product?.price || 0).toFixed(2)}</p>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <TestimonialSnippet productId={product?.id} />
+        {colors.length > 0 && <ColorSwatchSelector colors={colors} selectedColor={selectedColor} onColorChange={handleColorChange} />}
+        {sizes.length > 0 && <SizeSelector sizes={sizes} selectedSize={selectedSize} onSizeChange={setSelectedSize} />}
+
+        <div className="space-y-4 pt-4">
+          <div className="flex items-center gap-4">
+            <span className="text-sm font-light text-foreground">Quantity</span>
+            <div className="flex items-center border border-border">
+              <Button variant="ghost" size="sm" onClick={decrementQuantity} className="h-10 w-10 p-0 hover:bg-transparent hover:opacity-50 rounded-none border-none" aria-label="Decrease quantity">
+                <Minus className="h-4 w-4" />
+              </Button>
+              <span className="h-10 flex items-center px-4 text-sm font-light min-w-12 justify-center border-l border-r border-border">{quantity}</span>
+              <Button variant="ghost" size="sm" onClick={incrementQuantity} className="h-10 w-10 p-0 hover:bg-transparent hover:opacity-50 rounded-none border-none" aria-label="Increase quantity">
+                <Plus className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+
+          <Button id="main-add-to-bag" disabled={!canAddToBag} className="w-full h-12 bg-foreground text-background hover:bg-foreground/90 font-light rounded-none disabled:opacity-50 disabled:cursor-not-allowed">
+            Add to Bag — ${totalPrice.toFixed(2)}
+          </Button>
+
+          <TryItOnButton productId={product?.id || ""} productSlug={product?.slug || ""} productName={productName} productPrice={displayPrice} categorySlug={categorySlug} />
+
+          <div className="flex items-center justify-center gap-6 py-3 text-xs font-light text-muted-foreground">
+            {trustSignals.map(({ icon: Icon, label }) => (
+              <div key={label} className="flex items-center gap-1.5">
+                <Icon className="w-3.5 h-3.5" strokeWidth={1.5} />
+                <span>{label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <ProductFAQ commonQuestions={product?.common_questions} fitType={product?.fit_type} fabricComposition={product?.fabric_composition} careInstructions={product?.care_instructions} />
+        <ShippingReturnsAccordion />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Breadcrumb - Show only on desktop */}
-      <div className="hidden lg:block">
+      <motion.div 
+        className="hidden lg:block"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.4, delay: 0.1 }}
+      >
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
@@ -162,18 +306,33 @@ const ProductInfo = ({ product, variants = [], onColorChange }: ProductInfoProps
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
-      </div>
+      </motion.div>
 
       {/* Category Badge + Title + Price */}
       <div className="space-y-3">
-        <p className="text-xs font-light text-muted-foreground uppercase tracking-[0.15em]">
+        <motion.p 
+          className="text-xs font-light text-muted-foreground uppercase tracking-[0.15em]"
+          variants={fadeUpVariants}
+          initial="hidden"
+          animate="visible"
+          custom={0}
+        >
           {categoryName}
-        </p>
+        </motion.p>
         <div className="flex justify-between items-start gap-4">
-          <h1 className="text-2xl lg:text-3xl font-light text-foreground leading-tight">
-            {productName}
-          </h1>
-          <div className="text-right flex-shrink-0">
+          <TextReveal 
+            text={productName}
+            as="h1"
+            className="text-2xl lg:text-3xl font-light text-foreground leading-tight"
+            delay={0.1}
+          />
+          <motion.div 
+            className="text-right flex-shrink-0"
+            variants={fadeUpVariants}
+            initial="hidden"
+            animate="visible"
+            custom={0.3}
+          >
             {product?.is_on_sale && product?.sale_price ? (
               <div className="space-y-0.5">
                 <p className="text-xl font-light text-foreground">
@@ -188,33 +347,62 @@ const ProductInfo = ({ product, variants = [], onColorChange }: ProductInfoProps
                 ${(product?.price || 0).toFixed(2)}
               </p>
             )}
-          </div>
+          </motion.div>
         </div>
       </div>
 
       {/* Testimonial Snippet */}
-      <TestimonialSnippet productId={product?.id} />
+      <motion.div
+        variants={fadeUpVariants}
+        initial="hidden"
+        animate="visible"
+        custom={0.4}
+      >
+        <TestimonialSnippet productId={product?.id} />
+      </motion.div>
 
-      {/* Color Selector */}
-      {colors.length > 0 && (
-        <ColorSwatchSelector
-          colors={colors}
-          selectedColor={selectedColor}
-          onColorChange={handleColorChange}
-        />
-      )}
+      {/* Color Selector with stagger animation */}
+      <AnimatePresence>
+        {colors.length > 0 && (
+          <motion.div
+            variants={staggerContainerVariants}
+            initial="hidden"
+            animate="visible"
+          >
+            <ColorSwatchSelector
+              colors={colors}
+              selectedColor={selectedColor}
+              onColorChange={handleColorChange}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      {/* Size Selector */}
-      {sizes.length > 0 && (
-        <SizeSelector
-          sizes={sizes}
-          selectedSize={selectedSize}
-          onSizeChange={setSelectedSize}
-        />
-      )}
+      {/* Size Selector with stagger animation */}
+      <AnimatePresence>
+        {sizes.length > 0 && (
+          <motion.div
+            variants={staggerContainerVariants}
+            initial="hidden"
+            animate="visible"
+          >
+            <SizeSelector
+              sizes={sizes}
+              selectedSize={selectedSize}
+              onSizeChange={setSelectedSize}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Quantity and Add to Cart */}
-      <div className="space-y-4 pt-4">
+      <motion.div 
+        className="space-y-4 pt-4"
+        variants={fadeUpVariants}
+        initial="hidden"
+        animate="visible"
+        custom={0.5}
+      >
         <div className="flex items-center gap-4">
           <span className="text-sm font-light text-foreground">Quantity</span>
           <div className="flex items-center border border-border">
@@ -227,9 +415,14 @@ const ProductInfo = ({ product, variants = [], onColorChange }: ProductInfoProps
             >
               <Minus className="h-4 w-4" />
             </Button>
-            <span className="h-10 flex items-center px-4 text-sm font-light min-w-12 justify-center border-l border-r border-border">
+            <motion.span 
+              key={quantity}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="h-10 flex items-center px-4 text-sm font-light min-w-12 justify-center border-l border-r border-border"
+            >
               {quantity}
-            </span>
+            </motion.span>
             <Button
               variant="ghost"
               size="sm"
@@ -242,50 +435,88 @@ const ProductInfo = ({ product, variants = [], onColorChange }: ProductInfoProps
           </div>
         </div>
 
-        <Button 
-          id="main-add-to-bag"
-          disabled={!canAddToBag}
-          className="w-full h-12 bg-foreground text-background hover:bg-foreground/90 font-light rounded-none disabled:opacity-50 disabled:cursor-not-allowed"
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.6, duration: 0.4, ease: easing.editorial }}
         >
-          Add to Bag — ${totalPrice.toFixed(2)}
-        </Button>
+          <Button 
+            id="main-add-to-bag"
+            disabled={!canAddToBag}
+            className="w-full h-12 bg-foreground text-background hover:bg-foreground/90 font-light rounded-none disabled:opacity-50 disabled:cursor-not-allowed transition-all hover:shadow-lg"
+            asChild
+          >
+            <motion.button
+              whileHover={{ scale: 1.01 }}
+              whileTap={{ scale: 0.99 }}
+              transition={{ type: "spring", stiffness: 400, damping: 20 }}
+              disabled={!canAddToBag}
+            >
+              Add to Bag — ${totalPrice.toFixed(2)}
+            </motion.button>
+          </Button>
+        </motion.div>
 
         {/* Try It On Button */}
-        <TryItOnButton
-          productId={product?.id || ""}
-          productSlug={product?.slug || ""}
-          productName={productName}
-          productPrice={displayPrice}
-          categorySlug={categorySlug}
-        />
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.7, duration: 0.4 }}
+        >
+          <TryItOnButton
+            productId={product?.id || ""}
+            productSlug={product?.slug || ""}
+            productName={productName}
+            productPrice={displayPrice}
+            categorySlug={categorySlug}
+          />
+        </motion.div>
 
-        {/* Trust Row */}
-        <div className="flex items-center justify-center gap-6 py-3 text-xs font-light text-muted-foreground">
-          <div className="flex items-center gap-1.5">
-            <Truck className="w-3.5 h-3.5" strokeWidth={1.5} />
-            <span>Free shipping $75+</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <RotateCcw className="w-3.5 h-3.5" strokeWidth={1.5} />
-            <span>Easy 30-day returns</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <Heart className="w-3.5 h-3.5" strokeWidth={1.5} />
-            <span>Made with purpose</span>
-          </div>
-        </div>
-      </div>
+        {/* Trust Row with stagger */}
+        <motion.div 
+          className="flex items-center justify-center gap-6 py-3 text-xs font-light text-muted-foreground"
+          variants={staggerContainerVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          {trustSignals.map(({ icon: Icon, label }, index) => (
+            <motion.div 
+              key={label} 
+              className="flex items-center gap-1.5"
+              variants={staggerItemVariants}
+              custom={index}
+              whileHover={{ y: -2 }}
+              transition={{ type: "spring", stiffness: 400, damping: 20 }}
+            >
+              <Icon className="w-3.5 h-3.5" strokeWidth={1.5} />
+              <span>{label}</span>
+            </motion.div>
+          ))}
+        </motion.div>
+      </motion.div>
 
       {/* Common Questions FAQ */}
-      <ProductFAQ 
-        commonQuestions={product?.common_questions}
-        fitType={product?.fit_type}
-        fabricComposition={product?.fabric_composition}
-        careInstructions={product?.care_instructions}
-      />
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.8, duration: 0.5 }}
+      >
+        <ProductFAQ 
+          commonQuestions={product?.common_questions}
+          fitType={product?.fit_type}
+          fabricComposition={product?.fabric_composition}
+          careInstructions={product?.care_instructions}
+        />
+      </motion.div>
 
       {/* Shipping & Returns */}
-      <ShippingReturnsAccordion />
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.9, duration: 0.5 }}
+      >
+        <ShippingReturnsAccordion />
+      </motion.div>
     </div>
   );
 };
