@@ -40,8 +40,7 @@ const StoryCallingSection = () => {
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ delay: 0.4, duration: 0.8 }}
             >
-              Every piece is designed to inspire conversations and strengthen your walk
-              <span className="text-amber-500">.</span>
+              Every thread is a declaration. Every stitch is a stand. In the war between light and darkness, your wardrobe is your armor<span className="text-amber-500">.</span>
             </motion.blockquote>
 
             {/* Rotated vertical text */}
@@ -72,9 +71,9 @@ const StoryCallingSection = () => {
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ delay: 0.6, duration: 0.8 }}
             >
-              Line of Judah was born from a calling to create clothing that speaks truth. 
-              We believe that what you wear can be a testament to your faith — a daily 
-              reminder of who you are and whose you are.
+              Line of Judah was born from a calling — not to make clothes, but to equip warriors. 
+              We believe there's a great war raging. Not for territory. For souls. And in that war, 
+              what you wear matters. It marks you. It declares you. It positions you.
             </motion.p>
 
             <motion.p
@@ -83,9 +82,9 @@ const StoryCallingSection = () => {
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ delay: 0.7, duration: 0.8 }}
             >
-              This isn't a clothing company. It's a movement. A community of believers 
-              who wear their faith like armor, who use fashion as a form of ministry, 
-              and who refuse to let their wardrobes stay neutral.
+              This isn't a clothing company. It's an armory for the spiritually bold. 
+              For the believers who refuse to blend in while the world burns. 
+              For those who understand neutrality isn't an option.
             </motion.p>
 
             <motion.div

@@ -84,7 +84,7 @@ const StoryHero = () => {
           ))}
         </h1>
 
-        {/* Manifesto text */}
+        {/* Manifesto text - enhanced with warfare narrative */}
         <motion.div 
           className="max-w-xl space-y-4"
           initial={{ opacity: 0, y: 30 }}
@@ -92,11 +92,11 @@ const StoryHero = () => {
           transition={{ delay: 1.2, duration: 0.8 }}
         >
           <p className="text-lg md:text-xl font-light text-white/80 leading-relaxed">
-            We didn't start Line of Judah to blend in.
+            We didn't start Line of Judah to make clothes. We started it to arm believers.
           </p>
           <p className="text-lg md:text-xl font-light text-white/60 leading-relaxed">
-            For those who refuse to stay silent about their faith. 
-            For the believers who want their wardrobe to match their mission.
+            For those who understand the war is real. Who refuse to stay neutral. 
+            Who know their wardrobe is part of their witness.
           </p>
         </motion.div>
       </motion.div>
