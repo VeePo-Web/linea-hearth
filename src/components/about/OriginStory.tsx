@@ -1,60 +1,185 @@
-const OriginStory = () => {
-  return (
-    <section className="py-16 md:py-24 px-6 bg-foreground text-white">
-      <div className="max-w-6xl mx-auto">
-        <div className="grid md:grid-cols-2 gap-12 md:gap-16 items-center">
-          {/* Lion Imagery */}
-          <div className="relative order-2 md:order-1">
-            <div className="aspect-square overflow-hidden">
-              {/* Placeholder for lion image - using a styled div for now */}
-              <div className="w-full h-full bg-gradient-to-br from-amber-900/40 to-stone-900 flex items-center justify-center">
-                <svg 
-                  viewBox="0 0 100 100" 
-                  className="w-3/4 h-3/4 text-amber-500/20"
-                  fill="currentColor"
-                >
-                  {/* Stylized lion silhouette */}
-                  <path d="M50 10 C30 10 20 25 20 40 C20 50 25 55 25 60 C20 65 15 70 15 80 C15 90 25 95 35 95 L65 95 C75 95 85 90 85 80 C85 70 80 65 75 60 C75 55 80 50 80 40 C80 25 70 10 50 10 M40 45 C42 45 44 47 44 50 C44 53 42 55 40 55 C38 55 36 53 36 50 C36 47 38 45 40 45 M60 45 C62 45 64 47 64 50 C64 53 62 55 60 55 C58 55 56 53 56 50 C56 47 58 45 60 45 M50 60 C45 60 42 65 45 70 L50 75 L55 70 C58 65 55 60 50 60" />
-                </svg>
-              </div>
-            </div>
-          </div>
+import { motion, useInView, useScroll, useTransform } from 'framer-motion';
+import { useRef } from 'react';
 
-          {/* Story Content */}
-          <div className="space-y-8 order-1 md:order-2">
+const OriginStory = () => {
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const isInView = useInView(sectionRef, { once: true, amount: 0.2 });
+  
+  // Parallax effect
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start end", "end start"]
+  });
+  const parallaxY = useTransform(scrollYProgress, [0, 1], [100, -100]);
+
+  return (
+    <section 
+      ref={sectionRef}
+      className="relative min-h-screen bg-stone-950 text-white overflow-hidden py-24 md:py-32"
+    >
+      {/* JUDAH watermark */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={isInView ? { opacity: 0.03 } : { opacity: 0 }}
+        transition={{ duration: 1.5, delay: 0.3 }}
+        style={{ y: parallaxY }}
+        className="absolute inset-0 flex items-center justify-center pointer-events-none select-none overflow-hidden"
+      >
+        <span className="text-[30vw] md:text-[25vw] font-light text-white tracking-tighter whitespace-nowrap">
+          JUDAH
+        </span>
+      </motion.div>
+
+      {/* Index watermark */}
+      <motion.span
+        initial={{ opacity: 0 }}
+        animate={isInView ? { opacity: 0.03 } : { opacity: 0 }}
+        transition={{ duration: 1, delay: 0.5 }}
+        className="absolute top-8 left-8 text-[20vw] font-light text-white leading-none select-none pointer-events-none z-0"
+      >
+        03
+      </motion.span>
+
+      <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-12 lg:px-16">
+        <div className="grid lg:grid-cols-2 gap-16 lg:gap-24 items-center">
+          {/* Left: Lion imagery */}
+          <motion.div
+            initial={{ opacity: 0, scale: 1.1 }}
+            animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 1.1 }}
+            transition={{ duration: 1.2, ease: [0.25, 0.46, 0.45, 0.94] }}
+            className="relative order-2 lg:order-1"
+          >
+            <div className="aspect-square relative overflow-hidden">
+              {/* Gradient background */}
+              <div className="absolute inset-0 bg-gradient-to-br from-amber-900/30 via-stone-900 to-stone-950" />
+              
+              {/* Premium lion silhouette */}
+              <svg 
+                viewBox="0 0 200 200" 
+                className="absolute inset-0 w-full h-full p-8 md:p-12"
+                fill="none"
+              >
+                {/* Stylized lion head */}
+                <motion.path
+                  initial={{ pathLength: 0, opacity: 0 }}
+                  animate={isInView ? { pathLength: 1, opacity: 1 } : { pathLength: 0, opacity: 0 }}
+                  transition={{ duration: 2, delay: 0.5, ease: "easeOut" }}
+                  d="M100 20 C60 20 30 50 30 90 C30 110 40 125 40 140 C30 150 20 165 20 180 C20 195 35 200 55 200 L145 200 C165 200 180 195 180 180 C180 165 170 150 160 140 C160 125 170 110 170 90 C170 50 140 20 100 20"
+                  stroke="url(#lionGradient)"
+                  strokeWidth="1"
+                  strokeLinecap="round"
+                  className="drop-shadow-[0_0_20px_rgba(245,158,11,0.3)]"
+                />
+                {/* Eyes */}
+                <motion.circle
+                  initial={{ opacity: 0 }}
+                  animate={isInView ? { opacity: 1 } : { opacity: 0 }}
+                  transition={{ duration: 0.5, delay: 2 }}
+                  cx="70" cy="90" r="8"
+                  className="fill-amber-500/60"
+                />
+                <motion.circle
+                  initial={{ opacity: 0 }}
+                  animate={isInView ? { opacity: 1 } : { opacity: 0 }}
+                  transition={{ duration: 0.5, delay: 2.1 }}
+                  cx="130" cy="90" r="8"
+                  className="fill-amber-500/60"
+                />
+                {/* Nose */}
+                <motion.path
+                  initial={{ opacity: 0 }}
+                  animate={isInView ? { opacity: 1 } : { opacity: 0 }}
+                  transition={{ duration: 0.5, delay: 2.2 }}
+                  d="M100 120 L90 135 L100 145 L110 135 Z"
+                  className="fill-amber-500/40"
+                />
+                <defs>
+                  <linearGradient id="lionGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#f59e0b" stopOpacity="0.8" />
+                    <stop offset="50%" stopColor="#f59e0b" stopOpacity="0.4" />
+                    <stop offset="100%" stopColor="#f59e0b" stopOpacity="0.2" />
+                  </linearGradient>
+                </defs>
+              </svg>
+
+              {/* Glow effect */}
+              <div className="absolute inset-0 bg-gradient-radial from-amber-500/10 via-transparent to-transparent opacity-50" />
+            </div>
+
+            {/* Corner accents */}
+            <div className="absolute -top-4 -left-4 w-24 h-24 border-l-2 border-t-2 border-amber-500/30" />
+            <div className="absolute -bottom-4 -right-4 w-24 h-24 border-r-2 border-b-2 border-amber-500/30" />
+          </motion.div>
+
+          {/* Right: Story content */}
+          <div className="order-1 lg:order-2 space-y-8">
             {/* Eyebrow */}
-            <p className="text-xs uppercase tracking-[0.3em] text-amber-500">
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className="text-[10px] uppercase tracking-[0.4em] text-amber-500"
+            >
               The Name
-            </p>
+            </motion.p>
 
             {/* Title */}
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-light tracking-wide">
-              Line of Judah
-            </h2>
+            <motion.h2
+              initial={{ opacity: 0, y: 30 }}
+              animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+              className="text-5xl md:text-6xl lg:text-7xl font-light tracking-tight"
+            >
+              Line of
+              <span className="block text-amber-500">Judah</span>
+            </motion.h2>
 
             {/* Body */}
-            <div className="space-y-6 text-white/80 font-light leading-relaxed">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+              transition={{ duration: 0.8, delay: 0.6 }}
+              className="space-y-6 text-white/70 font-light leading-relaxed text-lg"
+            >
               <p>
                 <span className="text-amber-500 font-medium">Judah</span> means "praise." 
                 The lion is the symbol of the tribe of Judah — from which the Messiah descended. 
-                Genesis 49:9 declares, "Judah is a lion's cub... like a lion he crouches and lies down."
+                Genesis 49:9 declares:
+              </p>
+              <p className="text-xl text-white/90 italic">
+                "Judah is a lion's cub... like a lion he crouches and lies down."
               </p>
               <p>
                 Line of Judah is a declaration of identity. When you wear it, you're 
                 not just wearing a brand — you're wearing your lineage as a child of
-                the King. You carry the roar of the Lion within you.
+                the King.
               </p>
-            </div>
+            </motion.div>
 
-            {/* Scripture */}
-            <blockquote className="border-l-2 border-amber-500 pl-6 py-2">
-              <p className="text-lg italic text-amber-500">
+            {/* Scripture pull-quote */}
+            <motion.blockquote
+              initial={{ opacity: 0, x: -30 }}
+              animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -30 }}
+              transition={{ duration: 0.8, delay: 0.9 }}
+              className="relative pl-8 border-l-4 border-amber-500"
+            >
+              <p className="text-2xl md:text-3xl font-light text-amber-500 italic leading-relaxed">
                 "The Lion of the tribe of Judah has triumphed."
               </p>
-              <cite className="text-sm text-white/60 not-italic mt-2 block">
+              <cite className="text-sm text-white/50 not-italic mt-4 block uppercase tracking-[0.2em]">
                 — Revelation 5:5
               </cite>
-            </blockquote>
+            </motion.blockquote>
+
+            {/* Bottom line */}
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+              transition={{ duration: 0.6, delay: 1.1 }}
+              className="text-white font-light text-xl"
+            >
+              You carry the roar of the Lion within you.
+            </motion.p>
           </div>
         </div>
       </div>

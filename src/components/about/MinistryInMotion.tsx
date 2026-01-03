@@ -1,8 +1,15 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Instagram } from 'lucide-react';
+import { motion, useInView } from 'framer-motion';
+import { useRef } from 'react';
+import { Instagram, ArrowUpRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { staggerContainer, staggerItem } from '@/lib/animations';
 
 const MinistryInMotion = () => {
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const isInView = useInView(sectionRef, { once: true, amount: 0.2 });
+
   const { data: ugcPhotos, isLoading } = useQuery({
     queryKey: ['ministry-ugc'],
     queryFn: async () => {
@@ -11,97 +18,168 @@ const MinistryInMotion = () => {
         .select('*')
         .eq('is_approved', true)
         .order('created_at', { ascending: false })
-        .limit(12);
+        .limit(8);
 
       if (error) throw error;
       return data;
     },
   });
 
-  // Placeholder data for demo
+  // Placeholder data for demo - i-D style bento layout
   const placeholderPhotos = [
-    { id: '1', customer_name: 'Marcus T.', instagram_handle: '@marcust', image_url: '/founders.png', caption: 'Wearing my faith on campus' },
-    { id: '2', customer_name: 'Sarah M.', instagram_handle: '@sarahm', image_url: '/founders.png', caption: 'Sunday service vibes' },
-    { id: '3', customer_name: 'David K.', instagram_handle: '@davidk', image_url: '/founders.png', caption: 'Mission trip ready' },
-    { id: '4', customer_name: 'Grace L.', instagram_handle: '@gracel', image_url: '/founders.png', caption: 'Bold faith, bold style' },
-    { id: '5', customer_name: 'James R.', instagram_handle: '@jamesr', image_url: '/founders.png', caption: 'Representing the Kingdom' },
-    { id: '6', customer_name: 'Faith W.', instagram_handle: '@faithw', image_url: '/founders.png', caption: 'Walking in purpose' },
+    { id: '1', customer_name: 'Marcus T.', instagram_handle: '@marcust', image_url: '/founders.png', caption: 'Wearing my faith on campus', featured: true },
+    { id: '2', customer_name: 'Sarah M.', instagram_handle: '@sarahm', image_url: '/founders.png', caption: 'Sunday service vibes', featured: false },
+    { id: '3', customer_name: 'David K.', instagram_handle: '@davidk', image_url: '/founders.png', caption: 'Mission trip ready', featured: false },
+    { id: '4', customer_name: 'Grace L.', instagram_handle: '@gracel', image_url: '/founders.png', caption: 'Bold faith, bold style', featured: true },
+    { id: '5', customer_name: 'James R.', instagram_handle: '@jamesr', image_url: '/founders.png', caption: 'Representing the Kingdom', featured: false },
+    { id: '6', customer_name: 'Faith W.', instagram_handle: '@faithw', image_url: '/founders.png', caption: 'Walking in purpose', featured: false },
   ];
 
   const photos = ugcPhotos?.length ? ugcPhotos : placeholderPhotos;
 
-  return (
-    <section className="py-16 md:py-24 bg-background">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="text-center px-6 mb-12">
-          <p className="text-xs uppercase tracking-[0.3em] text-amber-600 mb-4">
-            Our Community
-          </p>
-          <h2 className="text-3xl md:text-4xl font-light text-foreground mb-4">
-            Ministry In Motion
-          </h2>
-          <p className="text-muted-foreground font-light max-w-lg mx-auto">
-            See our community wearing the mission worldwide. Tag @lineofjudah to be featured.
-          </p>
-        </div>
+  // Grid layout classes for bento/masonry effect
+  const getGridClass = (index: number) => {
+    const layouts = [
+      'col-span-2 row-span-2', // Large
+      'col-span-1 row-span-1', // Small
+      'col-span-1 row-span-1', // Small
+      'col-span-1 row-span-2', // Tall
+      'col-span-1 row-span-1', // Small
+      'col-span-2 row-span-1', // Wide
+    ];
+    return layouts[index % layouts.length];
+  };
 
-        {/* Horizontal Scroll Carousel */}
-        <div className="overflow-x-auto scrollbar-hide">
-          <div className="flex gap-4 px-6 pb-4" style={{ width: 'max-content' }}>
-            {isLoading ? (
-              // Loading skeletons
-              Array.from({ length: 6 }).map((_, i) => (
-                <div 
-                  key={i}
-                  className="w-64 md:w-72 aspect-square bg-muted animate-pulse rounded-sm"
-                />
-              ))
-            ) : (
-              photos.map((photo) => (
-                <div
+  return (
+    <section 
+      ref={sectionRef}
+      className="relative py-24 md:py-32 bg-background overflow-hidden"
+    >
+      {/* Index watermark */}
+      <motion.span
+        initial={{ opacity: 0 }}
+        animate={isInView ? { opacity: 0.03 } : { opacity: 0 }}
+        transition={{ duration: 1, delay: 0.3 }}
+        className="absolute top-8 right-8 text-[20vw] font-light text-foreground leading-none select-none pointer-events-none z-0"
+      >
+        04
+      </motion.span>
+
+      <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-12 lg:px-16">
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+          transition={{ duration: 0.8 }}
+          className="mb-16"
+        >
+          <p className="text-[10px] uppercase tracking-[0.4em] text-amber-500 mb-4">
+            Our Tribe
+          </p>
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-light text-foreground tracking-tight">
+              Ministry In<br />
+              <span className="text-muted-foreground">Motion</span>
+            </h2>
+            <p className="text-muted-foreground font-light max-w-sm md:text-right">
+              See our community wearing the mission worldwide. Tag @lineofjudah to be featured.
+            </p>
+          </div>
+        </motion.div>
+
+        {/* Bento Grid */}
+        <motion.div
+          variants={staggerContainer}
+          initial="hidden"
+          animate={isInView ? "visible" : "hidden"}
+          className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 auto-rows-[200px] md:auto-rows-[220px]"
+        >
+          {isLoading ? (
+            // Loading skeletons
+            Array.from({ length: 6 }).map((_, i) => (
+              <div 
+                key={i}
+                className={`bg-muted animate-pulse ${getGridClass(i)}`}
+              />
+            ))
+          ) : (
+            <>
+              {photos.slice(0, 6).map((photo, index) => (
+                <motion.div
                   key={photo.id}
-                  className="group relative w-64 md:w-72 aspect-square flex-shrink-0 overflow-hidden cursor-pointer"
+                  variants={staggerItem}
+                  className={`group relative overflow-hidden cursor-pointer ${getGridClass(index)}`}
                 >
                   <img
                     src={photo.image_url}
                     alt={`${photo.customer_name} wearing Line of Judah`}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105"
                   />
                   
+                  {/* Featured badge */}
+                  {'featured' in photo && photo.featured && (
+                    <div className="absolute top-3 left-3 bg-amber-500 text-stone-950 px-2 py-1">
+                      <span className="text-[9px] uppercase tracking-[0.15em] font-medium">Featured</span>
+                    </div>
+                  )}
+                  
                   {/* Hover Overlay */}
-                  <div className="absolute inset-0 bg-foreground/70 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center text-white p-4">
-                    <p className="font-light text-lg mb-1">{photo.customer_name}</p>
+                  <div className="absolute inset-0 bg-gradient-to-t from-stone-950/90 via-stone-950/40 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 flex flex-col justify-end p-4 md:p-6">
+                    <p className="font-light text-lg text-white mb-1">{photo.customer_name}</p>
                     {photo.instagram_handle && (
-                      <div className="flex items-center gap-1 text-sm text-white/80">
-                        <Instagram className="h-4 w-4" />
+                      <div className="flex items-center gap-1 text-sm text-white/70">
+                        <Instagram className="h-3 w-3" />
                         <span>{photo.instagram_handle}</span>
                       </div>
                     )}
                     {photo.caption && (
-                      <p className="text-sm text-white/70 mt-3 text-center italic">
+                      <p className="text-sm text-white/60 mt-2 italic line-clamp-2">
                         "{photo.caption}"
                       </p>
                     )}
                   </div>
-                </div>
-              ))
-            )}
-          </div>
-        </div>
+                </motion.div>
+              ))}
 
-        {/* Submit CTA */}
-        <div className="text-center mt-8 px-6">
-          <a 
-            href="https://instagram.com" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+              {/* CTA Card in grid */}
+              <motion.div
+                variants={staggerItem}
+                className="col-span-2 bg-stone-950 text-white flex flex-col items-center justify-center p-8 group hover:bg-amber-500 transition-colors duration-500"
+              >
+                <Instagram className="h-8 w-8 mb-4 text-amber-500 group-hover:text-stone-950 transition-colors" />
+                <p className="text-lg font-light mb-2 group-hover:text-stone-950 transition-colors">Join the Tribe</p>
+                <p className="text-sm text-white/60 group-hover:text-stone-950/70 text-center mb-4 transition-colors">
+                  Tag @lineofjudah for a chance to be featured
+                </p>
+                <a 
+                  href="https://instagram.com" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-sm text-amber-500 group-hover:text-stone-950 transition-colors"
+                >
+                  <span className="underline underline-offset-4">Submit Your Story</span>
+                  <ArrowUpRight className="h-4 w-4" />
+                </a>
+              </motion.div>
+            </>
+          )}
+        </motion.div>
+
+        {/* Community link */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+          transition={{ duration: 0.6, delay: 0.8 }}
+          className="mt-12 text-center"
+        >
+          <Link 
+            to="/community"
+            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors group"
           >
-            <Instagram className="h-4 w-4" />
-            <span className="underline underline-offset-4">Submit Your Photo</span>
-          </a>
-        </div>
+            <span>See all community stories</span>
+            <ArrowUpRight className="h-4 w-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+          </Link>
+        </motion.div>
       </div>
     </section>
   );

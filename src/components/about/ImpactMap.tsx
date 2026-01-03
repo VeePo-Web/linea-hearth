@@ -1,162 +1,217 @@
+import { motion, useInView } from 'framer-motion';
 import { useEffect, useState, useRef } from 'react';
-import { MapPin, GraduationCap, Globe, Heart } from 'lucide-react';
 
-interface StatItemProps {
-  icon: React.ReactNode;
+interface AnimatedCounterProps {
   value: number;
-  suffix: string;
+  suffix?: string;
   label: string;
-  delay: number;
+  delay?: number;
+  isInView: boolean;
 }
 
-const StatItem = ({ icon, value, suffix, label, delay }: StatItemProps) => {
+const AnimatedCounter = ({ value, suffix = '', label, delay = 0, isInView }: AnimatedCounterProps) => {
   const [count, setCount] = useState(0);
   const [hasAnimated, setHasAnimated] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && !hasAnimated) {
-          setHasAnimated(true);
-          // Animate count up
-          setTimeout(() => {
-            const duration = 2000;
-            const steps = 60;
-            const increment = value / steps;
-            let current = 0;
-            const timer = setInterval(() => {
-              current += increment;
-              if (current >= value) {
-                setCount(value);
-                clearInterval(timer);
-              } else {
-                setCount(Math.floor(current));
-              }
-            }, duration / steps);
-          }, delay);
-        }
-      },
-      { threshold: 0.5 }
-    );
-
-    if (ref.current) {
-      observer.observe(ref.current);
+    if (isInView && !hasAnimated) {
+      setHasAnimated(true);
+      const timeout = setTimeout(() => {
+        const duration = 2000;
+        const steps = 60;
+        const increment = value / steps;
+        let current = 0;
+        
+        const timer = setInterval(() => {
+          current += increment;
+          if (current >= value) {
+            setCount(value);
+            clearInterval(timer);
+          } else {
+            setCount(Math.floor(current));
+          }
+        }, duration / steps);
+        
+        return () => clearInterval(timer);
+      }, delay);
+      
+      return () => clearTimeout(timeout);
     }
-
-    return () => observer.disconnect();
-  }, [value, delay, hasAnimated]);
+  }, [value, delay, hasAnimated, isInView]);
 
   return (
-    <div ref={ref} className="text-center">
-      <div className="inline-flex items-center justify-center w-12 h-12 mb-4 text-amber-500">
-        {icon}
-      </div>
-      <p className="text-4xl md:text-5xl font-light text-foreground mb-2" aria-live="polite">
-        <span className="text-amber-500">{count}</span>
-        <span className="text-muted-foreground">{suffix}</span>
-      </p>
-      <p className="text-sm text-muted-foreground uppercase tracking-wider">
+    <div className="text-center">
+      <motion.p
+        initial={{ opacity: 0, y: 30 }}
+        animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+        transition={{ duration: 0.8, delay: delay / 1000 }}
+        className="text-[80px] md:text-[100px] lg:text-[140px] font-light text-white leading-none tracking-tighter"
+      >
+        {count}
+        <span className="text-amber-500">{suffix}</span>
+      </motion.p>
+      <motion.p
+        initial={{ opacity: 0, y: 10 }}
+        animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
+        transition={{ duration: 0.6, delay: delay / 1000 + 0.3 }}
+        className="text-[10px] uppercase tracking-[0.3em] text-white/50 mt-2"
+      >
         {label}
-      </p>
+      </motion.p>
     </div>
   );
 };
 
 const ImpactMap = () => {
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const isInView = useInView(sectionRef, { once: true, amount: 0.3 });
+
   const cities = [
     'Calgary', 'Toronto', 'Vancouver', 'Los Angeles', 'Dallas', 
-    'Atlanta', 'Houston', 'Phoenix', 'Denver', 'Seattle'
+    'Atlanta', 'Houston', 'Phoenix', 'Denver', 'Seattle',
+    'Chicago', 'Miami', 'New York', 'Austin', 'Portland'
+  ];
+
+  // City positions for map dots
+  const cityPositions = [
+    { top: '25%', left: '18%' },   // Calgary
+    { top: '35%', left: '78%' },   // Toronto
+    { top: '22%', left: '12%' },   // Vancouver
+    { top: '55%', left: '15%' },   // Los Angeles
+    { top: '62%', left: '45%' },   // Dallas
+    { top: '58%', left: '72%' },   // Atlanta
+    { top: '68%', left: '42%' },   // Houston
+    { top: '58%', left: '25%' },   // Phoenix
+    { top: '42%', left: '32%' },   // Denver
+    { top: '28%', left: '10%' },   // Seattle
+    { top: '38%', left: '55%' },   // Chicago
+    { top: '72%', left: '78%' },   // Miami
+    { top: '40%', left: '85%' },   // New York
+    { top: '65%', left: '38%' },   // Austin
+    { top: '32%', left: '8%' },    // Portland
   ];
 
   return (
-    <section className="py-16 md:py-24 px-6 bg-muted/30">
-      <div className="max-w-6xl mx-auto">
+    <section 
+      ref={sectionRef}
+      className="relative py-24 md:py-32 bg-stone-950 overflow-hidden"
+    >
+      {/* Grid pattern overlay */}
+      <div 
+        className="absolute inset-0 opacity-[0.02] pointer-events-none"
+        style={{
+          backgroundImage: `linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)`,
+          backgroundSize: '60px 60px'
+        }}
+      />
+
+      {/* Index watermark */}
+      <motion.span
+        initial={{ opacity: 0 }}
+        animate={isInView ? { opacity: 0.02 } : { opacity: 0 }}
+        transition={{ duration: 1, delay: 0.3 }}
+        className="absolute top-8 left-8 text-[20vw] font-light text-white leading-none select-none pointer-events-none z-0"
+      >
+        05
+      </motion.span>
+
+      <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-12 lg:px-16">
         {/* Header */}
-        <div className="text-center mb-16">
-          <p className="text-xs uppercase tracking-[0.3em] text-amber-600 mb-4">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+          transition={{ duration: 0.8 }}
+          className="text-center mb-16 md:mb-24"
+        >
+          <p className="text-[10px] uppercase tracking-[0.4em] text-amber-500 mb-4">
             Our Reach
           </p>
-          <h2 className="text-3xl md:text-4xl font-light text-foreground">
-            Ministry By The Numbers
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-light text-white tracking-tight">
+            The Mission<br />
+            <span className="text-white/40">Spreads</span>
           </h2>
-        </div>
+        </motion.div>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 mb-16">
-          <StatItem
-            icon={<MapPin className="w-8 h-8" />}
-            value={45}
-            suffix="+"
-            label="Cities"
-            delay={0}
-          />
-          <StatItem
-            icon={<GraduationCap className="w-8 h-8" />}
-            value={20}
-            suffix="+"
-            label="Campuses"
-            delay={100}
-          />
-          <StatItem
-            icon={<Globe className="w-8 h-8" />}
-            value={5}
-            suffix=""
-            label="Countries"
-            delay={200}
-          />
-          <StatItem
-            icon={<Heart className="w-8 h-8" />}
-            value={10}
-            suffix="K+"
-            label="Lives Touched"
-            delay={300}
-          />
+        {/* Stats Grid - Massive Numbers */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-4 mb-24">
+          <AnimatedCounter value={10} suffix="K+" label="Believers" delay={0} isInView={isInView} />
+          <AnimatedCounter value={45} suffix="+" label="Cities" delay={200} isInView={isInView} />
+          <AnimatedCounter value={20} suffix="+" label="Campuses" delay={400} isInView={isInView} />
+          <AnimatedCounter value={5} suffix="" label="Countries" delay={600} isInView={isInView} />
         </div>
 
         {/* Map Visualization */}
-        <div className="relative h-48 md:h-64 bg-background rounded-sm overflow-hidden mb-8">
-          {/* Stylized dots representing cities */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={isInView ? { opacity: 1 } : { opacity: 0 }}
+          transition={{ duration: 1, delay: 0.8 }}
+          className="relative h-48 md:h-72 lg:h-80 mb-12"
+        >
+          {/* Minimal world silhouette - just North America outline */}
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className="relative w-full max-w-xl h-full">
-              {/* Animated pulsing dots */}
-              {[
-                { top: '30%', left: '15%' },   // Calgary
-                { top: '35%', left: '80%' },   // Toronto
-                { top: '25%', left: '10%' },   // Vancouver
-                { top: '55%', left: '12%' },   // Los Angeles
-                { top: '65%', left: '45%' },   // Dallas
-                { top: '60%', left: '75%' },   // Atlanta
-                { top: '70%', left: '42%' },   // Houston
-                { top: '55%', left: '25%' },   // Phoenix
-                { top: '40%', left: '30%' },   // Denver
-                { top: '30%', left: '8%' },    // Seattle
-              ].map((pos, i) => (
-                <div
-                  key={i}
-                  className="absolute"
-                  style={{ top: pos.top, left: pos.left }}
-                >
-                  <div className="relative">
-                    <div className="w-3 h-3 bg-amber-500 rounded-full" />
-                    <div 
-                      className="absolute inset-0 w-3 h-3 bg-amber-500 rounded-full animate-ping opacity-75"
-                      style={{ animationDelay: `${i * 200}ms`, animationDuration: '2s' }}
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
+            <svg 
+              viewBox="0 0 400 200" 
+              className="w-full h-full opacity-10"
+              fill="currentColor"
+            >
+              <path 
+                d="M50 60 Q80 40 120 50 Q140 35 180 45 Q220 40 260 55 Q300 50 340 70 Q350 90 340 120 Q320 140 280 150 Q240 155 200 145 Q160 150 120 140 Q80 145 50 130 Q30 110 50 60" 
+                className="text-white"
+              />
+            </svg>
           </div>
-        </div>
 
-        {/* City List */}
-        <div className="text-center">
-          <p className="text-sm text-muted-foreground font-light">
-            {cities.join(' • ')}
-          </p>
-        </div>
+          {/* Pulsing city dots */}
+          <div className="absolute inset-0">
+            {cityPositions.map((pos, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, scale: 0 }}
+                animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0 }}
+                transition={{ duration: 0.5, delay: 1 + i * 0.1 }}
+                className="absolute"
+                style={{ top: pos.top, left: pos.left }}
+              >
+                <div className="relative">
+                  <div className="w-2 h-2 bg-amber-500 rounded-full" />
+                  <div 
+                    className="absolute inset-0 w-2 h-2 bg-amber-500 rounded-full animate-ping opacity-75"
+                    style={{ animationDelay: `${i * 200}ms`, animationDuration: '2s' }}
+                  />
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* City Marquee */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={isInView ? { opacity: 1 } : { opacity: 0 }}
+          transition={{ duration: 0.8, delay: 1.5 }}
+          className="overflow-hidden"
+        >
+          <div className="flex gap-8 animate-[marquee_30s_linear_infinite]">
+            {[...cities, ...cities].map((city, i) => (
+              <span 
+                key={i} 
+                className="text-sm text-white/30 uppercase tracking-[0.2em] whitespace-nowrap flex items-center gap-8"
+              >
+                {city}
+                <span className="w-1 h-1 bg-amber-500/50 rounded-full" />
+              </span>
+            ))}
+          </div>
+        </motion.div>
       </div>
+
+      {/* Add keyframe animation for marquee */}
+      <style>{`
+        @keyframes marquee {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+      `}</style>
     </section>
   );
 };
