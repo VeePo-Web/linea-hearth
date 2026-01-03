@@ -1,7 +1,12 @@
+import FooterEmailCapture from "./FooterEmailCapture";
+
 const Footer = () => {
   return (
     <footer className="w-full bg-stone-900 text-white pt-16 pb-4 px-6">
       <div className="">
+        {/* Email Capture Section */}
+        <FooterEmailCapture />
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-8">
           {/* Brand - Left side */}
           <div>

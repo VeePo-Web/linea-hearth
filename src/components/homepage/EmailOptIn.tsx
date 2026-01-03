@@ -41,19 +41,19 @@ const EmailOptIn = ({ variant = "default" }: EmailOptInProps) => {
     try {
       const { error: supabaseError } = await supabase
         .from("newsletter_subscribers")
-        .insert([{ email, source: "homepage_editorial" }]);
+        .insert([{ email, source: "front_line_main" }]);
 
       if (supabaseError) {
         if (supabaseError.code === "23505") {
-          setError("You're already subscribed.");
+          setError("You're already enlisted.");
         } else {
           throw supabaseError;
         }
       } else {
         setIsSuccess(true);
         toast({
-          title: "You're in.",
-          description: "Check your inbox for your 15% off code.",
+          title: "Welcome to the front line.",
+          description: "Your first deployment awaits. Check your inbox.",
         });
       }
     } catch (err) {
@@ -67,7 +67,7 @@ const EmailOptIn = ({ variant = "default" }: EmailOptInProps) => {
   const editorialEase: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
   // Character animation for headline
-  const headlineWords = ["THE", "TRIBE", "LIST."];
+  const headlineWords = ["JOIN THE", "FRONT", "LINE."];
   
   const getCharacterTransition = (delay: number): Transition => ({
     type: "spring" as const,
@@ -103,17 +103,21 @@ const EmailOptIn = ({ variant = "default" }: EmailOptInProps) => {
         }}
       />
 
-      {/* Large index number watermark */}
+      {/* Subtle crosshair background element */}
       <motion.div
         initial={{ opacity: 0 }}
-        animate={isInView ? { opacity: 0.08 } : { opacity: 0 }}
-        transition={{ duration: 1, delay: 2.0 }}
-        className="absolute bottom-8 right-8 md:bottom-12 md:right-12 pointer-events-none select-none"
+        animate={isInView ? { opacity: 0.04 } : { opacity: 0 }}
+        transition={{ duration: 1, delay: 1.5 }}
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none select-none"
       >
-        <span className="text-[80px] md:text-[120px] lg:text-[180px] font-extralight leading-none text-background">
-          024
-        </span>
-        <div className="w-12 h-px bg-background/30 mt-2" />
+        <div className="relative w-[60vw] h-[60vw] max-w-[600px] max-h-[600px]">
+          {/* Horizontal line */}
+          <div className="absolute top-1/2 left-0 right-0 h-px bg-background" />
+          {/* Vertical line */}
+          <div className="absolute left-1/2 top-0 bottom-0 w-px bg-background" />
+          {/* Circle */}
+          <div className="absolute inset-[15%] border border-background rounded-full" />
+        </div>
       </motion.div>
 
       <div className="container mx-auto px-4 md:px-8">
@@ -125,9 +129,9 @@ const EmailOptIn = ({ variant = "default" }: EmailOptInProps) => {
               initial={{ opacity: 0, y: 20 }}
               animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
               transition={getFadeUpTransition(0.2)}
-              className="text-xs uppercase tracking-[0.3em] text-background/50 mb-8"
+              className="text-[10px] uppercase tracking-[0.4em] text-background/50 mb-8"
             >
-              Only for those who are serious
+              Intelligence Briefings • Drop Alerts • First Deployment
             </motion.p>
 
             {/* Massive headline with character animation */}
@@ -135,15 +139,13 @@ const EmailOptIn = ({ variant = "default" }: EmailOptInProps) => {
               {headlineWords.map((word, wordIndex) => (
                 <div
                   key={word}
-                  className={`overflow-hidden ${
-                    word === "MISS A" ? "ml-[5vw] md:ml-[8vw]" : ""
-                  }`}
+                  className="overflow-hidden"
                 >
                   <motion.h2
                     initial="hidden"
                     animate={isInView ? "visible" : "hidden"}
-                    className={`text-[16vw] md:text-[12vw] lg:text-[8vw] font-extralight leading-[0.85] tracking-[-0.04em] ${
-                      word === "DROP." ? "text-amber-400" : "text-background"
+                    className={`text-[14vw] md:text-[10vw] lg:text-[7vw] font-extralight leading-[0.85] tracking-[-0.04em] ${
+                      word === "FRONT" ? "text-amber-400" : "text-background"
                     }`}
                   >
                     {prefersReducedMotion ? (
@@ -197,11 +199,11 @@ const EmailOptIn = ({ variant = "default" }: EmailOptInProps) => {
                     <Check className="w-4 h-4 text-foreground" />
                   </motion.div>
                   <span className="text-2xl md:text-3xl font-light tracking-tight">
-                    YOU'RE IN.
+                    ENLISTED.
                   </span>
                 </div>
                 <p className="text-sm text-background/60 uppercase tracking-[0.15em]">
-                  Check your inbox for your code.
+                  Your briefing is on the way. Welcome to the front line.
                 </p>
               </motion.div>
             ) : (
@@ -264,7 +266,7 @@ const EmailOptIn = ({ variant = "default" }: EmailOptInProps) => {
                     disabled={isLoading}
                     className="group relative text-xs uppercase tracking-[0.2em] text-background/80 hover:text-background transition-colors duration-300 flex items-center gap-2 mt-8"
                   >
-                    <span>{isLoading ? "JOINING..." : "GET EARLY ACCESS"}</span>
+                    <span>{isLoading ? "ENLISTING..." : "ENLIST NOW"}</span>
                     <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
                     {/* Animated underline */}
                     <span className="absolute -bottom-1 left-0 h-px bg-background origin-left transition-transform duration-300 scale-x-0 group-hover:scale-x-100 w-full" />
@@ -278,7 +280,7 @@ const EmailOptIn = ({ variant = "default" }: EmailOptInProps) => {
                   transition={getFadeUpTransition(1.6)}
                   className="text-xs text-background/40 uppercase tracking-[0.15em] pt-4"
                 >
-                  First to know. First to shop. 15% off your first order.
+                  First access to drops. Field reports. 15% off first deployment.
                 </motion.p>
               </motion.form>
             )}
