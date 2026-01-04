@@ -14,6 +14,57 @@ export type Database = {
   }
   public: {
     Tables: {
+      abandoned_carts: {
+        Row: {
+          cart_items: Json
+          cart_total: number
+          converted_at: string | null
+          created_at: string
+          discount_code: string | null
+          email: string
+          email_1_sent_at: string | null
+          email_2_sent_at: string | null
+          email_3_sent_at: string | null
+          id: string
+          recovered_at: string | null
+          recovery_token: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          cart_items?: Json
+          cart_total?: number
+          converted_at?: string | null
+          created_at?: string
+          discount_code?: string | null
+          email: string
+          email_1_sent_at?: string | null
+          email_2_sent_at?: string | null
+          email_3_sent_at?: string | null
+          id?: string
+          recovered_at?: string | null
+          recovery_token?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          cart_items?: Json
+          cart_total?: number
+          converted_at?: string | null
+          created_at?: string
+          discount_code?: string | null
+          email?: string
+          email_1_sent_at?: string | null
+          email_2_sent_at?: string | null
+          email_3_sent_at?: string | null
+          id?: string
+          recovered_at?: string | null
+          recovery_token?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       ambassador_applications: {
         Row: {
           admin_notes: string | null
