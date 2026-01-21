@@ -1,7 +1,8 @@
-import { Truck, Check, Sparkles } from "lucide-react";
+import { Truck, Sparkles } from "lucide-react";
 import { useCart } from "@/hooks/useCart";
 import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
+import { DrawCheckIcon } from "@/components/ui/draw-check-icon";
 
 const FreeShippingBar = () => {
   const { subtotal, freeShippingThreshold, amountToFreeShipping, hasFreeShipping } = useCart();
@@ -53,7 +54,7 @@ const FreeShippingBar = () => {
               showCelebration && "animate-bounce"
             )}>
               {showCelebration && <Sparkles className="h-4 w-4 text-amber-500" />}
-              <Check className="h-4 w-4 text-emerald-500" />
+              <DrawCheckIcon size="sm" className="text-emerald-500" delay={0} />
               <span className="font-medium text-emerald-600">Free shipping unlocked!</span>
               {showCelebration && <Sparkles className="h-4 w-4 text-amber-500" />}
             </div>

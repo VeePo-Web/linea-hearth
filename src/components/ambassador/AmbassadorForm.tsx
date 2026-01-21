@@ -24,7 +24,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ArrowRight, CheckCircle, Instagram, Youtube } from "lucide-react";
+import { ArrowRight, Instagram, Youtube } from "lucide-react";
+import { DrawCheckIcon } from "@/components/ui/draw-check-icon";
 
 const formSchema = z.object({
   full_name: z.string().min(2, "Name must be at least 2 characters"),
@@ -140,7 +141,7 @@ const AmbassadorForm = () => {
           transition={{ duration: 0.6 }}
           className="max-w-2xl mx-auto text-center"
         >
-          <CheckCircle className="w-16 h-16 text-accent mx-auto mb-8" />
+          <DrawCheckIcon size="xl" variant="circle-check" className="text-accent mx-auto mb-8" delay={200} />
           <h2 className="text-section text-background mb-6">
             APPLICATION RECEIVED.
           </h2>

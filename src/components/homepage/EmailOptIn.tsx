@@ -1,10 +1,11 @@
 import { useState, useRef } from "react";
 import { motion, useInView, Variants, Transition } from "framer-motion";
-import { ArrowRight, Check } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
+import { DrawCheckIcon } from "@/components/ui/draw-check-icon";
 
 const emailSchema = z.string().email("Please enter a valid email address");
 
@@ -196,7 +197,7 @@ const EmailOptIn = ({ variant = "default" }: EmailOptInProps) => {
                     transition={{ type: "spring", stiffness: 300, damping: 15, delay: 0.1 }}
                     className="w-8 h-8 rounded-full bg-amber-400 flex items-center justify-center"
                   >
-                    <Check className="w-4 h-4 text-foreground" />
+                    <DrawCheckIcon size="sm" className="text-foreground" delay={200} />
                   </motion.div>
                   <span className="text-2xl md:text-3xl font-light tracking-tight">
                     ENLISTED.

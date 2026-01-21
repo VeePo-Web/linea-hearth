@@ -1,10 +1,11 @@
-import { X, Lock, Check } from "lucide-react";
+import { X, Lock } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "@/hooks/useCart";
 import { useAbandonedCart } from "@/hooks/useAbandonedCart";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { DrawCheckIcon } from "@/components/ui/draw-check-icon";
 import FreeShippingBar from "./FreeShippingBar";
 import CartItem from "./CartItem";
 import SmartUpsell from "./SmartUpsell";
@@ -325,7 +326,7 @@ const CartDrawer = ({ onViewFavorites }: CartDrawerProps) => {
                                     <span className="w-1 h-1 bg-current rounded-full animate-pulse delay-150" />
                                   </span>
                                 ) : savingState === 'saved' ? (
-                                  <Check className="w-4 h-4" />
+                                  <DrawCheckIcon size="xs" delay={0} />
                                 ) : (
                                   "Secure"
                                 )}
@@ -356,7 +357,7 @@ const CartDrawer = ({ onViewFavorites }: CartDrawerProps) => {
                         className="mx-6 my-3"
                       >
                         <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                          <Check className="w-3.5 h-3.5 text-primary" />
+                          <DrawCheckIcon size="xs" className="text-primary" delay={0} />
                           <span>Cart saved. We'll keep your items ready.</span>
                         </div>
                       </motion.div>
