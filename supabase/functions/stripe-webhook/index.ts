@@ -155,6 +155,26 @@ Deno.serve(async (req) => {
           }
         }
 
+        // Trigger order confirmation email
+        try {
+          const baseUrl = Deno.env.get("SUPABASE_URL");
+          const anonKey = Deno.env.get("SUPABASE_ANON_KEY");
+          
+          await fetch(`${baseUrl}/functions/v1/send-order-confirmation`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${anonKey}`,
+            },
+            body: JSON.stringify({ orderId }),
+          });
+          
+          console.log(`Order confirmation email triggered for order ${orderId}`);
+        } catch (emailError) {
+          console.error("Failed to trigger order confirmation email:", emailError);
+          // Don't fail the webhook - email is non-critical
+        }
+
         // Mark abandoned cart as converted if applicable
         if (abandonedCartId) {
           await supabase
