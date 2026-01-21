@@ -1,14 +1,16 @@
-import { X } from "lucide-react";
+import { X, Shield, Loader2, Check } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "@/hooks/useCart";
+import { useAbandonedCart } from "@/hooks/useAbandonedCart";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import FreeShippingBar from "./FreeShippingBar";
 import CartItem from "./CartItem";
 import SmartUpsell from "./SmartUpsell";
 import TrustRow from "./TrustRow";
 import AffirmationStrip from "./AffirmationStrip";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface CartDrawerProps {
   onViewFavorites?: () => void;
@@ -61,7 +63,39 @@ const itemVariants = {
 
 const CartDrawer = ({ onViewFavorites }: CartDrawerProps) => {
   const { items, itemCount, subtotal, isCartOpen, closeCart } = useCart();
+  const { email: savedEmail, isSyncing, isSynced, syncCart } = useAbandonedCart();
   const drawerRef = useRef<HTMLDivElement>(null);
+  
+  // Email capture state
+  const [showEmailCapture, setShowEmailCapture] = useState(false);
+  const [emailInput, setEmailInput] = useState("");
+  const [emailError, setEmailError] = useState("");
+  
+  // Show email capture after a delay if cart has items and no email saved
+  useEffect(() => {
+    if (isCartOpen && items.length > 0 && !savedEmail && !isSynced) {
+      const timer = setTimeout(() => setShowEmailCapture(true), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [isCartOpen, items.length, savedEmail, isSynced]);
+
+  const handleSaveCart = async () => {
+    setEmailError("");
+    
+    // Validate email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(emailInput)) {
+      setEmailError("Please enter a valid email address");
+      return;
+    }
+    
+    const result = await syncCart(emailInput, items, subtotal);
+    if (result.success) {
+      setShowEmailCapture(false);
+    } else {
+      setEmailError(result.error || "Failed to save cart");
+    }
+  };
 
   // Focus trap and escape key handling
   useEffect(() => {
@@ -218,6 +252,71 @@ const CartDrawer = ({ onViewFavorites }: CartDrawerProps) => {
                       ))}
                     </AnimatePresence>
                   </div>
+
+                  {/* Save Your Cart Email Capture */}
+                  <AnimatePresence>
+                    {showEmailCapture && !savedEmail && !isSynced && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="mx-6 my-4 overflow-hidden"
+                      >
+                        <div className="bg-muted/30 border border-border p-4 space-y-3">
+                          <div className="flex items-center gap-2">
+                            <Shield className="w-4 h-4 text-primary" />
+                            <span className="text-sm font-medium text-foreground uppercase tracking-wider">
+                              Save Your Mission
+                            </span>
+                          </div>
+                          <p className="text-xs text-muted-foreground">
+                            Enter your email to save your cart and receive intel.
+                          </p>
+                          <div className="flex gap-2">
+                            <Input
+                              type="email"
+                              placeholder="your@email.com"
+                              value={emailInput}
+                              onChange={(e) => setEmailInput(e.target.value)}
+                              className="flex-1 rounded-none text-sm h-9"
+                              onKeyDown={(e) => e.key === 'Enter' && handleSaveCart()}
+                            />
+                            <Button
+                              onClick={handleSaveCart}
+                              disabled={isSyncing}
+                              size="sm"
+                              className="rounded-none h-9 px-4 text-xs uppercase tracking-wider"
+                            >
+                              {isSyncing ? (
+                                <Loader2 className="w-3 h-3 animate-spin" />
+                              ) : (
+                                "Secure"
+                              )}
+                            </Button>
+                          </div>
+                          {emailError && (
+                            <p className="text-xs text-destructive">{emailError}</p>
+                          )}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
+                  {/* Cart Saved Confirmation */}
+                  <AnimatePresence>
+                    {(savedEmail || isSynced) && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="mx-6 my-4"
+                      >
+                        <div className="flex items-center gap-2 text-sm text-primary">
+                          <Check className="w-4 h-4" />
+                          <span>Cart secured. We've got your six.</span>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
 
                   {/* Smart upsell */}
                   <SmartUpsell />
