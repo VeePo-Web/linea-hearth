@@ -1,21 +1,27 @@
-import { X } from "lucide-react";
+import { X, User } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "@/hooks/useCart";
+import { useAuth } from "@/hooks/useAuth";
 import CartDrawer from "@/components/cart/CartDrawer";
 import NavLink from "./NavLink";
 import MegaMenu from "./MegaMenu";
 import SearchOverlay from "./SearchOverlay";
 import MobileMenu from "./MobileMenu";
+import AuthModal from "@/components/auth/AuthModal";
+import AccountDropdown from "@/components/auth/AccountDropdown";
 
 const Navigation = () => {
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [offCanvasType, setOffCanvasType] = useState<'favorites' | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isAccountDropdownOpen, setIsAccountDropdownOpen] = useState(false);
   const location = useLocation();
 
+  const { user } = useAuth();
   const { itemCount, openCart, addItem, items } = useCart();
 
   useEffect(() => {
@@ -171,6 +177,24 @@ const Navigation = () => {
             </svg>
           </motion.button>
           
+          {/* Account */}
+          <div className="relative hidden lg:block">
+            <motion.button 
+              className="p-2.5 text-nav-foreground hover:text-nav-hover transition-colors duration-200 relative group" 
+              aria-label="Account" 
+              onClick={() => user ? setIsAccountDropdownOpen(!isAccountDropdownOpen) : setIsAuthModalOpen(true)}
+              whileHover={{ scale: 1.05 }} 
+              whileTap={{ scale: 0.95 }}
+            >
+              <motion.span 
+                className="absolute inset-0 rounded-full bg-muted scale-0 group-hover:scale-100 transition-transform duration-200"
+                initial={false}
+              />
+              <User className="w-5 h-5 relative z-10" strokeWidth={1.5} />
+            </motion.button>
+            {user && <AccountDropdown isOpen={isAccountDropdownOpen} onClose={() => setIsAccountDropdownOpen(false)} />}
+          </div>
+          
           {/* Favorites */}
           <motion.button 
             className="hidden lg:block p-2.5 text-nav-foreground hover:text-nav-hover transition-colors duration-200 relative group" 
@@ -227,10 +251,13 @@ const Navigation = () => {
       <SearchOverlay isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
 
       {/* Mobile Menu */}
-      <MobileMenu isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} navItems={navItems} onSearchOpen={() => setIsSearchOpen(true)} onFavoritesOpen={() => setOffCanvasType('favorites')} />
+      <MobileMenu isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} navItems={navItems} onSearchOpen={() => setIsSearchOpen(true)} onFavoritesOpen={() => setOffCanvasType('favorites')} onAuthOpen={() => setIsAuthModalOpen(true)} />
 
       {/* Cart Drawer */}
       <CartDrawer onViewFavorites={() => setOffCanvasType('favorites')} />
+
+      {/* Auth Modal */}
+      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
 
       {/* Favorites Off-canvas */}
       <AnimatePresence>

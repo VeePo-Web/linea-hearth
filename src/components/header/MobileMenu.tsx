@@ -26,6 +26,7 @@ interface MobileMenuProps {
   navItems: NavItem[];
   onSearchOpen: () => void;
   onFavoritesOpen: () => void;
+  onAuthOpen: () => void;
 }
 
 const backdropVariants = {
@@ -94,6 +95,7 @@ const MobileMenu = ({
   navItems,
   onSearchOpen,
   onFavoritesOpen,
+  onAuthOpen,
 }: MobileMenuProps) => {
   const [expandedItem, setExpandedItem] = useState<string | null>(null);
 
@@ -274,7 +276,10 @@ const MobileMenu = ({
               <div className="flex items-center justify-between pt-4 border-t border-border">
                 <button 
                   className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
-                  onClick={onClose}
+                  onClick={() => {
+                    onClose();
+                    setTimeout(onAuthOpen, 300);
+                  }}
                 >
                   <User size={16} strokeWidth={1.5} />
                   <span>Account</span>

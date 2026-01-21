@@ -65,6 +65,63 @@ export type Database = {
         }
         Relationships: []
       }
+      addresses: {
+        Row: {
+          address_line_1: string
+          address_line_2: string | null
+          city: string
+          country: string
+          created_at: string
+          first_name: string
+          id: string
+          is_default_billing: boolean | null
+          is_default_shipping: boolean | null
+          label: string | null
+          last_name: string
+          phone: string | null
+          postal_code: string
+          state: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          address_line_1: string
+          address_line_2?: string | null
+          city: string
+          country?: string
+          created_at?: string
+          first_name: string
+          id?: string
+          is_default_billing?: boolean | null
+          is_default_shipping?: boolean | null
+          label?: string | null
+          last_name: string
+          phone?: string | null
+          postal_code: string
+          state?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          address_line_1?: string
+          address_line_2?: string | null
+          city?: string
+          country?: string
+          created_at?: string
+          first_name?: string
+          id?: string
+          is_default_billing?: boolean | null
+          is_default_shipping?: boolean | null
+          label?: string | null
+          last_name?: string
+          phone?: string | null
+          postal_code?: string
+          state?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       ambassador_applications: {
         Row: {
           admin_notes: string | null
