@@ -10,6 +10,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { DrawCheckIcon } from '@/components/ui/draw-check-icon';
 import { Copy, Check, Share2, Twitter, Facebook, MessageCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -165,7 +166,7 @@ export const SaveLookModal = ({ open, onOpenChange }: SaveLookModalProps) => {
               {/* Success State */}
               <div className="text-center space-y-2">
                 <div className="w-12 h-12 mx-auto bg-primary/10 rounded-full flex items-center justify-center">
-                  <Check className="w-6 h-6 text-primary" />
+                  <DrawCheckIcon size="sm" className="text-primary" delay={100} />
                 </div>
                 <div className="text-sm font-light">Your outfit has been saved!</div>
               </div>

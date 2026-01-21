@@ -1,5 +1,6 @@
-import { Check, Package, Mail, Share2, Instagram, Twitter } from "lucide-react";
+import { Package, Mail, Instagram, Twitter } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { DrawCheckIcon } from "@/components/ui/draw-check-icon";
 import { useCart } from "@/hooks/useCart";
 import { useEffect, useState } from "react";
 
@@ -54,7 +55,7 @@ const OrderConfirmation = ({
             showConfetti ? "scale-100" : "scale-0"
           }`}
         >
-          <Check className="h-10 w-10 text-white" />
+          <DrawCheckIcon size="lg" className="text-white" delay={500} />
         </div>
         
         {/* Confetti rings */}

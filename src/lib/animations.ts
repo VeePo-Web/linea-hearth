@@ -204,3 +204,24 @@ export const wordItem: Variants = {
     }
   },
 };
+
+// SVG stroke draw animation
+export const strokeDraw: Variants = {
+  hidden: { 
+    pathLength: 0,
+    opacity: 0 
+  },
+  visible: { 
+    pathLength: 1,
+    opacity: 1,
+    transition: {
+      pathLength: {
+        duration: timing.medium,
+        ease: easing.editorial,
+      },
+      opacity: {
+        duration: 0.01,
+      }
+    }
+  },
+};

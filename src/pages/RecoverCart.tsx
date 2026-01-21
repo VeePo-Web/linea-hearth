@@ -3,6 +3,7 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 import { motion, Transition } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { DrawCheckIcon } from "@/components/ui/draw-check-icon";
 import { useCart } from "@/hooks/useCart";
 import { useToast } from "@/hooks/use-toast";
 import Layout from "@/components/layout/Layout";
@@ -33,13 +34,15 @@ interface RecoveryResponse {
 
 // Premium loading dots - 12px with deeper contrast
 const LoadingDots = () => {
+  const prefersReducedMotion = useReducedMotion();
+  
   return (
     <div className="flex items-center justify-center gap-3">
       {[0, 1, 2].map((i) => (
         <motion.span
           key={i}
           className="w-3 h-3 bg-foreground rounded-full"
-          animate={{ opacity: [0.2, 1, 0.2] }}
+          animate={prefersReducedMotion ? {} : { opacity: [0.2, 1, 0.2] }}
           transition={{
             duration: 1.2,
             repeat: Infinity,
@@ -49,28 +52,6 @@ const LoadingDots = () => {
         />
       ))}
     </div>
-  );
-};
-
-// SVG checkmark with stroke draw animation
-const DrawCheckIcon = ({ className, reduced }: { className?: string; reduced: boolean }) => {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      className={cn("w-7 h-7", className)}
-    >
-      <motion.path
-        d="M5 13l4 4L19 7"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        initial={{ pathLength: reduced ? 1 : 0 }}
-        animate={{ pathLength: 1 }}
-        transition={{ duration: 0.5, delay: 0.2 }}
-      />
-    </svg>
   );
 };
 
@@ -218,7 +199,7 @@ const RecoverCart = () => {
                 transition={getTransition(0.1)}
                 className="w-16 h-16 mx-auto border border-foreground flex items-center justify-center"
               >
-                <DrawCheckIcon className="text-foreground" reduced={prefersReducedMotion} />
+                <DrawCheckIcon size="md" variant="check" delay={300} className="text-foreground" />
               </motion.div>
 
               {/* Headline */}
