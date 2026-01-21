@@ -34,6 +34,13 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminProducts from "./pages/admin/AdminProducts";
 import AdminCategories from "./pages/admin/AdminCategories";
 import ProtectedRoute from "./components/admin/ProtectedRoute";
+import AccountLayout from "./pages/account/AccountLayout";
+import AccountDashboard from "./pages/account/AccountDashboard";
+import AccountOrders from "./pages/account/AccountOrders";
+import AccountOrderDetail from "./pages/account/AccountOrderDetail";
+import AccountProfile from "./pages/account/AccountProfile";
+import AccountAddresses from "./pages/account/AccountAddresses";
+import ProtectedAccountRoute from "./components/account/ProtectedAccountRoute";
 
 const queryClient = new QueryClient();
 
@@ -65,6 +72,14 @@ const AnimatedRoutes = () => {
         <Route path="/try-on/saved/:outfitId" element={<PageTransition><TryOnRoom /></PageTransition>} />
         <Route path="/ambassador" element={<PageTransition><Ambassador /></PageTransition>} />
         <Route path="/recover-cart" element={<PageTransition><RecoverCart /></PageTransition>} />
+        {/* Account Routes */}
+        <Route path="/account" element={<ProtectedAccountRoute><PageTransition><AccountLayout /></PageTransition></ProtectedAccountRoute>}>
+          <Route index element={<AccountDashboard />} />
+          <Route path="orders" element={<AccountOrders />} />
+          <Route path="orders/:orderId" element={<AccountOrderDetail />} />
+          <Route path="profile" element={<AccountProfile />} />
+          <Route path="addresses" element={<AccountAddresses />} />
+        </Route>
         {/* Admin Routes */}
         <Route path="/admin/login" element={<PageTransition><AdminLogin /></PageTransition>} />
         <Route path="/admin" element={<ProtectedRoute requireAdmin><PageTransition><AdminDashboard /></PageTransition></ProtectedRoute>} />
