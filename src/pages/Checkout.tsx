@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
-import { Minus, Plus, CreditCard, Check } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Minus, Plus, CreditCard, Check, ExternalLink, AlertCircle } from "lucide-react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import CheckoutHeader from "../components/header/CheckoutHeader";
 import Footer from "../components/footer/Footer";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useCart } from "@/hooks/useCart";
 import { useAbandonedCart } from "@/hooks/useAbandonedCart";
+import { useStripeCheckout } from "@/hooks/useStripeCheckout";
 import CheckoutProgress from "@/components/checkout/CheckoutProgress";
 import SavingsSummary from "@/components/checkout/SavingsSummary";
 import UrgencyTimer from "@/components/checkout/UrgencyTimer";
@@ -20,11 +21,14 @@ import OrderConfirmation from "@/components/checkout/OrderConfirmation";
 import PostPurchaseOffer from "@/components/checkout/PostPurchaseOffer";
 import MobileStickyCheckout from "@/components/checkout/MobileStickyCheckout";
 import FreeShippingBar from "@/components/cart/FreeShippingBar";
+import { toast } from "sonner";
 
 const Checkout = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { items, subtotal, hasFreeShipping, updateQuantity, removeItem, clearCart, itemCount } = useCart();
-  const { syncCart, markConverted, email: savedEmail, isSynced } = useAbandonedCart();
+  const { syncCart, markConverted, email: savedEmail, isSynced, cartId } = useAbandonedCart();
+  const { initiateCheckout, isLoading: isStripeLoading, error: stripeError } = useStripeCheckout();
   
   const [currentStep, setCurrentStep] = useState(2); // Start at "Details" step
   const [showDiscountInput, setShowDiscountInput] = useState(false);
@@ -107,6 +111,14 @@ const Checkout = () => {
     }
   }, [savedEmail, customerDetails.email]);
 
+  // Handle cancelled checkout return
+  useEffect(() => {
+    const cancelled = searchParams.get("cancelled");
+    if (cancelled === "true") {
+      toast.error("Checkout was cancelled. Your cart has been preserved.");
+    }
+  }, [searchParams]);
+
   const handleShippingAddressChange = (field: string, value: string) => {
     setShippingAddress(prev => ({ ...prev, [field]: value }));
   };
@@ -119,6 +131,58 @@ const Checkout = () => {
     setPaymentDetails(prev => ({ ...prev, [field]: value }));
   };
 
+  // Stripe Checkout handler
+  const handleStripeCheckout = async () => {
+    // Validate required fields
+    if (!customerDetails.email || !customerDetails.firstName || !customerDetails.lastName) {
+      toast.error("Please fill in all required customer details");
+      return;
+    }
+    if (!shippingAddress.address || !shippingAddress.city || !shippingAddress.postalCode || !shippingAddress.country) {
+      toast.error("Please fill in all required shipping address fields");
+      return;
+    }
+
+    setIsProcessing(true);
+    setCurrentStep(3);
+
+    const result = await initiateCheckout({
+      customerEmail: customerDetails.email,
+      customerFirstName: customerDetails.firstName,
+      customerLastName: customerDetails.lastName,
+      customerPhone: customerDetails.phone,
+      shippingAddress: {
+        address: shippingAddress.address,
+        city: shippingAddress.city,
+        postalCode: shippingAddress.postalCode,
+        country: shippingAddress.country,
+      },
+      billingAddress: hasSeparateBilling ? {
+        address: billingDetails.address,
+        city: billingDetails.city,
+        postalCode: billingDetails.postalCode,
+        country: billingDetails.country,
+      } : undefined,
+      shippingMethod: shippingOption as "standard" | "express" | "overnight",
+      discountCode: discountCode || undefined,
+      discountAmount: discountAmount > 0 ? discountAmount : undefined,
+      abandonedCartId: cartId || undefined,
+    });
+
+    if (!result.success) {
+      setIsProcessing(false);
+      setCurrentStep(2);
+      
+      if (result.configured === false) {
+        toast.error(result.message || "Payment processing is not configured yet");
+      } else {
+        toast.error(result.error || "Checkout failed. Please try again.");
+      }
+    }
+    // If successful, user will be redirected to Stripe
+  };
+
+  // Fallback simulated payment handler (when Stripe not configured)
   const handleCompleteOrder = async () => {
     setIsProcessing(true);
     setCurrentStep(3); // Move to payment step
@@ -768,19 +832,63 @@ const Checkout = () => {
                         </div>
                       </div>
 
+                      {/* Stripe Checkout Button - Primary */}
+                      <div className="space-y-3">
+                        <Button
+                          onClick={handleStripeCheckout}
+                          disabled={isProcessing || isStripeLoading || !customerDetails.email || !customerDetails.firstName || !customerDetails.lastName || !shippingAddress.address}
+                          className="w-full rounded-none h-12 text-base bg-primary hover:bg-primary/90"
+                        >
+                          {isProcessing || isStripeLoading ? (
+                            <>
+                              <span className="animate-spin mr-2">⏳</span>
+                              Preparing Checkout...
+                            </>
+                          ) : (
+                            <>
+                              <ExternalLink className="w-4 h-4 mr-2" />
+                              Pay with Stripe • €{total.toLocaleString()}
+                            </>
+                          )}
+                        </Button>
+                        
+                        {stripeError && (
+                          <div className="flex items-center gap-2 text-sm text-amber-600 bg-amber-50 dark:bg-amber-900/20 p-3 rounded-none">
+                            <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                            <span>{stripeError}</span>
+                          </div>
+                        )}
+                        
+                        <p className="text-xs text-muted-foreground text-center">
+                          You'll be redirected to Stripe's secure checkout
+                        </p>
+                      </div>
+
+                      {/* Divider */}
+                      <div className="relative py-2">
+                        <div className="absolute inset-0 flex items-center">
+                          <div className="w-full border-t border-muted-foreground/20" />
+                        </div>
+                        <div className="relative flex justify-center text-xs">
+                          <span className="bg-muted/20 px-4 text-muted-foreground">or test with simulated payment</span>
+                        </div>
+                      </div>
+
+                      {/* Fallback Simulated Payment Button */}
+                      <Button
+                        onClick={handleCompleteOrder}
+                        variant="outline"
+                        disabled={isProcessing || !paymentDetails.cardNumber || !paymentDetails.expiryDate || !paymentDetails.cvv || !paymentDetails.cardholderName}
+                        className="w-full rounded-none h-12 text-base"
+                      >
+                        {isProcessing ? "Processing..." : `Test Payment • €${total.toLocaleString()}`}
+                      </Button>
+
                       {/* Security assurance */}
                       <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
                         <span className="inline-block w-2 h-2 bg-emerald-500 rounded-full" />
                         100% Secure Checkout • Your data is never stored
                       </div>
-
-                      <Button
-                        onClick={handleCompleteOrder}
-                        disabled={isProcessing || !paymentDetails.cardNumber || !paymentDetails.expiryDate || !paymentDetails.cvv || !paymentDetails.cardholderName}
-                        className="w-full rounded-none h-12 text-base"
-                      >
-                        {isProcessing ? "Processing..." : `Complete Order • €${total.toLocaleString()}`}
-                      </Button>
                     </div>
                   </div>
                 </>
