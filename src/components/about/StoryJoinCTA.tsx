@@ -15,7 +15,7 @@ const StoryJoinCTA = () => {
     >
       {/* Index watermark */}
       <motion.span
-        className="absolute top-8 right-8 text-[10px] tracking-[0.4em] text-white/20 font-light z-20"
+        className="absolute top-10 right-10 lg:top-12 lg:right-12 text-[10px] tracking-[0.4em] text-white/20 font-light z-20"
         initial={{ opacity: 0 }}
         animate={isInView ? { opacity: 1 } : {}}
         transition={{ delay: 0.3, duration: 0.8 }}
@@ -40,8 +40,8 @@ const StoryJoinCTA = () => {
         </motion.div>
 
         {/* Right: CTA content */}
-        <div className="flex items-center px-8 md:px-16 lg:px-24 py-20 lg:py-32">
-          <div className="max-w-lg">
+        <div className="flex items-center px-8 md:px-12 lg:px-16 xl:px-24 py-20 lg:py-32">
+          <div className="max-w-md lg:max-w-lg">
             <motion.p
               className="text-[10px] tracking-[0.4em] text-amber-500 mb-6"
               initial={{ opacity: 0, y: 20 }}
@@ -52,7 +52,7 @@ const StoryJoinCTA = () => {
             </motion.p>
 
             <motion.h2
-              className="text-4xl md:text-5xl lg:text-6xl font-light tracking-tight mb-8 leading-tight"
+              className="text-4xl md:text-5xl lg:text-5xl xl:text-6xl font-light tracking-tight mb-8 leading-tight"
               initial={{ opacity: 0, y: 30 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ delay: 0.4, duration: 0.8 }}
@@ -61,7 +61,7 @@ const StoryJoinCTA = () => {
             </motion.h2>
 
             <motion.p
-              className="text-lg md:text-xl font-light text-white/60 mb-12 leading-relaxed"
+              className="text-base md:text-lg lg:text-xl font-light text-white/60 mb-12 leading-relaxed"
               initial={{ opacity: 0, y: 20 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ delay: 0.5, duration: 0.8 }}
@@ -72,7 +72,7 @@ const StoryJoinCTA = () => {
 
             {/* Dual CTAs */}
             <motion.div
-              className="flex flex-col sm:flex-row gap-4 mb-12"
+              className="flex flex-col sm:flex-row gap-3 lg:gap-4 mb-12"
               initial={{ opacity: 0, y: 20 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ delay: 0.6, duration: 0.8 }}
