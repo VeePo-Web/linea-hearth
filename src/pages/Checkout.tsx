@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { Minus, Plus, CreditCard } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import CheckoutHeader from "../components/header/CheckoutHeader";
@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useCart } from "@/hooks/useCart";
+import { useAbandonedCart } from "@/hooks/useAbandonedCart";
 import CheckoutProgress from "@/components/checkout/CheckoutProgress";
 import SavingsSummary from "@/components/checkout/SavingsSummary";
 import UrgencyTimer from "@/components/checkout/UrgencyTimer";
@@ -23,6 +24,7 @@ import FreeShippingBar from "@/components/cart/FreeShippingBar";
 const Checkout = () => {
   const navigate = useNavigate();
   const { items, subtotal, hasFreeShipping, updateQuantity, removeItem, clearCart, itemCount } = useCart();
+  const { syncCart, markConverted, email: savedEmail } = useAbandonedCart();
   
   const [currentStep, setCurrentStep] = useState(2); // Start at "Details" step
   const [showDiscountInput, setShowDiscountInput] = useState(false);
@@ -88,7 +90,22 @@ const Checkout = () => {
 
   const handleCustomerDetailsChange = (field: string, value: string) => {
     setCustomerDetails(prev => ({ ...prev, [field]: value }));
+    
+    // Sync cart when email is entered
+    if (field === 'email' && value && items.length > 0) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (emailRegex.test(value)) {
+        syncCart(value, items, subtotal);
+      }
+    }
   };
+
+  // Pre-fill email if we have one from cart recovery
+  useEffect(() => {
+    if (savedEmail && !customerDetails.email) {
+      setCustomerDetails(prev => ({ ...prev, email: savedEmail }));
+    }
+  }, [savedEmail, customerDetails.email]);
 
   const handleShippingAddressChange = (field: string, value: string) => {
     setShippingAddress(prev => ({ ...prev, [field]: value }));
@@ -111,6 +128,9 @@ const Checkout = () => {
     
     // Generate order number
     setOrderNumber(String(Math.floor(10000 + Math.random() * 90000)));
+    
+    // Mark abandoned cart as converted
+    await markConverted();
     
     setIsProcessing(false);
     setPaymentComplete(true);
