@@ -1,7 +1,9 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
-import { X, Search, Heart, Instagram, Mail, ChevronDown, User } from "lucide-react";
+import { X, Search, Heart, Instagram, Mail, ChevronDown, User, LogOut } from "lucide-react";
 import { useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
+import { useProfile } from "@/hooks/useProfile";
 
 interface SubCategory {
   name: string;
@@ -98,9 +100,18 @@ const MobileMenu = ({
   onAuthOpen,
 }: MobileMenuProps) => {
   const [expandedItem, setExpandedItem] = useState<string | null>(null);
+  const { user, signOut } = useAuth();
+  const { profile } = useProfile();
+
+  const firstName = profile?.full_name?.split(' ')[0] || user?.email?.split('@')[0] || 'Account';
 
   const toggleExpand = (name: string) => {
     setExpandedItem(expandedItem === name ? null : name);
+  };
+
+  const handleSignOut = async () => {
+    await signOut();
+    onClose();
   };
 
   return (
@@ -274,16 +285,36 @@ const MobileMenu = ({
 
               {/* Account + Social row */}
               <div className="flex items-center justify-between pt-4 border-t border-border">
-                <button 
-                  className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
-                  onClick={() => {
-                    onClose();
-                    setTimeout(onAuthOpen, 300);
-                  }}
-                >
-                  <User size={16} strokeWidth={1.5} />
-                  <span>Account</span>
-                </button>
+                {user ? (
+                  <>
+                    <Link 
+                      to="/account"
+                      onClick={onClose}
+                      className="flex items-center gap-2 text-sm text-foreground hover:text-muted-foreground transition-colors"
+                    >
+                      <User size={16} strokeWidth={1.5} />
+                      <span>Hi, {firstName}</span>
+                    </Link>
+                    <button 
+                      onClick={handleSignOut}
+                      className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      <LogOut size={16} strokeWidth={1.5} />
+                      <span>Sign Out</span>
+                    </button>
+                  </>
+                ) : (
+                  <button 
+                    className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    onClick={() => {
+                      onClose();
+                      setTimeout(onAuthOpen, 300);
+                    }}
+                  >
+                    <User size={16} strokeWidth={1.5} />
+                    <span>Sign In</span>
+                  </button>
+                )}
                 <div className="flex items-center gap-3">
                   <a
                     href="https://instagram.com"
