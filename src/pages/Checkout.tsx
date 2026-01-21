@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
-import { Minus, Plus, CreditCard } from "lucide-react";
+import { Minus, Plus, CreditCard, Check } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import CheckoutHeader from "../components/header/CheckoutHeader";
 import Footer from "../components/footer/Footer";
@@ -24,7 +24,7 @@ import FreeShippingBar from "@/components/cart/FreeShippingBar";
 const Checkout = () => {
   const navigate = useNavigate();
   const { items, subtotal, hasFreeShipping, updateQuantity, removeItem, clearCart, itemCount } = useCart();
-  const { syncCart, markConverted, email: savedEmail } = useAbandonedCart();
+  const { syncCart, markConverted, email: savedEmail, isSynced } = useAbandonedCart();
   
   const [currentStep, setCurrentStep] = useState(2); // Start at "Details" step
   const [showDiscountInput, setShowDiscountInput] = useState(false);
@@ -337,9 +337,17 @@ const Checkout = () => {
                     
                     <div className="space-y-6">
                       <div>
-                        <Label htmlFor="email" className="text-sm font-light text-foreground">
-                          Email Address *
-                        </Label>
+                        <div className="flex items-center justify-between">
+                          <Label htmlFor="email" className="text-sm font-light text-foreground">
+                            Email Address *
+                          </Label>
+                          {isSynced && (
+                            <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                              <Check className="w-3 h-3" />
+                              Cart saved
+                            </span>
+                          )}
+                        </div>
                         <Input
                           id="email"
                           type="email"
@@ -348,6 +356,11 @@ const Checkout = () => {
                           className="mt-2 rounded-none"
                           placeholder="Enter your email"
                         />
+                        {savedEmail && customerDetails.email === savedEmail && (
+                          <p className="mt-1.5 text-[10px] text-muted-foreground">
+                            Email restored from your previous session
+                          </p>
+                        )}
                       </div>
 
                       <div className="grid grid-cols-2 gap-4">
