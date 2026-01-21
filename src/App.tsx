@@ -12,6 +12,7 @@ import Index from "./pages/Index";
 import Category from "./pages/Category";
 import ProductDetail from "./pages/ProductDetail";
 import Checkout from "./pages/Checkout";
+import CheckoutSuccess from "./pages/CheckoutSuccess";
 import NotFound from "./pages/NotFound";
 import OurStory from "./pages/about/OurStory";
 import OurMission from "./pages/about/OurMission";
@@ -47,6 +48,7 @@ const AnimatedRoutes = () => {
         <Route path="/category/:category" element={<PageTransition><Category /></PageTransition>} />
         <Route path="/product/:productId" element={<PageTransition><ProductDetail /></PageTransition>} />
         <Route path="/checkout" element={<PageTransition><Checkout /></PageTransition>} />
+        <Route path="/checkout/success" element={<PageTransition><CheckoutSuccess /></PageTransition>} />
         <Route path="/about/our-story" element={<PageTransition><OurStory /></PageTransition>} />
         <Route path="/about/our-mission" element={<PageTransition><OurMission /></PageTransition>} />
         <Route path="/about/size-guide" element={<PageTransition><SizeGuide /></PageTransition>} />
