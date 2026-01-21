@@ -1,5 +1,5 @@
-import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { DrawCheckIcon } from "@/components/ui/draw-check-icon";
 
 interface CheckoutProgressProps {
   currentStep: number;
@@ -31,7 +31,7 @@ const CheckoutProgress = ({ currentStep }: CheckoutProgressProps) => {
                 )}
               >
                 {currentStep > step.id ? (
-                  <Check className="h-4 w-4" />
+                  <DrawCheckIcon size="xs" animate={false} />
                 ) : (
                   step.id
                 )}

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, Check } from "lucide-react";
+import { ArrowRight } from "lucide-react";
+import { DrawCheckIcon } from "@/components/ui/draw-check-icon";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
@@ -76,7 +77,7 @@ const FooterEmailCapture = () => {
               transition={{ type: "spring", stiffness: 300, damping: 15 }}
               className="w-6 h-6 rounded-full bg-amber-500 flex items-center justify-center"
             >
-              <Check className="w-3 h-3 text-stone-900" />
+              <DrawCheckIcon size="xs" className="text-stone-900" delay={150} />
             </motion.div>
             <span className="text-sm font-light text-white/80 uppercase tracking-[0.15em]">
               Enlisted

@@ -10,7 +10,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Mail, Send, Check } from "lucide-react";
+import { Mail, Send } from "lucide-react";
+import { DrawCheckIcon } from "@/components/ui/draw-check-icon";
 import { useToast } from "@/hooks/use-toast";
 
 interface AskUsModalProps {
@@ -64,7 +65,7 @@ const AskUsModal = ({ isOpen, onClose }: AskUsModalProps) => {
         {isSubmitted ? (
           <div className="py-12 text-center">
             <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Check className="w-8 h-8 text-green-600 dark:text-green-400" />
+              <DrawCheckIcon size="lg" className="text-green-600 dark:text-green-400" delay={100} />
             </div>
             <h3 className="text-xl font-light mb-2">Question Submitted!</h3>
             <p className="text-muted-foreground font-light">
