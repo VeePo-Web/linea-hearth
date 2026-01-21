@@ -58,7 +58,7 @@ const StoryWorldwideTribe = () => {
     >
       {/* Index watermark */}
       <motion.span
-        className="absolute top-8 right-8 text-[10px] tracking-[0.4em] text-stone-950/10 font-light"
+        className="absolute top-10 right-10 lg:top-12 lg:right-12 text-[10px] tracking-[0.4em] text-stone-950/10 font-light"
         initial={{ opacity: 0 }}
         animate={isInView ? { opacity: 1 } : {}}
         transition={{ delay: 0.3, duration: 0.8 }}
@@ -66,9 +66,9 @@ const StoryWorldwideTribe = () => {
         05
       </motion.span>
 
-      <div className="max-w-7xl mx-auto px-6 md:px-12">
+      <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-16 xl:px-20">
         {/* Section header */}
-        <div className="mb-16 md:mb-24">
+        <div className="mb-12 lg:mb-16 xl:mb-20">
           <motion.p
             className="text-[10px] tracking-[0.4em] text-amber-500 mb-6"
             initial={{ opacity: 0, y: 20 }}
@@ -97,7 +97,7 @@ const StoryWorldwideTribe = () => {
 
         {/* Bento grid gallery */}
         <motion.div
-          className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-16"
+          className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3 lg:gap-4 mb-16"
           initial={{ opacity: 0 }}
           animate={isInView ? { opacity: 1 } : {}}
           transition={{ delay: 0.5, duration: 0.8 }}
@@ -165,7 +165,7 @@ const StoryWorldwideTribe = () => {
 
         {/* CTA strip */}
         <motion.div
-          className="flex flex-col md:flex-row items-center justify-between gap-6 pt-8 border-t border-stone-200"
+          className="flex flex-col md:flex-row items-center lg:items-end justify-between gap-6 pt-10 lg:pt-12 border-t border-stone-200"
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ delay: 0.8, duration: 0.8 }}

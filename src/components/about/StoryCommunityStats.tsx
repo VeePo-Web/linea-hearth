@@ -71,7 +71,7 @@ const StoryCommunityStats = () => {
     >
       {/* Index watermark */}
       <motion.span
-        className="absolute top-8 right-8 text-[10px] tracking-[0.4em] text-white/20 font-light"
+        className="absolute top-10 right-10 lg:top-12 lg:right-12 text-[10px] tracking-[0.4em] text-white/20 font-light"
         initial={{ opacity: 0 }}
         animate={isInView ? { opacity: 1 } : {}}
         transition={{ delay: 0.3, duration: 0.8 }}
@@ -79,9 +79,9 @@ const StoryCommunityStats = () => {
         04
       </motion.span>
 
-      <div className="max-w-7xl mx-auto px-6 md:px-12">
+      <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-16 xl:px-20">
         {/* Section header */}
-        <div className="text-center mb-20 md:mb-32">
+        <div className="text-center mb-16 lg:mb-20 xl:mb-24">
           <motion.p
             className="text-[10px] tracking-[0.4em] text-amber-500 mb-6"
             initial={{ opacity: 0, y: 20 }}
@@ -101,7 +101,7 @@ const StoryCommunityStats = () => {
         </div>
 
         {/* Stats row */}
-        <div className="grid grid-cols-3 gap-8 md:gap-16 mb-24 md:mb-32">
+        <div className="grid grid-cols-3 gap-6 md:gap-12 lg:gap-16 mb-24 md:mb-32">
           {stats.map((stat, index) => (
             <motion.div
               key={stat.label}
@@ -110,14 +110,14 @@ const StoryCommunityStats = () => {
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ delay: 0.4 + index * 0.1, duration: 0.8 }}
             >
-              <span className="block text-5xl md:text-7xl lg:text-8xl font-light tracking-tight mb-2">
+              <span className="block text-5xl md:text-7xl lg:text-7xl xl:text-8xl font-light tracking-tight mb-2">
                 <CountUpNumber
                   target={stat.value}
                   suffix={stat.suffix}
                   isInView={isInView}
                 />
               </span>
-              <span className="text-[10px] md:text-xs tracking-[0.2em] text-white/40 uppercase">
+              <span className="text-[10px] md:text-xs tracking-[0.15em] lg:tracking-[0.2em] text-white/40 uppercase">
                 {stat.label}
               </span>
             </motion.div>

@@ -39,7 +39,7 @@ const StoryValuesGrid = () => {
 
       {/* Index watermark */}
       <motion.span 
-        className="absolute top-8 right-8 text-[10px] tracking-[0.4em] text-white/20 font-light"
+        className="absolute top-10 right-10 lg:top-12 lg:right-12 text-[10px] tracking-[0.4em] text-white/20 font-light"
         initial={{ opacity: 0 }}
         animate={isInView ? { opacity: 1 } : {}}
         transition={{ delay: 0.3, duration: 0.8 }}
@@ -47,9 +47,9 @@ const StoryValuesGrid = () => {
         03
       </motion.span>
 
-      <div className="max-w-7xl mx-auto px-6 md:px-12">
+      <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-16 xl:px-20">
         {/* Section header */}
-        <div className="mb-20 md:mb-32">
+        <div className="mb-16 lg:mb-20 xl:mb-24">
           <motion.p
             className="text-[10px] tracking-[0.4em] text-amber-500 mb-6"
             initial={{ opacity: 0, y: 20 }}
@@ -69,7 +69,7 @@ const StoryValuesGrid = () => {
         </div>
 
         {/* Values grid - pure typography, no icons */}
-        <div className="grid md:grid-cols-3 gap-12 md:gap-8 lg:gap-16">
+        <div className="grid md:grid-cols-3 gap-8 lg:gap-10 xl:gap-12">
           {values.map((value, index) => (
             <motion.div
               key={value.index}
@@ -79,12 +79,12 @@ const StoryValuesGrid = () => {
               transition={{ delay: 0.4 + index * 0.15, duration: 0.8 }}
             >
               {/* Massive index number as visual anchor */}
-              <span className="block text-[120px] md:text-[100px] lg:text-[140px] font-light leading-none text-white/5 mb-4 transition-colors duration-500 group-hover:text-amber-500/10">
+              <span className="block text-[120px] md:text-[100px] lg:text-[120px] xl:text-[140px] font-light leading-none text-white/5 mb-4 transition-colors duration-500 group-hover:text-amber-500/10">
                 {value.index}
               </span>
 
               {/* Content */}
-              <div className="relative -mt-16 md:-mt-12 lg:-mt-20 pl-2">
+              <div className="relative -mt-12 lg:-mt-16 xl:-mt-20 pl-2">
                 <h3 className="text-lg md:text-xl font-medium tracking-wide mb-4 text-white">
                   {value.title}
                 </h3>
@@ -93,8 +93,8 @@ const StoryValuesGrid = () => {
                 </p>
 
                 {/* Subtle accent line */}
-                <motion.div 
-                  className="w-8 h-px bg-amber-500/30 mt-6"
+                <motion.div
+                  className="w-12 lg:w-16 h-px bg-amber-500/30 mt-6"
                   initial={{ scaleX: 0 }}
                   animate={isInView ? { scaleX: 1 } : {}}
                   transition={{ delay: 0.6 + index * 0.15, duration: 0.6 }}

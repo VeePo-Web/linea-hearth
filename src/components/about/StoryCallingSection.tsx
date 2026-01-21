@@ -12,7 +12,7 @@ const StoryCallingSection = () => {
     >
       {/* Index watermark */}
       <motion.span 
-        className="absolute top-8 right-8 text-[10px] tracking-[0.4em] text-stone-950/10 font-light"
+        className="absolute top-10 right-10 lg:top-12 lg:right-12 text-[10px] tracking-[0.4em] text-stone-950/10 font-light"
         initial={{ opacity: 0 }}
         animate={isInView ? { opacity: 1 } : {}}
         transition={{ delay: 0.3, duration: 0.8 }}
@@ -20,13 +20,13 @@ const StoryCallingSection = () => {
         02
       </motion.span>
 
-      <div className="max-w-7xl mx-auto px-6 md:px-12">
-        <div className="grid lg:grid-cols-2 gap-16 md:gap-24 items-center">
+      <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-16 xl:px-20">
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 xl:gap-20 items-center">
           {/* Left: Giant quote */}
           <div className="relative">
             {/* Giant quotation mark */}
             <motion.span
-              className="absolute -top-16 -left-4 text-[200px] md:text-[300px] font-serif text-amber-500/10 leading-none select-none pointer-events-none"
+              className="absolute -top-12 lg:-top-16 -left-2 lg:-left-4 text-[200px] lg:text-[240px] xl:text-[280px] font-serif text-amber-500/10 leading-none select-none pointer-events-none"
               initial={{ opacity: 0, scale: 0.8 }}
               animate={isInView ? { opacity: 1, scale: 1 } : {}}
               transition={{ delay: 0.2, duration: 0.8 }}
@@ -35,7 +35,7 @@ const StoryCallingSection = () => {
             </motion.span>
 
             <motion.blockquote
-              className="relative z-10 text-3xl md:text-4xl lg:text-5xl font-light leading-tight tracking-tight"
+              className="relative z-10 text-3xl md:text-4xl lg:text-4xl xl:text-5xl font-light leading-tight tracking-tight"
               initial={{ opacity: 0, y: 40 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ delay: 0.4, duration: 0.8 }}

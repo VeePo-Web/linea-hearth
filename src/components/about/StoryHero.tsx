@@ -29,7 +29,7 @@ const StoryHero = () => {
 
       {/* Index watermark */}
       <motion.span 
-        className="absolute top-8 right-8 text-[10px] tracking-[0.4em] text-white/20 font-light"
+        className="absolute top-10 right-10 lg:top-12 lg:right-12 text-[10px] tracking-[0.4em] text-white/20 font-light"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.5, duration: 0.8 }}
@@ -52,7 +52,7 @@ const StoryHero = () => {
 
       {/* Content */}
       <motion.div 
-        className="relative z-20 w-full max-w-7xl mx-auto px-6 md:px-12"
+        className="relative z-20 w-full max-w-7xl mx-auto px-6 md:px-12 lg:px-16 xl:px-20"
         style={{ opacity }}
       >
         {/* Eyebrow */}
@@ -66,7 +66,7 @@ const StoryHero = () => {
         </motion.p>
 
         {/* Massive headline with character reveal */}
-        <h1 className="text-[15vw] md:text-[12vw] lg:text-[10vw] font-light leading-[0.85] tracking-[-0.02em] mb-12">
+        <h1 className="text-[15vw] md:text-[12vw] lg:text-[8vw] xl:text-[7vw] 2xl:text-[120px] font-light leading-[0.85] tracking-[-0.02em] mb-12">
           {headline.split("").map((char, index) => (
             <motion.span
               key={index}
@@ -86,7 +86,7 @@ const StoryHero = () => {
 
         {/* Manifesto text - enhanced with warfare narrative */}
         <motion.div 
-          className="max-w-xl space-y-4"
+          className="max-w-lg lg:max-w-xl space-y-4"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.2, duration: 0.8 }}
