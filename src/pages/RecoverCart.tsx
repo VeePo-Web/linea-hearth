@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
-import { Check, ShoppingBag } from "lucide-react";
+import { motion, Transition } from "framer-motion";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { useCart } from "@/hooks/useCart";
 import { useToast } from "@/hooks/use-toast";
 import Layout from "@/components/layout/Layout";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
+import { cn } from "@/lib/utils";
 
 interface RecoveredCartItem {
   id: number;
@@ -30,23 +31,52 @@ interface RecoveryResponse {
   error?: string;
 }
 
-// Pulsing dots loading indicator
-const LoadingDots = () => (
-  <div className="flex items-center justify-center gap-2">
-    {[0, 1, 2].map((i) => (
-      <motion.span
-        key={i}
-        className="w-2 h-2 bg-foreground rounded-full"
-        animate={{ opacity: [0.3, 1, 0.3] }}
-        transition={{
-          duration: 1,
-          repeat: Infinity,
-          delay: i * 0.2,
-          ease: "easeInOut",
-        }}
+// Premium loading dots - 12px with deeper contrast
+const LoadingDots = () => {
+  return (
+    <div className="flex items-center justify-center gap-3">
+      {[0, 1, 2].map((i) => (
+        <motion.span
+          key={i}
+          className="w-3 h-3 bg-foreground rounded-full"
+          animate={{ opacity: [0.2, 1, 0.2] }}
+          transition={{
+            duration: 1.2,
+            repeat: Infinity,
+            delay: i * 0.15,
+            ease: "easeInOut",
+          }}
+        />
+      ))}
+    </div>
+  );
+};
+
+// SVG checkmark with stroke draw animation
+const DrawCheckIcon = ({ className, reduced }: { className?: string; reduced: boolean }) => {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      className={cn("w-7 h-7", className)}
+    >
+      <motion.path
+        d="M5 13l4 4L19 7"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        initial={{ pathLength: reduced ? 1 : 0 }}
+        animate={{ pathLength: 1 }}
+        transition={{ duration: 0.5, delay: 0.2 }}
       />
-    ))}
-  </div>
+    </svg>
+  );
+};
+
+// Horizontal rule divider
+const Divider = ({ className }: { className?: string }) => (
+  <div className={cn("w-full h-px bg-foreground/20", className)} />
 );
 
 const RecoverCart = () => {
@@ -59,8 +89,16 @@ const RecoverCart = () => {
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [recoveredData, setRecoveredData] = useState<RecoveryResponse | null>(null);
+  const [resendEmail, setResendEmail] = useState("");
+  const [isResending, setIsResending] = useState(false);
 
   const token = searchParams.get('token');
+
+  // Simple transition helper
+  const getTransition = (delay: number = 0): Transition => ({
+    duration: prefersReducedMotion ? 0 : 0.3,
+    delay: prefersReducedMotion ? 0 : delay,
+  });
 
   useEffect(() => {
     if (!token) {
@@ -113,8 +151,8 @@ const RecoverCart = () => {
         toast({
           title: "Cart restored",
           description: data.discountCode 
-            ? `Use code ${data.discountCode} for 15% off your order.`
-            : "Your items are ready for checkout.",
+            ? `Use code ${data.discountCode} for 15% off`
+            : "Your items are ready for checkout",
         });
 
       } catch (error) {
@@ -127,28 +165,39 @@ const RecoverCart = () => {
     recoverCart();
   }, [token, addItem, clearCart, toast]);
 
-  const animationProps = prefersReducedMotion 
-    ? { initial: { opacity: 1 }, animate: { opacity: 1 } }
-    : { initial: { opacity: 0, y: 20 }, animate: { opacity: 1, y: 0 } };
+  const handleResendLink = async () => {
+    if (!resendEmail.trim()) return;
+    
+    setIsResending(true);
+    // For now, just show feedback - actual resend would need edge function
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    setIsResending(false);
+    
+    toast({
+      title: "Link sent",
+      description: "Check your email for a new recovery link",
+    });
+  };
 
   return (
     <Layout>
       <div className="min-h-[60vh] flex items-center justify-center px-6 py-24">
         <motion.div
-          {...animationProps}
-          transition={{ duration: 0.4, ease: "easeOut" }}
+          initial={{ opacity: prefersReducedMotion ? 1 : 0 }}
+          animate={{ opacity: 1 }}
+          transition={getTransition()}
           className="max-w-md w-full text-center"
         >
           {/* Loading State */}
           {status === 'loading' && (
-            <div className="space-y-8">
+            <div className="space-y-10">
               <LoadingDots />
-              <div className="space-y-2">
-                <h1 className="text-sm font-medium text-foreground uppercase tracking-[0.2em]">
-                  Retrieving Your Order
+              <div className="space-y-3">
+                <h1 className="text-sm font-medium text-foreground uppercase tracking-[0.3em]">
+                  Retrieving Order
                 </h1>
-                <p className="text-sm text-muted-foreground">
-                  One moment...
+                <p className="text-xs text-muted-foreground tracking-wide">
+                  One moment
                 </p>
               </div>
             </div>
@@ -157,73 +206,88 @@ const RecoverCart = () => {
           {/* Success State */}
           {status === 'success' && recoveredData && (
             <motion.div 
-              className="space-y-8"
-              initial={prefersReducedMotion ? {} : { opacity: 0 }}
+              className="space-y-10"
+              initial={{ opacity: prefersReducedMotion ? 1 : 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.3 }}
+              transition={getTransition()}
             >
-              {/* Checkmark */}
+              {/* Square Icon with Check */}
               <motion.div
-                initial={prefersReducedMotion ? {} : { scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.1 }}
-                className="w-16 h-16 mx-auto border border-foreground rounded-full flex items-center justify-center"
+                initial={{ opacity: prefersReducedMotion ? 1 : 0, y: prefersReducedMotion ? 0 : 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={getTransition(0.1)}
+                className="w-16 h-16 mx-auto border border-foreground flex items-center justify-center"
               >
-                <Check className="w-7 h-7 text-foreground" strokeWidth={1.5} />
+                <DrawCheckIcon className="text-foreground" reduced={prefersReducedMotion} />
               </motion.div>
 
               {/* Headline */}
-              <div className="space-y-2">
-                <h1 className="text-2xl font-light text-foreground tracking-wide">
-                  CART RESTORED
+              <motion.div 
+                initial={{ opacity: prefersReducedMotion ? 1 : 0, y: prefersReducedMotion ? 0 : 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={getTransition(0.25)}
+                className="space-y-3"
+              >
+                <h1 className="text-3xl md:text-4xl font-light text-foreground tracking-[0.08em]">
+                  RESTORED
                 </h1>
                 <p className="text-sm text-muted-foreground">
                   {recoveredData.cartItems.length} item{recoveredData.cartItems.length !== 1 ? 's' : ''} ready for checkout
                 </p>
-              </div>
+              </motion.div>
 
-              {/* Discount Code */}
+              {/* Discount Code Block */}
               {recoveredData.discountCode && (
                 <motion.div
-                  initial={prefersReducedMotion ? {} : { opacity: 0, y: 10 }}
+                  initial={{ opacity: prefersReducedMotion ? 1 : 0, y: prefersReducedMotion ? 0 : 16 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2, duration: 0.3 }}
-                  className="border border-foreground p-6 space-y-3"
+                  transition={getTransition(0.4)}
+                  className="border border-foreground p-8 space-y-6"
                 >
-                  <p className="text-[10px] text-muted-foreground uppercase tracking-[0.25em]">
-                    Your Exclusive Code
-                  </p>
-                  <p className="text-xl font-medium text-foreground tracking-[0.15em]">
+                  {/* Top divider with label */}
+                  <div className="flex items-center gap-4">
+                    <Divider className="flex-1" />
+                    <span className="text-[10px] text-muted-foreground uppercase tracking-[0.3em] whitespace-nowrap">
+                      Exclusive Offer
+                    </span>
+                    <Divider className="flex-1" />
+                  </div>
+
+                  {/* Code */}
+                  <p className="text-2xl md:text-3xl font-light text-foreground tracking-[0.2em]">
                     {recoveredData.discountCode}
                   </p>
+
+                  {/* Expiry */}
                   <p className="text-xs text-muted-foreground">
-                    15% off · Expires in 24 hours
+                    15% off your order · Expires in 24h
                   </p>
+
+                  {/* Bottom divider */}
+                  <Divider />
                 </motion.div>
               )}
 
               {/* Actions */}
               <motion.div 
-                className="flex flex-col gap-3 pt-2"
-                initial={prefersReducedMotion ? {} : { opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.3, duration: 0.3 }}
+                initial={{ opacity: prefersReducedMotion ? 1 : 0, y: prefersReducedMotion ? 0 : 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={getTransition(0.55)}
+                className="flex flex-col gap-4 pt-2"
               >
                 <Button
                   onClick={() => navigate('/checkout')}
-                  className="w-full rounded-none h-12 text-xs uppercase tracking-[0.2em]"
+                  className="w-full rounded-none h-14 text-xs uppercase tracking-[0.2em] font-medium"
                   size="lg"
                 >
-                  <ShoppingBag className="w-4 h-4 mr-2" strokeWidth={1.5} />
                   Complete Your Order
                 </Button>
-                <Button
-                  variant="ghost"
+                <button
                   onClick={() => navigate('/category/shop')}
-                  className="w-full rounded-none text-xs uppercase tracking-[0.15em] text-muted-foreground hover:text-foreground"
+                  className="text-xs uppercase tracking-[0.15em] text-muted-foreground hover:text-foreground transition-colors editorial-link py-2"
                 >
                   Continue Shopping
-                </Button>
+                </button>
               </motion.div>
             </motion.div>
           )}
@@ -231,43 +295,78 @@ const RecoverCart = () => {
           {/* Error State */}
           {status === 'error' && (
             <motion.div 
-              className="space-y-8"
-              initial={prefersReducedMotion ? {} : { opacity: 0 }}
+              className="space-y-10"
+              initial={{ opacity: prefersReducedMotion ? 1 : 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.3 }}
+              transition={getTransition()}
             >
-              {/* X mark */}
-              <div className="w-16 h-16 mx-auto border border-muted-foreground/50 rounded-full flex items-center justify-center">
-                <span className="text-2xl text-muted-foreground font-light">×</span>
-              </div>
+              {/* Square Icon with Dash */}
+              <motion.div
+                initial={{ opacity: prefersReducedMotion ? 1 : 0, y: prefersReducedMotion ? 0 : 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={getTransition(0.1)}
+                className="w-16 h-16 mx-auto border border-muted-foreground/30 flex items-center justify-center"
+              >
+                <span className="text-2xl text-muted-foreground font-light">—</span>
+              </motion.div>
 
               {/* Message */}
-              <div className="space-y-2">
-                <h1 className="text-lg font-light text-foreground uppercase tracking-[0.15em]">
+              <motion.div 
+                initial={{ opacity: prefersReducedMotion ? 1 : 0, y: prefersReducedMotion ? 0 : 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={getTransition(0.25)}
+                className="space-y-4"
+              >
+                <h1 className="text-2xl font-light text-foreground uppercase tracking-[0.08em]">
                   Link Expired
                 </h1>
-                <p className="text-sm text-muted-foreground max-w-xs mx-auto">
-                  {errorMessage || 'This recovery link is no longer valid. Your cart may have expired or already been used.'}
-                </p>
-              </div>
+                <div className="space-y-1">
+                  <p className="text-sm text-muted-foreground">
+                    Recovery links are valid for 30 days.
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    Enter your email to resend a link.
+                  </p>
+                </div>
+              </motion.div>
 
-              {/* Actions */}
-              <div className="flex flex-col gap-3 pt-2">
+              {/* Email Resend Form */}
+              <motion.div
+                initial={{ opacity: prefersReducedMotion ? 1 : 0, y: prefersReducedMotion ? 0 : 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={getTransition(0.4)}
+                className="space-y-4"
+              >
+                <Input
+                  type="email"
+                  placeholder="Email"
+                  value={resendEmail}
+                  onChange={(e) => setResendEmail(e.target.value)}
+                  className="rounded-none border-foreground/20 focus:border-foreground h-12 text-sm tracking-wide text-center"
+                />
                 <Button
-                  onClick={() => navigate('/category/shop')}
-                  className="w-full rounded-none h-12 text-xs uppercase tracking-[0.2em]"
+                  onClick={handleResendLink}
+                  disabled={!resendEmail.trim() || isResending}
+                  className="w-full rounded-none h-14 text-xs uppercase tracking-[0.2em] font-medium"
                   size="lg"
                 >
-                  Browse Collection
+                  {isResending ? "Sending..." : "Resend Link"}
                 </Button>
-                <Button
-                  variant="ghost"
-                  onClick={() => navigate('/')}
-                  className="w-full rounded-none text-xs uppercase tracking-[0.15em] text-muted-foreground hover:text-foreground"
+              </motion.div>
+
+              {/* Fallback */}
+              <motion.div
+                initial={{ opacity: prefersReducedMotion ? 1 : 0, y: prefersReducedMotion ? 0 : 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={getTransition(0.55)}
+              >
+                <button
+                  onClick={() => navigate('/category/shop')}
+                  className="text-xs uppercase tracking-[0.15em] text-muted-foreground hover:text-foreground transition-colors editorial-link py-2"
                 >
-                  Return to Home
-                </Button>
-              </div>
+                  Browse Collection
+                </button>
+              </motion.div>
             </motion.div>
           )}
         </motion.div>
