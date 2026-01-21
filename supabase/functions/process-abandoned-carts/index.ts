@@ -87,19 +87,19 @@ async function sendEmail(
   }
 }
 
-// Email templates using "Last Briefing" narrative
+// Email templates using premium editorial tone
 function getEmail1Html(cart: AbandonedCart, recoveryUrl: string): string {
   const itemsHtml = cart.cart_items.map(item => `
     <tr>
-      <td style="padding: 12px 0; border-bottom: 1px solid #e5e5e5;">
-        <img src="${item.image}" alt="${item.name}" style="width: 60px; height: 60px; object-fit: cover; margin-right: 12px;" />
+      <td style="padding: 16px 0; border-bottom: 1px solid #e8e8e8;">
+        <img src="${item.image}" alt="${item.name}" style="width: 80px; height: 100px; object-fit: cover;" />
       </td>
-      <td style="padding: 12px 0; border-bottom: 1px solid #e5e5e5;">
-        <strong>${item.name}</strong><br/>
-        <span style="color: #666;">Size: ${item.size || 'One Size'} | Qty: ${item.quantity}</span>
+      <td style="padding: 16px; border-bottom: 1px solid #e8e8e8; vertical-align: top;">
+        <p style="margin: 0 0 4px; font-size: 14px; color: #1a1a1a;">${item.name}</p>
+        <p style="margin: 0; font-size: 12px; color: #666;">Size: ${item.size || 'One Size'}</p>
       </td>
-      <td style="padding: 12px 0; border-bottom: 1px solid #e5e5e5; text-align: right;">
-        ${item.priceFormatted}
+      <td style="padding: 16px 0; border-bottom: 1px solid #e8e8e8; text-align: right; vertical-align: top;">
+        <p style="margin: 0; font-size: 14px; color: #1a1a1a;">${item.priceFormatted}</p>
       </td>
     </tr>
   `).join('');
@@ -109,46 +109,51 @@ function getEmail1Html(cart: AbandonedCart, recoveryUrl: string): string {
     <html>
     <head>
       <meta charset="utf-8">
-      <title>Your Mission Awaits | LINEA</title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Your Selection Awaits | LINEA</title>
     </head>
-    <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 0; background: #f5f5f5;">
-      <div style="max-width: 600px; margin: 0 auto; background: #ffffff;">
+    <body style="font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif; margin: 0; padding: 0; background: #ffffff; color: #1a1a1a;">
+      <div style="max-width: 560px; margin: 0 auto; padding: 0 20px;">
+        
         <!-- Header -->
-        <div style="background: #0a0a0a; padding: 32px; text-align: center;">
-          <h1 style="color: #ffffff; font-size: 24px; font-weight: 300; letter-spacing: 4px; margin: 0;">LINEA</h1>
+        <div style="padding: 40px 0 32px; text-align: center; border-bottom: 1px solid #e8e8e8;">
+          <p style="margin: 0; font-size: 18px; letter-spacing: 0.3em; font-weight: 300;">LINEA</p>
         </div>
         
-        <!-- Hero -->
-        <div style="padding: 48px 32px; text-align: center; background: linear-gradient(180deg, #1a1a1a 0%, #0a0a0a 100%);">
-          <h2 style="color: #ffffff; font-size: 28px; font-weight: 300; margin: 0 0 16px;">SOLDIER, YOUR GEAR AWAITS</h2>
-          <p style="color: #a0a0a0; font-size: 16px; line-height: 1.6; margin: 0;">
-            Your mission gear is still in the staging area. The battle doesn't wait.
+        <!-- Content -->
+        <div style="padding: 48px 0;">
+          <h1 style="margin: 0 0 12px; font-size: 24px; font-weight: 300; text-align: center; letter-spacing: 0.05em;">
+            Your selection is waiting
+          </h1>
+          <p style="margin: 0 0 40px; font-size: 14px; color: #666; text-align: center; line-height: 1.6;">
+            You left a few items in your cart. We're holding them for you.
           </p>
-        </div>
-        
-        <!-- Cart Items -->
-        <div style="padding: 32px;">
-          <table style="width: 100%; border-collapse: collapse;">
+          
+          <!-- Items -->
+          <table style="width: 100%; border-collapse: collapse; margin-bottom: 32px;">
             ${itemsHtml}
           </table>
           
-          <div style="margin-top: 24px; padding-top: 16px; border-top: 2px solid #0a0a0a; text-align: right;">
-            <strong style="font-size: 18px;">Total: €${cart.cart_total.toLocaleString()}</strong>
+          <!-- Total -->
+          <div style="padding: 16px 0; border-top: 1px solid #1a1a1a; text-align: right;">
+            <p style="margin: 0; font-size: 16px; color: #1a1a1a;">
+              Total: <strong>€${cart.cart_total.toLocaleString()}</strong>
+            </p>
+          </div>
+          
+          <!-- CTA -->
+          <div style="padding: 32px 0; text-align: center;">
+            <a href="${recoveryUrl}" style="display: inline-block; background: #1a1a1a; color: #ffffff; text-decoration: none; padding: 14px 40px; font-size: 12px; letter-spacing: 0.15em; text-transform: uppercase;">
+              Complete Your Order
+            </a>
           </div>
         </div>
         
-        <!-- CTA -->
-        <div style="padding: 0 32px 48px; text-align: center;">
-          <a href="${recoveryUrl}" style="display: inline-block; background: #0a0a0a; color: #ffffff; text-decoration: none; padding: 16px 48px; font-size: 14px; letter-spacing: 2px; text-transform: uppercase;">
-            COMPLETE YOUR MISSION
-          </a>
-        </div>
-        
         <!-- Footer -->
-        <div style="background: #f5f5f5; padding: 24px 32px; text-align: center;">
-          <p style="color: #666; font-size: 12px; margin: 0;">
+        <div style="padding: 32px 0; border-top: 1px solid #e8e8e8; text-align: center;">
+          <p style="margin: 0; font-size: 11px; color: #999; line-height: 1.8;">
             You received this email because you left items in your cart at LINEA.<br/>
-            <a href="#" style="color: #666;">Unsubscribe</a>
+            <a href="#" style="color: #999; text-decoration: underline;">Unsubscribe</a>
           </p>
         </div>
       </div>
@@ -163,48 +168,47 @@ function getEmail2Html(cart: AbandonedCart, recoveryUrl: string): string {
     <html>
     <head>
       <meta charset="utf-8">
-      <title>The Clock is Ticking | LINEA</title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Still Interested? | LINEA</title>
     </head>
-    <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 0; background: #f5f5f5;">
-      <div style="max-width: 600px; margin: 0 auto; background: #ffffff;">
+    <body style="font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif; margin: 0; padding: 0; background: #ffffff; color: #1a1a1a;">
+      <div style="max-width: 560px; margin: 0 auto; padding: 0 20px;">
+        
         <!-- Header -->
-        <div style="background: #0a0a0a; padding: 32px; text-align: center;">
-          <h1 style="color: #ffffff; font-size: 24px; font-weight: 300; letter-spacing: 4px; margin: 0;">LINEA</h1>
+        <div style="padding: 40px 0 32px; text-align: center; border-bottom: 1px solid #e8e8e8;">
+          <p style="margin: 0; font-size: 18px; letter-spacing: 0.3em; font-weight: 300;">LINEA</p>
         </div>
         
-        <!-- Hero -->
-        <div style="padding: 48px 32px; text-align: center; background: #0a0a0a;">
-          <h2 style="color: #ffffff; font-size: 28px; font-weight: 300; margin: 0 0 16px;">STILL STANDING BY?</h2>
-          <p style="color: #a0a0a0; font-size: 16px; line-height: 1.6; margin: 0 0 24px;">
-            Your armor is waiting. The world needs warriors who are ready to stand.
+        <!-- Content -->
+        <div style="padding: 48px 0; text-align: center;">
+          <h1 style="margin: 0 0 16px; font-size: 24px; font-weight: 300; letter-spacing: 0.05em;">
+            Still interested?
+          </h1>
+          <p style="margin: 0 0 32px; font-size: 14px; color: #666; line-height: 1.6;">
+            Your ${cart.cart_items.length} item${cart.cart_items.length > 1 ? 's are' : ' is'} waiting. Complete your order before they sell out.
           </p>
-          <div style="color: #d4af37; font-size: 14px; letter-spacing: 1px;">
-            "Put on the full armor of God" — Ephesians 6:11
+          
+          <!-- Summary -->
+          <div style="padding: 24px; border: 1px solid #e8e8e8; margin-bottom: 32px;">
+            <p style="margin: 0 0 8px; font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 0.1em;">
+              Your Cart
+            </p>
+            <p style="margin: 0; font-size: 24px; font-weight: 300; color: #1a1a1a;">
+              €${cart.cart_total.toLocaleString()}
+            </p>
           </div>
-        </div>
-        
-        <!-- Quick Summary -->
-        <div style="padding: 32px; text-align: center;">
-          <p style="font-size: 16px; color: #333; margin: 0 0 8px;">
-            <strong>${cart.cart_items.length} item${cart.cart_items.length > 1 ? 's' : ''}</strong> still in your cart
-          </p>
-          <p style="font-size: 24px; color: #0a0a0a; margin: 0;">
-            €${cart.cart_total.toLocaleString()}
-          </p>
-        </div>
-        
-        <!-- CTA -->
-        <div style="padding: 0 32px 48px; text-align: center;">
-          <a href="${recoveryUrl}" style="display: inline-block; background: #0a0a0a; color: #ffffff; text-decoration: none; padding: 16px 48px; font-size: 14px; letter-spacing: 2px; text-transform: uppercase;">
-            SUIT UP NOW
+          
+          <!-- CTA -->
+          <a href="${recoveryUrl}" style="display: inline-block; background: #1a1a1a; color: #ffffff; text-decoration: none; padding: 14px 40px; font-size: 12px; letter-spacing: 0.15em; text-transform: uppercase;">
+            Complete Your Order
           </a>
         </div>
         
         <!-- Footer -->
-        <div style="background: #f5f5f5; padding: 24px 32px; text-align: center;">
-          <p style="color: #666; font-size: 12px; margin: 0;">
+        <div style="padding: 32px 0; border-top: 1px solid #e8e8e8; text-align: center;">
+          <p style="margin: 0; font-size: 11px; color: #999; line-height: 1.8;">
             You received this email because you left items in your cart at LINEA.<br/>
-            <a href="#" style="color: #666;">Unsubscribe</a>
+            <a href="#" style="color: #999; text-decoration: underline;">Unsubscribe</a>
           </p>
         </div>
       </div>
@@ -219,55 +223,64 @@ function getEmail3Html(cart: AbandonedCart, recoveryUrl: string, discountCode: s
     <html>
     <head>
       <meta charset="utf-8">
-      <title>Final Call + 15% Off | LINEA</title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>15% Off Your Order | LINEA</title>
     </head>
-    <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 0; background: #f5f5f5;">
-      <div style="max-width: 600px; margin: 0 auto; background: #ffffff;">
+    <body style="font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif; margin: 0; padding: 0; background: #ffffff; color: #1a1a1a;">
+      <div style="max-width: 560px; margin: 0 auto; padding: 0 20px;">
+        
         <!-- Header -->
-        <div style="background: #0a0a0a; padding: 32px; text-align: center;">
-          <h1 style="color: #ffffff; font-size: 24px; font-weight: 300; letter-spacing: 4px; margin: 0;">LINEA</h1>
+        <div style="padding: 40px 0 32px; text-align: center; border-bottom: 1px solid #e8e8e8;">
+          <p style="margin: 0; font-size: 18px; letter-spacing: 0.3em; font-weight: 300;">LINEA</p>
         </div>
         
-        <!-- Hero with Discount -->
-        <div style="padding: 48px 32px; text-align: center; background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);">
-          <div style="display: inline-block; background: #d4af37; color: #0a0a0a; padding: 8px 16px; font-size: 12px; letter-spacing: 2px; margin-bottom: 24px;">
-            FINAL BRIEFING
+        <!-- Content -->
+        <div style="padding: 48px 0; text-align: center;">
+          <p style="margin: 0 0 16px; font-size: 11px; color: #666; text-transform: uppercase; letter-spacing: 0.2em;">
+            Exclusive Offer
+          </p>
+          <h1 style="margin: 0 0 16px; font-size: 32px; font-weight: 300; letter-spacing: 0.02em;">
+            15% off your order
+          </h1>
+          <p style="margin: 0 0 40px; font-size: 14px; color: #666; line-height: 1.6;">
+            Use the code below to complete your purchase.
+          </p>
+          
+          <!-- Discount Code -->
+          <div style="padding: 24px; border: 1px solid #1a1a1a; margin-bottom: 24px;">
+            <p style="margin: 0 0 8px; font-size: 10px; color: #666; text-transform: uppercase; letter-spacing: 0.2em;">
+              Your Code
+            </p>
+            <p style="margin: 0; font-size: 20px; letter-spacing: 0.15em; font-weight: 500; color: #1a1a1a;">
+              ${discountCode}
+            </p>
           </div>
-          <h2 style="color: #ffffff; font-size: 32px; font-weight: 300; margin: 0 0 16px;">15% OFF YOUR ORDER</h2>
-          <p style="color: #a0a0a0; font-size: 16px; line-height: 1.6; margin: 0 0 24px;">
-            This is your last call, soldier. Use code below before it expires.
-          </p>
-          <div style="background: #ffffff; color: #0a0a0a; padding: 16px 32px; display: inline-block; font-size: 20px; letter-spacing: 4px; font-weight: bold;">
-            ${discountCode}
+          
+          <!-- Price -->
+          <div style="margin-bottom: 32px;">
+            <p style="margin: 0 0 4px; font-size: 14px; color: #999; text-decoration: line-through;">
+              €${cart.cart_total.toLocaleString()}
+            </p>
+            <p style="margin: 0; font-size: 28px; font-weight: 300; color: #1a1a1a;">
+              €${(cart.cart_total * 0.85).toLocaleString()}
+            </p>
           </div>
-        </div>
-        
-        <!-- Cart Summary -->
-        <div style="padding: 32px; text-align: center;">
-          <p style="font-size: 16px; color: #666; margin: 0 0 8px;">Your cart total:</p>
-          <p style="font-size: 18px; color: #999; text-decoration: line-through; margin: 0;">
-            €${cart.cart_total.toLocaleString()}
-          </p>
-          <p style="font-size: 28px; color: #0a0a0a; margin: 8px 0 0; font-weight: bold;">
-            €${(cart.cart_total * 0.85).toLocaleString()}
-          </p>
-        </div>
-        
-        <!-- CTA -->
-        <div style="padding: 0 32px 48px; text-align: center;">
-          <a href="${recoveryUrl}" style="display: inline-block; background: #d4af37; color: #0a0a0a; text-decoration: none; padding: 16px 48px; font-size: 14px; letter-spacing: 2px; text-transform: uppercase; font-weight: bold;">
-            CLAIM YOUR 15% OFF
+          
+          <!-- CTA -->
+          <a href="${recoveryUrl}" style="display: inline-block; background: #1a1a1a; color: #ffffff; text-decoration: none; padding: 14px 40px; font-size: 12px; letter-spacing: 0.15em; text-transform: uppercase;">
+            Claim 15% Off
           </a>
-          <p style="color: #999; font-size: 12px; margin-top: 16px;">
+          
+          <p style="margin: 24px 0 0; font-size: 12px; color: #999;">
             Offer expires in 24 hours
           </p>
         </div>
         
         <!-- Footer -->
-        <div style="background: #f5f5f5; padding: 24px 32px; text-align: center;">
-          <p style="color: #666; font-size: 12px; margin: 0;">
+        <div style="padding: 32px 0; border-top: 1px solid #e8e8e8; text-align: center;">
+          <p style="margin: 0; font-size: 11px; color: #999; line-height: 1.8;">
             You received this email because you left items in your cart at LINEA.<br/>
-            <a href="#" style="color: #666;">Unsubscribe</a>
+            <a href="#" style="color: #999; text-decoration: underline;">Unsubscribe</a>
           </p>
         </div>
       </div>
@@ -313,7 +326,7 @@ Deno.serve(async (req) => {
       
       const sent = await sendEmail(
         cart.email,
-        "Soldier, Your Gear Awaits | LINEA",
+        "Your selection is waiting | LINEA",
         html,
         resendApiKey
       );
@@ -347,7 +360,7 @@ Deno.serve(async (req) => {
       
       const sent = await sendEmail(
         cart.email,
-        "Still Standing By? | LINEA",
+        "Still interested? | LINEA",
         html,
         resendApiKey
       );
@@ -384,7 +397,7 @@ Deno.serve(async (req) => {
       
       const sent = await sendEmail(
         cart.email,
-        "Final Call: 15% Off Your Order | LINEA",
+        "15% off your order | LINEA",
         html,
         resendApiKey
       );
