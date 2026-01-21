@@ -29,6 +29,7 @@ import Lookbook from "./pages/Lookbook";
 import TryOnRoom from "./pages/TryOnRoom";
 import Ambassador from "./pages/Ambassador";
 import RecoverCart from "./pages/RecoverCart";
+import ResetPassword from "./pages/ResetPassword";
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminProducts from "./pages/admin/AdminProducts";
@@ -72,6 +73,7 @@ const AnimatedRoutes = () => {
         <Route path="/try-on/saved/:outfitId" element={<PageTransition><TryOnRoom /></PageTransition>} />
         <Route path="/ambassador" element={<PageTransition><Ambassador /></PageTransition>} />
         <Route path="/recover-cart" element={<PageTransition><RecoverCart /></PageTransition>} />
+        <Route path="/reset-password" element={<PageTransition><ResetPassword /></PageTransition>} />
         {/* Account Routes */}
         <Route path="/account" element={<ProtectedAccountRoute><PageTransition><AccountLayout /></PageTransition></ProtectedAccountRoute>}>
           <Route index element={<AccountDashboard />} />
