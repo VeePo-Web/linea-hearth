@@ -1,7 +1,7 @@
 import { useRef, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-import { useTryOnState } from '@/hooks/useTryOnState';
+import { useTryOnState, BodyMeasurements } from '@/hooks/useTryOnState';
 import { Mannequin3D } from './Mannequin3D';
 import { GarmentLayer } from './GarmentLayer';
 
@@ -9,8 +9,14 @@ interface Avatar3DProps {
   position?: [number, number, number];
 }
 
-// Body proportion presets by body type and gender
-const getBodyProportions = (
+// Helper to map value from one range to another
+const mapRange = (value: number, inMin: number, inMax: number, outMin: number, outMax: number): number => {
+  const clamped = Math.max(inMin, Math.min(inMax, value));
+  return outMin + ((clamped - inMin) / (inMax - inMin)) * (outMax - outMin);
+};
+
+// Body proportion presets by body type and gender (fallback)
+const getPresetProportions = (
   bodyType: 'slim' | 'athletic' | 'average' | 'curvy',
   gender: 'male' | 'female'
 ) => {
@@ -38,17 +44,66 @@ const getBodyProportions = (
   };
 };
 
+// Convert real measurements to 3D proportions
+const getMeasurementBasedProportions = (
+  measurements: BodyMeasurements,
+  gender: 'male' | 'female'
+) => {
+  const { heightCm, weightKg, chestCm, waistCm, hipsCm } = measurements;
+  
+  // Calculate BMI for thickness adjustments
+  const heightM = heightCm / 100;
+  const bmi = weightKg / (heightM * heightM);
+  const bmiThicknessFactor = mapRange(bmi, 18.5, 32, 0.85, 1.25);
+  
+  // Torso proportions from measurements
+  const shoulderWidth = mapRange(chestCm, 80, 130, 0.36, 0.52) * (gender === 'male' ? 1.08 : 0.95);
+  const chestDepth = mapRange(chestCm, 80, 130, 0.16, 0.26) * bmiThicknessFactor;
+  const waistWidth = mapRange(waistCm, 60, 120, 0.24, 0.42);
+  let hipWidth = mapRange(hipsCm, 80, 130, 0.32, 0.50);
+  if (gender === 'female') hipWidth *= 1.06;
+  
+  // Limb proportions
+  const armThickness = 0.048 * bmiThicknessFactor * (gender === 'male' ? 1.1 : 0.9);
+  const legThickness = 0.075 * bmiThicknessFactor * (gender === 'male' ? 1.05 : 1.0);
+  
+  return {
+    shoulderWidth,
+    chestDepth,
+    waistWidth,
+    hipWidth,
+    armThickness,
+    legThickness,
+    height: (heightCm / 170) * 1.7,
+  };
+};
+
+// Unified function to get proportions based on mode
+const getBodyProportions = (
+  bodyType: 'slim' | 'athletic' | 'average' | 'curvy',
+  gender: 'male' | 'female',
+  measurements: BodyMeasurements,
+  useDetailedMeasurements: boolean
+) => {
+  if (useDetailedMeasurements) {
+    return getMeasurementBasedProportions(measurements, gender);
+  }
+  return getPresetProportions(bodyType, gender);
+};
+
 export const Avatar3D = ({ position = [0, 0, 0] }: Avatar3DProps) => {
   const groupRef = useRef<THREE.Group>(null);
   const { 
     avatarGender, 
     avatarBodyType, 
-    equippedItems 
+    equippedItems,
+    measurements,
+    useDetailedMeasurements,
   } = useTryOnState();
 
   const bodyScale = useMemo(
-    () => getBodyProportions(avatarBodyType, avatarGender),
-    [avatarBodyType, avatarGender]
+    () => getBodyProportions(avatarBodyType, avatarGender, measurements, useDetailedMeasurements),
+    [avatarBodyType, avatarGender, measurements, useDetailedMeasurements]
   );
 
   // Subtle breathing animation for the whole group

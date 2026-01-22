@@ -16,6 +16,15 @@ export interface EquippedItem {
   }>;
 }
 
+export interface BodyMeasurements {
+  heightCm: number;
+  weightKg: number;
+  chestCm: number;
+  waistCm: number;
+  hipsCm: number;
+  inseamCm: number;
+}
+
 export interface TryOnState {
   avatarGender: 'male' | 'female';
   avatarBodyType: 'slim' | 'athletic' | 'average' | 'curvy';
@@ -29,6 +38,10 @@ export interface TryOnState {
   };
   activeSlot: string | null;
   isLoading: boolean;
+  // New measurement-based customization
+  measurements: BodyMeasurements;
+  unitSystem: 'metric' | 'imperial';
+  useDetailedMeasurements: boolean;
 }
 
 interface TryOnContextType extends TryOnState {
@@ -42,9 +55,22 @@ interface TryOnContextType extends TryOnState {
   setIsLoading: (loading: boolean) => void;
   getTotalPrice: () => number;
   getEquippedCount: () => number;
+  // New measurement methods
+  setMeasurements: (measurements: BodyMeasurements) => void;
+  setUnitSystem: (unit: 'metric' | 'imperial') => void;
+  setUseDetailedMeasurements: (use: boolean) => void;
 }
 
 const TryOnContext = createContext<TryOnContextType | undefined>(undefined);
+
+const defaultMeasurements: BodyMeasurements = {
+  heightCm: 170,
+  weightKg: 70,
+  chestCm: 96,
+  waistCm: 82,
+  hipsCm: 98,
+  inseamCm: 76,
+};
 
 const defaultState: TryOnState = {
   avatarGender: 'male',
@@ -59,6 +85,9 @@ const defaultState: TryOnState = {
   },
   activeSlot: null,
   isLoading: false,
+  measurements: defaultMeasurements,
+  unitSystem: 'metric',
+  useDetailedMeasurements: false,
 };
 
 export const TryOnProvider = ({ children }: { children: ReactNode }) => {
@@ -127,6 +156,19 @@ export const TryOnProvider = ({ children }: { children: ReactNode }) => {
     return Object.values(state.equippedItems).filter(Boolean).length;
   }, [state.equippedItems]);
 
+  // New measurement methods
+  const setMeasurements = useCallback((measurements: BodyMeasurements) => {
+    setState(prev => ({ ...prev, measurements }));
+  }, []);
+
+  const setUnitSystem = useCallback((unitSystem: 'metric' | 'imperial') => {
+    setState(prev => ({ ...prev, unitSystem }));
+  }, []);
+
+  const setUseDetailedMeasurements = useCallback((useDetailedMeasurements: boolean) => {
+    setState(prev => ({ ...prev, useDetailedMeasurements }));
+  }, []);
+
   return (
     <TryOnContext.Provider
       value={{
@@ -141,6 +183,9 @@ export const TryOnProvider = ({ children }: { children: ReactNode }) => {
         setIsLoading,
         getTotalPrice,
         getEquippedCount,
+        setMeasurements,
+        setUnitSystem,
+        setUseDetailedMeasurements,
       }}
     >
       {children}
