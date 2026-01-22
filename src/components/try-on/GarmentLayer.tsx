@@ -140,6 +140,18 @@ export const GarmentLayer = ({ slot, equipped, bodyScale }: GarmentLayerProps) =
       // Use textureUrl (flat-front) for 3D, fall back to imageUrl
       const topImageUrl = equipped.textureUrl || equipped.imageUrl;
       
+      // Handle hoodie that may have ended up in top slot (fallback)
+      if (garmentType === 'hoodie') {
+        return (
+          <HoodieGeometry 
+            color={color}
+            imageUrl={topImageUrl}
+            garmentType="hoodie"
+            bodyScale={{ shoulderWidth: bodyScale.shoulderWidth, waistWidth: bodyScale.waistWidth }}
+          />
+        );
+      }
+      
       if (garmentType === 'tshirt') {
         const tshirtStyle = style as { neck?: 'crew' | 'vneck'; fit?: 'fitted' | 'regular' | 'oversized' } | undefined;
         return (
