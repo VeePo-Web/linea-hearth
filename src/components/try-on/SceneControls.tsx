@@ -1,7 +1,4 @@
-import { Button } from '@/components/ui/button';
-import { RotateCcw, ZoomIn, ZoomOut, Camera, Sun, Moon } from 'lucide-react';
-import { useState } from 'react';
-import { cn } from '@/lib/utils';
+import { RotateCcw, ZoomIn, ZoomOut, Camera, Sun, Moon, Sparkles } from 'lucide-react';
 
 interface SceneControlsProps {
   onReset: () => void;
@@ -9,7 +6,7 @@ interface SceneControlsProps {
   onZoomOut: () => void;
   onScreenshot: () => void;
   onToggleLighting: () => void;
-  lightingMode: 'studio' | 'natural';
+  lightingMode: 'studio' | 'natural' | 'dramatic';
 }
 
 export const SceneControls = ({ 
@@ -20,21 +17,32 @@ export const SceneControls = ({
   onToggleLighting,
   lightingMode
 }: SceneControlsProps) => {
+  const getLightingIcon = () => {
+    switch (lightingMode) {
+      case 'studio':
+        return <Sun className="w-4 h-4" />;
+      case 'natural':
+        return <Moon className="w-4 h-4" />;
+      case 'dramatic':
+        return <Sparkles className="w-4 h-4" />;
+    }
+  };
+
   return (
-    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-background/80 backdrop-blur-sm border border-border p-2 rounded-full">
+    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-1 bg-background/90 backdrop-blur-md border border-border/50 p-1.5 rounded-full shadow-lg">
       <button
         onClick={onReset}
-        className="w-10 h-10 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+        className="w-9 h-9 flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-full transition-all"
         aria-label="Reset view"
       >
         <RotateCcw className="w-4 h-4" />
       </button>
       
-      <div className="w-px h-6 bg-border" />
+      <div className="w-px h-5 bg-border/50" />
       
       <button
         onClick={onZoomOut}
-        className="w-10 h-10 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+        className="w-9 h-9 flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-full transition-all"
         aria-label="Zoom out"
       >
         <ZoomOut className="w-4 h-4" />
@@ -42,31 +50,28 @@ export const SceneControls = ({
       
       <button
         onClick={onZoomIn}
-        className="w-10 h-10 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+        className="w-9 h-9 flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-full transition-all"
         aria-label="Zoom in"
       >
         <ZoomIn className="w-4 h-4" />
       </button>
       
-      <div className="w-px h-6 bg-border" />
+      <div className="w-px h-5 bg-border/50" />
       
       <button
         onClick={onToggleLighting}
-        className="w-10 h-10 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
-        aria-label="Toggle lighting"
+        className="w-9 h-9 flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-full transition-all"
+        aria-label={`Lighting mode: ${lightingMode}`}
+        title={`Current: ${lightingMode}`}
       >
-        {lightingMode === 'studio' ? (
-          <Sun className="w-4 h-4" />
-        ) : (
-          <Moon className="w-4 h-4" />
-        )}
+        {getLightingIcon()}
       </button>
       
-      <div className="w-px h-6 bg-border" />
+      <div className="w-px h-5 bg-border/50" />
       
       <button
         onClick={onScreenshot}
-        className="w-10 h-10 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+        className="w-9 h-9 flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-full transition-all"
         aria-label="Take screenshot"
       >
         <Camera className="w-4 h-4" />
