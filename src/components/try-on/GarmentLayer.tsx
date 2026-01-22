@@ -143,6 +143,7 @@ export const GarmentLayer = ({ slot, equipped, bodyScale }: GarmentLayerProps) =
           <TshirtGeometry 
             color={color}
             imageUrl={equipped.imageUrl}
+            garmentType="tshirt"
             bodyScale={{ shoulderWidth: bodyScale.shoulderWidth, waistWidth: bodyScale.waistWidth }}
             neckStyle={tshirtStyle?.neck || 'crew'}
             fit={tshirtStyle?.fit || 'regular'}
@@ -154,6 +155,7 @@ export const GarmentLayer = ({ slot, equipped, bodyScale }: GarmentLayerProps) =
           <CrewneckGeometry 
             color={color}
             imageUrl={equipped.imageUrl}
+            garmentType="crewneck"
             bodyScale={{ shoulderWidth: bodyScale.shoulderWidth, waistWidth: bodyScale.waistWidth }}
           />
         );
@@ -163,6 +165,7 @@ export const GarmentLayer = ({ slot, equipped, bodyScale }: GarmentLayerProps) =
           <TankTopGeometry 
             color={color}
             imageUrl={equipped.imageUrl}
+            garmentType="tank"
             bodyScale={{ shoulderWidth: bodyScale.shoulderWidth, waistWidth: bodyScale.waistWidth }}
             neckStyle={style as 'scoop' | 'crew' | 'racerback' | undefined}
           />
@@ -173,6 +176,7 @@ export const GarmentLayer = ({ slot, equipped, bodyScale }: GarmentLayerProps) =
         <CrewneckGeometry 
           color={color}
           imageUrl={equipped.imageUrl}
+          garmentType="crewneck"
           bodyScale={{ shoulderWidth: bodyScale.shoulderWidth, waistWidth: bodyScale.waistWidth }}
         />
       );
@@ -183,6 +187,7 @@ export const GarmentLayer = ({ slot, equipped, bodyScale }: GarmentLayerProps) =
           <JacketGeometry 
             color={color}
             imageUrl={equipped.imageUrl}
+            garmentType="jacket"
             bodyScale={{ shoulderWidth: bodyScale.shoulderWidth, waistWidth: bodyScale.waistWidth }}
             style={style as 'coach' | 'bomber' | 'windbreaker' | undefined}
           />
@@ -193,6 +198,7 @@ export const GarmentLayer = ({ slot, equipped, bodyScale }: GarmentLayerProps) =
         <HoodieGeometry 
           color={color}
           imageUrl={equipped.imageUrl}
+          garmentType="hoodie"
           bodyScale={{ shoulderWidth: bodyScale.shoulderWidth, waistWidth: bodyScale.waistWidth }}
         />
       );
@@ -203,6 +209,7 @@ export const GarmentLayer = ({ slot, equipped, bodyScale }: GarmentLayerProps) =
           <ShortsGeometry 
             color={color}
             imageUrl={equipped.imageUrl}
+            garmentType="shorts"
             bodyScale={{ hipWidth: bodyScale.hipWidth, legThickness: bodyScale.legThickness }}
             style={style as 'athletic' | 'casual' | 'swim' | undefined}
           />
@@ -213,6 +220,7 @@ export const GarmentLayer = ({ slot, equipped, bodyScale }: GarmentLayerProps) =
         <PantsGeometry 
           color={color}
           imageUrl={equipped.imageUrl}
+          garmentType="pants"
           bodyScale={{ hipWidth: bodyScale.hipWidth, legThickness: bodyScale.legThickness }}
           style={style as 'slim' | 'straight' | 'relaxed' | undefined}
         />

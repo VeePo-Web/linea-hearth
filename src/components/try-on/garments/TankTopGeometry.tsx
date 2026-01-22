@@ -5,6 +5,7 @@ import { useFabricMaterial } from '../hooks/useFabricMaterial';
 interface TankTopGeometryProps {
   color?: string;
   imageUrl?: string;
+  garmentType?: string;
   bodyScale?: { shoulderWidth: number; waistWidth: number };
   neckStyle?: 'scoop' | 'crew' | 'racerback';
 }
@@ -12,13 +13,15 @@ interface TankTopGeometryProps {
 export const TankTopGeometry = ({ 
   color = '#FAFAFA', 
   imageUrl,
+  garmentType = 'tank',
   bodyScale = { shoulderWidth: 0.38, waistWidth: 0.30 },
   neckStyle = 'scoop'
 }: TankTopGeometryProps) => {
   const material = useFabricMaterial({ 
     type: 'cotton', 
     color, 
-    imageUrl 
+    imageUrl,
+    garmentType
   });
 
   // Create tank body profile - narrower at shoulders (no sleeves)

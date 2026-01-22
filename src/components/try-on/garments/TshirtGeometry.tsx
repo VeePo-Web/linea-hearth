@@ -2,10 +2,12 @@ import { useMemo } from 'react';
 import * as THREE from 'three';
 import { useFabricMaterial } from '../hooks/useFabricMaterial';
 import { ShoulderJunction } from './ShoulderJunction';
+import { applyFrontProjectionUVs } from '../utils/uvProjection';
 
 interface TshirtGeometryProps {
   color?: string;
   imageUrl?: string;
+  garmentType?: string;
   bodyScale?: { shoulderWidth: number; waistWidth: number };
   neckStyle?: 'crew' | 'vneck';
   fit?: 'fitted' | 'regular' | 'oversized';
@@ -14,6 +16,7 @@ interface TshirtGeometryProps {
 export const TshirtGeometry = ({ 
   color = '#FAFAFA', 
   imageUrl,
+  garmentType = 'tshirt',
   bodyScale = { shoulderWidth: 0.40, waistWidth: 0.32 },
   neckStyle = 'crew',
   fit = 'regular'
@@ -21,7 +24,8 @@ export const TshirtGeometry = ({
   const material = useFabricMaterial({ 
     type: 'cotton', 
     color, 
-    imageUrl 
+    imageUrl,
+    garmentType
   });
 
   // Fit adjustments
@@ -91,8 +95,14 @@ export const TshirtGeometry = ({
     
     const geometry = new THREE.LatheGeometry(points, 36);
     geometry.computeVertexNormals();
+    
+    // Apply front-projection UVs for texture mapping
+    if (imageUrl) {
+      applyFrontProjectionUVs(geometry, 'tshirt');
+    }
+    
     return geometry;
-  }, [bodyScale, fitScale, neckStyle]);
+  }, [bodyScale, fitScale, neckStyle, imageUrl]);
 
   const sleeveLength = 0.13 * fitScale.sleeve;
 

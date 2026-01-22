@@ -5,6 +5,7 @@ import { useFabricMaterial } from '../hooks/useFabricMaterial';
 interface PantsGeometryProps {
   color?: string;
   imageUrl?: string;
+  garmentType?: string;
   bodyScale?: { hipWidth: number; legThickness: number };
   style?: 'straight' | 'slim' | 'relaxed';
 }
@@ -12,13 +13,15 @@ interface PantsGeometryProps {
 export const PantsGeometry = ({ 
   color = '#1C1917', 
   imageUrl,
+  garmentType = 'pants',
   bodyScale = { hipWidth: 0.38, legThickness: 0.08 },
   style = 'straight'
 }: PantsGeometryProps) => {
   const material = useFabricMaterial({ 
     type: 'denim', 
     color, 
-    imageUrl 
+    imageUrl,
+    garmentType
   });
 
   // Style multipliers for leg taper
