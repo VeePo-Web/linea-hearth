@@ -86,19 +86,34 @@ export const useGarmentTexture = (
 
   useEffect(() => {
     if (!imageUrl) {
+      console.log('[Texture] ===== NO URL PROVIDED =====');
+      console.log('[Texture] Garment type:', garmentType);
       setTexture(null);
       return;
     }
 
-    console.log('[Texture] Loading:', imageUrl, 'for garment type:', garmentType);
+    console.log('[Texture] ===== LOADING TEXTURE =====');
+    console.log('[Texture] URL:', imageUrl);
+    console.log('[Texture] Garment type:', garmentType);
+    console.log('[Texture] Config:', JSON.stringify(config, null, 2));
+    
+    // Resolve URL - handle both absolute and relative paths
+    const resolvedUrl = imageUrl.startsWith('http') 
+      ? imageUrl 
+      : imageUrl.startsWith('/') 
+        ? imageUrl 
+        : `/${imageUrl}`;
+    
+    console.log('[Texture] Resolved URL:', resolvedUrl);
     
     setError(false);
     const loader = new THREE.TextureLoader();
 
     loader.load(
-      imageUrl,
+      resolvedUrl,
       (loadedTexture) => {
-        console.log('[Texture] Loaded successfully:', imageUrl);
+        console.log('[Texture] ✅ LOADED SUCCESSFULLY:', resolvedUrl);
+        console.log('[Texture] Image dimensions:', loadedTexture.image?.width, 'x', loadedTexture.image?.height);
         
         // Configure texture properties
         loadedTexture.wrapS = config.wrapS;
@@ -119,9 +134,14 @@ export const useGarmentTexture = (
         loadedTexture.needsUpdate = true;
         setTexture(loadedTexture);
       },
-      undefined,
+      (progress) => {
+        if (progress.total) {
+          console.log('[Texture] Loading progress:', Math.round((progress.loaded / progress.total) * 100) + '%');
+        }
+      },
       (err) => {
-        console.error('[Texture] Failed to load:', imageUrl, err);
+        console.error('[Texture] ❌ FAILED TO LOAD:', resolvedUrl);
+        console.error('[Texture] Error:', err);
         setError(true);
         setTexture(null);
       }
@@ -130,6 +150,7 @@ export const useGarmentTexture = (
     return () => {
       // Cleanup on unmount or URL change
       if (texture) {
+        console.log('[Texture] Disposing texture:', imageUrl);
         texture.dispose();
       }
     };
