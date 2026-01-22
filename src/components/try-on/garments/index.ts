@@ -7,3 +7,4 @@ export { JacketGeometry } from './JacketGeometry';
 export { TankTopGeometry } from './TankTopGeometry';
 export { BeanieGeometry } from './BeanieGeometry';
 export { SneakerGeometry } from './SneakerGeometry';
+export { ShoulderJunction } from './ShoulderJunction';

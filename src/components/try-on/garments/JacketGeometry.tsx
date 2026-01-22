@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import * as THREE from 'three';
 import { useFabricMaterial } from '../hooks/useFabricMaterial';
+import { ShoulderJunction } from './ShoulderJunction';
 
 interface JacketGeometryProps {
   color?: string;
@@ -21,10 +22,19 @@ export const JacketGeometry = ({
     imageUrl 
   });
 
-  // Create jacket body profile - slightly boxier than hoodie
+  // Calculate shoulder attachment parameters - jackets are more structured
+  const shoulderParams = useMemo(() => ({
+    bodyRadius: bodyScale.shoulderWidth / 2 + 0.03,
+    sleeveRadius: 0.072,
+    armDropAngle: 0.32, // Less angle for structured jackets
+    sleevePositionX: 0.25,
+    sleevePositionY: 0.20,
+  }), [bodyScale]);
+
+  // Create jacket body profile - slightly boxier than hoodie with shoulder overlap
   const bodyGeometry = useMemo(() => {
     const points: THREE.Vector2[] = [];
-    const segments = 24;
+    const segments = 28;
     
     for (let i = 0; i <= segments; i++) {
       const t = i / segments;
@@ -33,9 +43,15 @@ export const JacketGeometry = ({
       if (t < 0.08) {
         // Collar area
         radius = THREE.MathUtils.lerp(0.11, bodyScale.shoulderWidth / 2 + 0.03, t / 0.08);
+      } else if (t < 0.14) {
+        // Shoulder region - add structured bulge for sleeve overlap
+        const localT = (t - 0.08) / 0.06;
+        const baseRadius = bodyScale.shoulderWidth / 2 + 0.03;
+        const shoulderBulge = Math.sin(localT * Math.PI) * 0.012;
+        radius = baseRadius + shoulderBulge;
       } else if (t < 0.4) {
         // Shoulders - jackets are more structured
-        const localT = (t - 0.08) / 0.32;
+        const localT = (t - 0.14) / 0.26;
         radius = THREE.MathUtils.lerp(
           bodyScale.shoulderWidth / 2 + 0.03, 
           bodyScale.waistWidth / 2 + 0.05, 
@@ -63,13 +79,10 @@ export const JacketGeometry = ({
       points.push(new THREE.Vector2(radius, y));
     }
     
-    return new THREE.LatheGeometry(points, 36);
+    const geometry = new THREE.LatheGeometry(points, 40);
+    geometry.computeVertexNormals();
+    return geometry;
   }, [bodyScale]);
-
-  // Shoulder cap geometry
-  const shoulderCapGeometry = useMemo(() => {
-    return new THREE.SphereGeometry(0.072, 16, 8, 0, Math.PI * 2, 0, Math.PI / 2);
-  }, []);
 
   return (
     <group position={[0, 1.22, 0]}>
@@ -103,36 +116,56 @@ export const JacketGeometry = ({
         <meshStandardMaterial color="#a1a1aa" roughness={0.2} metalness={0.8} />
       </mesh>
       
-      {/* Left sleeve with shoulder cap */}
-      <group position={[-0.25, 0.20, 0]} rotation={[0, 0, 0.32]}>
-        <mesh geometry={shoulderCapGeometry} position={[0, 0.04, 0]} rotation={[0, 0, -0.32]}>
-          {material}
-        </mesh>
-        <mesh position={[0, -0.14, 0]}>
-          <cylinderGeometry args={[0.072, 0.062, 0.40, 24]} />
-          {material}
-        </mesh>
-        {/* Cuff - elastic or ribbed */}
-        <mesh position={[0, -0.36, 0]}>
-          <torusGeometry args={[0.058, 0.015, 10, 24]} />
-          {material}
-        </mesh>
+      {/* Left sleeve with seamless shoulder junction */}
+      <group position={[-shoulderParams.sleevePositionX, shoulderParams.sleevePositionY, 0]}>
+        {/* Shoulder junction - bridges body to sleeve */}
+        <ShoulderJunction
+          bodyRadius={shoulderParams.bodyRadius}
+          sleeveRadius={shoulderParams.sleeveRadius}
+          armDropAngle={shoulderParams.armDropAngle}
+          side="left"
+          material={material}
+          transitionLength={0.07}
+        />
+        
+        {/* Main sleeve */}
+        <group rotation={[0, 0, 0.32]}>
+          <mesh position={[0, -0.16, 0]}>
+            <cylinderGeometry args={[0.074, 0.062, 0.38, 24]} />
+            {material}
+          </mesh>
+          {/* Cuff - elastic or ribbed */}
+          <mesh position={[0, -0.37, 0]}>
+            <torusGeometry args={[0.058, 0.015, 10, 24]} />
+            {material}
+          </mesh>
+        </group>
       </group>
       
-      {/* Right sleeve with shoulder cap */}
-      <group position={[0.25, 0.20, 0]} rotation={[0, 0, -0.32]}>
-        <mesh geometry={shoulderCapGeometry} position={[0, 0.04, 0]} rotation={[0, 0, 0.32]}>
-          {material}
-        </mesh>
-        <mesh position={[0, -0.14, 0]}>
-          <cylinderGeometry args={[0.072, 0.062, 0.40, 24]} />
-          {material}
-        </mesh>
-        {/* Cuff */}
-        <mesh position={[0, -0.36, 0]}>
-          <torusGeometry args={[0.058, 0.015, 10, 24]} />
-          {material}
-        </mesh>
+      {/* Right sleeve with seamless shoulder junction */}
+      <group position={[shoulderParams.sleevePositionX, shoulderParams.sleevePositionY, 0]}>
+        {/* Shoulder junction - bridges body to sleeve */}
+        <ShoulderJunction
+          bodyRadius={shoulderParams.bodyRadius}
+          sleeveRadius={shoulderParams.sleeveRadius}
+          armDropAngle={shoulderParams.armDropAngle}
+          side="right"
+          material={material}
+          transitionLength={0.07}
+        />
+        
+        {/* Main sleeve */}
+        <group rotation={[0, 0, -0.32]}>
+          <mesh position={[0, -0.16, 0]}>
+            <cylinderGeometry args={[0.074, 0.062, 0.38, 24]} />
+            {material}
+          </mesh>
+          {/* Cuff */}
+          <mesh position={[0, -0.37, 0]}>
+            <torusGeometry args={[0.058, 0.015, 10, 24]} />
+            {material}
+          </mesh>
+        </group>
       </group>
       
       {/* Welt pockets - diagonal slash style */}
