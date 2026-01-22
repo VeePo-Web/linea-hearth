@@ -10,6 +10,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
+import GoogleAuthButton from './GoogleAuthButton';
+import AuthDivider from './AuthDivider';
 
 const signInSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -129,6 +131,11 @@ export default function SignInForm({ onSuccess, onSwitchToSignUp }: SignInFormPr
             onSubmit={handleSubmit(onSubmit)}
             className="space-y-6"
           >
+            {/* Google OAuth */}
+            <GoogleAuthButton onSuccess={onSuccess} />
+            
+            <AuthDivider text="or continue with email" />
+
             {/* Error message */}
             {errors.root && (
               <div className="p-3 bg-destructive/10 border border-destructive/20 text-destructive text-sm rounded">
