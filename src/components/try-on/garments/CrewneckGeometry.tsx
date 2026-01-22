@@ -2,22 +2,26 @@ import { useMemo } from 'react';
 import * as THREE from 'three';
 import { useFabricMaterial } from '../hooks/useFabricMaterial';
 import { ShoulderJunction } from './ShoulderJunction';
+import { applyFrontProjectionUVs } from '../utils/uvProjection';
 
 interface CrewneckGeometryProps {
   color?: string;
   imageUrl?: string;
+  garmentType?: string;
   bodyScale?: { shoulderWidth: number; waistWidth: number };
 }
 
 export const CrewneckGeometry = ({ 
   color = '#1C1917', 
   imageUrl,
+  garmentType = 'crewneck',
   bodyScale = { shoulderWidth: 0.40, waistWidth: 0.32 }
 }: CrewneckGeometryProps) => {
   const material = useFabricMaterial({ 
     type: 'cotton', 
     color, 
-    imageUrl 
+    imageUrl,
+    garmentType
   });
 
   // Calculate shoulder attachment parameters - crewneck is tighter than hoodie
@@ -67,8 +71,14 @@ export const CrewneckGeometry = ({
     
     const geometry = new THREE.LatheGeometry(points, 40);
     geometry.computeVertexNormals();
+    
+    // Apply front-projection UVs for texture mapping
+    if (imageUrl) {
+      applyFrontProjectionUVs(geometry, 'crewneck');
+    }
+    
     return geometry;
-  }, [bodyScale]);
+  }, [bodyScale, imageUrl]);
 
   return (
     <group position={[0, 1.22, 0]}>

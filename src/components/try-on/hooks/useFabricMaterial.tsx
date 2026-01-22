@@ -1,10 +1,12 @@
 import { useMemo } from 'react';
 import * as THREE from 'three';
+import { useGarmentTexture } from './useGarmentTexture';
 
 interface FabricMaterialProps {
   type: 'cotton' | 'fleece' | 'denim' | 'leather' | 'knit';
   color: string;
   imageUrl?: string;
+  garmentType?: string;
 }
 
 // Fabric presets for realistic materials
@@ -46,15 +48,21 @@ const fabricPresets = {
   },
 };
 
-export const useFabricMaterial = ({ type, color, imageUrl }: FabricMaterialProps) => {
+export const useFabricMaterial = ({ type, color, imageUrl, garmentType = 'hoodie' }: FabricMaterialProps) => {
   const preset = fabricPresets[type];
+  
+  // Load texture if imageUrl is provided
+  const texture = useGarmentTexture(imageUrl, garmentType);
 
   const material = useMemo(() => {
-    // For now, use solid colors with fabric-appropriate properties
-    // Future: Load imageUrl as texture
+    // When texture is available, use white base color so texture shows true colors
+    // When no texture, use the provided color
+    const baseColor = texture ? '#ffffff' : color;
+    
     return (
       <meshPhysicalMaterial
-        color={color}
+        map={texture}
+        color={baseColor}
         roughness={preset.roughness}
         metalness={preset.metalness}
         sheen={preset.sheen}
@@ -62,9 +70,11 @@ export const useFabricMaterial = ({ type, color, imageUrl }: FabricMaterialProps
         sheenColor={preset.sheenColor}
         envMapIntensity={0.4}
         side={THREE.DoubleSide}
+        // Slightly reduce roughness when textured for better visibility
+        {...(texture && { roughness: preset.roughness * 0.9 })}
       />
     );
-  }, [color, preset, imageUrl]);
+  }, [color, preset, texture]);
 
   return material;
 };

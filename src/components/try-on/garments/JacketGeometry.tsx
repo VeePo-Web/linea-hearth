@@ -2,10 +2,12 @@ import { useMemo } from 'react';
 import * as THREE from 'three';
 import { useFabricMaterial } from '../hooks/useFabricMaterial';
 import { ShoulderJunction } from './ShoulderJunction';
+import { applyFrontProjectionUVs } from '../utils/uvProjection';
 
 interface JacketGeometryProps {
   color?: string;
   imageUrl?: string;
+  garmentType?: string;
   bodyScale?: { shoulderWidth: number; waistWidth: number };
   style?: 'coach' | 'bomber' | 'windbreaker';
 }
@@ -13,13 +15,15 @@ interface JacketGeometryProps {
 export const JacketGeometry = ({ 
   color = '#1C1917', 
   imageUrl,
+  garmentType = 'jacket',
   bodyScale = { shoulderWidth: 0.42, waistWidth: 0.34 },
   style = 'coach'
 }: JacketGeometryProps) => {
   const material = useFabricMaterial({ 
     type: style === 'bomber' ? 'leather' : 'cotton', 
     color, 
-    imageUrl 
+    imageUrl,
+    garmentType
   });
 
   // Calculate shoulder attachment parameters - jackets are more structured
@@ -81,8 +85,14 @@ export const JacketGeometry = ({
     
     const geometry = new THREE.LatheGeometry(points, 40);
     geometry.computeVertexNormals();
+    
+    // Apply front-projection UVs for texture mapping
+    if (imageUrl) {
+      applyFrontProjectionUVs(geometry, 'jacket');
+    }
+    
     return geometry;
-  }, [bodyScale]);
+  }, [bodyScale, imageUrl]);
 
   return (
     <group position={[0, 1.22, 0]}>

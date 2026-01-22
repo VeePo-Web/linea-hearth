@@ -5,6 +5,7 @@ import { useFabricMaterial } from '../hooks/useFabricMaterial';
 interface ShortsGeometryProps {
   color?: string;
   imageUrl?: string;
+  garmentType?: string;
   bodyScale?: { hipWidth: number; legThickness: number };
   length?: 'short' | 'mid' | 'long';
   style?: 'athletic' | 'casual' | 'swim';
@@ -13,6 +14,7 @@ interface ShortsGeometryProps {
 export const ShortsGeometry = ({ 
   color = '#1C1917', 
   imageUrl,
+  garmentType = 'shorts',
   bodyScale = { hipWidth: 0.34, legThickness: 0.12 },
   length = 'mid',
   style = 'casual'
@@ -20,7 +22,8 @@ export const ShortsGeometry = ({
   const material = useFabricMaterial({ 
     type: style === 'swim' ? 'cotton' : 'cotton', 
     color, 
-    imageUrl 
+    imageUrl,
+    garmentType
   });
 
   // Length configuration

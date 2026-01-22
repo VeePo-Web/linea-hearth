@@ -2,22 +2,26 @@ import { useMemo } from 'react';
 import * as THREE from 'three';
 import { useFabricMaterial } from '../hooks/useFabricMaterial';
 import { ShoulderJunction } from './ShoulderJunction';
+import { applyFrontProjectionUVs } from '../utils/uvProjection';
 
 interface HoodieGeometryProps {
   color?: string;
   imageUrl?: string;
+  garmentType?: string;
   bodyScale?: { shoulderWidth: number; waistWidth: number };
 }
 
 export const HoodieGeometry = ({ 
   color = '#1C1917', 
   imageUrl,
+  garmentType = 'hoodie',
   bodyScale = { shoulderWidth: 0.40, waistWidth: 0.32 }
 }: HoodieGeometryProps) => {
   const material = useFabricMaterial({ 
     type: 'fleece', 
     color, 
-    imageUrl 
+    imageUrl,
+    garmentType
   });
 
   // Calculate shoulder attachment parameters
@@ -71,8 +75,14 @@ export const HoodieGeometry = ({
     
     const geometry = new THREE.LatheGeometry(points, 40);
     geometry.computeVertexNormals();
+    
+    // Apply front-projection UVs for texture mapping
+    if (imageUrl) {
+      applyFrontProjectionUVs(geometry, 'hoodie');
+    }
+    
     return geometry;
-  }, [bodyScale]);
+  }, [bodyScale, imageUrl]);
 
   // Folded hood geometry - teardrop cross-section for realistic fabric
   const hoodGeometry = useMemo(() => {
