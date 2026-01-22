@@ -3,21 +3,22 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { MeasurementSlider } from './MeasurementSlider';
 import { QuickSizePresets } from './QuickSizePresets';
 import { SizeRecommendation } from './SizeRecommendation';
+import { SaveProfileModal } from './SaveProfileModal';
+import { ProfileCard } from './ProfileCard';
 import { useTryOnState } from '@/hooks/useTryOnState';
+import { useBodyProfiles } from './hooks/useBodyProfiles';
 import { 
   BodyMeasurements, 
-  defaultMeasurements, 
   measurementRanges,
   quickPresets 
 } from './utils/measurementToProportions';
 import { recommendSize, SizeRecommendation as SizeRec } from './utils/sizeRecommendation';
 import { cn } from '@/lib/utils';
-import { Ruler, Weight, User, Sparkles, Save } from 'lucide-react';
+import { Ruler, Weight, User, Sparkles, Save, Plus, Download, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
-
-const STORAGE_KEY = 'linea_body_measurements';
+import { AnimatePresence, motion } from 'framer-motion';
 
 interface BodyMeasurementsPanelProps {
   className?: string;
@@ -33,12 +34,26 @@ export const BodyMeasurementsPanel = ({ className }: BodyMeasurementsPanelProps)
     setMeasurements,
     unitSystem,
     setUnitSystem,
-    useDetailedMeasurements,
-    setUseDetailedMeasurements,
   } = useTryOnState();
+
+  const {
+    profiles,
+    activeProfile,
+    defaultProfile,
+    isLoaded,
+    canAddProfile,
+    maxProfiles,
+    createProfile,
+    deleteProfile,
+    setDefaultProfile,
+    setActiveProfile,
+    exportProfile,
+    importProfile,
+  } = useBodyProfiles();
 
   const [selectedPresetId, setSelectedPresetId] = useState<string | undefined>();
   const [activeTab, setActiveTab] = useState<string>('quick');
+  const [showSaveModal, setShowSaveModal] = useState(false);
 
   // Size recommendation based on current measurements
   const sizeRecommendation: SizeRec | null = useMemo(() => {
@@ -46,21 +61,14 @@ export const BodyMeasurementsPanel = ({ className }: BodyMeasurementsPanelProps)
     return recommendSize(measurements);
   }, [measurements]);
 
-  // Load saved measurements on mount
+  // Load default profile on mount
   useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        if (parsed.measurements) {
-          setMeasurements(parsed.measurements);
-          setSelectedPresetId(undefined);
-        }
-      } catch (e) {
-        console.error('Failed to load saved measurements:', e);
-      }
+    if (isLoaded && defaultProfile && !activeProfile) {
+      setMeasurements(defaultProfile.measurements);
+      setAvatarGender(defaultProfile.gender);
+      setActiveProfile(defaultProfile.id);
     }
-  }, [setMeasurements]);
+  }, [isLoaded, defaultProfile, activeProfile, setMeasurements, setAvatarGender, setActiveProfile]);
 
   // Handle preset selection
   const handlePresetSelect = (presetMeasurements: BodyMeasurements) => {
@@ -69,6 +77,7 @@ export const BodyMeasurementsPanel = ({ className }: BodyMeasurementsPanelProps)
       ([_, preset]) => preset.measurements === presetMeasurements
     )?.[0];
     setSelectedPresetId(presetId);
+    setActiveProfile(null); // Clear active saved profile when using preset
   };
 
   // Handle individual measurement change
@@ -76,17 +85,67 @@ export const BodyMeasurementsPanel = ({ className }: BodyMeasurementsPanelProps)
     if (!measurements) return;
     setMeasurements({ ...measurements, [key]: value });
     setSelectedPresetId(undefined); // Clear preset when manually adjusting
+    setActiveProfile(null); // Clear active profile when manually adjusting
   };
 
-  // Save measurements to localStorage
-  const handleSave = () => {
+  // Handle save profile
+  const handleSaveProfile = (name: string) => {
     if (!measurements) return;
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({
-      measurements,
-      gender: avatarGender,
-      savedAt: new Date().toISOString(),
-    }));
-    toast.success('Measurements saved!');
+    const profile = createProfile(name, measurements, avatarGender);
+    if (profile) {
+      toast.success(`Profile "${name}" saved!`);
+    } else {
+      toast.error(`Maximum ${maxProfiles} profiles allowed`);
+    }
+  };
+
+  // Handle apply profile
+  const handleApplyProfile = (profileId: string) => {
+    const profile = profiles.find(p => p.id === profileId);
+    if (profile) {
+      setMeasurements(profile.measurements);
+      setAvatarGender(profile.gender);
+      setActiveProfile(profileId);
+      setSelectedPresetId(undefined);
+      toast.success(`Applied "${profile.name}"`);
+    }
+  };
+
+  // Handle delete profile
+  const handleDeleteProfile = (profileId: string) => {
+    const profile = profiles.find(p => p.id === profileId);
+    deleteProfile(profileId);
+    toast.success(`Deleted "${profile?.name}"`);
+  };
+
+  // Handle export
+  const handleExport = () => {
+    if (activeProfile) {
+      const json = exportProfile(activeProfile.id);
+      if (json) {
+        navigator.clipboard.writeText(json);
+        toast.success('Profile copied to clipboard');
+      }
+    } else if (measurements) {
+      const json = JSON.stringify({ name: 'Exported', measurements, gender: avatarGender });
+      navigator.clipboard.writeText(json);
+      toast.success('Measurements copied to clipboard');
+    }
+  };
+
+  // Handle import
+  const handleImport = async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+      const profile = importProfile(text);
+      if (profile) {
+        toast.success(`Imported "${profile.name}"`);
+      } else {
+        toast.error('Invalid profile data');
+      }
+    } catch {
+      toast.error('Failed to read clipboard');
+    }
   };
 
   // Skin tone options
@@ -100,7 +159,14 @@ export const BodyMeasurementsPanel = ({ className }: BodyMeasurementsPanelProps)
         <TabsList className="grid w-full grid-cols-3 h-9">
           <TabsTrigger value="quick" className="text-xs">Quick</TabsTrigger>
           <TabsTrigger value="detailed" className="text-xs">Detailed</TabsTrigger>
-          <TabsTrigger value="saved" className="text-xs">Saved</TabsTrigger>
+          <TabsTrigger value="saved" className="text-xs relative">
+            Saved
+            {profiles.length > 0 && (
+              <span className="absolute -top-1 -right-1 w-4 h-4 bg-foreground text-background text-[9px] rounded-full flex items-center justify-center">
+                {profiles.length}
+              </span>
+            )}
+          </TabsTrigger>
         </TabsList>
 
         {/* QUICK TAB */}
@@ -167,7 +233,11 @@ export const BodyMeasurementsPanel = ({ className }: BodyMeasurementsPanelProps)
 
           {/* Size Recommendation Preview */}
           {sizeRecommendation && (
-            <div className="pt-4 border-t border-border">
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="pt-4 border-t border-border"
+            >
               <div className="flex items-center justify-between mb-3">
                 <h3 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
                   Recommended Size
@@ -178,9 +248,9 @@ export const BodyMeasurementsPanel = ({ className }: BodyMeasurementsPanelProps)
                 </div>
               </div>
               <p className="text-xs text-muted-foreground">
-                Based on {selectedPresetId ? quickPresets[selectedPresetId]?.label : 'your measurements'}
+                Based on {selectedPresetId ? quickPresets[selectedPresetId]?.label : activeProfile?.name || 'your measurements'}
               </p>
-            </div>
+            </motion.div>
           )}
         </TabsContent>
 
@@ -299,33 +369,96 @@ export const BodyMeasurementsPanel = ({ className }: BodyMeasurementsPanelProps)
 
         {/* SAVED TAB */}
         <TabsContent value="saved" className="mt-4 space-y-4">
-          <div className="text-center py-6 space-y-4">
-            <Save className="h-8 w-8 text-muted-foreground mx-auto" />
-            <div>
-              <h4 className="text-sm font-medium">Save Your Measurements</h4>
-              <p className="text-xs text-muted-foreground mt-1">
-                Save your measurements for faster checkout and accurate size recommendations
-              </p>
-            </div>
-            <Button 
-              onClick={handleSave}
-              className="w-full"
-              disabled={!measurements}
-            >
-              Save Current Measurements
-            </Button>
+          {/* Header with count */}
+          <div className="flex items-center justify-between">
+            <h4 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+              My Saved Profiles
+            </h4>
+            <span className="text-xs text-muted-foreground">
+              {profiles.length}/{maxProfiles}
+            </span>
           </div>
 
-          {/* Show saved info if exists */}
-          {localStorage.getItem(STORAGE_KEY) && (
-            <div className="p-3 border border-border rounded-sm bg-muted/30">
-              <p className="text-xs text-muted-foreground">
-                ✓ Measurements saved locally
-              </p>
-            </div>
+          {/* Profile List */}
+          <AnimatePresence mode="popLayout">
+            {profiles.length > 0 ? (
+              <div className="space-y-3">
+                {profiles.map((profile) => (
+                  <ProfileCard
+                    key={profile.id}
+                    profile={profile}
+                    isActive={activeProfile?.id === profile.id}
+                    onApply={() => handleApplyProfile(profile.id)}
+                    onSetDefault={() => setDefaultProfile(profile.id)}
+                    onDelete={() => handleDeleteProfile(profile.id)}
+                  />
+                ))}
+              </div>
+            ) : (
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-center py-8 space-y-4"
+              >
+                <Save className="h-10 w-10 text-muted-foreground mx-auto" />
+                <div>
+                  <h4 className="text-sm font-medium">No Saved Profiles</h4>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Save your measurements for quick access and size recommendations
+                  </p>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Save Current Button */}
+          {canAddProfile && measurements && (
+            <Button 
+              onClick={() => setShowSaveModal(true)}
+              className="w-full gap-2"
+              variant="outline"
+            >
+              <Plus className="h-4 w-4" />
+              Save Current as New Profile
+            </Button>
           )}
+
+          {/* Export/Import */}
+          <div className="flex gap-2 pt-2 border-t border-border">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="flex-1 gap-2 text-xs"
+              onClick={handleExport}
+              disabled={!measurements}
+            >
+              <Download className="h-3.5 w-3.5" />
+              Export
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="flex-1 gap-2 text-xs"
+              onClick={handleImport}
+              disabled={!canAddProfile}
+            >
+              <Upload className="h-3.5 w-3.5" />
+              Import
+            </Button>
+          </div>
         </TabsContent>
       </Tabs>
+
+      {/* Save Profile Modal */}
+      {measurements && (
+        <SaveProfileModal
+          isOpen={showSaveModal}
+          onClose={() => setShowSaveModal(false)}
+          onSave={handleSaveProfile}
+          measurements={measurements}
+          gender={avatarGender}
+        />
+      )}
     </div>
   );
 };

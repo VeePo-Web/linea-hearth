@@ -149,21 +149,28 @@ const MannequinMaterial = ({ skinTone }: { skinTone: string }) => {
   );
 };
 
-// Smooth head geometry
-const Head = ({ skinTone }: { skinTone: string }) => (
-  <mesh position={[0, 1.72, 0]}>
-    <sphereGeometry args={[0.095, 32, 32]} />
-    <MannequinMaterial skinTone={skinTone} />
-  </mesh>
-);
+// Smooth head geometry - position adjusts based on height scale
+const Head = ({ skinTone, heightScale = 1 }: { skinTone: string; heightScale?: number }) => {
+  // Base Y position is 1.72, adjust for height scaling
+  const baseY = 1.52; // Position relative to torso top
+  return (
+    <mesh position={[0, baseY + 0.2, 0]}>
+      <sphereGeometry args={[0.095, 32, 32]} />
+      <MannequinMaterial skinTone={skinTone} />
+    </mesh>
+  );
+};
 
-// Neck
-const Neck = ({ skinTone }: { skinTone: string }) => (
-  <mesh position={[0, 1.58, 0]}>
-    <cylinderGeometry args={[0.045, 0.055, 0.12, 24]} />
-    <MannequinMaterial skinTone={skinTone} />
-  </mesh>
-);
+// Neck - position adjusts based on height scale
+const Neck = ({ skinTone, heightScale = 1 }: { skinTone: string; heightScale?: number }) => {
+  const baseY = 1.52; // Position relative to torso top
+  return (
+    <mesh position={[0, baseY + 0.06, 0]}>
+      <cylinderGeometry args={[0.045, 0.055, 0.12, 24]} />
+      <MannequinMaterial skinTone={skinTone} />
+    </mesh>
+  );
+};
 
 // Smooth torso using custom geometry
 const Torso = ({ skinTone, proportions }: { skinTone: string; proportions: ReturnType<typeof getBodyProportions> }) => {
@@ -176,25 +183,30 @@ const Torso = ({ skinTone, proportions }: { skinTone: string; proportions: Retur
   );
 };
 
-// Smooth arm with proper tapering
+// Smooth arm with proper tapering and length scaling
 const Arm = ({ side, skinTone, proportions }: { side: 'left' | 'right'; skinTone: string; proportions: ReturnType<typeof getBodyProportions> }) => {
   const xPos = side === 'left' ? -proportions.shoulderWidth / 2 - 0.04 : proportions.shoulderWidth / 2 + 0.04;
   const rotation = side === 'left' ? 0.12 : -0.12;
   
+  // Calculate arm segment lengths based on proportions
+  const armLengthScale = proportions.armLength / 0.58; // 0.58 is base arm length
+  const upperArmLength = 0.28 * armLengthScale;
+  const forearmLength = 0.26 * armLengthScale;
+  
   return (
     <group position={[xPos, 1.38, 0]} rotation={[0, 0, rotation]}>
       {/* Upper arm */}
-      <mesh position={[0, -0.12, 0]}>
-        <cylinderGeometry args={[proportions.armThickness, proportions.armThickness * 0.9, 0.28, 20]} />
+      <mesh position={[0, -upperArmLength / 2, 0]}>
+        <cylinderGeometry args={[proportions.armThickness, proportions.armThickness * 0.9, upperArmLength, 20]} />
         <MannequinMaterial skinTone={skinTone} />
       </mesh>
       {/* Forearm */}
-      <mesh position={[0, -0.38, 0]}>
-        <cylinderGeometry args={[proportions.armThickness * 0.85, proportions.armThickness * 0.7, 0.26, 20]} />
+      <mesh position={[0, -upperArmLength - forearmLength / 2 + 0.02, 0]}>
+        <cylinderGeometry args={[proportions.armThickness * 0.85, proportions.armThickness * 0.7, forearmLength, 20]} />
         <MannequinMaterial skinTone={skinTone} />
       </mesh>
       {/* Hand */}
-      <mesh position={[0, -0.55, 0]}>
+      <mesh position={[0, -upperArmLength - forearmLength + 0.02, 0]}>
         <sphereGeometry args={[proportions.armThickness * 0.8, 16, 16]} />
         <MannequinMaterial skinTone={skinTone} />
       </mesh>
@@ -202,24 +214,29 @@ const Arm = ({ side, skinTone, proportions }: { side: 'left' | 'right'; skinTone
   );
 };
 
-// Smooth leg with proper tapering
+// Smooth leg with proper tapering and length scaling
 const Leg = ({ side, skinTone, proportions }: { side: 'left' | 'right'; skinTone: string; proportions: ReturnType<typeof getBodyProportions> }) => {
   const xPos = side === 'left' ? -0.09 : 0.09;
+  
+  // Calculate leg segment lengths based on proportions
+  const legLengthScale = proportions.legLength / 0.82; // 0.82 is base leg length
+  const thighLength = 0.42 * legLengthScale;
+  const calfLength = 0.40 * legLengthScale;
   
   return (
     <group position={[xPos, 0.67, 0]}>
       {/* Upper leg (thigh) */}
-      <mesh position={[0, -0.02, 0]}>
-        <cylinderGeometry args={[proportions.legThickness, proportions.legThickness * 0.85, 0.42, 24]} />
+      <mesh position={[0, -thighLength / 2 + 0.02, 0]}>
+        <cylinderGeometry args={[proportions.legThickness, proportions.legThickness * 0.85, thighLength, 24]} />
         <MannequinMaterial skinTone={skinTone} />
       </mesh>
       {/* Lower leg (calf) */}
-      <mesh position={[0, -0.42, 0]}>
-        <cylinderGeometry args={[proportions.legThickness * 0.75, proportions.legThickness * 0.5, 0.40, 24]} />
+      <mesh position={[0, -thighLength - calfLength / 2 + 0.04, 0]}>
+        <cylinderGeometry args={[proportions.legThickness * 0.75, proportions.legThickness * 0.5, calfLength, 24]} />
         <MannequinMaterial skinTone={skinTone} />
       </mesh>
       {/* Foot */}
-      <mesh position={[0, -0.67, 0.03]} rotation={[Math.PI / 2.5, 0, 0]}>
+      <mesh position={[0, -thighLength - calfLength + 0.02, 0.03]} rotation={[Math.PI / 2.5, 0, 0]}>
         <capsuleGeometry args={[proportions.legThickness * 0.45, 0.12, 8, 16]} />
         <MannequinMaterial skinTone={skinTone} />
       </mesh>
@@ -236,18 +253,30 @@ export const Mannequin3D = ({ position = [0, 0, 0] }: MannequinProps) => {
     [avatarBodyType, avatarGender, measurements, useDetailedMeasurements]
   );
 
-  // Subtle breathing animation
+  // Calculate height scale for the entire mannequin
+  // Base height is 1.7m (170cm), scale proportionally
+  const heightScale = useMemo(() => {
+    return proportions.height / 1.7;
+  }, [proportions.height]);
+
+  // Subtle breathing animation with height scaling
   useFrame((state) => {
     if (groupRef.current) {
       const breathe = Math.sin(state.clock.getElapsedTime() * 1.5) * 0.003;
-      groupRef.current.scale.y = 1 + breathe;
+      groupRef.current.scale.y = heightScale * (1 + breathe);
     }
   });
 
+  // Y position offset to keep feet on ground when scaled
+  const yOffset = useMemo(() => {
+    // When scaled down, move up; when scaled up, move down
+    return (heightScale - 1) * 0.85;
+  }, [heightScale]);
+
   return (
-    <group ref={groupRef} position={position}>
-      <Head skinTone={avatarSkinTone} />
-      <Neck skinTone={avatarSkinTone} />
+    <group ref={groupRef} position={[position[0], position[1] + yOffset, position[2]]} scale={[1, heightScale, 1]}>
+      <Head skinTone={avatarSkinTone} heightScale={heightScale} />
+      <Neck skinTone={avatarSkinTone} heightScale={heightScale} />
       <Torso skinTone={avatarSkinTone} proportions={proportions} />
       <Arm side="left" skinTone={avatarSkinTone} proportions={proportions} />
       <Arm side="right" skinTone={avatarSkinTone} proportions={proportions} />
