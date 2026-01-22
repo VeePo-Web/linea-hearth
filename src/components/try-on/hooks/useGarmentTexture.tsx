@@ -90,12 +90,16 @@ export const useGarmentTexture = (
       return;
     }
 
+    console.log('[Texture] Loading:', imageUrl, 'for garment type:', garmentType);
+    
     setError(false);
     const loader = new THREE.TextureLoader();
 
     loader.load(
       imageUrl,
       (loadedTexture) => {
+        console.log('[Texture] Loaded successfully:', imageUrl);
+        
         // Configure texture properties
         loadedTexture.wrapS = config.wrapS;
         loadedTexture.wrapT = config.wrapT;
@@ -117,7 +121,7 @@ export const useGarmentTexture = (
       },
       undefined,
       (err) => {
-        console.warn('Failed to load garment texture:', imageUrl, err);
+        console.error('[Texture] Failed to load:', imageUrl, err);
         setError(true);
         setTexture(null);
       }

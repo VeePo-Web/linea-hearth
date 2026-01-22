@@ -8,7 +8,12 @@ export interface EquippedItem {
   price: number;
   name: string;
   imageUrl?: string;
+  textureUrl?: string;  // Flat-front image optimized for 3D texturing
   modelUrl?: string;
+  productImages?: Array<{
+    image_url: string;
+    is_primary?: boolean;
+  }>;
 }
 
 export interface TryOnState {
