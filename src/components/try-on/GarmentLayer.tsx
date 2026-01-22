@@ -137,12 +137,15 @@ export const GarmentLayer = ({ slot, equipped, bodyScale }: GarmentLayerProps) =
   // Render appropriate garment based on slot and inferred type
   switch (slot) {
     case 'top':
+      // Use textureUrl (flat-front) for 3D, fall back to imageUrl
+      const topImageUrl = equipped.textureUrl || equipped.imageUrl;
+      
       if (garmentType === 'tshirt') {
         const tshirtStyle = style as { neck?: 'crew' | 'vneck'; fit?: 'fitted' | 'regular' | 'oversized' } | undefined;
         return (
           <TshirtGeometry 
             color={color}
-            imageUrl={equipped.imageUrl}
+            imageUrl={topImageUrl}
             garmentType="tshirt"
             bodyScale={{ shoulderWidth: bodyScale.shoulderWidth, waistWidth: bodyScale.waistWidth }}
             neckStyle={tshirtStyle?.neck || 'crew'}
@@ -154,7 +157,7 @@ export const GarmentLayer = ({ slot, equipped, bodyScale }: GarmentLayerProps) =
         return (
           <CrewneckGeometry 
             color={color}
-            imageUrl={equipped.imageUrl}
+            imageUrl={topImageUrl}
             garmentType="crewneck"
             bodyScale={{ shoulderWidth: bodyScale.shoulderWidth, waistWidth: bodyScale.waistWidth }}
           />
@@ -164,7 +167,7 @@ export const GarmentLayer = ({ slot, equipped, bodyScale }: GarmentLayerProps) =
         return (
           <TankTopGeometry 
             color={color}
-            imageUrl={equipped.imageUrl}
+            imageUrl={topImageUrl}
             garmentType="tank"
             bodyScale={{ shoulderWidth: bodyScale.shoulderWidth, waistWidth: bodyScale.waistWidth }}
             neckStyle={style as 'scoop' | 'crew' | 'racerback' | undefined}
@@ -175,18 +178,21 @@ export const GarmentLayer = ({ slot, equipped, bodyScale }: GarmentLayerProps) =
       return (
         <CrewneckGeometry 
           color={color}
-          imageUrl={equipped.imageUrl}
+          imageUrl={topImageUrl}
           garmentType="crewneck"
           bodyScale={{ shoulderWidth: bodyScale.shoulderWidth, waistWidth: bodyScale.waistWidth }}
         />
       );
 
     case 'outerwear':
+      // Use textureUrl (flat-front) for 3D, fall back to imageUrl
+      const outerwearImageUrl = equipped.textureUrl || equipped.imageUrl;
+      
       if (garmentType === 'jacket' || garmentType === 'bomber') {
         return (
           <JacketGeometry 
             color={color}
-            imageUrl={equipped.imageUrl}
+            imageUrl={outerwearImageUrl}
             garmentType="jacket"
             bodyScale={{ shoulderWidth: bodyScale.shoulderWidth, waistWidth: bodyScale.waistWidth }}
             style={style as 'coach' | 'bomber' | 'windbreaker' | undefined}
@@ -197,18 +203,21 @@ export const GarmentLayer = ({ slot, equipped, bodyScale }: GarmentLayerProps) =
       return (
         <HoodieGeometry 
           color={color}
-          imageUrl={equipped.imageUrl}
+          imageUrl={outerwearImageUrl}
           garmentType="hoodie"
           bodyScale={{ shoulderWidth: bodyScale.shoulderWidth, waistWidth: bodyScale.waistWidth }}
         />
       );
 
     case 'bottom':
+      // Use textureUrl for bottoms (denim patterns, etc.)
+      const bottomImageUrl = equipped.textureUrl || equipped.imageUrl;
+      
       if (garmentType === 'shorts') {
         return (
           <ShortsGeometry 
             color={color}
-            imageUrl={equipped.imageUrl}
+            imageUrl={bottomImageUrl}
             garmentType="shorts"
             bodyScale={{ hipWidth: bodyScale.hipWidth, legThickness: bodyScale.legThickness }}
             style={style as 'athletic' | 'casual' | 'swim' | undefined}
@@ -219,7 +228,7 @@ export const GarmentLayer = ({ slot, equipped, bodyScale }: GarmentLayerProps) =
       return (
         <PantsGeometry 
           color={color}
-          imageUrl={equipped.imageUrl}
+          imageUrl={bottomImageUrl}
           garmentType="pants"
           bodyScale={{ hipWidth: bodyScale.hipWidth, legThickness: bodyScale.legThickness }}
           style={style as 'slim' | 'straight' | 'relaxed' | undefined}
@@ -227,11 +236,13 @@ export const GarmentLayer = ({ slot, equipped, bodyScale }: GarmentLayerProps) =
       );
 
     case 'head':
+      const headImageUrl = equipped.textureUrl || equipped.imageUrl;
+      
       if (garmentType === 'beanie') {
         return (
           <BeanieGeometry 
             color={color}
-            imageUrl={equipped.imageUrl}
+            imageUrl={headImageUrl}
             style={style as 'cuffed' | 'slouchy' | 'fitted' | undefined}
           />
         );
@@ -249,11 +260,13 @@ export const GarmentLayer = ({ slot, equipped, bodyScale }: GarmentLayerProps) =
       );
 
     case 'footwear':
+      const footwearImageUrl = equipped.textureUrl || equipped.imageUrl;
+      
       if (garmentType === 'sneaker' || garmentType === 'boot') {
         return (
           <SneakerGeometry 
             color={color}
-            imageUrl={equipped.imageUrl}
+            imageUrl={footwearImageUrl}
             style={garmentType === 'boot' ? 'high' : (style as 'low' | 'high' | 'runner' | undefined)}
           />
         );
@@ -262,7 +275,7 @@ export const GarmentLayer = ({ slot, equipped, bodyScale }: GarmentLayerProps) =
       return (
         <SneakerGeometry 
           color={color}
-          imageUrl={equipped.imageUrl}
+          imageUrl={footwearImageUrl}
           style="low"
         />
       );

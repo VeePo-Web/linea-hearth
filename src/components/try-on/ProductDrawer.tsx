@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { useTryOnState, EquippedItem } from '@/hooks/useTryOnState';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 import { cn } from '@/lib/utils';
 import { Check } from 'lucide-react';
+import { getTextureImageUrl } from '@/components/try-on/hooks/useGarmentTexture';
 
 interface ProductDrawerProps {
   isOpen: boolean;
@@ -62,6 +63,9 @@ export const ProductDrawer = ({ isOpen, onClose, slot }: ProductDrawerProps) => 
 
     const primaryImage = product.product_images?.find((img: any) => img.is_primary)?.image_url 
       || product.product_images?.[0]?.image_url;
+    
+    // Get texture-optimized image (flat-front) for 3D rendering
+    const textureImage = getTextureImageUrl(product.product_images, product.name);
 
     const item: EquippedItem = {
       productId: product.id,
@@ -70,6 +74,8 @@ export const ProductDrawer = ({ isOpen, onClose, slot }: ProductDrawerProps) => 
       size: selectedSize,
       color: 'Default',
       imageUrl: primaryImage,
+      textureUrl: textureImage,  // Use flat-front image for 3D textures
+      productImages: product.product_images,
     };
 
     equipItem(slot, item);
