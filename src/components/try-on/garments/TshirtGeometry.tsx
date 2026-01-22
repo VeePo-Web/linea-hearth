@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import * as THREE from 'three';
 import { useFabricMaterial } from '../hooks/useFabricMaterial';
+import { ShoulderJunction } from './ShoulderJunction';
 
 interface TshirtGeometryProps {
   color?: string;
@@ -32,10 +33,19 @@ export const TshirtGeometry = ({
     }
   }, [fit]);
 
-  // Create t-shirt body profile - shorter than crewneck
+  // Calculate shoulder attachment parameters - t-shirt has more visible armhole
+  const shoulderParams = useMemo(() => ({
+    bodyRadius: (bodyScale.shoulderWidth / 2 + 0.012) * fitScale.body,
+    sleeveRadius: 0.056 * fitScale.sleeve,
+    armDropAngle: 0.48, // More angle for set-in sleeve
+    sleevePositionX: 0.21 * fitScale.body,
+    sleevePositionY: neckStyle === 'vneck' ? 0.14 : 0.16,
+  }), [bodyScale, fitScale, neckStyle]);
+
+  // Create t-shirt body profile with shoulder overlap
   const bodyGeometry = useMemo(() => {
     const points: THREE.Vector2[] = [];
-    const segments = 22;
+    const segments = 26;
     const bodyMultiplier = fitScale.body;
     
     for (let i = 0; i <= segments; i++) {
@@ -46,9 +56,15 @@ export const TshirtGeometry = ({
         // Collar
         const collarRadius = neckStyle === 'vneck' ? 0.085 : 0.088;
         radius = THREE.MathUtils.lerp(collarRadius, (bodyScale.shoulderWidth / 2 + 0.012) * bodyMultiplier, t / 0.08);
+      } else if (t < 0.14) {
+        // Shoulder region - add subtle bulge for sleeve overlap (more pronounced for t-shirt)
+        const localT = (t - 0.08) / 0.06;
+        const baseRadius = (bodyScale.shoulderWidth / 2 + 0.012) * bodyMultiplier;
+        const shoulderBulge = Math.sin(localT * Math.PI) * 0.015; // More bulge for t-shirt
+        radius = baseRadius + shoulderBulge;
       } else if (t < 0.3) {
         // Shoulders - t-shirts have more pronounced shoulder drop
-        const localT = (t - 0.08) / 0.22;
+        const localT = (t - 0.14) / 0.16;
         radius = THREE.MathUtils.lerp(
           (bodyScale.shoulderWidth / 2 + 0.012) * bodyMultiplier, 
           (bodyScale.waistWidth / 2 + 0.025) * bodyMultiplier, 
@@ -73,17 +89,12 @@ export const TshirtGeometry = ({
       points.push(new THREE.Vector2(radius, y));
     }
     
-    return new THREE.LatheGeometry(points, 32);
+    const geometry = new THREE.LatheGeometry(points, 36);
+    geometry.computeVertexNormals();
+    return geometry;
   }, [bodyScale, fitScale, neckStyle]);
 
-  // Shoulder cap for seamless sleeve connection
-  const shoulderCapGeometry = useMemo(() => {
-    const size = 0.058 * fitScale.sleeve;
-    return new THREE.SphereGeometry(size, 14, 8, 0, Math.PI * 2, 0, Math.PI / 2);
-  }, [fitScale]);
-
   const sleeveLength = 0.13 * fitScale.sleeve;
-  const sleeveRadius = 0.056 * fitScale.sleeve;
 
   return (
     <group position={[0, 1.24, 0]}>
@@ -121,40 +132,56 @@ export const TshirtGeometry = ({
         </group>
       )}
       
-      {/* Left short sleeve with shoulder cap */}
-      <group position={[-0.21 * fitScale.body, 0.16, 0]} rotation={[0, 0, 0.48]}>
-        {/* Shoulder cap */}
-        <mesh geometry={shoulderCapGeometry} position={[0, 0.025, 0]} rotation={[0, 0, -0.48]}>
-          {material}
-        </mesh>
+      {/* Left short sleeve with seamless shoulder junction */}
+      <group position={[-shoulderParams.sleevePositionX, shoulderParams.sleevePositionY, 0]}>
+        {/* Shoulder junction - bridges body to sleeve */}
+        <ShoulderJunction
+          bodyRadius={shoulderParams.bodyRadius}
+          sleeveRadius={shoulderParams.sleeveRadius}
+          armDropAngle={shoulderParams.armDropAngle}
+          side="left"
+          material={material}
+          transitionLength={0.055}
+        />
+        
         {/* Main sleeve - short */}
-        <mesh position={[0, -sleeveLength / 2, 0]}>
-          <cylinderGeometry args={[sleeveRadius, sleeveRadius * 1.08, sleeveLength, 18]} />
-          {material}
-        </mesh>
-        {/* Sleeve hem - slight roll */}
-        <mesh position={[0, -sleeveLength, 0]}>
-          <torusGeometry args={[sleeveRadius * 1.05, 0.008, 6, 18]} />
-          {material}
-        </mesh>
+        <group rotation={[0, 0, 0.48]}>
+          <mesh position={[0, -sleeveLength / 2 - 0.02, 0]}>
+            <cylinderGeometry args={[shoulderParams.sleeveRadius * 1.05, shoulderParams.sleeveRadius * 1.12, sleeveLength, 20]} />
+            {material}
+          </mesh>
+          {/* Sleeve hem - slight roll */}
+          <mesh position={[0, -sleeveLength - 0.01, 0]}>
+            <torusGeometry args={[shoulderParams.sleeveRadius * 1.08, 0.008, 6, 20]} />
+            {material}
+          </mesh>
+        </group>
       </group>
       
-      {/* Right short sleeve with shoulder cap */}
-      <group position={[0.21 * fitScale.body, 0.16, 0]} rotation={[0, 0, -0.48]}>
-        {/* Shoulder cap */}
-        <mesh geometry={shoulderCapGeometry} position={[0, 0.025, 0]} rotation={[0, 0, 0.48]}>
-          {material}
-        </mesh>
+      {/* Right short sleeve with seamless shoulder junction */}
+      <group position={[shoulderParams.sleevePositionX, shoulderParams.sleevePositionY, 0]}>
+        {/* Shoulder junction - bridges body to sleeve */}
+        <ShoulderJunction
+          bodyRadius={shoulderParams.bodyRadius}
+          sleeveRadius={shoulderParams.sleeveRadius}
+          armDropAngle={shoulderParams.armDropAngle}
+          side="right"
+          material={material}
+          transitionLength={0.055}
+        />
+        
         {/* Main sleeve - short */}
-        <mesh position={[0, -sleeveLength / 2, 0]}>
-          <cylinderGeometry args={[sleeveRadius, sleeveRadius * 1.08, sleeveLength, 18]} />
-          {material}
-        </mesh>
-        {/* Sleeve hem - slight roll */}
-        <mesh position={[0, -sleeveLength, 0]}>
-          <torusGeometry args={[sleeveRadius * 1.05, 0.008, 6, 18]} />
-          {material}
-        </mesh>
+        <group rotation={[0, 0, -0.48]}>
+          <mesh position={[0, -sleeveLength / 2 - 0.02, 0]}>
+            <cylinderGeometry args={[shoulderParams.sleeveRadius * 1.05, shoulderParams.sleeveRadius * 1.12, sleeveLength, 20]} />
+            {material}
+          </mesh>
+          {/* Sleeve hem - slight roll */}
+          <mesh position={[0, -sleeveLength - 0.01, 0]}>
+            <torusGeometry args={[shoulderParams.sleeveRadius * 1.08, 0.008, 6, 20]} />
+            {material}
+          </mesh>
+        </group>
       </group>
       
       {/* Bottom hem - simple edge for t-shirt */}
