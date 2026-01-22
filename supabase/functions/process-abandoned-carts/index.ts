@@ -67,7 +67,7 @@ async function sendEmail(
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: 'LINEA <noreply@linea.com>',
+        from: 'Line of Judah <noreply@lineofjudah.com>',
         to: [to],
         subject,
         html,
@@ -87,203 +87,341 @@ async function sendEmail(
   }
 }
 
-// Email templates using premium editorial tone
-function getEmail1Html(cart: AbandonedCart, recoveryUrl: string): string {
+// Shared email footer component
+function getEmailFooter(siteUrl: string): string {
+  return `
+    <!-- Dark Footer -->
+    <tr>
+      <td style="background:#1C1917;padding:32px 40px;">
+        <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+          <tr>
+            <td align="center">
+              <p style="margin:0 0 4px;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;font-size:14px;color:#A8A29E;">Questions? We've got your back.</p>
+              <a href="mailto:hello@lineofjudah.com" style="font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;font-size:14px;color:#FFFFFF;text-decoration:none;">hello@lineofjudah.com</a>
+            </td>
+          </tr>
+          <tr>
+            <td align="center" style="padding-top:24px;">
+              <p style="margin:0 0 4px;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;color:#FFFFFF;text-transform:uppercase;">LINE OF JUDAH</p>
+              <p style="margin:0;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;font-size:13px;color:#78716C;">For those who walk different.</p>
+            </td>
+          </tr>
+          <tr>
+            <td align="center" style="padding-top:24px;">
+              <a href="https://instagram.com" style="display:inline-block;margin:0 8px;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;font-size:13px;color:#A8A29E;text-decoration:none;">Instagram</a>
+              <span style="color:#57534E;">•</span>
+              <a href="https://tiktok.com" style="display:inline-block;margin:0 8px;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;font-size:13px;color:#A8A29E;text-decoration:none;">TikTok</a>
+              <span style="color:#57534E;">•</span>
+              <a href="https://youtube.com" style="display:inline-block;margin:0 8px;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;font-size:13px;color:#A8A29E;text-decoration:none;">YouTube</a>
+            </td>
+          </tr>
+          <tr>
+            <td align="center" style="padding-top:24px;">
+              <p style="margin:0;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;font-size:12px;color:#57534E;">© 2026 Line of Judah. All rights reserved.</p>
+              <p style="margin:8px 0 0;">
+                <a href="${siteUrl}/privacy-policy" style="font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;font-size:12px;color:#57534E;text-decoration:none;">Privacy</a>
+                <span style="color:#44403C;margin:0 8px;">•</span>
+                <a href="${siteUrl}/terms-of-service" style="font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;font-size:12px;color:#57534E;text-decoration:none;">Terms</a>
+                <span style="color:#44403C;margin:0 8px;">•</span>
+                <a href="#" style="font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;font-size:12px;color:#57534E;text-decoration:none;">Unsubscribe</a>
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  `;
+}
+
+// Email templates using premium editorial tone - Line of Judah brand voice
+function getEmail1Html(cart: AbandonedCart, recoveryUrl: string, siteUrl: string): string {
   const itemsHtml = cart.cart_items.map(item => `
     <tr>
-      <td style="padding: 16px 0; border-bottom: 1px solid #e8e8e8;">
-        <img src="${item.image}" alt="${item.name}" style="width: 80px; height: 100px; object-fit: cover;" />
+      <td style="padding:16px 0;border-bottom:1px solid #E7E5E4;">
+        <img src="${item.image}" alt="${item.name}" width="80" height="100" style="display:block;width:80px;height:100px;object-fit:cover;border-radius:4px;" />
       </td>
-      <td style="padding: 16px; border-bottom: 1px solid #e8e8e8; vertical-align: top;">
-        <p style="margin: 0 0 4px; font-size: 14px; color: #1a1a1a;">${item.name}</p>
-        <p style="margin: 0; font-size: 12px; color: #666;">Size: ${item.size || 'One Size'}</p>
+      <td style="padding:16px;border-bottom:1px solid #E7E5E4;vertical-align:top;">
+        <p style="margin:0 0 4px;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;font-size:14px;font-weight:500;color:#1C1917;">${item.name}</p>
+        <p style="margin:0;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;font-size:12px;color:#78716C;">Size: ${item.size || 'One Size'}${item.color ? ` · ${item.color}` : ''}</p>
       </td>
-      <td style="padding: 16px 0; border-bottom: 1px solid #e8e8e8; text-align: right; vertical-align: top;">
-        <p style="margin: 0; font-size: 14px; color: #1a1a1a;">${item.priceFormatted}</p>
+      <td style="padding:16px 0;border-bottom:1px solid #E7E5E4;text-align:right;vertical-align:top;">
+        <p style="margin:0;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;font-size:14px;font-weight:500;color:#1C1917;">${item.priceFormatted}</p>
       </td>
     </tr>
   `).join('');
 
   return `
     <!DOCTYPE html>
-    <html>
+    <html lang="en">
     <head>
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Your Selection Awaits | LINEA</title>
+      <meta name="color-scheme" content="light">
+      <title>Your armor is waiting | Line of Judah</title>
     </head>
-    <body style="font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif; margin: 0; padding: 0; background: #ffffff; color: #1a1a1a;">
-      <div style="max-width: 560px; margin: 0 auto; padding: 0 20px;">
-        
-        <!-- Header -->
-        <div style="padding: 40px 0 32px; text-align: center; border-bottom: 1px solid #e8e8e8;">
-          <p style="margin: 0; font-size: 18px; letter-spacing: 0.3em; font-weight: 300;">LINEA</p>
-        </div>
-        
-        <!-- Content -->
-        <div style="padding: 48px 0;">
-          <h1 style="margin: 0 0 12px; font-size: 24px; font-weight: 300; text-align: center; letter-spacing: 0.05em;">
-            Your selection is waiting
-          </h1>
-          <p style="margin: 0 0 40px; font-size: 14px; color: #666; text-align: center; line-height: 1.6;">
-            You left a few items in your cart. We're holding them for you.
-          </p>
-          
-          <!-- Items -->
-          <table style="width: 100%; border-collapse: collapse; margin-bottom: 32px;">
-            ${itemsHtml}
-          </table>
-          
-          <!-- Total -->
-          <div style="padding: 16px 0; border-top: 1px solid #1a1a1a; text-align: right;">
-            <p style="margin: 0; font-size: 16px; color: #1a1a1a;">
-              Total: <strong>€${cart.cart_total.toLocaleString()}</strong>
-            </p>
-          </div>
-          
-          <!-- CTA -->
-          <div style="padding: 32px 0; text-align: center;">
-            <a href="${recoveryUrl}" style="display: inline-block; background: #1a1a1a; color: #ffffff; text-decoration: none; padding: 14px 40px; font-size: 12px; letter-spacing: 0.15em; text-transform: uppercase;">
-              Complete Your Order
-            </a>
-          </div>
-        </div>
-        
-        <!-- Footer -->
-        <div style="padding: 32px 0; border-top: 1px solid #e8e8e8; text-align: center;">
-          <p style="margin: 0; font-size: 11px; color: #999; line-height: 1.8;">
-            You received this email because you left items in your cart at LINEA.<br/>
-            <a href="#" style="color: #999; text-decoration: underline;">Unsubscribe</a>
-          </p>
-        </div>
-      </div>
+    <body style="margin:0;padding:0;background:#FAFAF9;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;">
+      <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background:#FAFAF9;">
+        <tr>
+          <td align="center" style="padding:40px 20px;">
+            <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="max-width:560px;background:#FFFFFF;border-radius:8px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.05);">
+              
+              <!-- Header -->
+              <tr>
+                <td style="padding:32px 40px 24px;text-align:center;border-bottom:1px solid #E7E5E4;">
+                  <p style="margin:0 0 8px;font-size:12px;font-weight:700;letter-spacing:2px;color:#1C1917;text-transform:uppercase;">LINE OF JUDAH</p>
+                  <div style="width:40px;height:2px;background:#F59E0B;margin:0 auto;"></div>
+                </td>
+              </tr>
+              
+              <!-- Hero -->
+              <tr>
+                <td style="padding:48px 40px 32px;text-align:center;">
+                  <h1 style="margin:0 0 16px;font-size:28px;font-weight:300;letter-spacing:0.02em;color:#1C1917;">
+                    YOUR ARMOR IS WAITING
+                  </h1>
+                  <p style="margin:0;font-size:15px;line-height:1.6;color:#57534E;">
+                    You started something. Your selection is on standby—<br/>armor ready, mission waiting.
+                  </p>
+                </td>
+              </tr>
+              
+              <!-- Items -->
+              <tr>
+                <td style="padding:0 40px;">
+                  <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+                    ${itemsHtml}
+                  </table>
+                </td>
+              </tr>
+              
+              <!-- Total -->
+              <tr>
+                <td style="padding:24px 40px;">
+                  <table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+                    <tr>
+                      <td style="border-top:2px solid #1C1917;padding-top:16px;text-align:right;">
+                        <p style="margin:0;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;font-size:16px;color:#1C1917;">
+                          Total: <strong style="font-weight:600;">€${cart.cart_total.toLocaleString()}</strong>
+                        </p>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+              
+              <!-- CTA -->
+              <tr>
+                <td style="padding:16px 40px 48px;text-align:center;">
+                  <a href="${recoveryUrl}" style="display:inline-block;background:#1C1917;color:#FFFFFF;text-decoration:none;padding:16px 48px;font-size:12px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;border-radius:4px;">
+                    CONTINUE WHERE YOU LEFT OFF
+                  </a>
+                </td>
+              </tr>
+              
+              <!-- Brand Quote -->
+              <tr>
+                <td style="padding:32px 40px;background:#FAFAF9;border-top:1px solid #E7E5E4;">
+                  <p style="margin:0;font-size:14px;font-style:italic;color:#78716C;text-align:center;line-height:1.6;">
+                    "Every outfit is an open door."
+                  </p>
+                </td>
+              </tr>
+              
+              ${getEmailFooter(siteUrl)}
+            </table>
+          </td>
+        </tr>
+      </table>
     </body>
     </html>
   `;
 }
 
-function getEmail2Html(cart: AbandonedCart, recoveryUrl: string): string {
+function getEmail2Html(cart: AbandonedCart, recoveryUrl: string, siteUrl: string): string {
   return `
     <!DOCTYPE html>
-    <html>
+    <html lang="en">
     <head>
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Still Interested? | LINEA</title>
+      <meta name="color-scheme" content="light">
+      <title>The mission continues | Line of Judah</title>
     </head>
-    <body style="font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif; margin: 0; padding: 0; background: #ffffff; color: #1a1a1a;">
-      <div style="max-width: 560px; margin: 0 auto; padding: 0 20px;">
-        
-        <!-- Header -->
-        <div style="padding: 40px 0 32px; text-align: center; border-bottom: 1px solid #e8e8e8;">
-          <p style="margin: 0; font-size: 18px; letter-spacing: 0.3em; font-weight: 300;">LINEA</p>
-        </div>
-        
-        <!-- Content -->
-        <div style="padding: 48px 0; text-align: center;">
-          <h1 style="margin: 0 0 16px; font-size: 24px; font-weight: 300; letter-spacing: 0.05em;">
-            Still interested?
-          </h1>
-          <p style="margin: 0 0 32px; font-size: 14px; color: #666; line-height: 1.6;">
-            Your ${cart.cart_items.length} item${cart.cart_items.length > 1 ? 's are' : ' is'} waiting. Complete your order before they sell out.
-          </p>
-          
-          <!-- Summary -->
-          <div style="padding: 24px; border: 1px solid #e8e8e8; margin-bottom: 32px;">
-            <p style="margin: 0 0 8px; font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 0.1em;">
-              Your Cart
-            </p>
-            <p style="margin: 0; font-size: 24px; font-weight: 300; color: #1a1a1a;">
-              €${cart.cart_total.toLocaleString()}
-            </p>
-          </div>
-          
-          <!-- CTA -->
-          <a href="${recoveryUrl}" style="display: inline-block; background: #1a1a1a; color: #ffffff; text-decoration: none; padding: 14px 40px; font-size: 12px; letter-spacing: 0.15em; text-transform: uppercase;">
-            Complete Your Order
-          </a>
-        </div>
-        
-        <!-- Footer -->
-        <div style="padding: 32px 0; border-top: 1px solid #e8e8e8; text-align: center;">
-          <p style="margin: 0; font-size: 11px; color: #999; line-height: 1.8;">
-            You received this email because you left items in your cart at LINEA.<br/>
-            <a href="#" style="color: #999; text-decoration: underline;">Unsubscribe</a>
-          </p>
-        </div>
-      </div>
+    <body style="margin:0;padding:0;background:#FAFAF9;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;">
+      <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background:#FAFAF9;">
+        <tr>
+          <td align="center" style="padding:40px 20px;">
+            <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="max-width:560px;background:#FFFFFF;border-radius:8px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.05);">
+              
+              <!-- Header -->
+              <tr>
+                <td style="padding:32px 40px 24px;text-align:center;border-bottom:1px solid #E7E5E4;">
+                  <p style="margin:0 0 8px;font-size:12px;font-weight:700;letter-spacing:2px;color:#1C1917;text-transform:uppercase;">LINE OF JUDAH</p>
+                  <div style="width:40px;height:2px;background:#F59E0B;margin:0 auto;"></div>
+                </td>
+              </tr>
+              
+              <!-- Hero -->
+              <tr>
+                <td style="padding:48px 40px 24px;text-align:center;">
+                  <h1 style="margin:0 0 16px;font-size:28px;font-weight:300;letter-spacing:0.02em;color:#1C1917;">
+                    THE MISSION CONTINUES
+                  </h1>
+                  <p style="margin:0;font-size:15px;line-height:1.6;color:#57534E;">
+                    You came close. Your armor is still waiting—but not forever.<br/>Every piece is a declaration. Don't leave it behind.
+                  </p>
+                </td>
+              </tr>
+              
+              <!-- Summary Card -->
+              <tr>
+                <td style="padding:24px 40px;">
+                  <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="border:1px solid #E7E5E4;border-radius:8px;">
+                    <tr>
+                      <td style="padding:32px;text-align:center;">
+                        <p style="margin:0 0 8px;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;font-size:11px;font-weight:600;letter-spacing:0.15em;color:#78716C;text-transform:uppercase;">
+                          YOUR CART
+                        </p>
+                        <p style="margin:0 0 8px;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;font-size:32px;font-weight:300;color:#1C1917;">
+                          €${cart.cart_total.toLocaleString()}
+                        </p>
+                        <p style="margin:0;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;font-size:13px;color:#78716C;">
+                          ${cart.cart_items.length} item${cart.cart_items.length > 1 ? 's' : ''} waiting
+                        </p>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+              
+              <!-- CTA -->
+              <tr>
+                <td style="padding:16px 40px 48px;text-align:center;">
+                  <a href="${recoveryUrl}" style="display:inline-block;background:#1C1917;color:#FFFFFF;text-decoration:none;padding:16px 48px;font-size:12px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;border-radius:4px;">
+                    GEAR UP NOW
+                  </a>
+                </td>
+              </tr>
+              
+              <!-- Brand Quote -->
+              <tr>
+                <td style="padding:32px 40px;background:#FAFAF9;border-top:1px solid #E7E5E4;">
+                  <p style="margin:0;font-size:14px;font-style:italic;color:#78716C;text-align:center;line-height:1.6;">
+                    "You don't preach—you spark curiosity. They ask. You answer."
+                  </p>
+                </td>
+              </tr>
+              
+              ${getEmailFooter(siteUrl)}
+            </table>
+          </td>
+        </tr>
+      </table>
     </body>
     </html>
   `;
 }
 
-function getEmail3Html(cart: AbandonedCart, recoveryUrl: string, discountCode: string): string {
+function getEmail3Html(cart: AbandonedCart, recoveryUrl: string, discountCode: string, siteUrl: string): string {
+  const discountedTotal = (cart.cart_total * 0.85).toFixed(2);
+  
   return `
     <!DOCTYPE html>
-    <html>
+    <html lang="en">
     <head>
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>15% Off Your Order | LINEA</title>
+      <meta name="color-scheme" content="light">
+      <title>15% reinforcement—your final call | Line of Judah</title>
     </head>
-    <body style="font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif; margin: 0; padding: 0; background: #ffffff; color: #1a1a1a;">
-      <div style="max-width: 560px; margin: 0 auto; padding: 0 20px;">
-        
-        <!-- Header -->
-        <div style="padding: 40px 0 32px; text-align: center; border-bottom: 1px solid #e8e8e8;">
-          <p style="margin: 0; font-size: 18px; letter-spacing: 0.3em; font-weight: 300;">LINEA</p>
-        </div>
-        
-        <!-- Content -->
-        <div style="padding: 48px 0; text-align: center;">
-          <p style="margin: 0 0 16px; font-size: 11px; color: #666; text-transform: uppercase; letter-spacing: 0.2em;">
-            Exclusive Offer
-          </p>
-          <h1 style="margin: 0 0 16px; font-size: 32px; font-weight: 300; letter-spacing: 0.02em;">
-            15% off your order
-          </h1>
-          <p style="margin: 0 0 40px; font-size: 14px; color: #666; line-height: 1.6;">
-            Use the code below to complete your purchase.
-          </p>
-          
-          <!-- Discount Code -->
-          <div style="padding: 24px; border: 1px solid #1a1a1a; margin-bottom: 24px;">
-            <p style="margin: 0 0 8px; font-size: 10px; color: #666; text-transform: uppercase; letter-spacing: 0.2em;">
-              Your Code
-            </p>
-            <p style="margin: 0; font-size: 20px; letter-spacing: 0.15em; font-weight: 500; color: #1a1a1a;">
-              ${discountCode}
-            </p>
-          </div>
-          
-          <!-- Price -->
-          <div style="margin-bottom: 32px;">
-            <p style="margin: 0 0 4px; font-size: 14px; color: #999; text-decoration: line-through;">
-              €${cart.cart_total.toLocaleString()}
-            </p>
-            <p style="margin: 0; font-size: 28px; font-weight: 300; color: #1a1a1a;">
-              €${(cart.cart_total * 0.85).toLocaleString()}
-            </p>
-          </div>
-          
-          <!-- CTA -->
-          <a href="${recoveryUrl}" style="display: inline-block; background: #1a1a1a; color: #ffffff; text-decoration: none; padding: 14px 40px; font-size: 12px; letter-spacing: 0.15em; text-transform: uppercase;">
-            Claim 15% Off
-          </a>
-          
-          <p style="margin: 24px 0 0; font-size: 12px; color: #999;">
-            Offer expires in 24 hours
-          </p>
-        </div>
-        
-        <!-- Footer -->
-        <div style="padding: 32px 0; border-top: 1px solid #e8e8e8; text-align: center;">
-          <p style="margin: 0; font-size: 11px; color: #999; line-height: 1.8;">
-            You received this email because you left items in your cart at LINEA.<br/>
-            <a href="#" style="color: #999; text-decoration: underline;">Unsubscribe</a>
-          </p>
-        </div>
-      </div>
+    <body style="margin:0;padding:0;background:#FAFAF9;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;">
+      <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background:#FAFAF9;">
+        <tr>
+          <td align="center" style="padding:40px 20px;">
+            <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="max-width:560px;background:#FFFFFF;border-radius:8px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.05);">
+              
+              <!-- Header -->
+              <tr>
+                <td style="padding:32px 40px 24px;text-align:center;border-bottom:1px solid #E7E5E4;">
+                  <p style="margin:0 0 8px;font-size:12px;font-weight:700;letter-spacing:2px;color:#1C1917;text-transform:uppercase;">LINE OF JUDAH</p>
+                  <div style="width:40px;height:2px;background:#F59E0B;margin:0 auto;"></div>
+                </td>
+              </tr>
+              
+              <!-- Hero -->
+              <tr>
+                <td style="padding:48px 40px 24px;text-align:center;">
+                  <p style="margin:0 0 12px;font-size:11px;font-weight:600;letter-spacing:0.2em;color:#F59E0B;text-transform:uppercase;">
+                    FINAL CALL
+                  </p>
+                  <h1 style="margin:0 0 16px;font-size:28px;font-weight:300;letter-spacing:0.02em;color:#1C1917;">
+                    REINFORCEMENT INCOMING
+                  </h1>
+                  <p style="margin:0;font-size:15px;line-height:1.6;color:#57534E;">
+                    This is it. We're giving you 15% off to finish<br/>what you started. After this, the next move is yours.
+                  </p>
+                </td>
+              </tr>
+              
+              <!-- Discount Code Card -->
+              <tr>
+                <td style="padding:24px 40px;">
+                  <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="border:2px solid #1C1917;border-radius:8px;overflow:hidden;">
+                    <tr>
+                      <td style="padding:32px;text-align:center;background:#FAFAF9;">
+                        <p style="margin:0 0 8px;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;font-size:11px;font-weight:600;letter-spacing:0.15em;color:#78716C;text-transform:uppercase;">
+                          — EXCLUSIVE OFFER —
+                        </p>
+                        <p style="margin:0 0 12px;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;font-size:28px;font-weight:600;letter-spacing:0.1em;color:#1C1917;">
+                          ${discountCode}
+                        </p>
+                        <p style="margin:0;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;font-size:13px;color:#78716C;">
+                          15% off · Expires in 24 hours
+                        </p>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+              
+              <!-- Price Comparison -->
+              <tr>
+                <td style="padding:16px 40px;text-align:center;">
+                  <p style="margin:0 0 4px;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;font-size:14px;color:#A8A29E;text-decoration:line-through;">
+                    €${cart.cart_total.toLocaleString()}
+                  </p>
+                  <p style="margin:0;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;font-size:32px;font-weight:300;color:#1C1917;">
+                    €${discountedTotal}
+                  </p>
+                </td>
+              </tr>
+              
+              <!-- CTA -->
+              <tr>
+                <td style="padding:24px 40px 48px;text-align:center;">
+                  <a href="${recoveryUrl}" style="display:inline-block;background:#1C1917;color:#FFFFFF;text-decoration:none;padding:16px 48px;font-size:12px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;border-radius:4px;">
+                    CLAIM YOUR REINFORCEMENT
+                  </a>
+                  <p style="margin:16px 0 0;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;font-size:12px;color:#A8A29E;">
+                    Offer expires in 24 hours
+                  </p>
+                </td>
+              </tr>
+              
+              <!-- Brand Quote -->
+              <tr>
+                <td style="padding:32px 40px;background:#FAFAF9;border-top:1px solid #E7E5E4;">
+                  <p style="margin:0;font-size:14px;font-style:italic;color:#78716C;text-align:center;line-height:1.6;">
+                    "This isn't just clothing. It's armor."
+                  </p>
+                </td>
+              </tr>
+              
+              ${getEmailFooter(siteUrl)}
+            </table>
+          </td>
+        </tr>
+      </table>
     </body>
     </html>
   `;
@@ -322,11 +460,11 @@ Deno.serve(async (req) => {
 
     for (const cart of email1Carts || []) {
       const recoveryUrl = `${siteUrl}/recover-cart?token=${cart.recovery_token}`;
-      const html = getEmail1Html(cart as AbandonedCart, recoveryUrl);
+      const html = getEmail1Html(cart as AbandonedCart, recoveryUrl, siteUrl);
       
       const sent = await sendEmail(
         cart.email,
-        "Your selection is waiting | LINEA",
+        "Your armor is waiting | Line of Judah",
         html,
         resendApiKey
       );
@@ -356,11 +494,11 @@ Deno.serve(async (req) => {
 
     for (const cart of email2Carts || []) {
       const recoveryUrl = `${siteUrl}/recover-cart?token=${cart.recovery_token}`;
-      const html = getEmail2Html(cart as AbandonedCart, recoveryUrl);
+      const html = getEmail2Html(cart as AbandonedCart, recoveryUrl, siteUrl);
       
       const sent = await sendEmail(
         cart.email,
-        "Still interested? | LINEA",
+        "The mission continues | Line of Judah",
         html,
         resendApiKey
       );
@@ -393,11 +531,11 @@ Deno.serve(async (req) => {
       const discountCode = generateDiscountCode();
       
       const recoveryUrl = `${siteUrl}/recover-cart?token=${cart.recovery_token}`;
-      const html = getEmail3Html(cart as AbandonedCart, recoveryUrl, discountCode);
+      const html = getEmail3Html(cart as AbandonedCart, recoveryUrl, discountCode, siteUrl);
       
       const sent = await sendEmail(
         cart.email,
-        "15% off your order | LINEA",
+        "15% reinforcement—your final call | Line of Judah",
         html,
         resendApiKey
       );
