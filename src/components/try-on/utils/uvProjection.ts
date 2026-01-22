@@ -16,28 +16,28 @@ interface ProjectionConfig {
 
 const defaultProjectionConfigs: Record<string, ProjectionConfig> = {
   hoodie: {
-    projectionWidth: 0.32,    // Wider to show full graphic
-    projectionHeight: 0.45,   // Taller to cover chest area
-    offsetY: 0.04,            // Lower to center on torso
-    fadeEdge: 0.08,
+    projectionWidth: 0.40,
+    projectionHeight: 0.50,
+    offsetY: 0.02,
+    fadeEdge: 0.05,
   },
   crewneck: {
-    projectionWidth: 0.28,
-    projectionHeight: 0.40,
-    offsetY: 0.04,
-    fadeEdge: 0.08,
+    projectionWidth: 0.36,
+    projectionHeight: 0.45,
+    offsetY: 0.02,
+    fadeEdge: 0.05,
   },
   tshirt: {
-    projectionWidth: 0.26,
-    projectionHeight: 0.36,
-    offsetY: 0.02,
-    fadeEdge: 0.06,
+    projectionWidth: 0.34,
+    projectionHeight: 0.42,
+    offsetY: 0.03,
+    fadeEdge: 0.05,
   },
   jacket: {
-    projectionWidth: 0.30,
-    projectionHeight: 0.42,
-    offsetY: 0.06,
-    fadeEdge: 0.1,
+    projectionWidth: 0.38,
+    projectionHeight: 0.48,
+    offsetY: 0.03,
+    fadeEdge: 0.06,
   },
 };
 

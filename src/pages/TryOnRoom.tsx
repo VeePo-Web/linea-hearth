@@ -10,6 +10,7 @@ import Footer from '@/components/footer/Footer';
 import { ArrowLeft, Share2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { getTextureImageUrl } from '@/components/try-on/hooks/useGarmentTexture';
 
 interface SavedOutfitBanner {
   name: string;
@@ -93,6 +94,9 @@ const TryOnRoomContent = () => {
         if (product) {
           const primaryImage = product.product_images?.find((img: { is_primary: boolean }) => img.is_primary)?.image_url 
             || product.product_images?.[0]?.image_url;
+          
+          // Get texture-optimized image (flat-front) for 3D rendering
+          const textureImage = getTextureImageUrl(product.product_images, product.name);
 
           const item: EquippedItem = {
             productId: product.id,
@@ -101,6 +105,8 @@ const TryOnRoomContent = () => {
             size: 'M',
             color: 'default',
             imageUrl: primaryImage,
+            textureUrl: textureImage,
+            productImages: product.product_images,
           };
 
           equipItem(slotMapping[slot], item);
