@@ -9,6 +9,7 @@ interface InfoCardProps {
   className?: string;
   variant?: 'default' | 'muted' | 'accent';
   size?: 'sm' | 'default';
+  iconColor?: 'amber' | 'emerald' | 'blue' | 'stone';
 }
 
 const InfoCard = memo(({
@@ -17,12 +18,20 @@ const InfoCard = memo(({
   description,
   className,
   variant = 'default',
-  size = 'default'
+  size = 'default',
+  iconColor = 'amber'
 }: InfoCardProps) => {
   const variantClasses = {
     default: "bg-stone-50 dark:bg-stone-900/50",
     muted: "bg-muted/30",
     accent: "border-l-4 border-amber-500 bg-amber-500/5"
+  };
+
+  const iconColorClasses = {
+    amber: "text-amber-500",
+    emerald: "text-emerald-500",
+    blue: "text-blue-500",
+    stone: "text-stone-400"
   };
 
   return (
@@ -37,7 +46,7 @@ const InfoCard = memo(({
         "flex items-center gap-2",
         size === 'default' ? "mb-3" : "mb-2"
       )}>
-        <Icon className="w-4 h-4 text-amber-500 flex-shrink-0" strokeWidth={1.5} />
+        <Icon className={cn("w-4 h-4 flex-shrink-0", iconColorClasses[iconColor])} strokeWidth={1.5} />
         <h3 className="font-medium text-sm">{title}</h3>
       </div>
       
