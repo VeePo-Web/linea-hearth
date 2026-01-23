@@ -1,4 +1,5 @@
 import { useState } from "react";
+import AuthModal from "@/components/auth/AuthModal";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import ProductCard, { ProductCardData } from "./ProductCard";
@@ -26,6 +27,7 @@ const ProductGrid = ({
   onTotalCountChange,
 }: ProductGridProps) => {
   const [quickViewProduct, setQuickViewProduct] = useState<ProductCardData | null>(null);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["products", categorySlug, filters, sortBy, page, pageSize],
@@ -203,6 +205,7 @@ const ProductGrid = ({
                 product={product}
                 index={index}
                 onQuickView={setQuickViewProduct}
+                onAuthRequired={() => setIsAuthModalOpen(true)}
               />
             ))}
           </div>
@@ -226,7 +229,11 @@ const ProductGrid = ({
         product={quickViewProduct}
         open={!!quickViewProduct}
         onClose={() => setQuickViewProduct(null)}
+        onAuthRequired={() => setIsAuthModalOpen(true)}
       />
+
+      {/* Auth Modal */}
+      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
     </>
   );
 };

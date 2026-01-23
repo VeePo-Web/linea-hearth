@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Eye, Plus } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import FavoriteButton from "@/components/favorites/FavoriteButton";
 
 interface ProductImage {
   image_url: string;
@@ -38,9 +39,10 @@ interface ProductCardProps {
   product: ProductCardData;
   onQuickView?: (product: ProductCardData) => void;
   index?: number;
+  onAuthRequired?: () => void;
 }
 
-const ProductCard = ({ product, onQuickView, index = 0 }: ProductCardProps) => {
+const ProductCard = ({ product, onQuickView, index = 0, onAuthRequired }: ProductCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
 
   // Get primary and secondary images
@@ -147,6 +149,18 @@ const ProductCard = ({ product, onQuickView, index = 0 }: ProductCardProps) => {
                 ))}
               </div>
             )}
+
+            {/* Favorite Button */}
+            <div className={`absolute top-3 right-3 transition-opacity duration-200 ${
+              isHovered ? "opacity-100" : "opacity-0 md:opacity-0"
+            } md:group-hover:opacity-100`}>
+              <FavoriteButton
+                productId={product.id}
+                size="sm"
+                onAuthRequired={onAuthRequired}
+                className="bg-white/90 backdrop-blur-sm hover:bg-white"
+              />
+            </div>
 
             {/* Quick Actions (hover) */}
             <div

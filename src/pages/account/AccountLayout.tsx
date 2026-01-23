@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Package, User, MapPin, LayoutDashboard, LogOut } from 'lucide-react';
+import { Package, User, MapPin, LayoutDashboard, LogOut, Heart } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
 import Layout from '@/components/layout/Layout';
@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils';
 const sidebarLinks = [
   { icon: LayoutDashboard, label: 'Dashboard', href: '/account' },
   { icon: Package, label: 'Orders', href: '/account/orders' },
+  { icon: Heart, label: 'Favorites', href: '/account/favorites' },
   { icon: User, label: 'Profile', href: '/account/profile' },
   { icon: MapPin, label: 'Addresses', href: '/account/addresses' },
 ];
