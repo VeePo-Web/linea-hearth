@@ -12,7 +12,7 @@ import { toast } from "sonner";
 
 const heroValueProps = [
   { icon: Truck, text: "Free Over $75" },
-  { icon: Clock, text: "Same-Day Processing" },
+  { icon: Clock, text: "Orders Ship in 2-5 Days" },
   { icon: Package, text: "Full Tracking" },
   { icon: Globe, text: "50+ Countries" },
 ];
@@ -22,54 +22,54 @@ const orderJourneySteps = [
     number: "01",
     icon: CheckCircle,
     title: "ORDER CONFIRMED",
-    description: "Your gear is locked in. We start packing immediately."
+    description: "Order confirmed. Production begins within 24 hours."
   },
   {
     number: "02",
     icon: Package,
-    title: "PROCESSING",
-    description: "Same-day handling for orders before 2 PM EST."
+    title: "PRODUCTION",
+    description: "Your items are carefully made. This takes 2-5 business days."
   },
   {
     number: "03",
     icon: Truck,
     title: "IN TRANSIT",
-    description: "Full tracking active. You know where it is at all times."
+    description: "Full tracking active. You'll know exactly where your order is."
   },
   {
     number: "04",
     icon: MapPin,
     title: "DELIVERED",
-    description: "Armor arrives. Mission ready."
+    description: "Delivered to your door."
   }
 ];
 
 const shippingOptions = [
   {
     icon: Truck,
-    title: "GROUND OPS",
-    description: "5-7 business days via USPS Priority Mail. The reliable standard.",
+    title: "STANDARD",
+    description: "5-9 business days total (includes 2-5 days production + 3-4 days shipping).",
     variant: "default" as const,
     badge: "FREE OVER $75"
   },
   {
     icon: Zap,
-    title: "RAPID DEPLOY",
-    description: "2-3 business days via FedEx 2-Day. When you need it fast.",
+    title: "EXPRESS",
+    description: "4-7 business days total (includes production + 2-3 day shipping).",
     variant: "default" as const,
     badge: "$12.99"
   },
   {
     icon: Rocket,
-    title: "PRIORITY EXTRACTION",
-    description: "Next business day via FedEx Overnight. Mission-critical speed.",
+    title: "OVERNIGHT",
+    description: "3-6 business days total (includes production + overnight shipping).",
     variant: "accent" as const,
     badge: "$24.99"
   },
   {
     icon: Globe,
-    title: "GLOBAL REACH",
-    description: "7-14 business days via DHL/UPS. We ship to 50+ countries.",
+    title: "INTERNATIONAL",
+    description: "10-21 business days total. Includes production time plus international transit.",
     variant: "default" as const,
     badge: "CALCULATED"
   }
@@ -79,22 +79,22 @@ const internationalRegions = [
   {
     icon: MapPin,
     title: "NORTH AMERICA",
-    description: "Canada & Mexico: 5-10 business days with full tracking."
+    description: "Canada & Mexico: 8-14 business days with full tracking."
   },
   {
     icon: MapPin,
     title: "EUROPE & UK",
-    description: "7-14 business days. DHL Express available for faster delivery."
+    description: "10-18 business days. Express options available for faster delivery."
   },
   {
     icon: MapPin,
     title: "ASIA-PACIFIC",
-    description: "Australia, Japan, Korea, Singapore: 10-18 business days."
+    description: "Australia, Japan, Korea, Singapore: 12-21 business days."
   },
   {
     icon: MapPin,
     title: "WORLDWIDE",
-    description: "Rest of world: 14-21 business days. Contact us for specific regions."
+    description: "Rest of world: 14-25 business days. Contact us for specific regions."
   }
 ];
 
@@ -111,9 +111,9 @@ const ShippingInfo = () => {
 
   return (
     <ServicePageLayout
-      title="YOUR ARMOR ARRIVES. ON TIME. EVERY TIME."
-      subtitle="We move like the mission depends on it. Free deployment over $75. Full tracking on every package. Global reach to 50+ countries."
-      eyebrow="DEPLOYMENT LOGISTICS"
+      title="Reliable Delivery. Every Order."
+      subtitle="Free shipping on orders over $75. Full tracking included. Worldwide delivery to 50+ countries."
+      eyebrow="SHIPPING & DELIVERY"
       heroAlignment="center"
       heroValueProps={heroValueProps}
     >
@@ -122,18 +122,18 @@ const ShippingInfo = () => {
         <div className="flex items-center justify-center gap-3">
           <CheckCircle className="w-5 h-5 text-emerald-600 dark:text-emerald-500 flex-shrink-0" />
           <p className="text-sm font-medium text-emerald-900 dark:text-emerald-100 tracking-wide">
-            98% ON-TIME DELIVERY RATE — 10,000+ PACKAGES DEPLOYED THIS YEAR
+            98% of orders delivered on time — Over 10,000 packages shipped this year
           </p>
         </div>
       </div>
 
       {/* Order Journey StepFlow */}
-      <ServiceSection id="journey" title="YOUR ORDER'S JOURNEY" size="compact">
+      <ServiceSection id="journey" title="Your Order's Journey" size="compact">
         <StepFlow steps={orderJourneySteps} variant="default" />
       </ServiceSection>
 
       {/* Shipping Calculator */}
-      <ServiceSection id="calculator" title="CALCULATE YOUR ETA">
+      <ServiceSection id="calculator" title="Calculate Your Delivery Time">
         <p className="text-muted-foreground font-light mb-6">
           Enter your ZIP code to see estimated delivery times for your location.
         </p>
@@ -141,7 +141,7 @@ const ShippingInfo = () => {
       </ServiceSection>
 
       {/* Shipping Options Grid */}
-      <ServiceSection id="options" title="DEPLOYMENT SPEED">
+      <ServiceSection id="options" title="Shipping Options">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {shippingOptions.map((option) => (
             <div key={option.title} className="relative">
@@ -164,9 +164,9 @@ const ShippingInfo = () => {
       </ServiceSection>
 
       {/* International Shipping */}
-      <ServiceSection id="international" title="GLOBAL OPERATIONS">
+      <ServiceSection id="international" title="International Shipping">
         <p className="text-muted-foreground font-light mb-6">
-          We deploy to over 50 countries worldwide. All international shipments include full tracking and delivery confirmation.
+          We ship to over 50 countries worldwide. All international shipments include full tracking and delivery confirmation.
         </p>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
@@ -192,14 +192,14 @@ const ShippingInfo = () => {
       </ServiceSection>
 
       {/* Shipping FAQ */}
-      <ServiceSection id="faq" title="LOGISTICS INTEL">
+      <ServiceSection id="faq" title="Frequently Asked Questions">
         <ShippingFAQ />
       </ServiceSection>
 
       {/* Tracking CTA */}
       <ActionCTA
-        title="NEED TRACKING SUPPORT?"
-        subtitle="Enter your order number to check real-time status, or contact our logistics team directly."
+        title="Need Tracking Support?"
+        subtitle="Enter your order number to check real-time status, or contact our support team directly."
         alignment="center"
         showInput
         inputPlaceholder="Order number (e.g., #LOJ-12345)"
@@ -207,7 +207,7 @@ const ShippingInfo = () => {
         onSubmit={handleTrackOrder}
         footerText="Or contact"
         footerLinks={[
-          { text: "logistics@lineofjudah.com", href: "mailto:shipping@lineofjudah.com", isExternal: true }
+          { text: "orders@lineofjudah.com", href: "mailto:orders@lineofjudah.com", isExternal: true }
         ]}
       />
     </ServicePageLayout>
