@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation, Navigate } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import { AuthProvider } from "@/hooks/useAuth";
 import { CartProvider } from "@/hooks/useCart";
@@ -17,7 +17,6 @@ import NotFound from "./pages/NotFound";
 import OurStory from "./pages/about/OurStory";
 import OurMission from "./pages/about/OurMission";
 import SizeGuide from "./pages/about/SizeGuide";
-import CustomerCare from "./pages/about/CustomerCare";
 import Contact from "./pages/Contact";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
@@ -61,7 +60,7 @@ const AnimatedRoutes = () => {
         <Route path="/about/our-story" element={<PageTransition><OurStory /></PageTransition>} />
         <Route path="/about/our-mission" element={<PageTransition><OurMission /></PageTransition>} />
         <Route path="/about/size-guide" element={<PageTransition><SizeGuide /></PageTransition>} />
-        <Route path="/about/customer-care" element={<PageTransition><CustomerCare /></PageTransition>} />
+        <Route path="/about/customer-care" element={<Navigate to="/contact" replace />} />
         <Route path="/contact" element={<PageTransition><Contact /></PageTransition>} />
         <Route path="/privacy-policy" element={<PageTransition><PrivacyPolicy /></PageTransition>} />
         <Route path="/terms-of-service" element={<PageTransition><TermsOfService /></PageTransition>} />

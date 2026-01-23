@@ -1,4 +1,5 @@
-import { Clock, Calendar, Zap, MessageCircle, Mail, Phone, MessageSquare, Instagram, ExternalLink } from "lucide-react";
+import { Clock, Calendar, Zap, MessageCircle, Mail, Phone, MessageSquare, Instagram, ExternalLink, Package, Ruler, RotateCcw, HelpCircle } from "lucide-react";
+import { Link } from "react-router-dom";
 import ServicePageLayout from "@/components/service/ServicePageLayout";
 import ServiceSection from "@/components/service/ServiceSection";
 import InfoCard from "@/components/service/InfoCard";
@@ -7,6 +8,7 @@ import DeclarationBlock from "@/components/accessibility/DeclarationBlock";
 import ResponseCommitment from "@/components/contact/ResponseCommitment";
 import OperatingHours from "@/components/contact/OperatingHours";
 import ContactForm from "@/components/contact/ContactForm";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useToast } from "@/hooks/use-toast";
 
 const heroValueProps = [
@@ -85,6 +87,66 @@ const priorityHotlines = [
     subject: "Partnership / Press",
     email: "press@lineofjudah.com",
     response: "48-72 hours",
+  },
+];
+
+const selfServiceTools = [
+  {
+    icon: Package,
+    title: "ORDER TRACKING",
+    description: "Check real-time status of your shipment and get tracking updates.",
+    link: "/account/orders",
+  },
+  {
+    icon: Ruler,
+    title: "SIZE GUIDE",
+    description: "Detailed measurements and fit notes for every product.",
+    link: "/about/size-guide",
+  },
+  {
+    icon: RotateCcw,
+    title: "RETURNS PORTAL",
+    description: "Start a return or exchange in under 2 minutes.",
+    link: "/returns",
+  },
+  {
+    icon: HelpCircle,
+    title: "FAQ",
+    description: "Answers to the questions we hear most often.",
+    link: "/faq",
+  },
+];
+
+const quickFAQs = [
+  {
+    id: "shipping",
+    question: "What are your shipping options and timeframes?",
+    answer: "Ground Ops (5-7 days, FREE over $75), Rapid Deploy (2-3 days, $12.99), Priority Extraction (next day, $24.99). We ship to 50+ countries worldwide. All orders include tracking and insurance.",
+  },
+  {
+    id: "returns",
+    question: "What's your return and exchange policy?",
+    answer: "30-day satisfaction guarantee on unworn items with original tags attached. Free returns via prepaid label. Custom pieces and items marked Final Sale are non-returnable. Exchanges processed within 3-5 business days of receiving your return.",
+  },
+  {
+    id: "sizing",
+    question: "How do I find my size?",
+    answer: "Check our Size Guide for detailed measurements on every product. Each item includes model info (height, size worn). For personalized recommendations, use our AI Fit Finder in the Try-On Room or email fit@lineofjudah.com.",
+  },
+  {
+    id: "tracking",
+    question: "Can I track my order?",
+    answer: "Yes. Tracking activates within 24 hours of shipment. You'll receive an email with tracking link, or check Account → Orders anytime. We ship via USPS, UPS, and FedEx depending on destination.",
+  },
+  {
+    id: "gifting",
+    question: "Do you offer gift wrapping?",
+    answer: "We don't offer gift wrapping currently, but all orders ship in premium branded packaging suitable for gifting. Gift receipts are available at checkout—just check the box.",
+  },
+  {
+    id: "ambassador",
+    question: "How do I become an Ambassador?",
+    answer: "Apply at our Ambassador page. We review applications monthly and look for tribe members who live the mission and create authentic content. Ambassadors get early access, exclusive discounts, and commission on referrals.",
   },
 ];
 
@@ -192,6 +254,66 @@ const Contact = () => {
               </div>
             </div>
           ))}
+        </div>
+      </ServiceSection>
+      
+      {/* Self-Service Tools */}
+      <ServiceSection
+        id="self-service"
+        title="Self-Service Tools"
+        subtitle="Handle common tasks yourself—faster than waiting for a response."
+        className="mt-16"
+      >
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          {selfServiceTools.map((tool) => (
+            <Link key={tool.title} to={tool.link} className="block group">
+              <InfoCard
+                title={tool.title}
+                description={tool.description}
+                icon={tool.icon}
+                iconColor="emerald"
+              >
+                <span className="inline-flex items-center gap-1 text-sm font-medium text-amber-600 group-hover:text-amber-700 transition-colors mt-4">
+                  Open Tool
+                  <ExternalLink className="w-3 h-3" />
+                </span>
+              </InfoCard>
+            </Link>
+          ))}
+        </div>
+      </ServiceSection>
+      
+      {/* Quick Intel FAQ */}
+      <ServiceSection
+        id="quick-intel"
+        title="Quick Intel"
+        subtitle="Answers to the questions we hear most often."
+        className="mt-16"
+      >
+        <Accordion type="single" collapsible className="space-y-3">
+          {quickFAQs.map((faq) => (
+            <AccordionItem 
+              key={faq.id} 
+              value={faq.id} 
+              className="border border-border px-6 bg-background hover:bg-muted/30 transition-colors"
+            >
+              <AccordionTrigger className="text-left hover:no-underline py-4">
+                <span className="font-medium">{faq.question}</span>
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground pb-4">
+                {faq.answer}
+              </AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
+        <div className="mt-6 text-center">
+          <Link 
+            to="/faq" 
+            className="inline-flex items-center gap-2 text-sm font-medium text-amber-600 hover:text-amber-700 transition-colors"
+          >
+            View All FAQs
+            <ExternalLink className="w-3 h-3" />
+          </Link>
         </div>
       </ServiceSection>
       
