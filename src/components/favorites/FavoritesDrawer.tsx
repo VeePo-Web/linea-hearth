@@ -1,9 +1,11 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ShoppingBag, Heart, Trash2 } from 'lucide-react';
+import { X, ShoppingBag, Heart, Trash2, Check } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useFavorites } from '@/hooks/useFavorites';
-import { useCart } from '@/hooks/useCart';
 import { useAuth } from '@/hooks/useAuth';
+import { useQuickAdd, ProductForQuickAdd } from '@/hooks/useQuickAdd';
+import InlineQuickSizePicker from '@/components/ui/InlineQuickSizePicker';
+import { formatPrice } from '@/lib/cartUtils';
 
 interface FavoritesDrawerProps {
   isOpen: boolean;
@@ -11,29 +13,207 @@ interface FavoritesDrawerProps {
   onAuthRequired: () => void;
 }
 
+// Individual favorite item with quick add functionality
+function FavoriteItem({ 
+  favorite, 
+  onRemove, 
+  onClose, 
+  index 
+}: { 
+  favorite: ReturnType<typeof useFavorites>['favorites'][0];
+  onRemove: (id: string) => void;
+  onClose: () => void;
+  index: number;
+}) {
+  const quickAddProduct: ProductForQuickAdd = {
+    id: favorite.product.id,
+    name: favorite.product.name,
+    slug: favorite.product.slug,
+    price: favorite.product.price,
+    sale_price: favorite.product.sale_price,
+    is_on_sale: favorite.product.is_on_sale,
+    category_slug: favorite.product.category?.slug,
+    product_images: favorite.product.images?.map(img => ({
+      image_url: img.image_url,
+      is_primary: img.is_primary,
+    })),
+    // Note: favorites don't have variant data loaded, so quick add will use defaults
+    product_variants: [],
+  };
+
+  const quickAdd = useQuickAdd(quickAddProduct, { showToast: true });
+  
+  const primaryImage = favorite.product.images?.find(img => img.is_primary) || favorite.product.images?.[0];
+  const displayPrice = favorite.product.is_on_sale && favorite.product.sale_price
+    ? favorite.product.sale_price
+    : favorite.product.price;
+
+  return (
+    <motion.div
+      className="flex gap-4 p-2 rounded-lg hover:bg-muted/30 transition-colors group relative"
+      initial={{ opacity: 0, x: 20 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: -20, height: 0 }}
+      transition={{ delay: index * 0.05 }}
+      layout
+    >
+      {/* Image */}
+      <Link
+        to={`/product/${favorite.product.slug}`}
+        onClick={onClose}
+        className="w-20 h-24 bg-muted flex-shrink-0 overflow-hidden relative"
+      >
+        <img
+          src={primaryImage?.image_url || '/placeholder.svg'}
+          alt={primaryImage?.alt_text || favorite.product.name}
+          className="w-full h-full object-cover"
+        />
+        
+        {/* Success Overlay */}
+        <AnimatePresence>
+          {quickAdd.isAdded && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-emerald-600/90 flex items-center justify-center"
+            >
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ type: "spring", stiffness: 400, damping: 20 }}
+              >
+                <Check className="w-6 h-6 text-white" strokeWidth={2.5} />
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </Link>
+
+      {/* Details */}
+      <div className="flex-1 min-w-0">
+        <Link
+          to={`/product/${favorite.product.slug}`}
+          onClick={onClose}
+          className="block"
+        >
+          <h3 className="text-sm font-medium text-foreground truncate hover:underline">
+            {favorite.product.name}
+          </h3>
+        </Link>
+        
+        {favorite.product.category && (
+          <p className="text-xs text-muted-foreground mt-0.5">
+            {favorite.product.category.name}
+          </p>
+        )}
+
+        <div className="flex items-center gap-2 mt-1">
+          <span className="text-sm font-medium text-foreground">
+            {formatPrice(displayPrice)}
+          </span>
+          {favorite.product.is_on_sale && favorite.product.sale_price && (
+            <span className="text-xs text-muted-foreground line-through">
+              {formatPrice(favorite.product.price)}
+            </span>
+          )}
+          {/* Size memory indicator */}
+          {quickAdd.rememberedSize && (
+            <span className="text-[10px] uppercase tracking-wide text-amber-600 font-medium">
+              {quickAdd.rememberedSize}
+            </span>
+          )}
+        </div>
+
+        {/* Actions */}
+        <div className="flex items-center gap-2 mt-3 relative">
+          {!quickAdd.isPickerOpen ? (
+            <button
+              onClick={quickAdd.handleQuickAdd}
+              disabled={quickAdd.isAdding || quickAdd.isAdded}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-foreground text-background text-xs font-medium hover:bg-foreground/90 transition-colors disabled:opacity-50"
+            >
+              {quickAdd.isAdding ? (
+                <span className="animate-pulse">Adding...</span>
+              ) : quickAdd.isAdded ? (
+                <>
+                  <Check size={12} />
+                  Added
+                </>
+              ) : (
+                <>
+                  <ShoppingBag size={12} />
+                  {quickAdd.canOneTap ? `Add in ${quickAdd.rememberedSize}` : 'Add to Bag'}
+                </>
+              )}
+            </button>
+          ) : null}
+          
+          <button
+            onClick={() => onRemove(favorite.product_id)}
+            className="p-1.5 text-muted-foreground hover:text-destructive transition-colors"
+            aria-label="Remove from favorites"
+          >
+            <Trash2 size={14} />
+          </button>
+        </div>
+        
+        {/* Inline Size Picker */}
+        <AnimatePresence>
+          {quickAdd.isPickerOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="mt-2 overflow-hidden"
+            >
+              <div className="bg-muted/50 p-2 rounded">
+                <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-2">
+                  Select Size
+                </p>
+                <div className="flex flex-wrap gap-1.5">
+                  {quickAdd.availableSizes.map(size => {
+                    const isRemembered = size === quickAdd.rememberedSize;
+                    return (
+                      <button
+                        key={size}
+                        onClick={(e) => quickAdd.handleSizeSelect(size, e)}
+                        className={`
+                          relative min-w-[32px] h-8 px-2 text-xs rounded transition-colors
+                          ${isRemembered
+                            ? 'bg-amber-500 text-white font-medium'
+                            : 'bg-background hover:bg-muted text-foreground border border-border'
+                          }
+                        `}
+                      >
+                        {size}
+                        {isRemembered && (
+                          <span className="absolute -top-1.5 left-1/2 -translate-x-1/2 text-[7px] uppercase tracking-wide text-amber-600 bg-muted/50 px-1 rounded whitespace-nowrap">
+                            yours
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+                <button
+                  onClick={quickAdd.hideSizePicker}
+                  className="mt-2 text-xs text-muted-foreground hover:text-foreground"
+                >
+                  Cancel
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </motion.div>
+  );
+}
+
 export default function FavoritesDrawer({ isOpen, onClose, onAuthRequired }: FavoritesDrawerProps) {
   const { user } = useAuth();
   const { favorites, isLoading, removeFavorite, favoritesCount } = useFavorites();
-  const { addItem } = useCart();
-
-  const handleAddToBag = (favorite: typeof favorites[0]) => {
-    const primaryImage = favorite.product.images?.find(img => img.is_primary) || favorite.product.images?.[0];
-    
-    addItem({
-      id: parseInt(favorite.product.id.slice(0, 8), 16), // Convert UUID to number for cart
-      name: favorite.product.name,
-      price: favorite.product.is_on_sale && favorite.product.sale_price 
-        ? favorite.product.sale_price 
-        : favorite.product.price,
-      priceFormatted: `$${(favorite.product.is_on_sale && favorite.product.sale_price 
-        ? favorite.product.sale_price 
-        : favorite.product.price).toFixed(2)}`,
-      image: primaryImage?.image_url || '/placeholder.svg',
-      category: favorite.product.category?.name || 'Apparel',
-    });
-  };
-
-  const formatPrice = (price: number) => `$${price.toFixed(2)}`;
 
   return (
     <AnimatePresence>
@@ -167,85 +347,15 @@ export default function FavoritesDrawer({ isOpen, onClose, onAuthRequired }: Fav
                 // Favorites list
                 <div className="p-4 space-y-4">
                   <AnimatePresence initial={false}>
-                    {favorites.map((favorite, index) => {
-                      const primaryImage = favorite.product.images?.find(img => img.is_primary) || favorite.product.images?.[0];
-                      const displayPrice = favorite.product.is_on_sale && favorite.product.sale_price
-                        ? favorite.product.sale_price
-                        : favorite.product.price;
-
-                      return (
-                        <motion.div
-                          key={favorite.id}
-                          className="flex gap-4 p-2 rounded-lg hover:bg-muted/30 transition-colors group"
-                          initial={{ opacity: 0, x: 20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          exit={{ opacity: 0, x: -20, height: 0 }}
-                          transition={{ delay: index * 0.05 }}
-                          layout
-                        >
-                          {/* Image */}
-                          <Link
-                            to={`/product/${favorite.product.slug}`}
-                            onClick={onClose}
-                            className="w-20 h-24 bg-muted flex-shrink-0 overflow-hidden"
-                          >
-                            <img
-                              src={primaryImage?.image_url || '/placeholder.svg'}
-                              alt={primaryImage?.alt_text || favorite.product.name}
-                              className="w-full h-full object-cover"
-                            />
-                          </Link>
-
-                          {/* Details */}
-                          <div className="flex-1 min-w-0">
-                            <Link
-                              to={`/product/${favorite.product.slug}`}
-                              onClick={onClose}
-                              className="block"
-                            >
-                              <h3 className="text-sm font-medium text-foreground truncate hover:underline">
-                                {favorite.product.name}
-                              </h3>
-                            </Link>
-                            
-                            {favorite.product.category && (
-                              <p className="text-xs text-muted-foreground mt-0.5">
-                                {favorite.product.category.name}
-                              </p>
-                            )}
-
-                            <div className="flex items-center gap-2 mt-1">
-                              <span className="text-sm font-medium text-foreground">
-                                {formatPrice(displayPrice)}
-                              </span>
-                              {favorite.product.is_on_sale && favorite.product.sale_price && (
-                                <span className="text-xs text-muted-foreground line-through">
-                                  {formatPrice(favorite.product.price)}
-                                </span>
-                              )}
-                            </div>
-
-                            {/* Actions */}
-                            <div className="flex items-center gap-2 mt-3">
-                              <button
-                                onClick={() => handleAddToBag(favorite)}
-                                className="flex items-center gap-1.5 px-3 py-1.5 bg-foreground text-background text-xs font-medium hover:bg-foreground/90 transition-colors"
-                              >
-                                <ShoppingBag size={12} />
-                                Add to Bag
-                              </button>
-                              <button
-                                onClick={() => removeFavorite(favorite.product_id)}
-                                className="p-1.5 text-muted-foreground hover:text-destructive transition-colors"
-                                aria-label="Remove from favorites"
-                              >
-                                <Trash2 size={14} />
-                              </button>
-                            </div>
-                          </div>
-                        </motion.div>
-                      );
-                    })}
+                    {favorites.map((favorite, index) => (
+                      <FavoriteItem
+                        key={favorite.id}
+                        favorite={favorite}
+                        onRemove={removeFavorite}
+                        onClose={onClose}
+                        index={index}
+                      />
+                    ))}
                   </AnimatePresence>
                 </div>
               )}

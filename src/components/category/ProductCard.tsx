@@ -1,9 +1,13 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Eye, Plus } from "lucide-react";
+import { Eye, Plus, Check } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import FavoriteButton from "@/components/favorites/FavoriteButton";
+import InlineQuickSizePicker from "@/components/ui/InlineQuickSizePicker";
+import { useQuickAdd, ProductForQuickAdd } from "@/hooks/useQuickAdd";
+import { useReducedMotion } from "@/hooks/useReducedMotion";
 
 interface ProductImage {
   image_url: string;
@@ -44,6 +48,25 @@ interface ProductCardProps {
 
 const ProductCard = ({ product, onQuickView, index = 0, onAuthRequired }: ProductCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
+  const prefersReducedMotion = useReducedMotion();
+
+  // Map product to QuickAdd format
+  const quickAddProduct: ProductForQuickAdd = {
+    id: product.id,
+    name: product.name,
+    slug: product.slug,
+    price: product.price,
+    sale_price: product.sale_price,
+    is_on_sale: product.is_on_sale,
+    category_slug: product.categories?.slug,
+    product_images: product.product_images?.map(img => ({
+      image_url: img.image_url,
+      is_primary: img.is_primary,
+    })),
+    product_variants: product.product_variants,
+  };
+
+  const quickAdd = useQuickAdd(quickAddProduct);
 
   // Get primary and secondary images
   const sortedImages = [...(product.product_images || [])].sort(
@@ -51,12 +74,6 @@ const ProductCard = ({ product, onQuickView, index = 0, onAuthRequired }: Produc
   );
   const primaryImage = sortedImages.find((img) => img.is_primary) || sortedImages[0];
   const secondaryImage = sortedImages.find((img) => !img.is_primary && img !== primaryImage);
-
-  // Calculate total stock
-  const totalStock = (product.product_variants || []).reduce(
-    (sum, v) => sum + v.stock_quantity,
-    0
-  );
 
   // Check if product is new (created within last 14 days)
   const isNew = new Date(product.created_at) > new Date(Date.now() - 14 * 24 * 60 * 60 * 1000);
@@ -78,14 +95,11 @@ const ProductCard = ({ product, onQuickView, index = 0, onAuthRequired }: Produc
   if (product.is_on_sale && product.sale_price) {
     badges.push({ label: "SALE", className: "bg-amber-500 text-white" });
   }
-  if (totalStock > 0 && totalStock < 3) {
-    badges.push({ label: "ALMOST GONE", className: "bg-red-500 text-white" });
-  } else if (totalStock > 0 && totalStock < 5) {
+  if (quickAdd.hasLowStock) {
     badges.push({ label: "LOW STOCK", className: "bg-orange-500 text-white" });
+  } else if (quickAdd.totalStock > 0 && quickAdd.totalStock < 5) {
+    badges.push({ label: "ALMOST GONE", className: "bg-red-500 text-white" });
   }
-
-  // Check if single variant for quick add
-  const isSingleVariant = (product.product_variants || []).length <= 1;
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("en-US", {
@@ -94,12 +108,17 @@ const ProductCard = ({ product, onQuickView, index = 0, onAuthRequired }: Produc
     }).format(price);
   };
 
+  const springConfig = { type: "spring" as const, stiffness: 400, damping: 25 };
+
   return (
     <Card
       className="border-none shadow-none bg-transparent group cursor-pointer animate-fade-in"
       style={{ animationDelay: `${index * 50}ms` }}
       onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      onMouseLeave={() => {
+        setIsHovered(false);
+        if (quickAdd.isPickerOpen) quickAdd.hideSizePicker();
+      }}
     >
       <CardContent className="p-0">
         <Link to={`/product/${product.slug}`}>
@@ -162,10 +181,33 @@ const ProductCard = ({ product, onQuickView, index = 0, onAuthRequired }: Produc
               />
             </div>
 
+            {/* Success Overlay */}
+            <AnimatePresence>
+              {quickAdd.isAdded && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="absolute inset-0 bg-emerald-600/90 flex flex-col items-center justify-center gap-2 z-10"
+                >
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                  >
+                    <Check className="w-8 h-8 text-white" strokeWidth={2.5} />
+                  </motion.div>
+                  <span className="text-white text-xs font-medium">
+                    Size {quickAdd.addedSize}
+                  </span>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
             {/* Quick Actions (hover) */}
             <div
               className={`absolute bottom-3 left-3 right-3 flex gap-2 transition-all duration-300 ${
-                isHovered ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
+                isHovered && !quickAdd.isPickerOpen && !quickAdd.isAdded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
               }`}
             >
               <Button
@@ -181,21 +223,46 @@ const ProductCard = ({ product, onQuickView, index = 0, onAuthRequired }: Produc
                 <Eye className="w-3.5 h-3.5 mr-1.5" />
                 Quick View
               </Button>
-              {isSingleVariant && totalStock > 0 && (
-                <Button
-                  variant="default"
-                  size="sm"
-                  className="bg-foreground/95 hover:bg-foreground text-background text-xs h-9 px-3"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    // TODO: Add to cart
-                  }}
+              {quickAdd.totalStock > 0 && (
+                <motion.div
+                  whileHover={prefersReducedMotion ? {} : { scale: 1.05 }}
+                  whileTap={prefersReducedMotion ? {} : { scale: 0.95 }}
+                  transition={springConfig}
                 >
-                  <Plus className="w-3.5 h-3.5" />
-                </Button>
+                  <Button
+                    variant="default"
+                    size="sm"
+                    className={`text-xs h-9 px-3 ${
+                      quickAdd.canOneTap 
+                        ? 'bg-amber-500 hover:bg-amber-400 text-white' 
+                        : 'bg-foreground/95 hover:bg-foreground text-background'
+                    }`}
+                    onClick={quickAdd.handleQuickAdd}
+                    disabled={quickAdd.isAdding}
+                  >
+                    {quickAdd.isAdding ? (
+                      <span className="animate-pulse">...</span>
+                    ) : (
+                      <Plus className="w-3.5 h-3.5" />
+                    )}
+                  </Button>
+                </motion.div>
               )}
             </div>
+
+            {/* Inline Size Picker */}
+            <AnimatePresence>
+              {quickAdd.isPickerOpen && (
+                <InlineQuickSizePicker
+                  sizes={quickAdd.availableSizes}
+                  rememberedSize={quickAdd.rememberedSize}
+                  onSelect={quickAdd.handleSizeSelect}
+                  onClose={quickAdd.hideSizePicker}
+                  getStockForSize={(size) => quickAdd.getStockForVariant(size)}
+                  variant="light"
+                />
+              )}
+            </AnimatePresence>
           </div>
         </Link>
 
@@ -231,39 +298,47 @@ const ProductCard = ({ product, onQuickView, index = 0, onAuthRequired }: Produc
             </div>
           </div>
 
-          {/* Color Swatches */}
-          {uniqueColors.length > 1 && (
-            <div className="flex items-center gap-1.5 pt-1">
-              {uniqueColors.slice(0, 4).map((color) => (
-                <span
-                  key={color}
-                  className="w-3.5 h-3.5 rounded-full border border-border"
-                  style={{
-                    backgroundColor:
-                      color.toLowerCase() === "black"
-                        ? "#1a1a1a"
-                        : color.toLowerCase() === "white"
-                        ? "#ffffff"
-                        : color.toLowerCase() === "navy"
-                        ? "#1e3a5f"
-                        : color.toLowerCase() === "gray" || color.toLowerCase() === "grey"
-                        ? "#6b7280"
-                        : color.toLowerCase() === "natural"
-                        ? "#f5f0e6"
-                        : color.toLowerCase() === "gold"
-                        ? "#d4af37"
-                        : color,
-                  }}
-                  title={color}
-                />
-              ))}
-              {uniqueColors.length > 4 && (
-                <span className="text-[10px] text-muted-foreground">
-                  +{uniqueColors.length - 4}
-                </span>
-              )}
-            </div>
-          )}
+          {/* Color Swatches + Size Memory Hint */}
+          <div className="flex items-center justify-between pt-1">
+            {uniqueColors.length > 1 && (
+              <div className="flex items-center gap-1.5">
+                {uniqueColors.slice(0, 4).map((color) => (
+                  <span
+                    key={color}
+                    className="w-3.5 h-3.5 rounded-full border border-border"
+                    style={{
+                      backgroundColor:
+                        color.toLowerCase() === "black"
+                          ? "#1a1a1a"
+                          : color.toLowerCase() === "white"
+                          ? "#ffffff"
+                          : color.toLowerCase() === "navy"
+                          ? "#1e3a5f"
+                          : color.toLowerCase() === "gray" || color.toLowerCase() === "grey"
+                          ? "#6b7280"
+                          : color.toLowerCase() === "natural"
+                          ? "#f5f0e6"
+                          : color.toLowerCase() === "gold"
+                          ? "#d4af37"
+                          : color,
+                    }}
+                    title={color}
+                  />
+                ))}
+                {uniqueColors.length > 4 && (
+                  <span className="text-[10px] text-muted-foreground">
+                    +{uniqueColors.length - 4}
+                  </span>
+                )}
+              </div>
+            )}
+            {/* Size memory indicator */}
+            {quickAdd.rememberedSize && quickAdd.stockForRemembered > 0 && (
+              <span className="text-[10px] uppercase tracking-wide text-amber-600 font-medium">
+                {quickAdd.rememberedSize}
+              </span>
+            )}
+          </div>
         </div>
       </CardContent>
     </Card>

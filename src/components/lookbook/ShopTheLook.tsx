@@ -5,10 +5,11 @@ import { motion, useReducedMotion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useCart } from "@/hooks/useCart";
-import { useSizeMemory } from "@/hooks/useSizeMemory";
+import { useQuickAdd, ProductForQuickAdd } from "@/hooks/useQuickAdd";
 import StaggerContainer from "@/components/motion/StaggerContainer";
-import InlineSizePicker from "./InlineSizePicker";
+import InlineQuickSizePicker from "@/components/ui/InlineQuickSizePicker";
 import { DrawCheckIcon } from "@/components/ui/draw-check-icon";
+import { productIdToCartId } from "@/lib/cartUtils";
 
 interface LookProduct {
   id: string;
@@ -29,25 +30,191 @@ interface ShopTheLookProps {
   lookName: string;
 }
 
-// Default sizes for products (in real app, would come from product variants)
-const DEFAULT_SIZES = ['S', 'M', 'L', 'XL'];
+// Individual product card with integrated quick add
+function LookProductCard({ 
+  product, 
+  productsInCart 
+}: { 
+  product: LookProduct; 
+  productsInCart: Set<number>;
+}) {
+  const prefersReducedMotion = useReducedMotion();
+  
+  const quickAddProduct: ProductForQuickAdd = {
+    id: product.id,
+    name: product.name,
+    slug: product.slug,
+    price: product.price,
+    sale_price: product.sale_price,
+    is_on_sale: product.is_on_sale,
+    position: product.position,
+    product_images: product.product_images,
+    product_variants: [], // Lookbook products use default sizes
+  };
+
+  const quickAdd = useQuickAdd(quickAddProduct, { 
+    categoryOverride: product.position || undefined,
+  });
+
+  const primaryImage = product.product_images?.find(img => img.is_primary) || product.product_images?.[0];
+  const positionLabel = getPositionLabel(product.position);
+  const cartId = productIdToCartId(product.id);
+  const isInCart = productsInCart.has(cartId);
+
+  const springConfig = { type: "spring" as const, stiffness: 400, damping: 25 };
+
+  return (
+    <motion.div 
+      className="group relative"
+      whileHover={prefersReducedMotion ? {} : { y: -4 }}
+      transition={springConfig}
+    >
+      <Link to={`/product/${product.slug}`}>
+        <motion.div 
+          className="aspect-[3/4] bg-stone-800 rounded-lg overflow-hidden relative"
+          whileHover={prefersReducedMotion ? {} : { 
+            boxShadow: "0 10px 40px -10px rgba(0,0,0,0.5)" 
+          }}
+          transition={springConfig}
+        >
+          {primaryImage && (
+            <motion.img
+              src={primaryImage.image_url}
+              alt={product.name}
+              className="w-full h-full object-cover"
+              whileHover={prefersReducedMotion ? {} : { scale: 1.05 }}
+              transition={{ duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
+            />
+          )}
+          
+          {/* Position Tag */}
+          {positionLabel && (
+            <span className="absolute top-2 left-2 text-[9px] uppercase tracking-wider bg-black/70 text-white/90 px-2 py-1 rounded font-light">
+              {positionLabel}
+            </span>
+          )}
+
+          {/* Success Overlay */}
+          <AnimatePresence>
+            {quickAdd.isAdded && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="absolute inset-0 bg-green-600/90 rounded-lg 
+                           flex flex-col items-center justify-center gap-2"
+              >
+                <DrawCheckIcon size="lg" color="white" animate delay={0.1} />
+                <span className="text-white text-xs font-medium">
+                  Size {quickAdd.addedSize}
+                </span>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* In Cart Badge */}
+          {isInCart && !quickAdd.isAdded && (
+            <div className="absolute top-2 right-2 bg-green-600 rounded-full p-1">
+              <Check className="w-3 h-3 text-white" />
+            </div>
+          )}
+
+          {/* Quick Add Button */}
+          {!isInCart && !quickAdd.isAdded && (
+            <motion.button
+              onClick={quickAdd.handleQuickAdd}
+              disabled={quickAdd.isAdding}
+              className={`
+                absolute bottom-2 right-2 w-9 h-9 rounded-full 
+                flex items-center justify-center transition-colors
+                ${quickAdd.canOneTap 
+                  ? 'bg-amber-500 hover:bg-amber-400' 
+                  : 'bg-white/95 hover:bg-white'
+                }
+              `}
+              whileHover={prefersReducedMotion ? {} : { scale: 1.1 }}
+              whileTap={prefersReducedMotion ? {} : { scale: 0.9 }}
+              aria-label={quickAdd.canOneTap 
+                ? `Quick add ${product.name} in size ${quickAdd.rememberedSize}` 
+                : `Add ${product.name} - select size`
+              }
+              transition={springConfig}
+            >
+              {quickAdd.isAdding ? (
+                <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <Plus className={`w-4 h-4 ${quickAdd.canOneTap ? 'text-white' : 'text-stone-900'}`} />
+              )}
+            </motion.button>
+          )}
+
+          {/* Inline Size Picker */}
+          <AnimatePresence>
+            {quickAdd.isPickerOpen && (
+              <InlineQuickSizePicker
+                sizes={quickAdd.availableSizes}
+                rememberedSize={quickAdd.rememberedSize}
+                onSelect={quickAdd.handleSizeSelect}
+                onClose={quickAdd.hideSizePicker}
+                getStockForSize={(size) => quickAdd.getStockForVariant(size)}
+                variant="dark"
+              />
+            )}
+          </AnimatePresence>
+        </motion.div>
+      </Link>
+
+      {/* Product Info */}
+      <div className="mt-2.5">
+        <p className="text-xs text-white/90 font-light truncate">
+          {product.name}
+        </p>
+        <div className="flex items-center gap-2 mt-0.5">
+          <p className="text-xs text-white/50 font-light">
+            {product.is_on_sale && product.sale_price ? (
+              <>
+                <span className="text-amber-500">${product.sale_price}</span>
+                <span className="line-through ml-1.5 text-white/30">${product.price}</span>
+              </>
+            ) : (
+              `$${product.price}`
+            )}
+          </p>
+          {/* Show remembered size hint */}
+          {quickAdd.rememberedSize && !isInCart && (
+            <span className="text-[9px] uppercase tracking-wide text-amber-500/70">
+              {quickAdd.rememberedSize}
+            </span>
+          )}
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+function getPositionLabel(position: string | null) {
+  if (!position) return null;
+  const labels: Record<string, string> = {
+    hat: "HAT",
+    top: "TOP",
+    bottom: "BOTTOM",
+    shoes: "SHOES",
+    accessories: "ACC",
+  };
+  return labels[position.toLowerCase()] || position.toUpperCase();
+}
 
 const ShopTheLook = ({ products, lookName }: ShopTheLookProps) => {
   const { toast } = useToast();
   const { addItem, items } = useCart();
-  const { getRememberedSize, rememberSize } = useSizeMemory();
   const prefersReducedMotion = useReducedMotion();
   
-  // Track which product has size selector expanded
-  const [expandedProduct, setExpandedProduct] = useState<string | null>(null);
-  // Track recently added products for success animation
+  // Track recently added products for the "complete look" logic
   const [addedProducts, setAddedProducts] = useState<Set<string>>(new Set());
-  // Track sizes selected for each product (for the session)
-  const [selectedSizes, setSelectedSizes] = useState<Record<string, string>>({});
 
   // Check which products are already in cart
   const productsInCart = useMemo(() => 
-    new Set(items.map(item => String(item.id))),
+    new Set(items.map(item => item.id)),
     [items]
   );
 
@@ -55,82 +222,35 @@ const ShopTheLook = ({ products, lookName }: ShopTheLookProps) => {
     return sum + (product.is_on_sale && product.sale_price ? product.sale_price : product.price);
   }, 0);
 
-  const addedCount = products.filter(p => addedProducts.has(p.id) || productsInCart.has(p.id)).length;
+  const addedCount = products.filter(p => {
+    const cartId = productIdToCartId(p.id);
+    return addedProducts.has(p.id) || productsInCart.has(cartId);
+  }).length;
 
-  const addToCart = (product: LookProduct, size: string) => {
-    const price = product.is_on_sale && product.sale_price ? product.sale_price : product.price;
-    const primaryImage = product.product_images?.find(img => img.is_primary) || product.product_images?.[0];
-    
-    addItem({
-      id: parseInt(product.id) || Math.random() * 10000,
-      name: product.name,
-      price: price,
-      priceFormatted: `$${price}`,
-      image: primaryImage?.image_url || '',
-      category: product.position || 'Lookbook',
-      size: size,
-    });
-
-    // Show success state
-    setAddedProducts(prev => new Set(prev).add(product.id));
-    setSelectedSizes(prev => ({ ...prev, [product.id]: size }));
-    setExpandedProduct(null);
-
-    // Remember size for this category
-    if (product.position) {
-      rememberSize(product.position, size);
-    }
-
-    toast({
-      title: `Added in size ${size}`,
-      description: product.name,
-    });
-
-    // Clear success state after animation
-    setTimeout(() => {
-      setAddedProducts(prev => {
-        const next = new Set(prev);
-        next.delete(product.id);
-        return next;
-      });
-    }, 2000);
-  };
-
-  const handleQuickAdd = (product: LookProduct, e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    // If already in cart, don't do anything
-    if (productsInCart.has(product.id)) return;
-    
-    // Check for remembered size
-    const categoryKey = product.position || 'tops';
-    const rememberedSize = getRememberedSize(categoryKey);
-    
-    if (rememberedSize) {
-      // One-tap add with remembered size
-      addToCart(product, rememberedSize);
-    } else {
-      // Expand to show size selector
-      setExpandedProduct(expandedProduct === product.id ? null : product.id);
-    }
-  };
-
-  const handleSizeSelect = (product: LookProduct, size: string) => {
-    addToCart(product, size);
-  };
-
+  // Handle add all with size memory
   const handleAddAll = () => {
     let addedAny = false;
     
     products.forEach(product => {
-      if (productsInCart.has(product.id)) return;
+      const cartId = productIdToCartId(product.id);
+      if (productsInCart.has(cartId)) return;
       
-      const categoryKey = product.position || 'tops';
-      const rememberedSize = getRememberedSize(categoryKey);
-      const size = rememberedSize || 'M'; // Default to M if no preference
+      const primaryImage = product.product_images?.find(img => img.is_primary) || product.product_images?.[0];
+      const price = product.is_on_sale && product.sale_price ? product.sale_price : product.price;
       
-      addToCart(product, size);
+      // Note: Individual size selection would come from the quick add hook
+      // For "add all", we use 'M' as sensible default
+      addItem({
+        id: cartId,
+        name: product.name,
+        price: price,
+        priceFormatted: `$${price}`,
+        image: primaryImage?.image_url || '',
+        category: product.position || 'Lookbook',
+        size: 'M',
+      });
+
+      setAddedProducts(prev => new Set(prev).add(product.id));
       addedAny = true;
     });
 
@@ -140,18 +260,6 @@ const ShopTheLook = ({ products, lookName }: ShopTheLookProps) => {
         description: `"${lookName}" added to your bag`,
       });
     }
-  };
-
-  const getPositionLabel = (position: string | null) => {
-    if (!position) return null;
-    const labels: Record<string, string> = {
-      hat: "HAT",
-      top: "TOP",
-      bottom: "BOTTOM",
-      shoes: "SHOES",
-      accessories: "ACC",
-    };
-    return labels[position.toLowerCase()] || position.toUpperCase();
   };
 
   if (products.length === 0) {
@@ -180,136 +288,13 @@ const ShopTheLook = ({ products, lookName }: ShopTheLookProps) => {
 
       {/* Products Grid */}
       <StaggerContainer className="grid grid-cols-2 gap-3" staggerDelay={0.1} delayChildren={0}>
-        {products.slice(0, 4).map((product) => {
-          const primaryImage = product.product_images?.find(img => img.is_primary) || product.product_images?.[0];
-          const positionLabel = getPositionLabel(product.position);
-          const isInCart = productsInCart.has(product.id);
-          const isJustAdded = addedProducts.has(product.id);
-          const isExpanded = expandedProduct === product.id;
-          const categoryKey = product.position || 'tops';
-          const rememberedSize = getRememberedSize(categoryKey);
-
-          return (
-            <motion.div 
-              key={product.id} 
-              className="group relative"
-              whileHover={prefersReducedMotion ? {} : { y: -4 }}
-              transition={springConfig}
-            >
-              <Link to={`/product/${product.slug}`}>
-                <motion.div 
-                  className="aspect-[3/4] bg-stone-800 rounded-lg overflow-hidden relative"
-                  whileHover={prefersReducedMotion ? {} : { 
-                    boxShadow: "0 10px 40px -10px rgba(0,0,0,0.5)" 
-                  }}
-                  transition={springConfig}
-                >
-                  {primaryImage && (
-                    <motion.img
-                      src={primaryImage.image_url}
-                      alt={product.name}
-                      className="w-full h-full object-cover"
-                      whileHover={prefersReducedMotion ? {} : { scale: 1.05 }}
-                      transition={{ duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
-                    />
-                  )}
-                  
-                  {/* Position Tag */}
-                  {positionLabel && (
-                    <span className="absolute top-2 left-2 text-[9px] uppercase tracking-wider bg-black/70 text-white/90 px-2 py-1 rounded font-light">
-                      {positionLabel}
-                    </span>
-                  )}
-
-                  {/* Success Overlay */}
-                  <AnimatePresence>
-                    {isJustAdded && (
-                      <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="absolute inset-0 bg-green-600/90 rounded-lg 
-                                   flex flex-col items-center justify-center gap-2"
-                      >
-                        <DrawCheckIcon size="lg" color="white" animate delay={0.1} />
-                        <span className="text-white text-xs font-medium">
-                          Size {selectedSizes[product.id]}
-                        </span>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-
-                  {/* In Cart Badge */}
-                  {isInCart && !isJustAdded && (
-                    <div className="absolute top-2 right-2 bg-green-600 rounded-full p-1">
-                      <Check className="w-3 h-3 text-white" />
-                    </div>
-                  )}
-
-                  {/* Quick Add Button */}
-                  {!isInCart && !isJustAdded && (
-                    <motion.button
-                      onClick={(e) => handleQuickAdd(product, e)}
-                      className={`
-                        absolute bottom-2 right-2 w-9 h-9 rounded-full 
-                        flex items-center justify-center transition-colors
-                        ${rememberedSize 
-                          ? 'bg-amber-500 hover:bg-amber-400' 
-                          : 'bg-white/95 hover:bg-white'
-                        }
-                      `}
-                      whileHover={prefersReducedMotion ? {} : { scale: 1.1 }}
-                      whileTap={prefersReducedMotion ? {} : { scale: 0.9 }}
-                      aria-label={rememberedSize 
-                        ? `Quick add ${product.name} in size ${rememberedSize}` 
-                        : `Add ${product.name} - select size`
-                      }
-                      transition={springConfig}
-                    >
-                      <Plus className={`w-4 h-4 ${rememberedSize ? 'text-white' : 'text-stone-900'}`} />
-                    </motion.button>
-                  )}
-
-                  {/* Inline Size Picker */}
-                  <AnimatePresence>
-                    {isExpanded && (
-                      <InlineSizePicker
-                        sizes={DEFAULT_SIZES}
-                        rememberedSize={rememberedSize}
-                        onSelect={(size) => handleSizeSelect(product, size)}
-                      />
-                    )}
-                  </AnimatePresence>
-                </motion.div>
-              </Link>
-
-              {/* Product Info */}
-              <div className="mt-2.5">
-                <p className="text-xs text-white/90 font-light truncate">
-                  {product.name}
-                </p>
-                <div className="flex items-center gap-2 mt-0.5">
-                  <p className="text-xs text-white/50 font-light">
-                    {product.is_on_sale && product.sale_price ? (
-                      <>
-                        <span className="text-amber-500">${product.sale_price}</span>
-                        <span className="line-through ml-1.5 text-white/30">${product.price}</span>
-                      </>
-                    ) : (
-                      `$${product.price}`
-                    )}
-                  </p>
-                  {/* Show remembered size hint */}
-                  {rememberedSize && !isInCart && (
-                    <span className="text-[9px] uppercase tracking-wide text-amber-500/70">
-                      {rememberedSize}
-                    </span>
-                  )}
-                </div>
-              </div>
-            </motion.div>
-          );
-        })}
+        {products.slice(0, 4).map((product) => (
+          <LookProductCard
+            key={product.id}
+            product={product}
+            productsInCart={productsInCart}
+          />
+        ))}
       </StaggerContainer>
 
       {/* Add Complete Look CTA */}
@@ -344,7 +329,7 @@ const ShopTheLook = ({ products, lookName }: ShopTheLookProps) => {
       </motion.div>
 
       {/* Size memory hint */}
-      {products.some(p => getRememberedSize(p.position || 'tops')) && (
+      {products.length > 0 && (
         <p className="text-[10px] text-center text-white/30 font-light">
           Tap + to instantly add in your size
         </p>

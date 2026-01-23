@@ -1,11 +1,9 @@
-import { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Check } from "lucide-react";
-import { useCart } from "@/hooks/useCart";
-import { useSizeMemory } from "@/hooks/useSizeMemory";
+import { useQuickAdd, ProductForQuickAdd } from "@/hooks/useQuickAdd";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
-import { useToast } from "@/hooks/use-toast";
+import InlineQuickSizePicker from "@/components/ui/InlineQuickSizePicker";
 import { easing } from "@/lib/animations";
 
 interface ProductImage {
@@ -35,113 +33,31 @@ interface LookbookProductCardProps {
   position: string | null;
 }
 
-const DEFAULT_SIZES = ['S', 'M', 'L', 'XL'];
-
 const LookbookProductCard = ({ product, position }: LookbookProductCardProps) => {
-  const [showSizes, setShowSizes] = useState(false);
-  const [isAdded, setIsAdded] = useState(false);
-  const [isAdding, setIsAdding] = useState(false);
-  
-  const { addItem } = useCart();
-  const { getRememberedSize, rememberSize } = useSizeMemory();
-  const { toast } = useToast();
   const prefersReducedMotion = useReducedMotion();
+
+  // Map to QuickAdd format
+  const quickAddProduct: ProductForQuickAdd = {
+    id: product.id,
+    name: product.name,
+    slug: product.slug,
+    price: product.price,
+    sale_price: product.sale_price,
+    is_on_sale: product.is_on_sale,
+    category_slug: product.categories?.slug,
+    position: position,
+    product_images: product.product_images,
+    product_variants: product.product_variants?.map(v => ({
+      size: v.size,
+      color: null,
+      stock_quantity: v.stock_quantity,
+    })),
+  };
+
+  const quickAdd = useQuickAdd(quickAddProduct);
 
   const primaryImage = product.product_images?.find(img => img.is_primary);
   const imageUrl = primaryImage?.image_url || product.product_images?.[0]?.image_url;
-  
-  const displayPrice = product.is_on_sale && product.sale_price 
-    ? product.sale_price 
-    : product.price;
-
-  // Get available sizes from variants
-  const availableSizes = product.product_variants
-    ?.filter(v => v.size && v.stock_quantity > 0)
-    .map(v => v.size!) || [];
-  
-  const sizes = availableSizes.length > 0 ? availableSizes : DEFAULT_SIZES;
-
-  // Get remembered size based on position (TOP → tops, BOTTOM → bottoms, etc.)
-  const getPositionSlug = (pos: string | null): string => {
-    if (!pos) return 'tops';
-    const normalized = pos.toLowerCase();
-    if (['top', 'tops', 'shirt', 'hoodie', 'tee'].includes(normalized)) return 'tops';
-    if (['bottom', 'bottoms', 'pants', 'shorts'].includes(normalized)) return 'bottoms';
-    if (['hat', 'hats', 'cap', 'beanie'].includes(normalized)) return 'hats';
-    return 'tops';
-  };
-
-  const categorySlug = product.categories?.slug || getPositionSlug(position);
-  const rememberedSize = getRememberedSize(categorySlug);
-
-  const sizeInStock = (size: string): boolean => {
-    if (availableSizes.length === 0) return true; // Assume in stock if no variant data
-    return availableSizes.includes(size);
-  };
-
-  const addToCart = (size: string) => {
-    setIsAdding(true);
-    
-    addItem({
-      id: parseInt(product.id.replace(/\D/g, '')) || Math.random() * 10000,
-      name: product.name,
-      price: displayPrice,
-      priceFormatted: `$${displayPrice.toFixed(2)}`,
-      image: imageUrl || '',
-      category: categorySlug,
-      size: size,
-      quantity: 1
-    });
-
-    // Success animation
-    setTimeout(() => {
-      setIsAdding(false);
-      setIsAdded(true);
-      setShowSizes(false);
-      
-      setTimeout(() => {
-        setIsAdded(false);
-      }, 2000);
-    }, 300);
-  };
-
-  const handleQuickAdd = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    if (isAdded || isAdding) return;
-
-    if (rememberedSize && sizeInStock(rememberedSize)) {
-      // One-tap instant add
-      addToCart(rememberedSize);
-      toast({
-        title: `Added in size ${rememberedSize}`,
-        description: product.name,
-      });
-    } else {
-      // Show size picker
-      setShowSizes(true);
-    }
-  };
-
-  const handleSizeSelect = (size: string, e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    rememberSize(categorySlug, size);
-    addToCart(size);
-    
-    toast({
-      title: `Added in size ${size}`,
-      description: product.name,
-    });
-  };
-
-  const handleCloseSizes = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setShowSizes(false);
-  };
 
   const cardVariants = {
     hidden: { opacity: 0, y: 20 },
@@ -183,7 +99,7 @@ const LookbookProductCard = ({ product, position }: LookbookProductCardProps) =>
 
           {/* Success Overlay */}
           <AnimatePresence>
-            {isAdded && (
+            {quickAdd.isAdded && (
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -203,25 +119,25 @@ const LookbookProductCard = ({ product, position }: LookbookProductCardProps) =>
 
           {/* Quick Add Button */}
           <AnimatePresence>
-            {!showSizes && !isAdded && (
+            {!quickAdd.isPickerOpen && !quickAdd.isAdded && (
               <motion.button
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 10 }}
-                onClick={handleQuickAdd}
-                disabled={isAdding}
+                onClick={quickAdd.handleQuickAdd}
+                disabled={quickAdd.isAdding}
                 className="absolute bottom-2 left-2 right-2 h-9 bg-background/95 backdrop-blur-sm 
                          text-foreground text-xs font-light flex items-center justify-center gap-1.5
                          opacity-0 group-hover:opacity-100 transition-opacity duration-300
                          hover:bg-foreground hover:text-background disabled:opacity-50"
               >
-                {isAdding ? (
+                {quickAdd.isAdding ? (
                   <span className="animate-pulse">Adding...</span>
                 ) : (
                   <>
                     <Plus className="w-3.5 h-3.5" />
-                    {rememberedSize && sizeInStock(rememberedSize) 
-                      ? `Add in ${rememberedSize}` 
+                    {quickAdd.canOneTap 
+                      ? `Add in ${quickAdd.rememberedSize}` 
                       : 'Add'}
                   </>
                 )}
@@ -231,49 +147,15 @@ const LookbookProductCard = ({ product, position }: LookbookProductCardProps) =>
 
           {/* Inline Size Picker */}
           <AnimatePresence>
-            {showSizes && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 20 }}
-                transition={{ duration: 0.2 }}
-                className="absolute bottom-0 left-0 right-0 bg-stone-900/95 backdrop-blur-sm p-3"
-                onClick={handleCloseSizes}
-              >
-                <p className="text-[10px] text-white/60 uppercase tracking-wider mb-2 text-center">
-                  Select Size
-                </p>
-                <div className="flex flex-wrap gap-1.5 justify-center" onClick={e => e.stopPropagation()}>
-                  {sizes.map(size => {
-                    const inStock = sizeInStock(size);
-                    const isRemembered = size === rememberedSize;
-                    
-                    return (
-                      <motion.button
-                        key={size}
-                        onClick={(e) => inStock && handleSizeSelect(size, e)}
-                        disabled={!inStock}
-                        className={`
-                          relative min-w-[36px] h-9 px-2 text-xs rounded
-                          transition-colors
-                          ${inStock 
-                            ? isRemembered
-                              ? 'bg-amber-500 text-white'
-                              : 'bg-white/10 text-white hover:bg-white/20'
-                            : 'bg-white/5 text-white/30 cursor-not-allowed line-through'
-                          }
-                        `}
-                        whileTap={inStock && !prefersReducedMotion ? { scale: 0.95 } : {}}
-                      >
-                        {size}
-                        {isRemembered && inStock && (
-                          <span className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-1 h-1 bg-amber-300 rounded-full" />
-                        )}
-                      </motion.button>
-                    );
-                  })}
-                </div>
-              </motion.div>
+            {quickAdd.isPickerOpen && (
+              <InlineQuickSizePicker
+                sizes={quickAdd.availableSizes}
+                rememberedSize={quickAdd.rememberedSize}
+                onSelect={quickAdd.handleSizeSelect}
+                onClose={quickAdd.hideSizePicker}
+                getStockForSize={(size) => quickAdd.getStockForVariant(size)}
+                variant="dark"
+              />
             )}
           </AnimatePresence>
         </div>
@@ -296,6 +178,12 @@ const LookbookProductCard = ({ product, position }: LookbookProductCardProps) =>
             ) : (
               <span className="text-sm font-light text-muted-foreground">
                 ${product.price.toFixed(2)}
+              </span>
+            )}
+            {/* Size memory indicator */}
+            {quickAdd.rememberedSize && quickAdd.stockForRemembered > 0 && (
+              <span className="text-[9px] uppercase tracking-wide text-amber-600 font-medium">
+                {quickAdd.rememberedSize}
               </span>
             )}
           </div>

@@ -1,6 +1,7 @@
-import { useState, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { X, Minus, Plus, ChevronLeft, ChevronRight, Heart } from "lucide-react";
+import { X, Minus, Plus, ChevronLeft, ChevronRight, Check } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Dialog,
   DialogContent,
@@ -10,6 +11,9 @@ import { Button } from "@/components/ui/button";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import type { ProductCardData } from "./ProductCard";
 import FavoriteButton from "@/components/favorites/FavoriteButton";
+import { useQuickAdd, ProductForQuickAdd } from "@/hooks/useQuickAdd";
+import { useReducedMotion } from "@/hooks/useReducedMotion";
+import { formatPrice } from "@/lib/cartUtils";
 
 interface QuickViewModalProps {
   product: ProductCardData | null;
@@ -23,14 +27,54 @@ const QuickViewModal = ({ product, open, onClose, onAuthRequired }: QuickViewMod
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const prefersReducedMotion = useReducedMotion();
 
-  // Reset state when product changes
-  useMemo(() => {
-    setSelectedSize(null);
-    setSelectedColor(null);
-    setQuantity(1);
-    setCurrentImageIndex(0);
-  }, [product?.id]);
+  // Map product to QuickAdd format
+  const quickAddProduct: ProductForQuickAdd | null = product ? {
+    id: product.id,
+    name: product.name,
+    slug: product.slug,
+    price: product.price,
+    sale_price: product.sale_price,
+    is_on_sale: product.is_on_sale,
+    category_slug: product.categories?.slug,
+    product_images: product.product_images?.map(img => ({
+      image_url: img.image_url,
+      is_primary: img.is_primary,
+    })),
+    product_variants: product.product_variants,
+  } : null;
+
+  const quickAdd = useQuickAdd(quickAddProduct, { 
+    showToast: true,
+    onSuccess: () => {
+      onClose();
+    }
+  });
+
+  // Reset state and auto-select remembered size when product changes
+  useEffect(() => {
+    if (product?.id) {
+      setQuantity(1);
+      setCurrentImageIndex(0);
+      
+      // Auto-select remembered size if in stock
+      if (quickAdd.rememberedSize && quickAdd.stockForRemembered > 0) {
+        setSelectedSize(quickAdd.rememberedSize);
+      } else if (quickAdd.suggestedFallback) {
+        setSelectedSize(quickAdd.suggestedFallback);
+      } else {
+        setSelectedSize(null);
+      }
+      
+      // Auto-select color if only one available
+      if (quickAdd.availableColors.length === 1) {
+        setSelectedColor(quickAdd.availableColors[0]);
+      } else {
+        setSelectedColor(null);
+      }
+    }
+  }, [product?.id, quickAdd.rememberedSize, quickAdd.stockForRemembered, quickAdd.suggestedFallback, quickAdd.availableColors]);
 
   if (!product) return null;
 
@@ -55,28 +99,10 @@ const QuickViewModal = ({ product, open, onClose, onAuthRequired }: QuickViewMod
     ),
   ];
 
-  // Check stock for selected variant
-  const getStockForVariant = (size?: string, color?: string) => {
-    return (product.product_variants || [])
-      .filter((v) => {
-        if (size && v.size !== size) return false;
-        if (color && v.color !== color) return false;
-        return true;
-      })
-      .reduce((sum, v) => sum + v.stock_quantity, 0);
-  };
-
-  const currentStock = getStockForVariant(
+  const currentStock = quickAdd.getStockForVariant(
     selectedSize || undefined,
     selectedColor || undefined
   );
-
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(price);
-  };
 
   const displayPrice = product.is_on_sale && product.sale_price
     ? product.sale_price
@@ -97,6 +123,14 @@ const QuickViewModal = ({ product, open, onClose, onAuthRequired }: QuickViewMod
     setCurrentImageIndex((prev) =>
       prev === 0 ? sortedImages.length - 1 : prev - 1
     );
+  };
+
+  const handleAddToCart = () => {
+    quickAdd.addToCart({ 
+      size: selectedSize || undefined, 
+      color: selectedColor || undefined,
+      quantity 
+    });
   };
 
   return (
@@ -126,6 +160,29 @@ const QuickViewModal = ({ product, open, onClose, onAuthRequired }: QuickViewMod
                   alt={product.name}
                   className="w-full h-full object-cover"
                 />
+
+                {/* Success Overlay */}
+                <AnimatePresence>
+                  {quickAdd.isAdded && (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="absolute inset-0 bg-emerald-600/90 flex flex-col items-center justify-center gap-3"
+                    >
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                      >
+                        <Check className="w-12 h-12 text-white" strokeWidth={2.5} />
+                      </motion.div>
+                      <span className="text-white text-sm font-medium">
+                        Added in size {quickAdd.addedSize}
+                      </span>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
 
                 {/* Navigation arrows */}
                 {sortedImages.length > 1 && (
@@ -211,15 +268,16 @@ const QuickViewModal = ({ product, open, onClose, onAuthRequired }: QuickViewMod
                 </label>
                 <div className="flex flex-wrap gap-2">
                   {uniqueSizes.map((size) => {
-                    const stockForSize = getStockForVariant(size, selectedColor || undefined);
+                    const stockForSize = quickAdd.getStockForVariant(size, selectedColor || undefined);
                     const isAvailable = stockForSize > 0;
+                    const isRemembered = size === quickAdd.rememberedSize;
 
                     return (
                       <button
                         key={size}
                         disabled={!isAvailable}
                         onClick={() => setSelectedSize(size)}
-                        className={`px-4 py-2 text-sm border transition-colors ${
+                        className={`relative px-4 py-2 text-sm border transition-colors ${
                           selectedSize === size
                             ? "border-foreground bg-foreground text-background"
                             : isAvailable
@@ -228,6 +286,12 @@ const QuickViewModal = ({ product, open, onClose, onAuthRequired }: QuickViewMod
                         }`}
                       >
                         {size}
+                        {/* "Your size" badge */}
+                        {isRemembered && isAvailable && selectedSize !== size && (
+                          <span className="absolute -top-2 left-1/2 -translate-x-1/2 px-1 text-[8px] uppercase tracking-wide text-amber-600 bg-background whitespace-nowrap">
+                            yours
+                          </span>
+                        )}
                       </button>
                     );
                   })}
@@ -243,7 +307,7 @@ const QuickViewModal = ({ product, open, onClose, onAuthRequired }: QuickViewMod
                 </label>
                 <div className="flex flex-wrap gap-2">
                   {uniqueColors.map((color) => {
-                    const stockForColor = getStockForVariant(selectedSize || undefined, color);
+                    const stockForColor = quickAdd.getStockForVariant(selectedSize || undefined, color);
                     const isAvailable = stockForColor > 0;
 
                     return (
@@ -325,17 +389,18 @@ const QuickViewModal = ({ product, open, onClose, onAuthRequired }: QuickViewMod
             <div className="mt-auto space-y-3">
               <Button
                 className="w-full h-12 text-sm font-normal"
-                disabled={!canAddToCart}
-                onClick={() => {
-                  // TODO: Add to cart logic
-                  onClose();
-                }}
+                disabled={!canAddToCart || quickAdd.isAdding}
+                onClick={handleAddToCart}
               >
-                {canAddToCart
-                  ? `Add to Bag — ${formatPrice(displayPrice * quantity)}`
-                  : currentStock === 0
-                  ? "Out of Stock"
-                  : "Select Options"}
+                {quickAdd.isAdding ? (
+                  <span className="animate-pulse">Adding...</span>
+                ) : canAddToCart ? (
+                  `Add to Bag — ${formatPrice(displayPrice * quantity)}`
+                ) : currentStock === 0 ? (
+                  "Out of Stock"
+                ) : (
+                  "Select Options"
+                )}
               </Button>
 
               <div className="flex items-center justify-between">
