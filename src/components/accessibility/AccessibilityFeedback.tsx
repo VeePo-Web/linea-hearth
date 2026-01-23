@@ -11,13 +11,13 @@ const AccessibilityFeedback = () => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    issue: ""
+    description: ""
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.name || !formData.email || !formData.issue) {
+    if (!formData.name || !formData.email || !formData.description) {
       toast({
         title: "Please fill in all fields",
         variant: "destructive"
@@ -31,68 +31,68 @@ const AccessibilityFeedback = () => {
     await new Promise(resolve => setTimeout(resolve, 1000));
     
     toast({
-      title: "Thank you for your feedback",
-      description: "We'll review your submission and respond within 2 business days."
+      title: "Barrier report received",
+      description: "Our team will respond within 48 hours."
     });
     
-    setFormData({ name: "", email: "", issue: "" });
+    setFormData({ name: "", email: "", description: "" });
     setIsSubmitting(false);
   };
 
   return (
-    <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <form onSubmit={handleSubmit} className="space-y-6 max-w-xl">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="name" className="text-sm font-light">
+          <Label htmlFor="feedback-name" className="text-sm font-medium">
             Name
           </Label>
           <Input
-            id="name"
+            id="feedback-name"
             type="text"
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             placeholder="Your name"
-            className="h-11 font-light"
+            className="h-11 font-light rounded-none"
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="email" className="text-sm font-light">
+          <Label htmlFor="feedback-email" className="text-sm font-medium">
             Email
           </Label>
           <Input
-            id="email"
+            id="feedback-email"
             type="email"
             value={formData.email}
             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
             placeholder="your@email.com"
-            className="h-11 font-light"
+            className="h-11 font-light rounded-none"
           />
         </div>
       </div>
       <div className="space-y-2">
-        <Label htmlFor="issue" className="text-sm font-light">
-          Describe the accessibility issue or suggestion
+        <Label htmlFor="feedback-description" className="text-sm font-medium">
+          Barrier Description
         </Label>
         <Textarea
-          id="issue"
-          value={formData.issue}
-          onChange={(e) => setFormData({ ...formData, issue: e.target.value })}
-          placeholder="Please describe the issue you encountered or your suggestion for improvement..."
-          rows={4}
-          className="font-light resize-none"
+          id="feedback-description"
+          value={formData.description}
+          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+          placeholder="Describe the barrier you encountered..."
+          rows={5}
+          className="font-light resize-none rounded-none"
         />
       </div>
       <Button 
         type="submit" 
         disabled={isSubmitting}
-        className="h-11 px-6"
+        className="h-12 px-8 bg-foreground text-background hover:bg-foreground/90 rounded-none font-medium tracking-wide"
       >
         {isSubmitting ? (
-          "Sending..."
+          "SUBMITTING..."
         ) : (
           <>
-            <Send className="w-4 h-4 mr-2" />
-            Submit Feedback
+            <Send className="w-4 h-4 mr-2" strokeWidth={1.5} />
+            REPORT BARRIER
           </>
         )}
       </Button>

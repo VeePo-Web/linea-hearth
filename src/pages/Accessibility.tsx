@@ -1,109 +1,255 @@
 import { useEffect } from "react";
-import LegalPageLayout from "@/components/legal/LegalPageLayout";
-import ComplianceStatus from "@/components/accessibility/ComplianceStatus";
-import AccessibilityFeatures from "@/components/accessibility/AccessibilityFeatures";
+import { Link } from "react-router-dom";
+import { 
+  Shield, 
+  Keyboard, 
+  Volume2, 
+  CirclePause, 
+  Palette, 
+  Focus,
+  Image as ImageIcon,
+  Monitor,
+  ZoomIn,
+  Mic,
+  Users,
+  Link as LinkIcon,
+  CheckCircle,
+  ExternalLink,
+  ArrowRight
+} from "lucide-react";
+import ServicePageLayout from "@/components/service/ServicePageLayout";
+import ServiceSection from "@/components/service/ServiceSection";
+import InfoCard from "@/components/service/InfoCard";
+import ActionCTA from "@/components/service/ActionCTA";
 import AccessibilityFeedback from "@/components/accessibility/AccessibilityFeedback";
-import { LegalSection, ImportantCallout } from "@/components/legal/LegalSection";
+
+// Hero value props
+const heroValueProps = [
+  { icon: Shield, text: "WCAG 2.1 AA" },
+  { icon: Keyboard, text: "Keyboard First" },
+  { icon: Volume2, text: "Screen Reader Ready" },
+  { icon: CirclePause, text: "Motion Respect" }
+];
+
+// Access features data
+const accessFeatures = [
+  {
+    icon: Keyboard,
+    title: "KEYBOARD NAVIGATION",
+    description: "Every interactive element accessible via Tab, Enter, Escape. Logical flow throughout the entire site."
+  },
+  {
+    icon: Volume2,
+    title: "SCREEN READER READY",
+    description: "Semantic HTML. ARIA labels. Content announced correctly by all major screen readers."
+  },
+  {
+    icon: Palette,
+    title: "COLOR CONTRAST",
+    description: "All text meets WCAG AA contrast ratios. Readable in bright light or dark mode."
+  },
+  {
+    icon: Focus,
+    title: "FOCUS INDICATORS",
+    description: "Visible outlines on all interactive elements. Never hidden or suppressed."
+  },
+  {
+    icon: CirclePause,
+    title: "MOTION RESPECT",
+    description: "Animations honor prefers-reduced-motion. No forced movement or parallax effects."
+  },
+  {
+    icon: ImageIcon,
+    title: "MEANINGFUL IMAGES",
+    description: "Alt text on all product and content images. Decorative items properly labeled."
+  }
+];
+
+// Technology compatibility data
+const techCompatibility = [
+  {
+    icon: Monitor,
+    title: "SCREEN READERS",
+    description: "NVDA, JAWS, VoiceOver — tested and fully compatible."
+  },
+  {
+    icon: ZoomIn,
+    title: "MAGNIFICATION",
+    description: "Screen magnification software supported. Responsive layouts at all zoom levels."
+  },
+  {
+    icon: Mic,
+    title: "VOICE CONTROL",
+    description: "Speech recognition software compatible for full navigation."
+  },
+  {
+    icon: Keyboard,
+    title: "KEYBOARD-ONLY",
+    description: "Complete site functionality without requiring a mouse."
+  }
+];
+
+// Known limitations data
+const knownLimitations = [
+  {
+    icon: Users,
+    title: "COMMUNITY CONTENT",
+    description: "Customer reviews may lack accessibility. We moderate content and add alternatives where possible."
+  },
+  {
+    icon: LinkIcon,
+    title: "THIRD-PARTY TOOLS",
+    description: "Payment and analytics partners may have their own limitations. We audit partners for compliance."
+  }
+];
+
+// Compliance Strip Component
+const ComplianceStrip = () => (
+  <div className="bg-stone-100 dark:bg-stone-900 p-4 mb-12 flex items-center justify-center gap-3 flex-wrap text-center">
+    <div className="flex items-center gap-2">
+      <CheckCircle className="w-4 h-4 text-emerald-500" strokeWidth={1.5} />
+      <span className="text-sm font-medium">WCAG 2.1 AA CONFORMANCE</span>
+    </div>
+    <span className="text-muted-foreground hidden sm:inline">—</span>
+    <span className="text-sm text-muted-foreground">Audited January 2025</span>
+    <span className="text-muted-foreground hidden sm:inline">—</span>
+    <a 
+      href="#" 
+      className="text-sm text-amber-600 hover:text-amber-700 inline-flex items-center gap-1 transition-colors"
+      aria-label="View full accessibility conformance report (opens in new tab)"
+    >
+      View Full Report
+      <ExternalLink className="w-3 h-3" />
+    </a>
+  </div>
+);
 
 const Accessibility = () => {
   useEffect(() => {
-    document.title = "Accessibility Statement - Line of Judah";
+    document.title = "Accessibility - Line of Judah";
   }, []);
 
+  const handleContactClick = () => {
+    window.location.href = 'mailto:accessibility@lineofjudah.com';
+  };
+
   return (
-    <LegalPageLayout
-      title="ACCESSIBLE TO ALL"
-      subtitle="We're committed to making Line of Judah accessible to everyone, regardless of ability or technology."
-      lastUpdated="January 2025"
+    <ServicePageLayout
+      title="EVERY SOLDIER INCLUDED. NO EXCEPTIONS."
+      subtitle="Our mission includes everyone. Full WCAG 2.1 AA conformance. If you face a barrier, we break it down."
+      eyebrow="UNIVERSAL ACCESS PROTOCOL"
+      heroAlignment="center"
+      heroValueProps={heroValueProps}
     >
-      {/* Compliance Status Badge */}
-      <ComplianceStatus />
+      <ComplianceStrip />
 
-      {/* Our Commitment */}
-      <LegalSection id="commitment" title="Our Commitment">
-        <p>
-          Line of Judah is committed to ensuring digital accessibility for people with
-          disabilities. We are continually improving the user experience for everyone and 
-          applying the relevant accessibility standards to guarantee we provide equal access 
-          to all users.
+      {/* Our Doctrine */}
+      <ServiceSection id="doctrine" title="OUR DOCTRINE">
+        <p className="text-muted-foreground font-light leading-relaxed">
+          Line of Judah is committed to ensuring digital accessibility for everyone who wants to 
+          wear their faith. We believe that access to our message should never be limited by 
+          ability or technology. Our site is built with accessibility as a foundation, not an 
+          afterthought.
         </p>
-        <p className="mt-4">
-          We aim to conform to the Web Content Accessibility Guidelines (WCAG) 2.1 Level AA 
-          standards. These guidelines explain how to make web content more accessible for 
-          people with disabilities, and more user-friendly for everyone.
+        <p className="text-muted-foreground font-light leading-relaxed mt-4">
+          We continuously work to improve the accessibility of our website and mobile experience, 
+          following the Web Content Accessibility Guidelines (WCAG) 2.1 Level AA as our standard.
         </p>
-      </LegalSection>
+      </ServiceSection>
 
-      {/* Accessibility Features */}
-      <LegalSection id="features" title="Accessibility Features">
-        <AccessibilityFeatures />
-      </LegalSection>
-
-      {/* Browser & Assistive Technology */}
-      <LegalSection id="technology" title="Compatibility">
-        <p>
-          Our website is designed to be compatible with the following assistive technologies:
+      {/* Access Specifications */}
+      <ServiceSection id="specifications" title="ACCESS SPECIFICATIONS">
+        <p className="text-muted-foreground font-light mb-6">
+          Built-in accessibility from the ground up:
         </p>
-        <ul className="mt-4 space-y-2">
-          <li>Screen readers (NVDA, JAWS, VoiceOver)</li>
-          <li>Screen magnification software</li>
-          <li>Speech recognition software</li>
-          <li>Keyboard-only navigation</li>
-        </ul>
-        <p className="mt-4">
-          We recommend using the latest version of your preferred browser for the best experience.
-        </p>
-      </LegalSection>
-
-      {/* Known Limitations */}
-      <LegalSection id="limitations" title="Known Limitations">
-        <ImportantCallout>
-          While we strive for full accessibility, some areas of our site may have limitations. 
-          We are actively working to identify and resolve these issues.
-        </ImportantCallout>
-        <div className="mt-4 space-y-4">
-          <div>
-            <h4 className="text-sm font-medium text-foreground mb-1">User-Generated Content</h4>
-            <p>
-              Some customer reviews and community content may not have been created with 
-              accessibility in mind. We moderate this content and add appropriate alternatives 
-              where possible.
-            </p>
-          </div>
-          <div>
-            <h4 className="text-sm font-medium text-foreground mb-1">Third-Party Content</h4>
-            <p>
-              Some third-party tools and widgets (such as payment processors) may have 
-              their own accessibility limitations. We select partners who share our 
-              commitment to accessibility.
-            </p>
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {accessFeatures.map((feature) => (
+            <InfoCard
+              key={feature.title}
+              icon={feature.icon}
+              title={feature.title}
+              description={feature.description}
+            />
+          ))}
         </div>
-      </LegalSection>
+      </ServiceSection>
 
-      {/* Feedback */}
-      <LegalSection id="feedback" title="Help Us Improve">
-        <p>
-          We welcome your feedback on the accessibility of our website. If you encounter 
-          any barriers or have suggestions for improvement, please let us know.
+      {/* Technology Alliance */}
+      <ServiceSection id="technology" title="TECHNOLOGY ALLIANCE">
+        <p className="text-muted-foreground font-light mb-6">
+          Compatible with major assistive technologies:
+        </p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {techCompatibility.map((tech) => (
+            <InfoCard
+              key={tech.title}
+              icon={tech.icon}
+              title={tech.title}
+              description={tech.description}
+            />
+          ))}
+        </div>
+      </ServiceSection>
+
+      {/* Active Operations (Known Limitations) */}
+      <ServiceSection id="limitations" title="ACTIVE OPERATIONS">
+        <p className="text-muted-foreground font-light mb-6">
+          Areas we're actively improving:
+        </p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {knownLimitations.map((limitation) => (
+            <InfoCard
+              key={limitation.title}
+              icon={limitation.icon}
+              title={limitation.title}
+              description={limitation.description}
+              variant="muted"
+            />
+          ))}
+        </div>
+      </ServiceSection>
+
+      {/* Report a Barrier */}
+      <ServiceSection id="feedback" title="REPORT A BARRIER">
+        <p className="text-muted-foreground font-light mb-6">
+          Encountered an obstacle? Let us know. We respond within 48 hours.
         </p>
         <AccessibilityFeedback />
-      </LegalSection>
+      </ServiceSection>
 
-      {/* Contact */}
-      <LegalSection id="contact" title="Accessibility Contact">
-        <p>
-          For immediate assistance or to report an accessibility issue, please contact us:
-        </p>
-        <div className="mt-4 space-y-1">
-          <p className="text-foreground">Email: accessibility@lineofjudah.com</p>
-          <p className="text-foreground">Phone: +1 (212) 555-0123</p>
-        </div>
-        <p className="mt-4">
-          We aim to respond to accessibility feedback within 2 business days.
-        </p>
-      </LegalSection>
-    </LegalPageLayout>
+      {/* Try-On Room CTA */}
+      <div className="mb-16">
+        <InfoCard
+          icon={Monitor}
+          title="ACCESSIBLE TRY-ON EXPERIENCE"
+          description={
+            <div className="space-y-3">
+              <p>Our virtual try-on room is keyboard navigable and screen reader compatible.</p>
+              <Link 
+                to="/try-on"
+                className="inline-flex items-center gap-2 text-amber-600 hover:text-amber-700 transition-colors text-sm font-medium"
+              >
+                Enter Try-On Room
+                <ArrowRight className="w-3 h-3" />
+              </Link>
+            </div>
+          }
+          variant="accent"
+        />
+      </div>
+
+      {/* Direct Line CTA */}
+      <ActionCTA
+        title="DIRECT LINE"
+        subtitle="Immediate assistance for accessibility concerns. We respond within 2 business days."
+        buttonText="EMAIL ACCESSIBILITY TEAM"
+        onSubmit={handleContactClick}
+        footerText="Or call"
+        footerLinks={[
+          { text: "+1 (212) 555-0123", href: "tel:+12125550123", isExternal: true }
+        ]}
+      />
+    </ServicePageLayout>
   );
 };
 
