@@ -246,4 +246,279 @@
   .group:hover .hero-image-grayscale {
     filter: grayscale(0%) contrast(1);
   }
+
+  /* Print Utility Classes */
+  .print-hide {
+    /* Visible on screen, hidden in print */
+  }
+  
+  .print-only {
+    display: none !important;
+  }
+  
+  .print-break-before {
+    /* Page break before in print */
+  }
+  
+  .print-break-after {
+    /* Page break after in print */
+  }
+  
+  .print-avoid-break {
+    /* Avoid page break inside in print */
+  }
+}
+
+/* Print Stylesheet - Premium Legal Document Output */
+@media print {
+  /* Page setup */
+  @page {
+    margin: 1in;
+    size: letter;
+  }
+  
+  @page :first {
+    margin-top: 0.75in;
+  }
+
+  /* Reset everything */
+  * {
+    background: transparent !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  /* Base document styling */
+  html, body {
+    font-family: 'Georgia', 'Times New Roman', serif !important;
+    font-size: 11pt !important;
+    line-height: 1.6 !important;
+    color: #000 !important;
+    background: #fff !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Hide web-only elements */
+  .print-hide,
+  header,
+  footer,
+  aside,
+  nav,
+  button:not(.print-keep),
+  [data-radix-scroll-area-viewport],
+  .scrollbar-hide {
+    display: none !important;
+  }
+
+  /* Show print-only elements */
+  .print-only {
+    display: block !important;
+  }
+
+  /* Page break control */
+  .print-break-before {
+    page-break-before: always;
+    break-before: page;
+  }
+
+  .print-break-after {
+    page-break-after: always;
+    break-after: page;
+  }
+
+  .print-avoid-break {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  /* Typography for print */
+  h1 {
+    font-size: 24pt !important;
+    font-weight: 300 !important;
+    margin-bottom: 12pt !important;
+    page-break-after: avoid;
+    break-after: avoid;
+  }
+
+  h2 {
+    font-size: 14pt !important;
+    font-weight: 400 !important;
+    margin-top: 18pt !important;
+    margin-bottom: 8pt !important;
+    padding-bottom: 4pt !important;
+    border-bottom: 0.5pt solid #ccc !important;
+    page-break-after: avoid;
+    break-after: avoid;
+  }
+
+  h3, h4 {
+    font-size: 12pt !important;
+    font-weight: 500 !important;
+    page-break-after: avoid;
+    break-after: avoid;
+  }
+
+  p, li {
+    font-size: 11pt !important;
+    line-height: 1.6 !important;
+    orphans: 3;
+    widows: 3;
+  }
+
+  /* Section styling */
+  section {
+    page-break-inside: avoid;
+    break-inside: avoid;
+    margin-bottom: 16pt !important;
+  }
+
+  /* Links - show URL for external links */
+  a[href^="http"]:after {
+    content: " (" attr(href) ")";
+    font-size: 9pt;
+    color: #666;
+    word-break: break-all;
+  }
+
+  /* Internal links - no URL display */
+  a[href^="/"],
+  a[href^="#"],
+  a[href^="mailto:"] {
+    text-decoration: underline;
+    color: #000 !important;
+  }
+
+  a[href^="/"]:after,
+  a[href^="#"]:after {
+    content: "";
+  }
+
+  a[href^="mailto:"]:after {
+    content: "";
+  }
+
+  /* Print header styling */
+  .print-header {
+    display: flex !important;
+    justify-content: space-between;
+    align-items: baseline;
+    padding-bottom: 12pt;
+    margin-bottom: 18pt;
+    border-bottom: 1pt solid #000;
+  }
+
+  .print-header-title {
+    font-size: 10pt !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .print-header-meta {
+    font-size: 9pt !important;
+    color: #666 !important;
+  }
+
+  /* Print footer styling */
+  .print-footer {
+    display: block !important;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding-top: 8pt;
+    border-top: 0.5pt solid #ccc;
+    font-size: 8pt !important;
+    color: #666 !important;
+    text-align: center;
+  }
+
+  /* Data summary card - print optimized */
+  .print-data-card {
+    border: 0.5pt solid #ccc !important;
+    padding: 12pt !important;
+    margin: 12pt 0 !important;
+    page-break-inside: avoid;
+  }
+
+  .print-data-card .grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8pt !important;
+  }
+
+  /* Important callout - print optimized */
+  .print-callout {
+    border: 1pt solid #000 !important;
+    border-left-width: 3pt !important;
+    padding: 10pt !important;
+    margin: 12pt 0 !important;
+    page-break-inside: avoid;
+  }
+
+  .print-callout svg {
+    display: none !important;
+  }
+
+  .print-callout::before {
+    content: "⚠ IMPORTANT: ";
+    font-weight: 600;
+  }
+
+  /* Layout reset - full width content */
+  .grid {
+    display: block !important;
+  }
+
+  .lg\:col-span-1,
+  .lg\:col-span-3 {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  /* Remove unnecessary spacing */
+  .max-w-7xl,
+  .max-w-4xl,
+  .max-w-3xl {
+    max-width: 100% !important;
+    padding: 0 !important;
+  }
+
+  /* Prose styling for print */
+  .prose {
+    max-width: 100% !important;
+    font-size: 11pt !important;
+  }
+
+  .prose p {
+    margin-bottom: 8pt !important;
+  }
+
+  .prose ul, .prose ol {
+    margin-left: 18pt !important;
+    margin-bottom: 8pt !important;
+  }
+
+  .prose li {
+    margin-bottom: 4pt !important;
+  }
+
+  /* Hide hero dark background section in print */
+  .bg-stone-900 {
+    background: transparent !important;
+    color: #000 !important;
+    padding: 0 !important;
+  }
+
+  .bg-stone-900 .text-white {
+    color: #000 !important;
+  }
+
+  .bg-stone-900 .text-amber-500 {
+    color: #666 !important;
+  }
+
+  .bg-stone-900 .text-white\/70 {
+    color: #444 !important;
+  }
 }
