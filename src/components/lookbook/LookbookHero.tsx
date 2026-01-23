@@ -14,7 +14,7 @@ const LookbookHero = () => {
 
   return (
     <section 
-      className="h-screen w-full flex items-center justify-center relative bg-stone-900 snap-start overflow-hidden"
+      className="lookbook-section-height w-full flex items-center justify-center relative bg-stone-900 snap-start overflow-hidden"
     >
       {/* Noise grain texture overlay */}
       <div 

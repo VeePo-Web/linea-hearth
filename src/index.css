@@ -267,6 +267,30 @@
   .print-avoid-break {
     /* Avoid page break inside in print */
   }
+
+  /* Lookbook Section Height - accounts for fixed header */
+  .lookbook-section-height {
+    height: calc(100vh - var(--header-height));
+    min-height: calc(100vh - var(--header-height));
+  }
+
+  @supports (height: 100dvh) {
+    .lookbook-section-height {
+      height: calc(100dvh - var(--header-height));
+      min-height: calc(100dvh - var(--header-height));
+    }
+  }
+
+  /* Lookbook mobile half-section height */
+  .lookbook-half-height {
+    height: calc((100vh - var(--header-height)) / 2);
+  }
+
+  @supports (height: 100dvh) {
+    .lookbook-half-height {
+      height: calc((100dvh - var(--header-height)) / 2);
+    }
+  }
 }
 
 /* Print Stylesheet - Premium Legal Document Output */

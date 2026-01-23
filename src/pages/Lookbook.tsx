@@ -154,8 +154,14 @@ const Lookbook = () => {
     <div className="min-h-screen bg-stone-900">
       <Header />
       
-      {/* Main Scroll Container */}
-      <main className="lookbook-scroll-container snap-y snap-mandatory overflow-y-scroll h-screen scroll-smooth">
+      {/* Main Scroll Container - offset by header height */}
+      <main 
+        className="lookbook-scroll-container snap-y snap-mandatory overflow-y-auto scroll-smooth"
+        style={{ 
+          height: 'calc(100vh - var(--header-height))',
+          marginTop: 'var(--header-height)' 
+        }}
+      >
         {/* Hero Section */}
         <LookbookHero />
 
