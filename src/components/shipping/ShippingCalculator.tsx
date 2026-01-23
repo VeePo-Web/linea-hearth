@@ -114,7 +114,7 @@ const ShippingCalculator = () => {
           disabled={isCalculating}
           className="h-12 px-8"
         >
-          {isCalculating ? "Calculating..." : "Check Delivery"}
+          {isCalculating ? "CALCULATING..." : "CALCULATE ETA"}
         </Button>
       </div>
 

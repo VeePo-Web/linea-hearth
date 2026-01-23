@@ -8,23 +8,27 @@ import {
 const shippingFAQs = [
   {
     question: "When does my order ship?",
-    answer: "Orders placed before 2:00 PM EST on business days are processed and shipped the same day. Orders placed after 2:00 PM EST or on weekends/holidays will ship the next business day."
+    answer: "Orders placed before 2:00 PM EST on business days are processed and shipped the same day. Orders placed after 2:00 PM EST or on weekends/holidays ship the next business day. No exceptions. We move fast."
   },
   {
     question: "How can I track my order?",
-    answer: "Once your order ships, you'll receive a confirmation email with your tracking number. You can track your package directly through the carrier's website or by clicking the link in your email."
+    answer: "Once your order ships, you'll receive a confirmation email with your tracking number and direct carrier link. Full visibility, every step of the way. You can also check status on your account dashboard."
   },
   {
     question: "Can I change my shipping address after ordering?",
-    answer: "If your order hasn't shipped yet, contact our customer care team immediately at support@lineofjudah.com. Once an order has shipped, we cannot modify the delivery address."
+    answer: "If your order hasn't shipped yet, contact our logistics team immediately at logistics@lineofjudah.com. Once an order is in transit, we cannot modify the delivery address. Plan accordingly."
   },
   {
     question: "What if my package is lost or damaged?",
-    answer: "All shipments are insured. If your package is lost or arrives damaged, please contact us within 48 hours of the expected delivery date. We'll work with the carrier to resolve the issue and ensure you receive your order or a full refund."
+    answer: "All shipments are fully insured. If your package is lost or arrives damaged, contact us within 48 hours of the expected delivery date. We'll resolve it—either a replacement ships immediately or you get a full refund. No runaround."
   },
   {
-    question: "Do you offer gift wrapping?",
-    answer: "Yes! Every order is beautifully packaged in our premium packaging at no additional charge. If you'd like a personalized gift message included, you can add one during checkout."
+    question: "Do you offer gift packaging?",
+    answer: "Every order ships in our premium packaging at no extra charge. If you want a personalized gift message included, add it during checkout. Your recipient will know it came from someone with taste."
+  },
+  {
+    question: "What carriers do you use?",
+    answer: "Domestic orders ship via USPS Priority Mail (standard) or FedEx (express/overnight). International orders ship via DHL or UPS with full tracking and customs documentation included."
   }
 ];
 
@@ -40,7 +44,7 @@ const ShippingFAQ = () => {
           <AccordionTrigger className="text-left font-light hover:no-underline py-4">
             {faq.question}
           </AccordionTrigger>
-          <AccordionContent className="text-muted-foreground pb-4">
+          <AccordionContent className="text-muted-foreground font-light pb-4">
             {faq.answer}
           </AccordionContent>
         </AccordionItem>
