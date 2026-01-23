@@ -1,115 +1,175 @@
-import Layout from "@/components/layout/Layout";
-import PageHeader from "../../components/about/PageHeader";
-import ContentSection from "../../components/about/ContentSection";
-import { Button } from "../../components/ui/button";
-import AboutSidebar from "../../components/about/AboutSidebar";
+import { useState, useEffect } from "react";
+import { Layers, Target, Users, Sparkles, Maximize2, Scissors, Ruler } from "lucide-react";
+import { Link } from "react-router-dom";
+import ServicePageLayout from "@/components/service/ServicePageLayout";
+import ServiceSection from "@/components/service/ServiceSection";
+import StepFlow from "@/components/service/StepFlow";
+import InfoCard from "@/components/service/InfoCard";
+import ActionCTA from "@/components/service/ActionCTA";
+import UnitToggle from "@/components/size-guide/UnitToggle";
+import SizeChartTable from "@/components/size-guide/SizeChartTable";
+
+// Hero value props
+const heroValueProps = [
+  { icon: Layers, text: "S - 3XL Range" },
+  { icon: Target, text: "True to Size" },
+  { icon: Users, text: "Model Reference" },
+  { icon: Sparkles, text: "AI Fit Finder" }
+];
+
+// Measurement protocol steps
+const measurementSteps = [
+  {
+    icon: Ruler,
+    title: "CHEST",
+    description: "Measure around fullest part. Tape horizontal. Arms relaxed."
+  },
+  {
+    icon: Ruler,
+    title: "LENGTH",
+    description: "From shoulder peak to hem. Consider fit preference."
+  },
+  {
+    icon: Ruler,
+    title: "WAIST",
+    description: "Natural waist, not belt line. Snug but comfortable."
+  },
+  {
+    icon: Ruler,
+    title: "SLEEVE",
+    description: "Center back neck to wrist. Arm slightly bent."
+  }
+];
+
+// Size chart data
+const sizeChartData = {
+  in: [
+    { size: "S", chest: "36-38", length: "27", sleeve: "33" },
+    { size: "M", chest: "39-41", length: "28", sleeve: "34", isPopular: true },
+    { size: "L", chest: "42-44", length: "29", sleeve: "35" },
+    { size: "XL", chest: "45-47", length: "30", sleeve: "36" },
+    { size: "2XL", chest: "48-50", length: "31", sleeve: "37" },
+    { size: "3XL", chest: "51-53", length: "32", sleeve: "38" }
+  ],
+  cm: [
+    { size: "S", chest: "91-97", length: "69", sleeve: "84" },
+    { size: "M", chest: "99-104", length: "71", sleeve: "86", isPopular: true },
+    { size: "L", chest: "107-112", length: "74", sleeve: "89" },
+    { size: "XL", chest: "114-119", length: "76", sleeve: "91" },
+    { size: "2XL", chest: "122-127", length: "79", sleeve: "94" },
+    { size: "3XL", chest: "130-135", length: "81", sleeve: "97" }
+  ]
+};
+
+// Fit profile cards
+const fitProfiles = [
+  {
+    icon: Target,
+    title: "STANDARD ISSUE",
+    description: "Default cut. Not tight, not loose. Battle-ready for any occasion. Size up if you prefer layering."
+  },
+  {
+    icon: Maximize2,
+    title: "COMMAND SILHOUETTE",
+    description: "Extra room for the streetwear drape. Relaxed through body. Consider sizing down for less volume."
+  },
+  {
+    icon: Scissors,
+    title: "TACTICAL CROP",
+    description: "Hits at natural waist. Designed for high-waisted bottoms and layering. Check garment length."
+  }
+];
 
 const SizeGuide = () => {
+  const [unit, setUnit] = useState<"in" | "cm">("in");
+
+  useEffect(() => {
+    document.title = "Size Guide - Line of Judah";
+  }, []);
+
+  const handleContact = () => {
+    window.location.href = "mailto:support@lineofjudah.com?subject=Size%20Fit%20Help";
+  };
+
   return (
-    <Layout>
-      <div className="flex">
-        <div className="hidden lg:block">
-          <AboutSidebar />
-        </div>
-        
-        <main className="w-full lg:w-[70vw] lg:ml-auto px-6">
-        <PageHeader 
-          title="Size Guide" 
-          subtitle="Find your perfect fit with our comprehensive sizing guide"
-        />
-        
-        <ContentSection title="Apparel Sizing">
-          <div className="space-y-8">
-            <div className="bg-muted/10 rounded-lg p-8">
-              <h3 className="text-xl font-light text-foreground mb-6">How to Measure</h3>
-              <div className="grid md:grid-cols-2 gap-8">
-                <div className="space-y-4">
-                  <h4 className="font-medium text-foreground">Chest</h4>
-                  <p className="text-muted-foreground">
-                    Measure around the fullest part of your chest, keeping the tape horizontal.
-                  </p>
-                </div>
-                <div className="space-y-4">
-                  <h4 className="font-medium text-foreground">Length</h4>
-                  <p className="text-muted-foreground">
-                    Measure from the highest point of your shoulder down to where you want 
-                    the garment to end.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse border border-border">
-                <thead>
-                  <tr className="bg-muted/20">
-                    <th className="border border-border p-3 text-left font-light">Size</th>
-                    <th className="border border-border p-3 text-left font-light">Chest (in)</th>
-                    <th className="border border-border p-3 text-left font-light">Length (in)</th>
-                    <th className="border border-border p-3 text-left font-light">Sleeve (in)</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {[
-                    { size: "S", chest: "36-38", length: "27", sleeve: "33" },
-                    { size: "M", chest: "39-41", length: "28", sleeve: "34" },
-                    { size: "L", chest: "42-44", length: "29", sleeve: "35" },
-                    { size: "XL", chest: "45-47", length: "30", sleeve: "36" },
-                    { size: "2XL", chest: "48-50", length: "31", sleeve: "37" },
-                    { size: "3XL", chest: "51-53", length: "32", sleeve: "38" }
-                  ].map((row, index) => (
-                    <tr key={index} className="hover:bg-muted/10">
-                      <td className="border border-border p-3 font-medium">{row.size}</td>
-                      <td className="border border-border p-3">{row.chest}</td>
-                      <td className="border border-border p-3">{row.length}</td>
-                      <td className="border border-border p-3">{row.sleeve}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </ContentSection>
-
-        <ContentSection title="Fit Guide">
-          <div className="grid md:grid-cols-2 gap-12">
-            <div className="space-y-6">
-              <h3 className="text-xl font-light text-foreground">Regular Fit</h3>
-              <p className="text-muted-foreground">
-                Our regular fit offers a classic, comfortable silhouette that's not too 
-                tight or too loose. Great for everyday wear.
-              </p>
-            </div>
-            
-            <div className="space-y-6">
-              <h3 className="text-xl font-light text-foreground">Oversized Fit</h3>
-              <p className="text-muted-foreground">
-                Our oversized pieces are designed with extra room for a relaxed, 
-                streetwear-inspired look. Consider sizing down if you prefer less volume.
-              </p>
-            </div>
-          </div>
-        </ContentSection>
-
-        <ContentSection title="Need Help?">
-          <div className="space-y-6">
-            <p className="text-muted-foreground">
-              Still unsure about sizing? Our team is here to help you find the perfect fit. 
-              Reach out to us or check out our model info on product pages for reference.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Button variant="outline" className="rounded-none">
-                Download PDF Guide
-              </Button>
-              <Button className="rounded-none">
-                Contact Support
-              </Button>
-            </div>
-          </div>
-        </ContentSection>
-        </main>
+    <ServicePageLayout
+      title="CALIBRATE YOUR ARMOR."
+      subtitle="Every piece is cut for combat. Know your dimensions. Trust the fit."
+      eyebrow="TACTICAL CALIBRATION"
+      heroAlignment="center"
+      heroValueProps={heroValueProps}
+    >
+      {/* Measurement Protocol */}
+      <div className="bg-stone-100 dark:bg-stone-900/50 py-16 -mx-6 px-6 mb-16">
+        <ServiceSection
+          id="protocol"
+          title="TAKE YOUR READINGS"
+          subtitle="Four measurements. That's all it takes to find your fit."
+          className="max-w-5xl mx-auto"
+        >
+          <StepFlow steps={measurementSteps} variant="compact" />
+        </ServiceSection>
       </div>
-    </Layout>
+
+      {/* Size Chart */}
+      <ServiceSection
+        id="specifications"
+        title="ARMOR SPECIFICATIONS"
+        subtitle="Our standard sizing across all tops and outerwear."
+      >
+        <div className="flex justify-end mb-6">
+          <UnitToggle unit={unit} onUnitChange={setUnit} />
+        </div>
+        <SizeChartTable data={sizeChartData[unit]} unit={unit} />
+      </ServiceSection>
+
+      {/* Fit Profiles */}
+      <ServiceSection
+        id="fit-profiles"
+        title="FIT PROFILES"
+        subtitle="Each garment is labeled with its intended fit. Here's what they mean."
+      >
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {fitProfiles.map((profile, index) => (
+            <InfoCard
+              key={index}
+              icon={profile.icon}
+              title={profile.title}
+              description={profile.description}
+            />
+          ))}
+        </div>
+      </ServiceSection>
+
+      {/* AI Fit Finder CTA */}
+      <ServiceSection
+        id="ai-fit"
+        title="PERSONALIZED FIT"
+        subtitle="Let our AI calibrate your exact measurements."
+      >
+        <Link to="/try-on" className="block">
+          <InfoCard
+            icon={Sparkles}
+            title="GET YOUR AI FIT RECOMMENDATION"
+            description="Enter your measurements and body type. Our system analyzes thousands of data points to recommend your ideal size with 95%+ accuracy."
+            variant="accent"
+            className="cursor-pointer hover:border-amber-400 transition-colors"
+          />
+        </Link>
+      </ServiceSection>
+
+      {/* Contact CTA */}
+      <ActionCTA
+        title="STILL UNCERTAIN?"
+        subtitle="Our team helps soldiers find their fit. No question too specific."
+        buttonText="CONTACT COMMAND"
+        onSubmit={handleContact}
+        footerText="Or"
+        footerLinks={[
+          { text: "Download Full Size Guide PDF", href: "#", isExternal: false }
+        ]}
+      />
+    </ServicePageLayout>
   );
 };
 
