@@ -18,6 +18,7 @@ import OurStory from "./pages/about/OurStory";
 import OurMission from "./pages/about/OurMission";
 import SizeGuide from "./pages/about/SizeGuide";
 import CustomerCare from "./pages/about/CustomerCare";
+import Contact from "./pages/Contact";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import Community from "./pages/Community";
@@ -61,6 +62,7 @@ const AnimatedRoutes = () => {
         <Route path="/about/our-mission" element={<PageTransition><OurMission /></PageTransition>} />
         <Route path="/about/size-guide" element={<PageTransition><SizeGuide /></PageTransition>} />
         <Route path="/about/customer-care" element={<PageTransition><CustomerCare /></PageTransition>} />
+        <Route path="/contact" element={<PageTransition><Contact /></PageTransition>} />
         <Route path="/privacy-policy" element={<PageTransition><PrivacyPolicy /></PageTransition>} />
         <Route path="/terms-of-service" element={<PageTransition><TermsOfService /></PageTransition>} />
         <Route path="/faq" element={<PageTransition><FAQ /></PageTransition>} />

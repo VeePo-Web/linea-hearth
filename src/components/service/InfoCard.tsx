@@ -10,6 +10,7 @@ interface InfoCardProps {
   variant?: 'default' | 'muted' | 'accent';
   size?: 'sm' | 'default';
   iconColor?: 'amber' | 'emerald' | 'blue' | 'stone';
+  children?: ReactNode;
 }
 
 const InfoCard = memo(({
@@ -19,7 +20,8 @@ const InfoCard = memo(({
   className,
   variant = 'default',
   size = 'default',
-  iconColor = 'amber'
+  iconColor = 'amber',
+  children
 }: InfoCardProps) => {
   const variantClasses = {
     default: "bg-stone-50 dark:bg-stone-900/50",
@@ -60,6 +62,12 @@ const InfoCard = memo(({
           description
         )}
       </div>
+      
+      {children && (
+        <div className="mt-2">
+          {children}
+        </div>
+      )}
     </div>
   );
 });

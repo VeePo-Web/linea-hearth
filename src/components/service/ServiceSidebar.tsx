@@ -21,7 +21,7 @@ const navigationGroups = [
       { name: "Shipping", path: "/shipping", icon: Truck },
       { name: "Returns & Exchanges", path: "/returns", icon: RotateCcw },
       { name: "Size Guide", path: "/about/size-guide", icon: Ruler },
-      { name: "Customer Care", path: "/about/customer-care", icon: Headphones },
+      { name: "Contact Us", path: "/contact", icon: Headphones },
     ]
   },
   {
