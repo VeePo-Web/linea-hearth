@@ -294,6 +294,108 @@ export type Database = {
           },
         ]
       }
+      discount_code_redemptions: {
+        Row: {
+          customer_email: string
+          discount_applied_cents: number
+          discount_code_id: string
+          id: string
+          order_id: string | null
+          redeemed_at: string | null
+        }
+        Insert: {
+          customer_email: string
+          discount_applied_cents: number
+          discount_code_id: string
+          id?: string
+          order_id?: string | null
+          redeemed_at?: string | null
+        }
+        Update: {
+          customer_email?: string
+          discount_applied_cents?: number
+          discount_code_id?: string
+          id?: string
+          order_id?: string | null
+          redeemed_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "discount_code_redemptions_discount_code_id_fkey"
+            columns: ["discount_code_id"]
+            isOneToOne: false
+            referencedRelation: "discount_codes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "discount_code_redemptions_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      discount_codes: {
+        Row: {
+          code: string
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          discount_type: string
+          discount_value: number
+          expires_at: string | null
+          id: string
+          is_active: boolean | null
+          maximum_discount_cents: number | null
+          minimum_order_cents: number | null
+          name: string
+          per_user_limit: number | null
+          starts_at: string | null
+          updated_at: string | null
+          usage_count: number | null
+          usage_limit: number | null
+        }
+        Insert: {
+          code: string
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          discount_type: string
+          discount_value: number
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          maximum_discount_cents?: number | null
+          minimum_order_cents?: number | null
+          name: string
+          per_user_limit?: number | null
+          starts_at?: string | null
+          updated_at?: string | null
+          usage_count?: number | null
+          usage_limit?: number | null
+        }
+        Update: {
+          code?: string
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          discount_type?: string
+          discount_value?: number
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          maximum_discount_cents?: number | null
+          minimum_order_cents?: number | null
+          name?: string
+          per_user_limit?: number | null
+          starts_at?: string | null
+          updated_at?: string | null
+          usage_count?: number | null
+          usage_limit?: number | null
+        }
+        Relationships: []
+      }
       favorites: {
         Row: {
           created_at: string
