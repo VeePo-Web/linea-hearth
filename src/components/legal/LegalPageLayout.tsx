@@ -1,7 +1,14 @@
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 import Header from "@/components/header/Header";
 import Footer from "@/components/footer/Footer";
-import LegalSidebar from "./LegalSidebar";
+import LegalSidebar, { TOCSection } from "./LegalSidebar";
+import { cn } from "@/lib/utils";
+import { ChevronDown } from "lucide-react";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 
 interface LegalPageLayoutProps {
   children: ReactNode;
@@ -9,6 +16,7 @@ interface LegalPageLayoutProps {
   subtitle?: string;
   lastUpdated?: string;
   showSidebar?: boolean;
+  tocSections?: TOCSection[];
 }
 
 const LegalPageLayout = ({ 
@@ -16,8 +24,19 @@ const LegalPageLayout = ({
   title, 
   subtitle,
   lastUpdated,
-  showSidebar = true 
+  showSidebar = true,
+  tocSections
 }: LegalPageLayoutProps) => {
+  const [isMobileTocOpen, setIsMobileTocOpen] = useState(false);
+
+  const scrollToSection = (id: string) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth", block: "start" });
+      setIsMobileTocOpen(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -47,10 +66,46 @@ const LegalPageLayout = ({
       <main className="max-w-7xl mx-auto px-6 py-16">
         {showSidebar ? (
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-12">
-            <aside className="lg:col-span-1">
-              <LegalSidebar />
+            {/* Desktop Sidebar */}
+            <aside className="hidden lg:block lg:col-span-1">
+              <LegalSidebar tocSections={tocSections} />
             </aside>
+            
+            {/* Content Area */}
             <div className="lg:col-span-3">
+              {/* Mobile TOC - Above content, not overlapping */}
+              {tocSections && tocSections.length > 0 && (
+                <Collapsible 
+                  open={isMobileTocOpen} 
+                  onOpenChange={setIsMobileTocOpen} 
+                  className="lg:hidden mb-8"
+                >
+                  <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-stone-100 dark:bg-stone-900 border border-stone-200 dark:border-stone-800">
+                    <span className="text-xs font-medium tracking-widest">ON THIS PAGE</span>
+                    <ChevronDown 
+                      className={cn(
+                        "w-4 h-4 transition-transform",
+                        isMobileTocOpen && "rotate-180"
+                      )} 
+                    />
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="bg-stone-50 dark:bg-stone-900/50 border border-t-0 border-stone-200 dark:border-stone-800">
+                    <ul className="p-4 space-y-2">
+                      {tocSections.map((section) => (
+                        <li key={section.id}>
+                          <button
+                            onClick={() => scrollToSection(section.id)}
+                            className="text-sm py-1 transition-colors font-light text-muted-foreground hover:text-foreground"
+                          >
+                            {section.title}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </CollapsibleContent>
+                </Collapsible>
+              )}
+              
               {children}
             </div>
           </div>

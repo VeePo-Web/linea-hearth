@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 import LegalPageLayout from "@/components/legal/LegalPageLayout";
-import TableOfContents from "@/components/legal/TableOfContents";
 import { LegalSection, ImportantCallout } from "@/components/legal/LegalSection";
 
 const tocSections = [
@@ -29,8 +28,8 @@ const TermsOfService = () => {
       title="Terms of Service"
       subtitle="Please read these terms carefully before using our website or services."
       lastUpdated="January 15, 2024"
+      tocSections={tocSections}
     >
-      <TableOfContents sections={tocSections} />
 
       <LegalSection id="agreement" title="Agreement to Terms">
         <p>
