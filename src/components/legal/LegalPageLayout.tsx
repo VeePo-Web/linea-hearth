@@ -2,6 +2,7 @@ import { ReactNode, useState } from "react";
 import Header from "@/components/header/Header";
 import Footer from "@/components/footer/Footer";
 import LegalSidebar, { TOCSection } from "./LegalSidebar";
+import PrintButton from "./PrintButton";
 import { cn } from "@/lib/utils";
 import { ChevronDown } from "lucide-react";
 import {
@@ -41,20 +42,31 @@ const LegalPageLayout = ({
     <div className="min-h-screen bg-background">
       <Header />
       
+      {/* Print-only Document Header */}
+      <div className="print-only print-header hidden">
+        <div className="print-header-title">{title}</div>
+        <div className="print-header-meta">
+          Line of Judah LLC {lastUpdated && `| Last Updated: ${lastUpdated}`}
+        </div>
+      </div>
+      
       {/* Hero Section - pt-[var(--header-height)] for header offset + additional padding */}
-      <section className="bg-stone-900 text-white pt-[calc(var(--header-height)+2rem)] pb-16 px-6">
+      <section className="bg-stone-900 text-white pt-[calc(var(--header-height)+2rem)] pb-16 px-6 print:bg-transparent print:text-foreground print:pt-0 print:pb-8">
         <div className="max-w-7xl mx-auto">
           <div className="max-w-3xl">
-            {lastUpdated && (
-              <span className="inline-block text-xs font-medium tracking-widest text-amber-500 mb-4">
-                LAST UPDATED: {lastUpdated.toUpperCase()}
-              </span>
-            )}
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-light tracking-tight mb-4">
+            <div className="flex items-center justify-between gap-4 mb-4">
+              {lastUpdated && (
+                <span className="inline-block text-xs font-medium tracking-widest text-amber-500 print:text-muted-foreground">
+                  LAST UPDATED: {lastUpdated.toUpperCase()}
+                </span>
+              )}
+              <PrintButton />
+            </div>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-light tracking-tight mb-4 print:text-3xl print:mb-2">
               {title}
             </h1>
             {subtitle && (
-              <p className="text-lg text-white/70 font-light leading-relaxed">
+              <p className="text-lg text-white/70 font-light leading-relaxed print:text-foreground/70 print:text-base">
                 {subtitle}
               </p>
             )}
@@ -117,6 +129,11 @@ const LegalPageLayout = ({
       </main>
 
       <Footer />
+      
+      {/* Print-only Document Footer */}
+      <div className="print-only print-footer hidden">
+        lineofjudah.com | hello@lineofjudah.com
+      </div>
     </div>
   );
 };
