@@ -35,8 +35,7 @@ interface CheckoutRequest {
     country: string;
   };
   shippingMethod: "standard" | "express" | "overnight";
-  discountCode?: string;
-  discountAmount?: number;
+  discountCodeId?: string;
   abandonedCartId?: string;
 }
 
@@ -91,8 +90,7 @@ Deno.serve(async (req) => {
       shippingAddress,
       billingAddress,
       shippingMethod,
-      discountCode,
-      discountAmount,
+      discountCodeId,
       abandonedCartId,
     } = body;
 
@@ -122,8 +120,84 @@ Deno.serve(async (req) => {
       shippingCents = 0;
     }
 
-    // Apply discount
-    const discountCents = discountAmount ? Math.round(discountAmount * 100) : 0;
+    // Validate discount code server-side if provided
+    let discountCents = 0;
+    let validatedDiscountCode: string | null = null;
+    let discountCodeRecord: { id: string; code: string; name: string; discount_type: string; discount_value: number; usage_count: number } | null = null;
+
+    if (discountCodeId) {
+      const { data: codeData, error: codeError } = await supabase
+        .from("discount_codes")
+        .select("*")
+        .eq("id", discountCodeId)
+        .eq("is_active", true)
+        .single();
+
+      if (codeError || !codeData) {
+        return new Response(
+          JSON.stringify({ success: false, error: "Invalid or expired discount code" }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      // Validate expiry
+      const now = new Date();
+      if (codeData.expires_at && new Date(codeData.expires_at) < now) {
+        return new Response(
+          JSON.stringify({ success: false, error: "This discount code has expired" }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      // Validate usage limit
+      if (codeData.usage_limit !== null && codeData.usage_count >= codeData.usage_limit) {
+        return new Response(
+          JSON.stringify({ success: false, error: "This discount code has reached its usage limit" }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      // Validate minimum order
+      if (subtotalCents < codeData.minimum_order_cents) {
+        return new Response(
+          JSON.stringify({ 
+            success: false, 
+            error: `Minimum order of €${(codeData.minimum_order_cents / 100).toFixed(2)} required for this code` 
+          }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      // Check per-user limit
+      const { count: userRedemptions } = await supabase
+        .from("discount_code_redemptions")
+        .select("*", { count: "exact", head: true })
+        .eq("discount_code_id", codeData.id)
+        .ilike("customer_email", customerEmail);
+
+      if (userRedemptions !== null && userRedemptions >= codeData.per_user_limit) {
+        return new Response(
+          JSON.stringify({ success: false, error: "You have already used this discount code" }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      // Calculate discount amount
+      if (codeData.discount_type === "percentage") {
+        discountCents = Math.round((subtotalCents * codeData.discount_value) / 100);
+        if (codeData.maximum_discount_cents && discountCents > codeData.maximum_discount_cents) {
+          discountCents = codeData.maximum_discount_cents;
+        }
+      } else {
+        discountCents = Math.round(codeData.discount_value);
+        if (discountCents > subtotalCents) {
+          discountCents = subtotalCents;
+        }
+      }
+
+      validatedDiscountCode = codeData.code;
+      discountCodeRecord = codeData;
+    }
 
     // Calculate total
     const totalCents = subtotalCents + shippingCents - discountCents;
@@ -155,9 +229,12 @@ Deno.serve(async (req) => {
         discount_cents: discountCents,
         total_cents: totalCents,
         currency: "eur",
-        discount_code: discountCode,
+        discount_code: validatedDiscountCode,
         shipping_method: shippingMethod,
-        metadata: { abandoned_cart_id: abandonedCartId },
+        metadata: { 
+          abandoned_cart_id: abandonedCartId,
+          discount_code_id: discountCodeId,
+        },
       })
       .select()
       .single();
@@ -261,7 +338,7 @@ Deno.serve(async (req) => {
     });
 
     // Apply discount if provided
-    if (discountCents > 0) {
+    if (discountCents > 0 && discountCodeRecord) {
       // Create a coupon for the discount
       const couponResponse = await fetch("https://api.stripe.com/v1/coupons", {
         method: "POST",
@@ -273,7 +350,7 @@ Deno.serve(async (req) => {
           amount_off: String(discountCents),
           currency: "eur",
           duration: "once",
-          name: discountCode || "Discount",
+          name: discountCodeRecord.name || discountCodeRecord.code || "Discount",
         }),
       });
 
@@ -281,6 +358,21 @@ Deno.serve(async (req) => {
         const coupon = await couponResponse.json();
         stripeParams.append("discounts[0][coupon]", coupon.id);
       }
+
+      // Increment usage count and create redemption record
+      await supabase
+        .from("discount_codes")
+        .update({ usage_count: discountCodeRecord.usage_count + 1 })
+        .eq("id", discountCodeRecord.id);
+
+      await supabase
+        .from("discount_code_redemptions")
+        .insert({
+          discount_code_id: discountCodeRecord.id,
+          order_id: order.id,
+          customer_email: customerEmail,
+          discount_applied_cents: discountCents,
+        });
     }
 
     // Create Stripe session

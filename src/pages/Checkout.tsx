@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
-import { Minus, Plus, CreditCard, Check, ExternalLink, AlertCircle } from "lucide-react";
+import { Minus, Plus, CreditCard, Check, ExternalLink, AlertCircle, X, Loader2 } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import CheckoutHeader from "../components/header/CheckoutHeader";
 import Footer from "../components/footer/Footer";
@@ -11,6 +11,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useCart } from "@/hooks/useCart";
 import { useAbandonedCart } from "@/hooks/useAbandonedCart";
 import { useStripeCheckout } from "@/hooks/useStripeCheckout";
+import { useDiscountCode, AppliedDiscount } from "@/hooks/useDiscountCode";
 import CheckoutProgress from "@/components/checkout/CheckoutProgress";
 import SavingsSummary from "@/components/checkout/SavingsSummary";
 import UrgencyTimer from "@/components/checkout/UrgencyTimer";
@@ -29,11 +30,17 @@ const Checkout = () => {
   const { items, subtotal, hasFreeShipping, updateQuantity, removeItem, clearCart, itemCount } = useCart();
   const { syncCart, markConverted, email: savedEmail, isSynced, cartId } = useAbandonedCart();
   const { initiateCheckout, isLoading: isStripeLoading, error: stripeError } = useStripeCheckout();
+  const { 
+    validateCode, 
+    appliedDiscount, 
+    clearDiscount, 
+    isValidating: isValidatingDiscount, 
+    error: discountError 
+  } = useDiscountCode();
   
   const [currentStep, setCurrentStep] = useState(2); // Start at "Details" step
   const [showDiscountInput, setShowDiscountInput] = useState(false);
   const [discountCode, setDiscountCode] = useState("");
-  const [discountAmount, setDiscountAmount] = useState(0);
   const [customerDetails, setCustomerDetails] = useState({
     email: "",
     firstName: "",
@@ -69,6 +76,9 @@ const Checkout = () => {
   const [showPostPurchaseOffer, setShowPostPurchaseOffer] = useState(false);
   const [orderNumber, setOrderNumber] = useState("");
 
+  // Calculate discount amount from validated discount
+  const discountAmount = appliedDiscount ? Math.round(appliedDiscount.discountAmountCents / 100) : 0;
+
   const getShippingCost = () => {
     if (hasFreeShipping && shippingOption === "standard") return 0;
     switch (shippingOption) {
@@ -84,12 +94,25 @@ const Checkout = () => {
   const shipping = getShippingCost();
   const total = subtotal - discountAmount + shipping;
 
-  const handleDiscountSubmit = () => {
-    // Simulate discount validation
-    if (discountCode.toLowerCase() === "save10") {
-      setDiscountAmount(Math.round(subtotal * 0.1));
+  const handleDiscountSubmit = async () => {
+    if (!discountCode.trim()) return;
+    
+    // Convert subtotal to cents for validation
+    const subtotalCents = Math.round(subtotal * 100);
+    const email = customerDetails.email || "guest@checkout.temp";
+    
+    const result = await validateCode(discountCode, subtotalCents, email);
+    
+    if (result.valid) {
+      toast.success(`Discount "${result.discountCode?.name}" applied!`);
+      setShowDiscountInput(false);
     }
-    setShowDiscountInput(false);
+  };
+
+  const handleRemoveDiscount = () => {
+    clearDiscount();
+    setDiscountCode("");
+    toast.info("Discount removed");
   };
 
   const handleCustomerDetailsChange = (field: string, value: string) => {
@@ -164,8 +187,7 @@ const Checkout = () => {
         country: billingDetails.country,
       } : undefined,
       shippingMethod: shippingOption as "standard" | "express" | "overnight",
-      discountCode: discountCode || undefined,
-      discountAmount: discountAmount > 0 ? discountAmount : undefined,
+      discountCodeId: appliedDiscount?.codeId || undefined,
       abandonedCartId: cartId || undefined,
     });
 
@@ -322,7 +344,33 @@ const Checkout = () => {
 
                 {/* Discount Code Section */}
                 <div className="pt-4 border-t border-muted-foreground/20">
-                  {!showDiscountInput ? (
+                  {appliedDiscount ? (
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between bg-emerald-500/10 border border-emerald-500/30 p-3">
+                        <div className="flex items-center gap-2">
+                          <Check className="h-4 w-4 text-emerald-600" />
+                          <div>
+                            <p className="text-sm font-medium text-emerald-600">
+                              {appliedDiscount.name}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              {appliedDiscount.discountType === "percentage"
+                                ? `${appliedDiscount.discountValue}% off`
+                                : `€${(appliedDiscount.discountValue / 100).toFixed(2)} off`}
+                            </p>
+                          </div>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={handleRemoveDiscount}
+                          className="h-7 px-2 text-muted-foreground hover:text-foreground"
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  ) : !showDiscountInput ? (
                     <button 
                       onClick={() => setShowDiscountInput(true)}
                       className="text-sm text-foreground underline hover:no-underline transition-all"
@@ -335,18 +383,46 @@ const Checkout = () => {
                         <Input
                           type="text"
                           value={discountCode}
-                          onChange={(e) => setDiscountCode(e.target.value)}
-                          placeholder="Enter code (try SAVE10)"
-                          className="flex-1 rounded-none text-sm"
+                          onChange={(e) => setDiscountCode(e.target.value.toUpperCase())}
+                          placeholder="Enter code"
+                          className={`flex-1 rounded-none text-sm uppercase ${
+                            discountError ? "border-destructive focus-visible:ring-destructive" : ""
+                          }`}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              e.preventDefault();
+                              handleDiscountSubmit();
+                            }
+                          }}
                         />
                         <Button 
                           onClick={handleDiscountSubmit}
                           variant="outline"
-                          className="rounded-none text-sm"
+                          className="rounded-none text-sm min-w-[70px]"
+                          disabled={isValidatingDiscount || !discountCode.trim()}
                         >
-                          Apply
+                          {isValidatingDiscount ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            "Apply"
+                          )}
                         </Button>
                       </div>
+                      {discountError && (
+                        <p className="text-xs text-destructive flex items-center gap-1">
+                          <AlertCircle className="h-3 w-3" />
+                          {discountError}
+                        </p>
+                      )}
+                      <button
+                        onClick={() => {
+                          setShowDiscountInput(false);
+                          setDiscountCode("");
+                        }}
+                        className="text-xs text-muted-foreground hover:text-foreground"
+                      >
+                        Cancel
+                      </button>
                     </div>
                   )}
                 </div>

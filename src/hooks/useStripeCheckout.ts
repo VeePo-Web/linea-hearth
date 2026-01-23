@@ -17,8 +17,7 @@ interface CheckoutData {
   shippingAddress: ShippingAddress;
   billingAddress?: ShippingAddress;
   shippingMethod: "standard" | "express" | "overnight";
-  discountCode?: string;
-  discountAmount?: number;
+  discountCodeId?: string;
   abandonedCartId?: string;
 }
 
