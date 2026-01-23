@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 import LegalPageLayout from "@/components/legal/LegalPageLayout";
-import TableOfContents from "@/components/legal/TableOfContents";
 import { LegalSection } from "@/components/legal/LegalSection";
 import DataSummaryCard from "@/components/legal/DataSummaryCard";
 
@@ -26,9 +25,8 @@ const PrivacyPolicy = () => {
       title="Privacy Policy"
       subtitle="Your privacy is important to us. This policy explains how we collect, use, and protect your personal information."
       lastUpdated="January 15, 2024"
+      tocSections={tocSections}
     >
-      <TableOfContents sections={tocSections} />
-      
       {/* Data Summary Card */}
       <DataSummaryCard />
 
