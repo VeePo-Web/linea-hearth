@@ -1182,9 +1182,58 @@ export type Database = {
         }
         Relationships: []
       }
+      user_size_preferences: {
+        Row: {
+          bottoms_size: string | null
+          bottoms_updated_at: string | null
+          created_at: string | null
+          hats_size: string | null
+          hats_updated_at: string | null
+          id: string
+          tops_size: string | null
+          tops_updated_at: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          bottoms_size?: string | null
+          bottoms_updated_at?: string | null
+          created_at?: string | null
+          hats_size?: string | null
+          hats_updated_at?: string | null
+          id?: string
+          tops_size?: string | null
+          tops_updated_at?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          bottoms_size?: string | null
+          bottoms_updated_at?: string | null
+          created_at?: string | null
+          hats_size?: string | null
+          hats_updated_at?: string | null
+          id?: string
+          tops_size?: string | null
+          tops_updated_at?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
-      [_ in never]: never
+      size_confidence_stats: {
+        Row: {
+          confidence_percentage: number | null
+          size: string | null
+          size_type: string | null
+          successful_orders: number | null
+          total_orders: number | null
+          user_id: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       has_role: {
