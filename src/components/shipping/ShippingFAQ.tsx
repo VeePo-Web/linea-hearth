@@ -20,7 +20,7 @@ const shippingFAQs = [
   },
   {
     question: "What if my package is lost or damaged?",
-    answer: "All shipments are fully insured. If your package is lost or arrives damaged, contact us within 30 days of the expected delivery date with photos if applicable. We'll send a replacement or issue a full refund—no runaround."
+    answer: "All shipments are fully insured. If your package is lost or arrives damaged, contact us within 15 days of delivery with clear photos showing the damage and the shipping label/packaging. We'll send a replacement or issue a full refund—no hassle."
   },
   {
     question: "Do you offer gift packaging?",
