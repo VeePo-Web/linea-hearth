@@ -10,6 +10,7 @@ interface ShippingEstimate {
   maxDays: number;
   price: string;
   carrier: string;
+  includesProduction?: boolean;
 }
 
 const ShippingCalculator = () => {
@@ -24,38 +25,46 @@ const ShippingCalculator = () => {
     const isWestCoast = ["9", "8"].includes(firstDigit);
     const isMidwest = ["5", "6", "7"].includes(firstDigit);
     
-    let standardDays = { min: 3, max: 5 };
-    let expressDays = { min: 2, max: 3 };
+    // Shipping-only times (before adding production)
+    let standardShipping = { min: 3, max: 4 };
+    let expressShipping = { min: 2, max: 3 };
     
     if (isWestCoast) {
-      standardDays = { min: 5, max: 7 };
-      expressDays = { min: 3, max: 4 };
+      standardShipping = { min: 4, max: 5 };
+      expressShipping = { min: 2, max: 3 };
     } else if (isMidwest) {
-      standardDays = { min: 4, max: 6 };
-      expressDays = { min: 2, max: 3 };
+      standardShipping = { min: 3, max: 4 };
+      expressShipping = { min: 2, max: 3 };
     }
+
+    // Production time: 2-5 business days (Printful standard)
+    const productionMin = 2;
+    const productionMax = 5;
 
     return [
       {
         method: "Standard Shipping",
-        minDays: standardDays.min,
-        maxDays: standardDays.max,
+        minDays: productionMin + standardShipping.min,
+        maxDays: productionMax + standardShipping.max,
         price: "Free over $75",
-        carrier: "USPS Priority Mail"
+        carrier: "USPS Priority Mail",
+        includesProduction: true
       },
       {
         method: "Express Shipping",
-        minDays: expressDays.min,
-        maxDays: expressDays.max,
+        minDays: productionMin + expressShipping.min,
+        maxDays: productionMax + expressShipping.max,
         price: "$12.99",
-        carrier: "FedEx 2-Day"
+        carrier: "FedEx 2-Day",
+        includesProduction: true
       },
       {
         method: "Overnight",
-        minDays: 1,
-        maxDays: 1,
+        minDays: productionMin + 1,
+        maxDays: productionMax + 2,
         price: "$24.99",
-        carrier: "FedEx Overnight"
+        carrier: "FedEx Overnight",
+        includesProduction: true
       }
     ];
   };
@@ -140,24 +149,31 @@ const ShippingCalculator = () => {
             {estimates.map((estimate) => (
               <div 
                 key={estimate.method}
-                className="flex items-center justify-between p-4 bg-stone-50 dark:bg-stone-900"
+                className="flex flex-col p-4 bg-stone-50 dark:bg-stone-900"
               >
-                <div className="flex items-start gap-3">
-                  <Package className="w-5 h-5 text-muted-foreground mt-0.5" />
-                  <div>
-                    <p className="font-medium text-foreground">{estimate.method}</p>
-                    <p className="text-sm text-muted-foreground">{estimate.carrier}</p>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-start gap-3">
+                    <Package className="w-5 h-5 text-muted-foreground mt-0.5" />
+                    <div>
+                      <p className="font-medium text-foreground">{estimate.method}</p>
+                      <p className="text-sm text-muted-foreground">{estimate.carrier}</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-medium text-foreground">{estimate.price}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {estimate.minDays === estimate.maxDays 
+                        ? getDeliveryDate(estimate.minDays)
+                        : `${getDeliveryDate(estimate.minDays)} - ${getDeliveryDate(estimate.maxDays)}`
+                      }
+                    </p>
                   </div>
                 </div>
-                <div className="text-right">
-                  <p className="font-medium text-foreground">{estimate.price}</p>
-                  <p className="text-sm text-muted-foreground">
-                    {estimate.minDays === estimate.maxDays 
-                      ? getDeliveryDate(estimate.minDays)
-                      : `${getDeliveryDate(estimate.minDays)} - ${getDeliveryDate(estimate.maxDays)}`
-                    }
+                {estimate.includesProduction && (
+                  <p className="text-xs text-muted-foreground mt-2 pl-8">
+                    Includes 2-5 business days for production
                   </p>
-                </div>
+                )}
               </div>
             ))}
           </div>

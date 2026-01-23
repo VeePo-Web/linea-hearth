@@ -12,7 +12,7 @@ import { toast } from "sonner";
 
 const heroValueProps = [
   { icon: Truck, text: "Free Over $75" },
-  { icon: Clock, text: "Orders Ship in 2-5 Days" },
+  { icon: Clock, text: "2-5 Days Production" },
   { icon: Package, text: "Full Tracking" },
   { icon: Globe, text: "50+ Countries" },
 ];

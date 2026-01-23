@@ -43,7 +43,7 @@ const quickQuestions = [
   {
     icon: Clock,
     title: "How Long Do I Have?",
-    description: "30 days from delivery. After that, all sales are final.",
+    description: "30 days from delivery for returns. 15 days for damage claims.",
     variant: "default" as const,
   },
   {
@@ -164,8 +164,9 @@ const ReturnsExchanges = () => {
                 Received something damaged or defective? We'll make it right:
               </p>
               <ul className="space-y-2">
-                <li>• Contact us within 30 days of delivery</li>
-                <li>• Include photos of the damage or defect</li>
+                <li>• Contact us within 15 days of delivery</li>
+                <li>• Include clear photos showing the damage or defect</li>
+                <li>• Photos must show the shipping label and packaging</li>
                 <li>• We'll send a replacement or full refund at no cost to you</li>
                 <li>• No need to return the damaged item</li>
               </ul>
