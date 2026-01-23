@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
-import { X, Minus, Plus, ChevronLeft, ChevronRight } from "lucide-react";
+import { X, Minus, Plus, ChevronLeft, ChevronRight, Heart } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -9,14 +9,16 @@ import {
 import { Button } from "@/components/ui/button";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import type { ProductCardData } from "./ProductCard";
+import FavoriteButton from "@/components/favorites/FavoriteButton";
 
 interface QuickViewModalProps {
   product: ProductCardData | null;
   open: boolean;
   onClose: () => void;
+  onAuthRequired?: () => void;
 }
 
-const QuickViewModal = ({ product, open, onClose }: QuickViewModalProps) => {
+const QuickViewModal = ({ product, open, onClose, onAuthRequired }: QuickViewModalProps) => {
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
@@ -336,13 +338,20 @@ const QuickViewModal = ({ product, open, onClose }: QuickViewModalProps) => {
                   : "Select Options"}
               </Button>
 
-              <Link
-                to={`/product/${product.slug}`}
-                className="block text-center text-sm text-muted-foreground hover:text-foreground hover:underline transition-colors"
-                onClick={onClose}
-              >
-                View Full Details
-              </Link>
+              <div className="flex items-center justify-between">
+                <Link
+                  to={`/product/${product.slug}`}
+                  className="text-sm text-muted-foreground hover:text-foreground hover:underline transition-colors"
+                  onClick={onClose}
+                >
+                  View Full Details
+                </Link>
+                <FavoriteButton
+                  productId={product.id}
+                  variant="icon-with-text"
+                  onAuthRequired={onAuthRequired}
+                />
+              </div>
             </div>
           </div>
         </div>

@@ -4,6 +4,7 @@ import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "@/hooks/useCart";
 import { useAuth } from "@/hooks/useAuth";
+import { useFavorites } from "@/hooks/useFavorites";
 import CartDrawer from "@/components/cart/CartDrawer";
 import NavLink from "./NavLink";
 import MegaMenu from "./MegaMenu";
@@ -11,6 +12,7 @@ import SearchOverlay from "./SearchOverlay";
 import MobileMenu from "./MobileMenu";
 import AuthModal from "@/components/auth/AuthModal";
 import AccountDropdown from "@/components/auth/AccountDropdown";
+import FavoritesDrawer from "@/components/favorites/FavoritesDrawer";
 
 const Navigation = () => {
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
@@ -23,6 +25,7 @@ const Navigation = () => {
 
   const { user } = useAuth();
   const { itemCount, openCart, addItem, items } = useCart();
+  const { favoritesCount } = useFavorites();
 
   useEffect(() => {
     if (items.length === 0) {
@@ -210,6 +213,19 @@ const Navigation = () => {
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-5 h-5 relative z-10">
               <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
             </svg>
+            <AnimatePresence>
+              {favoritesCount > 0 && (
+                <motion.span 
+                  initial={{ scale: 0 }} 
+                  animate={{ scale: 1 }} 
+                  exit={{ scale: 0 }}
+                  transition={{ type: "spring" as const, stiffness: 500, damping: 15 }} 
+                  className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-primary text-primary-foreground text-[0.6rem] font-semibold rounded-full flex items-center justify-center pointer-events-none z-20"
+                >
+                  {favoritesCount > 9 ? '9+' : favoritesCount}
+                </motion.span>
+              )}
+            </AnimatePresence>
           </motion.button>
           
           {/* Cart */}
@@ -259,65 +275,15 @@ const Navigation = () => {
       {/* Auth Modal */}
       <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
 
-      {/* Favorites Off-canvas */}
-      <AnimatePresence>
-        {offCanvasType === 'favorites' && (
-          <>
-            <motion.div 
-              className="fixed inset-0 z-50 bg-black/50"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              onClick={() => setOffCanvasType(null)}
-            />
-            <motion.div 
-              className="fixed right-0 top-0 h-screen w-96 bg-background border-l border-border z-50 flex flex-col shadow-2xl"
-              initial={{ x: "100%" }}
-              animate={{ x: 0 }}
-              exit={{ x: "100%" }}
-              transition={{ type: "spring" as const, stiffness: 300, damping: 30 }}
-            >
-              <div className="flex items-center justify-between p-6 border-b border-border">
-                <h2 className="text-lg font-light text-foreground">Your Favorites</h2>
-                <motion.button 
-                  onClick={() => setOffCanvasType(null)} 
-                  className="p-2 text-foreground hover:text-muted-foreground transition-colors relative group" 
-                  aria-label="Close"
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <motion.span 
-                    className="absolute inset-0 rounded-full bg-muted scale-0 group-hover:scale-100 transition-transform duration-200"
-                    initial={false}
-                  />
-                  <X size={20} className="relative z-10" />
-                </motion.button>
-              </div>
-              <div className="flex-1 flex flex-col items-center justify-center p-6">
-                <motion.div 
-                  className="w-16 h-16 mb-4 rounded-full bg-muted/50 flex items-center justify-center"
-                  initial={{ scale: 0.8, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ delay: 0.2 }}
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1" stroke="currentColor" className="w-8 h-8 text-muted-foreground">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
-                  </svg>
-                </motion.div>
-                <motion.p 
-                  className="text-muted-foreground text-sm text-center"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 }}
-                >
-                  Save your favorite items to view them later.
-                </motion.p>
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+      {/* Favorites Drawer */}
+      <FavoritesDrawer 
+        isOpen={offCanvasType === 'favorites'} 
+        onClose={() => setOffCanvasType(null)} 
+        onAuthRequired={() => {
+          setOffCanvasType(null);
+          setIsAuthModalOpen(true);
+        }}
+      />
     </nav>
   );
 };

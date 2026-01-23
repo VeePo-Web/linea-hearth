@@ -41,7 +41,7 @@ export default function AccountDropdown({ isOpen, onClose }: AccountDropdownProp
     { icon: Package, label: 'My Orders', href: '/account/orders' },
     { icon: User, label: 'Profile', href: '/account/profile' },
     { icon: MapPin, label: 'Addresses', href: '/account/addresses' },
-    { icon: Heart, label: 'Favorites', href: '/account' },
+    { icon: Heart, label: 'Favorites', href: '/account/favorites' },
   ];
 
   return (

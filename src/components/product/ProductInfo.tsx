@@ -10,7 +10,7 @@ import {
   BreadcrumbPage, 
   BreadcrumbSeparator 
 } from "@/components/ui/breadcrumb";
-import { Minus, Plus, Truck, RotateCcw, Heart } from "lucide-react";
+import { Minus, Plus, Truck, RotateCcw } from "lucide-react";
 import SizeSelector from "./SizeSelector";
 import ColorSwatchSelector from "./ColorSwatchSelector";
 import TestimonialSnippet from "./TestimonialSnippet";
@@ -18,6 +18,7 @@ import ProductFAQ from "./ProductFAQ";
 import ShippingReturnsAccordion from "./ShippingReturnsAccordion";
 import TryItOnButton from "./TryItOnButton";
 import TextReveal from "@/components/motion/TextReveal";
+import FavoriteButton from "@/components/favorites/FavoriteButton";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { easing } from "@/lib/animations";
 
@@ -52,6 +53,7 @@ interface ProductInfoProps {
   };
   variants?: ProductVariant[];
   onColorChange?: (color: string) => void;
+  onAuthRequired?: () => void;
 }
 
 // Color code mapping
@@ -68,7 +70,7 @@ const colorCodes: Record<string, string> = {
   cream: "#fffdd0",
 };
 
-const ProductInfo = ({ product, variants = [], onColorChange }: ProductInfoProps) => {
+const ProductInfo = ({ product, variants = [], onColorChange, onAuthRequired }: ProductInfoProps) => {
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
@@ -183,7 +185,6 @@ const ProductInfo = ({ product, variants = [], onColorChange }: ProductInfoProps
   const trustSignals = [
     { icon: Truck, label: "Free shipping $75+" },
     { icon: RotateCcw, label: "Easy 30-day returns" },
-    { icon: Heart, label: "Made with purpose" },
   ];
 
   if (prefersReducedMotion) {
@@ -257,6 +258,13 @@ const ProductInfo = ({ product, variants = [], onColorChange }: ProductInfoProps
           <Button id="main-add-to-bag" disabled={!canAddToBag} className="w-full h-12 bg-foreground text-background hover:bg-foreground/90 font-light rounded-none disabled:opacity-50 disabled:cursor-not-allowed">
             Add to Bag — ${totalPrice.toFixed(2)}
           </Button>
+
+          <FavoriteButton
+            productId={product?.id || ""}
+            variant="icon-with-text"
+            onAuthRequired={onAuthRequired}
+            className="w-full justify-center"
+          />
 
           <TryItOnButton productId={product?.id || ""} productSlug={product?.slug || ""} productName={productName} productPrice={displayPrice} categorySlug={categorySlug} />
 
@@ -455,6 +463,20 @@ const ProductInfo = ({ product, variants = [], onColorChange }: ProductInfoProps
               Add to Bag — ${totalPrice.toFixed(2)}
             </motion.button>
           </Button>
+        </motion.div>
+
+        {/* Save to Favorites Button */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.65, duration: 0.4 }}
+        >
+          <FavoriteButton
+            productId={product?.id || ""}
+            variant="icon-with-text"
+            onAuthRequired={onAuthRequired}
+            className="w-full justify-center"
+          />
         </motion.div>
 
         {/* Try It On Button */}

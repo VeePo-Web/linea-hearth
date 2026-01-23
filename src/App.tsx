@@ -41,6 +41,7 @@ import AccountOrders from "./pages/account/AccountOrders";
 import AccountOrderDetail from "./pages/account/AccountOrderDetail";
 import AccountProfile from "./pages/account/AccountProfile";
 import AccountAddresses from "./pages/account/AccountAddresses";
+import AccountFavorites from "./pages/account/AccountFavorites";
 import ProtectedAccountRoute from "./components/account/ProtectedAccountRoute";
 
 const queryClient = new QueryClient();
@@ -80,6 +81,7 @@ const AnimatedRoutes = () => {
           <Route index element={<AccountDashboard />} />
           <Route path="orders" element={<AccountOrders />} />
           <Route path="orders/:orderId" element={<AccountOrderDetail />} />
+          <Route path="favorites" element={<AccountFavorites />} />
           <Route path="profile" element={<AccountProfile />} />
           <Route path="addresses" element={<AccountAddresses />} />
         </Route>
