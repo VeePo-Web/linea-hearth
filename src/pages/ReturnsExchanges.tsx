@@ -12,44 +12,44 @@ import {
 const returnSteps = [
   {
     icon: Mail,
-    title: "INITIATE",
-    description: "Log your order number. Select items for tactical reset.",
+    title: "CONTACT US",
+    description: "Email us with your order number and the reason for return.",
   },
   {
     icon: Package,
-    title: "SECURE",
-    description: "Pack your gear. Original packaging preferred, not required.",
+    title: "PACK ITEM",
+    description: "Pack the item securely. Original packaging preferred but not required.",
   },
   {
     icon: Truck,
-    title: "DEPLOY",
-    description: "Drop at any USPS or FedEx. Prepaid label provided.",
+    title: "SHIP BACK",
+    description: "We'll email you a prepaid shipping label (US orders).",
   },
   {
     icon: CreditCard,
-    title: "REGROUP",
-    description: "Refund hits your account in 5-7 days. Mission complete.",
+    title: "REFUND",
+    description: "Refund processed within 5-7 business days of receipt.",
   },
 ];
 
 const heroValueProps = [
-  { icon: Shield, text: "30-Day Grace Period" },
-  { icon: Package, text: "Free Return Shipping" },
+  { icon: Shield, text: "30-Day Window" },
+  { icon: Package, text: "Free Return Shipping (US)" },
   { icon: CheckCircle, text: "Full Refund Guarantee" },
-  { icon: RotateCcw, text: "Instant Exchanges" },
+  { icon: RotateCcw, text: "Easy Exchanges" },
 ];
 
 const quickQuestions = [
   {
     icon: Clock,
     title: "How Long Do I Have?",
-    description: "30 days from delivery. After that, all gear is final.",
+    description: "30 days from delivery. After that, all sales are final.",
     variant: "default" as const,
   },
   {
     icon: Package,
     title: "Need Original Packaging?",
-    description: "Preferred but not mandatory. Just secure your gear for transit.",
+    description: "Preferred but not mandatory. Just pack your item securely for transit.",
     variant: "default" as const,
   },
   {
@@ -61,7 +61,7 @@ const quickQuestions = [
   {
     icon: CheckCircle,
     title: "Is Return Shipping Free?",
-    description: "For US soldiers, yes. Prepaid label included. International covers their own extraction.",
+    description: "For US orders, yes. Prepaid label included. International customers cover return shipping.",
     variant: "default" as const,
   },
 ];
@@ -78,26 +78,26 @@ const ReturnsExchanges = () => {
 
   return (
     <ServicePageLayout
-      title="WE STAND BEHIND OUR ARMOR."
-      subtitle="Not working out? No judgment. We make returns simple so you can stay focused on the mission."
-      eyebrow="THE TRIBE TAKES CARE OF ITS OWN"
+      title="Simple Returns. No Hassle."
+      subtitle="Something not right? We'll make it right. Contact us within 30 days of delivery."
+      eyebrow="RETURNS & EXCHANGES"
       heroAlignment="center"
       heroValueProps={heroValueProps}
     >
       {/* StepFlow Section */}
       <div className="p-8 md:p-12 bg-stone-50 dark:bg-stone-900/30 mb-16 -mx-6 lg:mx-0">
         <h2 className="text-sm font-medium tracking-widest text-center mb-10 uppercase">
-          Your Mission Debrief
+          How Returns Work
         </h2>
         <StepFlow steps={returnSteps} />
       </div>
 
       {/* Policy Details */}
-      <ServiceSection id="policy" title="THE TERMS OF RETREAT">
+      <ServiceSection id="policy" title="Return Policy Details">
         <Accordion type="single" collapsible className="space-y-2">
           <AccordionItem value="eligible" className="border border-border px-6">
             <AccordionTrigger className="text-left font-light py-5 hover:no-underline">
-              Gear Eligible for Return
+              Eligible for Return
             </AccordionTrigger>
             <AccordionContent className="text-muted-foreground font-light leading-relaxed pb-6">
               <ul className="space-y-2">
@@ -111,7 +111,7 @@ const ReturnsExchanges = () => {
 
           <AccordionItem value="not-eligible" className="border border-border px-6">
             <AccordionTrigger className="text-left font-light py-5 hover:no-underline">
-              What Stays on the Field
+              Non-Returnable Items
             </AccordionTrigger>
             <AccordionContent className="text-muted-foreground font-light leading-relaxed pb-6">
               <ul className="space-y-2">
@@ -126,11 +126,11 @@ const ReturnsExchanges = () => {
 
           <AccordionItem value="international" className="border border-border px-6">
             <AccordionTrigger className="text-left font-light py-5 hover:no-underline">
-              Global Soldiers
+              International Orders
             </AccordionTrigger>
             <AccordionContent className="text-muted-foreground font-light leading-relaxed pb-6">
               <p className="mb-4">
-                International soldiers can return items within 30 days. Return shipping costs are on you—we recommend a tracked method for your protection.
+                International customers can return items within 30 days. Return shipping costs are the customer's responsibility—we recommend using a tracked shipping method for your protection.
               </p>
               <p>
                 Duties and taxes paid at original purchase are non-refundable. Refunds are processed in the original currency.
@@ -140,7 +140,7 @@ const ReturnsExchanges = () => {
 
           <AccordionItem value="exchanges" className="border border-border px-6">
             <AccordionTrigger className="text-left font-light py-5 hover:no-underline">
-              Swap Your Size
+              Size Exchanges
             </AccordionTrigger>
             <AccordionContent className="text-muted-foreground font-light leading-relaxed pb-6">
               <p className="mb-4">
@@ -157,16 +157,16 @@ const ReturnsExchanges = () => {
 
           <AccordionItem value="damaged" className="border border-border px-6">
             <AccordionTrigger className="text-left font-light py-5 hover:no-underline">
-              Damaged in Transit?
+              Damaged or Defective Items
             </AccordionTrigger>
             <AccordionContent className="text-muted-foreground font-light leading-relaxed pb-6">
               <p className="mb-4">
-                Received something damaged? That's on us. Here's how we'll make it right:
+                Received something damaged or defective? We'll make it right:
               </p>
               <ul className="space-y-2">
-                <li>• Contact us within 7 days of delivery</li>
-                <li>• Include photos of the damage</li>
-                <li>• We'll send a replacement or full refund immediately</li>
+                <li>• Contact us within 30 days of delivery</li>
+                <li>• Include photos of the damage or defect</li>
+                <li>• We'll send a replacement or full refund at no cost to you</li>
                 <li>• No need to return the damaged item</li>
               </ul>
             </AccordionContent>
@@ -175,7 +175,7 @@ const ReturnsExchanges = () => {
       </ServiceSection>
 
       {/* Quick Questions */}
-      <ServiceSection id="faq" title="INTEL BRIEFING" showDivider={false}>
+      <ServiceSection id="faq" title="Quick Answers" showDivider={false}>
         <div className="grid gap-6 md:grid-cols-2">
           {quickQuestions.map((question) => (
             <InfoCard
@@ -191,12 +191,12 @@ const ReturnsExchanges = () => {
 
       {/* CTA */}
       <ActionCTA
-        title="NEED A TACTICAL RESET?"
-        subtitle="Enter your order number. We'll generate your return label and get you moving."
+        title="Start Your Return"
+        subtitle="Enter your order number and we'll email you a prepaid return label."
         alignment="center"
         showInput
         inputPlaceholder="Order number (e.g., #LOJ-12345)"
-        buttonText="BEGIN DEBRIEF"
+        buttonText="SUBMIT REQUEST"
         onSubmit={handleReturnSubmit}
         footerText="Questions?"
         footerLinks={[

@@ -166,9 +166,9 @@ const Accessibility = () => {
 
   return (
     <ServicePageLayout
-      title="EVERY SOLDIER INCLUDED. NO EXCEPTIONS."
-      subtitle="Our mission includes everyone. Full WCAG 2.1 AA conformance. If you face a barrier, we break it down."
-      eyebrow="UNIVERSAL ACCESS PROTOCOL"
+      title="Accessible to Everyone."
+      subtitle="We're committed to making our site usable for all visitors. WCAG 2.1 AA compliant."
+      eyebrow="ACCESSIBILITY"
       heroAlignment="center"
       heroValueProps={heroValueProps}
     >
@@ -184,18 +184,17 @@ const Accessibility = () => {
 
       {/* Declaration Block - Editorial Hook */}
       <DeclarationBlock
-        quote="IF YOU CARRY THE CALLING, YOU CARRY THE ARMOR. NO BARRIER STANDS BETWEEN YOU AND THE MISSION."
-        attribution="— LINE OF JUDAH ACCESSIBILITY DOCTRINE, 2024"
+        quote="Access to our products should never be limited by ability or technology."
+        attribution="— Our Commitment"
       />
 
       <div id="main-accessibility-content">
-        {/* Our Doctrine */}
-        <ServiceSection id="doctrine" title="OUR DOCTRINE">
+        {/* Our Commitment */}
+        <ServiceSection id="commitment" title="Our Commitment">
           <p className="text-muted-foreground font-light leading-relaxed">
-            Line of Judah is committed to ensuring digital accessibility for everyone who wants to 
-            wear their faith. We believe that access to our message should never be limited by 
-            ability or technology. Our site is built with accessibility as a foundation, not an 
-            afterthought.
+            Line of Judah is committed to ensuring digital accessibility for everyone. We believe 
+            that access to our products should never be limited by ability or technology. Our site 
+            is built with accessibility as a foundation, not an afterthought.
           </p>
           <p className="text-muted-foreground font-light leading-relaxed mt-4">
             We continuously work to improve the accessibility of our website and mobile experience, 
@@ -203,8 +202,8 @@ const Accessibility = () => {
           </p>
         </ServiceSection>
 
-        {/* Access Specifications - Emerald Icons */}
-        <ServiceSection id="specifications" title="ACCESS SPECIFICATIONS">
+        {/* Accessibility Features */}
+        <ServiceSection id="features" title="Accessibility Features">
           <p className="text-muted-foreground font-light mb-6">
             Built-in accessibility from the ground up:
           </p>
@@ -221,16 +220,16 @@ const Accessibility = () => {
           </div>
         </ServiceSection>
 
-        {/* How We Test - New Transparency Section */}
-        <ServiceSection id="testing" title="HOW WE TEST">
+        {/* How We Test */}
+        <ServiceSection id="testing" title="How We Test">
           <p className="text-muted-foreground font-light mb-8">
-            Accessibility isn't a checkbox. It's a continuous operation:
+            Accessibility is an ongoing commitment, not a one-time checkbox:
           </p>
           <StepFlow steps={testingSteps} variant="compact" />
         </ServiceSection>
 
-        {/* Technology Alliance - Blue Icons */}
-        <ServiceSection id="technology" title="TECHNOLOGY ALLIANCE">
+        {/* Assistive Technology Support */}
+        <ServiceSection id="technology" title="Assistive Technology Support">
           <p className="text-muted-foreground font-light mb-6">
             Compatible with major assistive technologies:
           </p>
@@ -247,8 +246,8 @@ const Accessibility = () => {
           </div>
         </ServiceSection>
 
-        {/* Active Operations (Known Limitations) - Stone Icons */}
-        <ServiceSection id="limitations" title="ACTIVE OPERATIONS">
+        {/* Known Limitations */}
+        <ServiceSection id="limitations" title="Known Limitations">
           <p className="text-muted-foreground font-light mb-6">
             Areas we're actively improving:
           </p>
@@ -267,7 +266,7 @@ const Accessibility = () => {
         </ServiceSection>
 
         {/* Accessible Shopping Tools */}
-        <ServiceSection id="tools" title="ACCESSIBLE SHOPPING TOOLS">
+        <ServiceSection id="tools" title="Accessible Shopping Tools">
           <p className="text-muted-foreground font-light mb-6">
             Tools designed for inclusive shopping:
           </p>
@@ -275,12 +274,12 @@ const Accessibility = () => {
         </ServiceSection>
 
         {/* Keyboard Shortcuts Reference */}
-        <ServiceSection id="shortcuts" title="NAVIGATION REFERENCE">
+        <ServiceSection id="shortcuts" title="Keyboard Navigation">
           <KeyboardShortcuts />
         </ServiceSection>
 
         {/* Report a Barrier */}
-        <ServiceSection id="feedback" title="REPORT A BARRIER">
+        <ServiceSection id="feedback" title="Report an Accessibility Issue">
           <p className="text-muted-foreground font-light mb-6">
             Encountered an obstacle? Let us know. We respond within 48 hours.
           </p>
@@ -291,7 +290,7 @@ const Accessibility = () => {
         <div className="mb-16">
           <InfoCard
             icon={Monitor}
-            title="ACCESSIBLE TRY-ON EXPERIENCE"
+            title="Accessible Try-On Experience"
             description={
               <div className="space-y-3">
                 <p>Our virtual try-on room is keyboard navigable and screen reader compatible.</p>
@@ -309,15 +308,15 @@ const Accessibility = () => {
         </div>
       </div>
 
-      {/* Direct Line CTA */}
+      {/* Contact CTA */}
       <ActionCTA
-        title="DIRECT LINE"
-        subtitle="Immediate assistance for accessibility concerns. We respond within 2 business days."
+        title="Contact Our Accessibility Team"
+        subtitle="For immediate assistance with accessibility concerns, we respond within 2 business days."
         buttonText="EMAIL ACCESSIBILITY TEAM"
         onSubmit={handleContactClick}
         footerText="Or contact us directly:"
         footerLinks={[
-          { text: "accessibility@lineofjudah.com", href: "mailto:accessibility@lineofjudah.com?subject=Priority%20Access", isExternal: true },
+          { text: "accessibility@lineofjudah.com", href: "mailto:accessibility@lineofjudah.com?subject=Accessibility%20Inquiry", isExternal: true },
           { text: "+1 (212) 555-0123", href: "tel:+12125550123", isExternal: true }
         ]}
       />

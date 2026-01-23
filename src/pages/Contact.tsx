@@ -30,8 +30,8 @@ const contactChannels = [
     },
   },
   {
-    title: "HOTLINE",
-    description: "Speak directly with the tribe. Best for urgent order issues or complex questions.",
+    title: "PHONE",
+    description: "Speak directly with our team. Best for urgent order issues or complex questions.",
     icon: Phone,
     iconColor: "blue" as const,
     action: {
@@ -121,12 +121,12 @@ const quickFAQs = [
   {
     id: "shipping",
     question: "What are your shipping options and timeframes?",
-    answer: "Ground Ops (5-7 days, FREE over $75), Rapid Deploy (2-3 days, $12.99), Priority Extraction (next day, $24.99). We ship to 50+ countries worldwide. All orders include tracking and insurance.",
+    answer: "Standard (5-9 business days, FREE over $75), Express (2-3 business days, $12.99), Overnight (next business day, $24.99). We ship to 50+ countries worldwide. All orders include tracking and insurance.",
   },
   {
     id: "returns",
     question: "What's your return and exchange policy?",
-    answer: "30-day satisfaction guarantee on unworn items with original tags attached. Free returns via prepaid label. Custom pieces and items marked Final Sale are non-returnable. Exchanges processed within 3-5 business days of receiving your return.",
+    answer: "30-day satisfaction guarantee on unworn items with original tags attached. Free return shipping on US orders. Custom pieces and items marked Final Sale are non-returnable. Exchanges processed within 3-5 business days of receiving your return.",
   },
   {
     id: "sizing",
@@ -136,7 +136,7 @@ const quickFAQs = [
   {
     id: "tracking",
     question: "Can I track my order?",
-    answer: "Yes. Tracking activates within 24 hours of shipment. You'll receive an email with tracking link, or check Account → Orders anytime. We ship via USPS, UPS, and FedEx depending on destination.",
+    answer: "Yes. Tracking activates within 24-48 hours of order confirmation. You'll receive an email with tracking link, or check Account → Orders anytime. We ship via USPS, UPS, and FedEx depending on destination.",
   },
   {
     id: "gifting",
@@ -146,7 +146,7 @@ const quickFAQs = [
   {
     id: "ambassador",
     question: "How do I become an Ambassador?",
-    answer: "Apply at our Ambassador page. We review applications monthly and look for tribe members who live the mission and create authentic content. Ambassadors get early access, exclusive discounts, and commission on referrals.",
+    answer: "Apply at our Ambassador page. We review applications monthly and look for community members who share our values and create authentic content. Ambassadors get early access, exclusive discounts, and commission on referrals.",
   },
 ];
 
@@ -162,9 +162,9 @@ const Contact = () => {
   
   return (
     <ServicePageLayout
-      title="Direct Line to the Tribe."
-      subtitle="Questions. Concerns. Battle reports. We're here. Response within 24 hours — faster for active orders."
-      eyebrow="COMMAND CENTER"
+      title="We're Here When You Need Us."
+      subtitle="Questions answered within 24 hours. Order issues prioritized same-day."
+      eyebrow="CUSTOMER SUPPORT"
       heroValueProps={heroValueProps}
       heroAlignment="center"
       showSidebar={true}
@@ -176,8 +176,8 @@ const Contact = () => {
       {/* Declaration */}
       <div className="mt-12">
         <DeclarationBlock
-          quote="We don't do bots. Every message reaches a real member of the tribe."
-          attribution="Line of Judah Support Doctrine"
+          quote="Every message is read by a real person. We believe you deserve better than automated responses."
+          attribution="— Our Promise"
         />
       </div>
       
@@ -283,10 +283,10 @@ const Contact = () => {
         </div>
       </ServiceSection>
       
-      {/* Quick Intel FAQ */}
+      {/* Common Questions FAQ */}
       <ServiceSection
-        id="quick-intel"
-        title="Quick Intel"
+        id="common-questions"
+        title="Common Questions"
         subtitle="Answers to the questions we hear most often."
         className="mt-16"
       >
@@ -332,7 +332,7 @@ const Contact = () => {
       {/* Contact Form */}
       <ServiceSection
         id="form"
-        title="Send a Transmission"
+        title="Send a Message"
         subtitle="Fill out the form below and we'll route your message to the right team member."
         className="mt-16"
       >
@@ -341,11 +341,11 @@ const Contact = () => {
         </div>
       </ServiceSection>
       
-      {/* Headquarters */}
+      {/* Our Office */}
       <ServiceSection
-        id="headquarters"
-        title="Headquarters"
-        subtitle="Our base of operations."
+        id="office"
+        title="Our Office"
+        subtitle="Where we work."
         className="mt-16"
       >
         <div className="p-6 bg-muted/50 border border-border">
