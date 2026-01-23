@@ -1,12 +1,12 @@
-import { useState, useMemo } from "react";
-import { useEffect } from "react";
-import Layout from "@/components/layout/Layout";
-import FAQHero from "@/components/faq/FAQHero";
-import FAQCategoryNav from "@/components/faq/FAQCategoryNav";
+import { useState, useMemo, useEffect } from "react";
+import { Search, MessageCircle } from "lucide-react";
+import ServicePageLayout from "@/components/service/ServicePageLayout";
+import ServiceSection from "@/components/service/ServiceSection";
+import ActionCTA from "@/components/service/ActionCTA";
+import FAQCategoryTabs from "@/components/faq/FAQCategoryTabs";
 import FAQAccordionGroup from "@/components/faq/FAQAccordionGroup";
 import AskUsModal from "@/components/faq/AskUsModal";
 import { Button } from "@/components/ui/button";
-import { MessageCircle } from "lucide-react";
 
 export interface FAQItem {
   id: string;
@@ -17,7 +17,7 @@ export interface FAQItem {
 }
 
 const faqData: FAQItem[] = [
-  // Shipping
+  // Shipping / DEPLOYMENT
   {
     id: "ship-1",
     question: "How long does shipping take?",
@@ -46,7 +46,7 @@ const faqData: FAQItem[] = [
     category: "shipping",
     keywords: ["track", "tracking", "where", "status", "locate"]
   },
-  // Returns
+  // Returns / TACTICAL RESET
   {
     id: "ret-1",
     question: "What is your return policy?",
@@ -82,7 +82,7 @@ const faqData: FAQItem[] = [
     category: "returns",
     keywords: ["exchange", "swap", "different", "size", "color"]
   },
-  // Products
+  // Products / ARMOR SPECS
   {
     id: "prod-1",
     question: "What materials do you use?",
@@ -104,7 +104,7 @@ const faqData: FAQItem[] = [
     category: "products",
     keywords: ["care", "wash", "clean", "maintain", "instructions"]
   },
-  // Sizing
+  // Sizing / FIT INTEL
   {
     id: "size-1",
     question: "How do I find my size?",
@@ -126,7 +126,7 @@ const faqData: FAQItem[] = [
     category: "sizing",
     keywords: ["true", "standard", "accurate", "run"]
   },
-  // Orders
+  // Orders / MISSION STATUS
   {
     id: "ord-1",
     question: "Can I modify my order after placing it?",
@@ -148,7 +148,7 @@ const faqData: FAQItem[] = [
     category: "orders",
     keywords: ["payment", "pay", "credit", "card", "paypal", "afterpay"]
   },
-  // Care
+  // Care / GEAR MAINTENANCE
   {
     id: "care-1",
     question: "How should I wash my apparel?",
@@ -172,15 +172,53 @@ const faqData: FAQItem[] = [
   }
 ];
 
+// Brand-voice category labels
+const categoryLabels: Record<string, string> = {
+  shipping: "DEPLOYMENT",
+  returns: "TACTICAL RESET",
+  products: "ARMOR SPECS",
+  sizing: "FIT INTEL",
+  orders: "MISSION STATUS",
+  care: "GEAR MAINTENANCE",
+};
+
 const categories = [
-  { id: "all", label: "All" },
-  { id: "shipping", label: "Shipping" },
-  { id: "returns", label: "Returns" },
-  { id: "products", label: "Products" },
-  { id: "sizing", label: "Sizing" },
-  { id: "orders", label: "Orders" },
-  { id: "care", label: "Care" }
+  { id: "all", label: "ALL INTEL" },
+  { id: "shipping", label: "DEPLOYMENT" },
+  { id: "returns", label: "TACTICAL RESET" },
+  { id: "products", label: "ARMOR SPECS" },
+  { id: "sizing", label: "FIT INTEL" },
+  { id: "orders", label: "MISSION STATUS" },
+  { id: "care", label: "GEAR MAINTENANCE" }
 ] as const;
+
+const getCategoryLabel = (category: string) => categoryLabels[category] || category.toUpperCase();
+
+// No Results State Component
+const NoResultsState = ({ 
+  searchQuery, 
+  onAskClick 
+}: { 
+  searchQuery: string; 
+  onAskClick: () => void;
+}) => (
+  <div className="text-center py-16">
+    <div className="w-16 h-16 bg-stone-100 dark:bg-stone-800 rounded-full flex items-center justify-center mx-auto mb-6">
+      <Search className="w-6 h-6 text-muted-foreground" />
+    </div>
+    <h3 className="text-xl font-light mb-2 uppercase tracking-wide">INTEL NOT FOUND.</h3>
+    <p className="text-muted-foreground font-light mb-8 max-w-md mx-auto">
+      Your search for "{searchQuery}" returned no active briefings. Our command center is standing by.
+    </p>
+    <Button 
+      onClick={onAskClick}
+      className="bg-amber-500 hover:bg-amber-600 text-white"
+    >
+      <MessageCircle className="w-4 h-4 mr-2" />
+      CONTACT COMMAND
+    </Button>
+  </div>
+);
 
 const FAQ = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -226,42 +264,50 @@ const FAQ = () => {
 
   const hasNoResults = searchQuery.trim() && filteredFAQs.length === 0;
 
-  return (
-    <Layout>
-      <FAQHero 
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-      />
+  const handleCategoryChange = (category: string) => {
+    setActiveCategory(category);
+    // Clear search when changing categories for cleaner UX
+    if (searchQuery) {
+      setSearchQuery("");
+    }
+  };
 
-      <FAQCategoryNav 
+  return (
+    <ServicePageLayout
+      title="MISSION INTEL. DECODED."
+      subtitle="The answers you need to stay battle-ready. Search the archives or browse by operation."
+      eyebrow="TACTICAL INTELLIGENCE"
+      heroAlignment="center"
+      showSearch
+      searchQuery={searchQuery}
+      onSearchChange={setSearchQuery}
+      searchPlaceholder="Search the intel archives..."
+    >
+      {/* Category Tabs */}
+      <FAQCategoryTabs
         categories={categories}
         activeCategory={activeCategory}
-        onCategoryChange={setActiveCategory}
+        onCategoryChange={handleCategoryChange}
       />
 
-      <main className="max-w-4xl mx-auto px-6 py-12">
+      {/* FAQ Content */}
+      <div className="min-h-[400px]">
         {hasNoResults ? (
-          <div className="text-center py-16">
-            <p className="text-lg text-muted-foreground mb-6">
-              No results found for "{searchQuery}"
-            </p>
-            <Button 
-              onClick={() => setIsAskModalOpen(true)}
-              className="bg-amber-500 hover:bg-amber-600 text-white"
-            >
-              <MessageCircle className="w-4 h-4 mr-2" />
-              Ask Us Instead
-            </Button>
-          </div>
+          <NoResultsState 
+            searchQuery={searchQuery} 
+            onAskClick={() => setIsAskModalOpen(true)} 
+          />
         ) : activeCategory === "all" && !searchQuery ? (
-          // Show grouped by category
+          // Show grouped by category with ServiceSection wrappers
           Object.entries(groupedFAQs).map(([category, items]) => (
-            <FAQAccordionGroup 
+            <ServiceSection 
               key={category}
-              category={category}
-              items={items}
-              searchQuery={searchQuery}
-            />
+              id={category}
+              title={getCategoryLabel(category)}
+              size="compact"
+            >
+              <FAQAccordionGroup items={items} searchQuery={searchQuery} />
+            </ServiceSection>
           ))
         ) : (
           // Show flat list for filtered results
@@ -270,33 +316,29 @@ const FAQ = () => {
             searchQuery={searchQuery}
           />
         )}
+      </div>
 
-        {/* Ask Us CTA */}
-        {!hasNoResults && (
-          <div className="mt-16 p-8 bg-stone-900 text-white text-center">
-            <h3 className="text-2xl font-light mb-3">
-              Can't find what you're looking for?
-            </h3>
-            <p className="text-white/70 mb-6 font-light">
-              Our team is here to help with any questions.
-            </p>
-            <Button 
-              onClick={() => setIsAskModalOpen(true)}
-              variant="outline"
-              className="border-white text-white hover:bg-white hover:text-stone-900"
-            >
-              <MessageCircle className="w-4 h-4 mr-2" />
-              Ask Us a Question
-            </Button>
-          </div>
-        )}
-      </main>
+      {/* CTA */}
+      {!hasNoResults && (
+        <ActionCTA
+          title="NEED DIRECT COMMS?"
+          subtitle="Our command center responds within 24 hours. No question too complex."
+          alignment="center"
+          buttonText="OPEN CHANNEL"
+          onSubmit={() => setIsAskModalOpen(true)}
+          footerText="Or reach us at"
+          footerLinks={[
+            { text: "intel@lineofjudah.com", href: "mailto:hello@lineofjudah.com", isExternal: true }
+          ]}
+          className="mt-16"
+        />
+      )}
 
       <AskUsModal 
         isOpen={isAskModalOpen}
         onClose={() => setIsAskModalOpen(false)}
       />
-    </Layout>
+    </ServicePageLayout>
   );
 };
 
