@@ -168,7 +168,7 @@ const FitGuideSection = () => {
     <>
       <section 
         data-section="fit-guide"
-        className="min-h-screen w-full snap-start bg-stone-900 py-16 lg:py-24 px-6"
+        className="lookbook-section-height w-full snap-start bg-stone-900 py-16 lg:py-24 px-6 overflow-y-auto"
       >
         <div className="max-w-6xl mx-auto">
           {/* Section Header */}

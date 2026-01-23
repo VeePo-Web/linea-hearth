@@ -60,7 +60,7 @@ const LookSection = ({ look, index }: LookSectionProps) => {
     <section
       ref={sectionRef}
       data-look-index={index}
-      className="h-screen w-full snap-start relative flex flex-col lg:flex-row overflow-hidden"
+      className="lookbook-section-height w-full snap-start relative flex flex-col lg:flex-row overflow-hidden"
     >
       {/* Oversized Look Index - Background Element */}
       <motion.div
@@ -79,7 +79,7 @@ const LookSection = ({ look, index }: LookSectionProps) => {
 
       {/* Image Side */}
       <div 
-        className={`w-full lg:w-3/5 h-[50vh] lg:h-full relative overflow-hidden ${
+        className={`w-full lg:w-3/5 lookbook-half-height lg:h-full relative overflow-hidden ${
           isReversed ? 'lg:order-2' : ''
         }`}
       >
@@ -133,7 +133,7 @@ const LookSection = ({ look, index }: LookSectionProps) => {
 
       {/* Content Side */}
       <div 
-        className={`w-full lg:w-2/5 h-[50vh] lg:h-full flex items-center justify-center bg-stone-900 px-6 lg:px-12 py-8 relative z-10 ${
+        className={`w-full lg:w-2/5 lookbook-half-height lg:h-full flex items-center justify-center bg-stone-900 px-6 lg:px-12 py-8 relative z-10 ${
           isReversed ? 'lg:order-1' : ''
         }`}
       >
