@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -8,6 +8,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Ruler } from "lucide-react";
+import { useSizeMemory } from "@/hooks/useSizeMemory";
+import { useToast } from "@/hooks/use-toast";
 
 interface SizeOption {
   size: string;
@@ -18,15 +20,59 @@ interface SizeSelectorProps {
   sizes: SizeOption[];
   selectedSize: string | null;
   onSizeChange: (size: string) => void;
+  categorySlug?: string;
+  autoSelectRemembered?: boolean;
 }
 
-const SizeSelector = ({ sizes, selectedSize, onSizeChange }: SizeSelectorProps) => {
+const SizeSelector = ({ 
+  sizes, 
+  selectedSize, 
+  onSizeChange,
+  categorySlug,
+  autoSelectRemembered = true
+}: SizeSelectorProps) => {
   const [sizeGuideOpen, setSizeGuideOpen] = useState(false);
+  const [hasAutoSelected, setHasAutoSelected] = useState(false);
+  const { getRememberedSize, rememberSize } = useSizeMemory();
+  const { toast } = useToast();
+
+  const rememberedSize = categorySlug ? getRememberedSize(categorySlug) : null;
+
+  // Auto-select remembered size on mount
+  useEffect(() => {
+    if (!autoSelectRemembered || !categorySlug || hasAutoSelected) return;
+    
+    if (rememberedSize && !selectedSize) {
+      const matchingSize = sizes.find(s => s.size === rememberedSize && s.stock > 0);
+      if (matchingSize) {
+        onSizeChange(rememberedSize);
+        setHasAutoSelected(true);
+      }
+    }
+  }, [categorySlug, sizes, autoSelectRemembered, rememberedSize, selectedSize, onSizeChange, hasAutoSelected]);
 
   const getSizeState = (stock: number) => {
     if (stock === 0) return "oos";
     if (stock <= 3) return "low";
     return "available";
+  };
+
+  const handleSizeChange = (size: string) => {
+    onSizeChange(size);
+    
+    // Remember this size for the category
+    if (categorySlug) {
+      const isFirstTimeForCategory = !rememberedSize;
+      rememberSize(categorySlug, size);
+      
+      // Show confirmation toast only on first save
+      if (isFirstTimeForCategory) {
+        toast({
+          title: "Size remembered",
+          description: `We'll remember ${size} for this category`,
+        });
+      }
+    }
   };
 
   return (
@@ -117,11 +163,12 @@ const SizeSelector = ({ sizes, selectedSize, onSizeChange }: SizeSelectorProps) 
           const state = getSizeState(stock);
           const isSelected = selectedSize === size;
           const isDisabled = state === "oos";
+          const isRemembered = rememberedSize === size && !isSelected;
 
           return (
             <button
               key={size}
-              onClick={() => !isDisabled && onSizeChange(size)}
+              onClick={() => !isDisabled && handleSizeChange(size)}
               disabled={isDisabled}
               className={`
                 relative min-w-[44px] h-11 px-3 text-sm font-light border transition-all duration-200
@@ -129,13 +176,26 @@ const SizeSelector = ({ sizes, selectedSize, onSizeChange }: SizeSelectorProps) 
                   ? "bg-foreground text-background border-foreground" 
                   : isDisabled
                     ? "bg-muted/30 text-muted-foreground/40 border-border/50 cursor-not-allowed line-through"
-                    : "bg-background text-foreground border-border hover:border-foreground"
+                    : isRemembered
+                      ? "bg-amber-500/10 text-foreground border-amber-500/50 hover:border-amber-500"
+                      : "bg-background text-foreground border-border hover:border-foreground"
                 }
               `}
-              aria-label={`Size ${size}${isDisabled ? " - Out of stock" : state === "low" ? ` - Only ${stock} left` : ""}`}
+              aria-label={`Size ${size}${isDisabled ? " - Out of stock" : state === "low" ? ` - Only ${stock} left` : ""}${isRemembered ? " - Your usual size" : ""}`}
             >
               {size}
-              {state === "low" && !isSelected && (
+              
+              {/* "Your size" badge for remembered size */}
+              {isRemembered && stock > 0 && (
+                <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 text-[8px] 
+                                 uppercase tracking-wider bg-amber-500 text-white px-1.5 py-0.5 
+                                 rounded-full whitespace-nowrap font-medium">
+                  Your size
+                </span>
+              )}
+              
+              {/* Low stock indicator */}
+              {state === "low" && !isSelected && !isRemembered && (
                 <span className="absolute -top-1 -right-1 w-2 h-2 bg-amber-500 rounded-full" />
               )}
             </button>
