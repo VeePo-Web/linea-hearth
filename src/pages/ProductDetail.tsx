@@ -9,7 +9,7 @@ import HowItMinisters from "../components/product/HowItMinisters";
 import FitFabricSection from "../components/product/FitFabricSection";
 import ProductReviews from "../components/product/ProductReviews";
 import StyledByTribe from "../components/product/StyledByTribe";
-import WearWithSection from "../components/product/WearWithSection";
+import LookbookLookSection from "../components/product/LookbookLookSection";
 import GuaranteeBadge from "../components/product/GuaranteeBadge";
 import MobileStickyATC from "../components/product/MobileStickyATC";
 import ProductCarousel from "../components/content/ProductCarousel";
@@ -162,10 +162,10 @@ const ProductDetail = () => {
       {/* Styled By The Tribe - UGC */}
       <StyledByTribe productId={product.id} />
 
-      {/* Complete The Look - Cross-sells */}
-      <WearWithSection 
+      {/* Complete The Look - Curated from Lookbook */}
+      <LookbookLookSection 
         currentProductId={product.id}
-        categoryId={product.category_id}
+        fallbackCategoryId={product.category_id}
       />
 
       {/* Guarantee Badge */}
