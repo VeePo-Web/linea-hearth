@@ -31,6 +31,12 @@ const AddedToCartToast = ({
 
   const handleViewCart = (e: React.MouseEvent) => {
     e.stopPropagation();
+    
+    // Haptic feedback on button tap (mobile)
+    if (!prefersReducedMotion && 'vibrate' in navigator) {
+      navigator.vibrate(10);
+    }
+    
     if (toastId) sonnerToast.dismiss(toastId);
     onViewCart?.();
   };
