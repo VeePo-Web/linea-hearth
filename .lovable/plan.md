@@ -1,41 +1,52 @@
 
 
-# Haptic Feedback for "View Cart" Button - Implementation Plan
+# Milestone Celebration Haptics - Implementation Plan
 
 ## Overview
 
-Add a tactile vibration when the "View Cart" button is tapped in the AddedToCartToast component, providing immediate physical confirmation that the action was registered.
+Enhance the FreeShippingBar with tiered haptic feedback that provides tactile celebration when users hit free shipping milestones, reinforcing the dopamine loop of progress toward free shipping.
 
 ---
 
 ## TEMU Conversion Psychology
 
-**Why haptic on button tap matters:**
-- **Action confirmation loop**: User taps → feels vibration → knows action registered before cart opens
-- **Reduces "did I tap it?" anxiety**: Physical feedback eliminates doubt
-- **Creates premium native app feel**: Matches iOS/Android shopping apps (TEMU, Shein, Amazon)
-- **Differentiated from toast appearance haptic**: Toast shows (10ms) → user taps View Cart (different 10ms) → distinct tactile signatures
+**Why milestone haptics matter:**
+- **Gamification reinforcement**: Haptics make abstract progress feel physical
+- **Dopamine loop completion**: See progress bar fill → Feel vibration → Brain registers achievement
+- **Reduced cognitive load**: "Did I unlock something?" → Physical confirmation says yes
+- **Mobile-native expectation**: Gaming apps, banking apps, fitness trackers all use milestone haptics
 
-**Pulse Duration Selection:**
-The toast appearance already uses 10ms. For the View Cart tap:
-- **Recommended: 10ms** — consistent with existing button tap patterns
-- Short enough to feel responsive, not jarring
-- Matches the "navigate to cart" action weight
+**Pulse Duration Selection (based on existing patterns):**
+
+| Milestone | Pulse Duration | Rationale |
+|-----------|----------------|-----------|
+| Halfway (50%) | 30ms | Lighter celebration — "you're on your way" |
+| Almost (90%) | No haptic | Urgency messaging is enough — don't over-vibrate |
+| Unlocked (100%) | 50ms | Strongest celebration — achievement unlocked |
+
+The tiered approach creates a "crescendo" effect: 30ms → (nothing) → 50ms. This makes the final unlock feel more rewarding.
 
 ---
 
 ## Current State Analysis
 
-The `handleViewCart` function currently:
-1. Stops event propagation
-2. Dismisses the toast
-3. Calls `onViewCart()` to open the cart drawer
+The `celebrateMilestone` function (lines 42-54) currently:
+1. Sets active celebration state
+2. Adds tier to celebrated set
+3. Only triggers haptic for 'unlocked' tier (50ms)
+4. **Does NOT check `prefersReducedMotion`** — this is a bug we should fix
 
 ```typescript
-const handleViewCart = (e: React.MouseEvent) => {
-  e.stopPropagation();
-  if (toastId) sonnerToast.dismiss(toastId);
-  onViewCart?.();
+const celebrateMilestone = (tier: MilestoneType) => {
+  setActiveCelebration(tier);
+  setCelebratedMilestones(prev => new Set([...prev, tier]));
+  
+  // Haptic feedback only on unlock (subtle single pulse)
+  if (tier === 'unlocked' && navigator.vibrate) {
+    navigator.vibrate(50);
+  }
+  
+  // ...
 };
 ```
 
@@ -43,48 +54,77 @@ const handleViewCart = (e: React.MouseEvent) => {
 
 ## Implementation
 
-### File: `src/components/cart/AddedToCartToast.tsx`
+### File: `src/components/cart/FreeShippingBar.tsx`
 
 **Changes:**
-Add haptic feedback to the `handleViewCart` function, respecting reduced motion preferences.
+1. Add 30ms haptic for 'halfway' tier
+2. Keep 50ms haptic for 'unlocked' tier
+3. Respect `prefersReducedMotion` preference
+4. Check for `navigator.vibrate` support
 
-**Updated function:**
+**Updated `celebrateMilestone` function:**
+
 ```typescript
-const handleViewCart = (e: React.MouseEvent) => {
-  e.stopPropagation();
+const celebrateMilestone = (tier: MilestoneType) => {
+  setActiveCelebration(tier);
+  setCelebratedMilestones(prev => new Set([...prev, tier]));
   
-  // Haptic feedback on button tap (mobile)
+  // Tiered haptic feedback for milestone celebrations (mobile)
+  // Skip haptics if user prefers reduced motion
   if (!prefersReducedMotion && 'vibrate' in navigator) {
-    navigator.vibrate(10);
+    if (tier === 'halfway') {
+      navigator.vibrate(30); // Lighter celebration pulse
+    } else if (tier === 'unlocked') {
+      navigator.vibrate(50); // Stronger achievement pulse
+    }
+    // No haptic for 'almost' — urgency messaging is sufficient
   }
   
-  if (toastId) sonnerToast.dismiss(toastId);
-  onViewCart?.();
+  // Clear celebration after animation completes
+  const duration = tier === 'unlocked' ? 2000 : 1500;
+  setTimeout(() => setActiveCelebration(null), duration);
 };
 ```
 
 ---
 
+## Haptic Signature Design
+
+```text
+Cart Value:    €0 ──────────────────────────────────────── €150+
+Progress:      0%        50%              90%           100%
+
+Haptics:       ─────────[30ms]─────────────────────────[50ms]
+                          ↑                                ↑
+                    "Halfway there"               "Free shipping!"
+```
+
+**Why no haptic at 90%?**
+- Users are already highly engaged at this point (so close to goal)
+- The urgency messaging ("Just €15 more!") creates psychological pull
+- Over-vibrating reduces the perceived specialness of haptics
+- The 100% unlock feels more impactful as a distinct tactile event
+
+---
+
 ## Technical Considerations
 
-### Why Separate from Toast Appearance Haptic?
+### Reduced Motion Compliance
 
-The toast has two distinct user moments:
-1. **Toast appears** → 10ms haptic confirms "item added"
-2. **User taps View Cart** → 10ms haptic confirms "navigating to cart"
-
-These are ~500ms+ apart in user experience, so they create distinct tactile checkpoints, not a confusing double-buzz.
-
-### Reduced Motion Handling
-
-We already have `prefersReducedMotion` from the `useReducedMotion()` hook. The same check applies to the button tap haptic — users who prefer reduced motion likely prefer reduced haptic feedback too.
+The current code triggers haptics without checking `prefersReducedMotion`. While haptics aren't technically "motion," users who prefer reduced motion often have sensory sensitivities that extend to vibration. We respect this preference.
 
 ### Browser Compatibility
 
-- `'vibrate' in navigator` check handles unsupported browsers gracefully
-- Works on Android Chrome, Firefox Mobile
-- iOS Safari does NOT support `navigator.vibrate` (no-op, no error)
-- Desktop browsers will simply skip the vibration
+- `'vibrate' in navigator` check handles unsupported browsers
+- Works on: Android Chrome, Firefox Mobile
+- Gracefully no-ops on: iOS Safari, Desktop browsers
+
+### Why `'vibrate' in navigator` Instead of `navigator.vibrate`?
+
+The property check is safer because:
+- `navigator.vibrate` can be `undefined` in some browsers
+- Property existence check prevents potential errors
+- Follows the existing pattern in `AddedToCartToast.tsx`
 
 ---
 
@@ -92,34 +132,56 @@ We already have `prefersReducedMotion` from the `useReducedMotion()` hook. The s
 
 | File | Changes |
 |------|---------|
-| `src/components/cart/AddedToCartToast.tsx` | Add haptic trigger inside `handleViewCart` function |
+| `src/components/cart/FreeShippingBar.tsx` | Update `celebrateMilestone` function to add tiered haptics with reduced motion check |
 
 ---
 
 ## Acceptance Criteria
 
-- [ ] View Cart button triggers 10ms haptic pulse on tap (mobile)
-- [ ] No haptic if `prefers-reduced-motion` is enabled
+- [ ] 30ms haptic pulse triggers when 50% threshold is crossed (going up)
+- [ ] 50ms haptic pulse triggers when 100% threshold is crossed
+- [ ] No haptic triggers for 90% threshold
+- [ ] No haptics if `prefers-reduced-motion` is enabled
 - [ ] No JavaScript errors on devices without `navigator.vibrate`
-- [ ] Haptic fires before toast dismissal (user feels tap confirmation)
+- [ ] Haptics only fire once per session (existing milestone tracking prevents re-fire)
 - [ ] Works on Android Chrome and Firefox Mobile
-- [ ] Gracefully no-ops on iOS Safari (no errors)
 
 ---
 
 ## Code Diff Preview
 
 ```diff
-  const handleViewCart = (e: React.MouseEvent) => {
-    e.stopPropagation();
-+   
-+   // Haptic feedback on button tap (mobile)
+  const celebrateMilestone = (tier: MilestoneType) => {
+    setActiveCelebration(tier);
+    setCelebratedMilestones(prev => new Set([...prev, tier]));
+    
+-   // Haptic feedback only on unlock (subtle single pulse)
+-   if (tier === 'unlocked' && navigator.vibrate) {
+-     navigator.vibrate(50);
++   // Tiered haptic feedback for milestone celebrations (mobile)
++   // Skip haptics if user prefers reduced motion
 +   if (!prefersReducedMotion && 'vibrate' in navigator) {
-+     navigator.vibrate(10);
-+   }
-+   
-    if (toastId) sonnerToast.dismiss(toastId);
-    onViewCart?.();
++     if (tier === 'halfway') {
++       navigator.vibrate(30); // Lighter celebration pulse
++     } else if (tier === 'unlocked') {
++       navigator.vibrate(50); // Stronger achievement pulse
++     }
++     // No haptic for 'almost' — urgency messaging is sufficient
+    }
+    
+    // Clear celebration after animation completes
+    const duration = tier === 'unlocked' ? 2000 : 1500;
+    setTimeout(() => setActiveCelebration(null), duration);
   };
 ```
+
+---
+
+## Conversion Impact
+
+| Metric | Expected Impact | Mechanism |
+|--------|-----------------|-----------|
+| Free shipping unlock rate | +5% | Gamification reinforcement creates goal commitment |
+| Average order value | +3% | Users add items specifically to hit thresholds |
+| User satisfaction | +8% | Multi-sensory feedback feels premium/native |
 
