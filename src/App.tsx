@@ -7,6 +7,7 @@ import { AnimatePresence } from "framer-motion";
 import { AuthProvider } from "@/hooks/useAuth";
 import { CartProvider } from "@/hooks/useCart";
 import { SizeQuizProvider } from "@/contexts/SizeQuizContext";
+import { RecentlyViewedProvider } from "@/contexts/RecentlyViewedContext";
 import ScrollToTop from "./components/ScrollToTop";
 import PageTransition from "./components/motion/PageTransition";
 import Index from "./pages/Index";
@@ -102,16 +103,18 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
       <CartProvider>
-        <SizeQuizProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <ScrollToTop />
-              <AnimatedRoutes />
-            </BrowserRouter>
-          </TooltipProvider>
-        </SizeQuizProvider>
+        <RecentlyViewedProvider>
+          <SizeQuizProvider>
+            <TooltipProvider>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
+                <ScrollToTop />
+                <AnimatedRoutes />
+              </BrowserRouter>
+            </TooltipProvider>
+          </SizeQuizProvider>
+        </RecentlyViewedProvider>
       </CartProvider>
     </AuthProvider>
   </QueryClientProvider>

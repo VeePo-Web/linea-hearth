@@ -10,6 +10,7 @@ import FeaturedCollection from "../components/homepage/FeaturedCollection";
 import TestimonySpotlight from "../components/homepage/TestimonySpotlight";
 import InstagramFeed from "../components/homepage/InstagramFeed";
 import MobileStickyBar from "../components/homepage/MobileStickyBar";
+import RecentlyViewed from "../components/homepage/RecentlyViewed";
 
 const Index = () => {
   return (
@@ -19,6 +20,13 @@ const Index = () => {
       
       {/* Value Strip - Compressed single line */}
       <ValueStackBanner />
+      
+      {/* Recently Viewed - Show for return visitors */}
+      <RecentlyViewed 
+        maxItems={8} 
+        title="Continue Shopping"
+        className="mt-8 lg:mt-12"
+      />
       
       {/* Featured Drop - Magazine spread */}
       <FeaturedDrop />

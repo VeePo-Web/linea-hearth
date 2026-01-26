@@ -15,6 +15,7 @@ import AffirmationStrip from "./AffirmationStrip";
 import BundleProgress from "./BundleProgress";
 import BundleSavingsRow from "./BundleSavingsRow";
 import SavedForLaterShelf from "./SavedForLaterShelf";
+import ContinueShopping from "./ContinueShopping";
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 
@@ -386,6 +387,9 @@ const CartDrawer = ({ onViewFavorites }: CartDrawerProps) => {
 
                   {/* Smart upsell */}
                   <SmartUpsell />
+
+                  {/* Continue Shopping - Recently Viewed */}
+                  <ContinueShopping maxItems={4} />
 
                   {/* Mobile favorites link */}
                   {onViewFavorites && (
