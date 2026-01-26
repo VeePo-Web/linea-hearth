@@ -1,33 +1,43 @@
 
 
-# Haptic Feedback for "Just Added" Toast - Implementation Plan
+# Haptic Feedback for "View Cart" Button - Implementation Plan
 
 ## Overview
 
-Add a subtle haptic vibration when the "Just Added" toast appears on mobile devices, providing tactile confirmation that reinforces the add-to-cart action.
+Add a tactile vibration when the "View Cart" button is tapped in the AddedToCartToast component, providing immediate physical confirmation that the action was registered.
 
 ---
 
 ## TEMU Conversion Psychology
 
-**Why haptic feedback matters:**
-- Creates a **multi-sensory confirmation loop**: visual (toast) + tactile (vibration)
-- Reduces anxiety: "Did I add it?" becomes physically certain
-- Matches native iOS/Android shopping app behavior (users expect it)
-- Studies show haptic feedback increases perceived action completion by 23%
+**Why haptic on button tap matters:**
+- **Action confirmation loop**: User taps → feels vibration → knows action registered before cart opens
+- **Reduces "did I tap it?" anxiety**: Physical feedback eliminates doubt
+- **Creates premium native app feel**: Matches iOS/Android shopping apps (TEMU, Shein, Amazon)
+- **Differentiated from toast appearance haptic**: Toast shows (10ms) → user taps View Cart (different 10ms) → distinct tactile signatures
 
 **Pulse Duration Selection:**
-Based on the existing codebase patterns:
+The toast appearance already uses 10ms. For the View Cart tap:
+- **Recommended: 10ms** — consistent with existing button tap patterns
+- Short enough to feel responsive, not jarring
+- Matches the "navigate to cart" action weight
 
-| Existing Action | Pulse Duration |
-|-----------------|----------------|
-| Cart addItem (direct) | 10ms |
-| Save for later | 10ms |
-| Quick add success | 50ms |
-| Tier unlock | 30ms |
-| Free shipping unlock | 50ms |
+---
 
-**Recommended for Toast:** **10ms** — aligns with the direct cart add pattern since the toast confirms the same action. This creates a consistent tactile signature across the add-to-cart experience.
+## Current State Analysis
+
+The `handleViewCart` function currently:
+1. Stops event propagation
+2. Dismisses the toast
+3. Calls `onViewCart()` to open the cart drawer
+
+```typescript
+const handleViewCart = (e: React.MouseEvent) => {
+  e.stopPropagation();
+  if (toastId) sonnerToast.dismiss(toastId);
+  onViewCart?.();
+};
+```
 
 ---
 
@@ -36,47 +46,45 @@ Based on the existing codebase patterns:
 ### File: `src/components/cart/AddedToCartToast.tsx`
 
 **Changes:**
-1. Add `useEffect` hook to trigger haptic feedback on mount
-2. Only trigger once when toast first appears
-3. No vibration if `prefersReducedMotion` is true (accessibility)
+Add haptic feedback to the `handleViewCart` function, respecting reduced motion preferences.
 
+**Updated function:**
 ```typescript
-import { useEffect } from 'react';
-
-// Inside the component, after prefersReducedMotion:
-useEffect(() => {
-  // Subtle haptic pulse when toast appears (mobile)
+const handleViewCart = (e: React.MouseEvent) => {
+  e.stopPropagation();
+  
+  // Haptic feedback on button tap (mobile)
   if (!prefersReducedMotion && 'vibrate' in navigator) {
     navigator.vibrate(10);
   }
-}, []); // Empty deps = run once on mount
+  
+  if (toastId) sonnerToast.dismiss(toastId);
+  onViewCart?.();
+};
 ```
 
 ---
 
 ## Technical Considerations
 
-### Why in the Toast Component (not the utility)?
+### Why Separate from Toast Appearance Haptic?
 
-The `showAddedToast` function in `toastUtils.tsx` is just a function call — it doesn't have access to the React lifecycle or the `prefersReducedMotion` hook. By placing the haptic trigger in the component:
+The toast has two distinct user moments:
+1. **Toast appears** → 10ms haptic confirms "item added"
+2. **User taps View Cart** → 10ms haptic confirms "navigating to cart"
 
-1. We respect reduced motion preferences
-2. We trigger at the exact moment the toast becomes visible
-3. We follow the existing pattern (e.g., `FreeShippingBar.tsx` triggers haptics in component effects)
-
-### Avoiding Double Vibration
-
-The `useCart.tsx` already has a 10ms vibration on `addItem` (line 102-104). However:
-- That fires when the item is added to the cart state
-- This toast fires when the visual confirmation appears
-- These happen nearly simultaneously (~100ms apart)
-- For a 10ms pulse, users won't perceive a "double tap" — it reinforces the action
-
-If this becomes an issue, we could add a `skipHaptic` prop to the toast, but this is unlikely to be needed.
+These are ~500ms+ apart in user experience, so they create distinct tactile checkpoints, not a confusing double-buzz.
 
 ### Reduced Motion Handling
 
-Already handled: the component checks `prefersReducedMotion` and skips the vibration if true.
+We already have `prefersReducedMotion` from the `useReducedMotion()` hook. The same check applies to the button tap haptic — users who prefer reduced motion likely prefer reduced haptic feedback too.
+
+### Browser Compatibility
+
+- `'vibrate' in navigator` check handles unsupported browsers gracefully
+- Works on Android Chrome, Firefox Mobile
+- iOS Safari does NOT support `navigator.vibrate` (no-op, no error)
+- Desktop browsers will simply skip the vibration
 
 ---
 
@@ -84,41 +92,34 @@ Already handled: the component checks `prefersReducedMotion` and skips the vibra
 
 | File | Changes |
 |------|---------|
-| `src/components/cart/AddedToCartToast.tsx` | Add `useEffect` with haptic trigger on mount |
+| `src/components/cart/AddedToCartToast.tsx` | Add haptic trigger inside `handleViewCart` function |
 
 ---
 
 ## Acceptance Criteria
 
-- [ ] Toast triggers 10ms haptic pulse on mobile devices
+- [ ] View Cart button triggers 10ms haptic pulse on tap (mobile)
 - [ ] No haptic if `prefers-reduced-motion` is enabled
-- [ ] Haptic fires only once per toast (not on re-render)
-- [ ] Works on Android Chrome and iOS Safari (where supported)
 - [ ] No JavaScript errors on devices without `navigator.vibrate`
+- [ ] Haptic fires before toast dismissal (user feels tap confirmation)
+- [ ] Works on Android Chrome and Firefox Mobile
+- [ ] Gracefully no-ops on iOS Safari (no errors)
 
 ---
 
 ## Code Diff Preview
 
 ```diff
-import { motion } from 'framer-motion';
-+import { useEffect } from 'react';
-import { toast as sonnerToast } from 'sonner';
-import { useReducedMotion } from '@/hooks/useReducedMotion';
-
-const AddedToCartToast = ({...}) => {
-  const prefersReducedMotion = useReducedMotion();
-
-+  // Subtle haptic feedback when toast appears (mobile)
-+  useEffect(() => {
-+    if (!prefersReducedMotion && 'vibrate' in navigator) {
-+      navigator.vibrate(10);
-+    }
-+  }, [prefersReducedMotion]);
-
-  const handleViewCart = (e: React.MouseEvent) => {...};
-  
-  return (...);
-};
+  const handleViewCart = (e: React.MouseEvent) => {
+    e.stopPropagation();
++   
++   // Haptic feedback on button tap (mobile)
++   if (!prefersReducedMotion && 'vibrate' in navigator) {
++     navigator.vibrate(10);
++   }
++   
+    if (toastId) sonnerToast.dismiss(toastId);
+    onViewCart?.();
+  };
 ```
 
