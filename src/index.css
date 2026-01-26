@@ -190,11 +190,15 @@
 
   /* Hero Massive Typography - 032c Industrial */
   .text-hero-massive {
-    @apply text-[18vw] md:text-[14vw] lg:text-[12vw] font-extralight tracking-[-0.04em] leading-[0.85];
+    @apply text-[18vw] md:text-[14vw] lg:text-[12vw] font-extralight tracking-[-0.02em] leading-[0.88];
+    transform-style: preserve-3d;
+    -webkit-font-smoothing: antialiased;
   }
 
   .text-hero-massive-mobile {
-    @apply text-[22vw] font-extralight tracking-[-0.04em] leading-[0.8];
+    @apply text-[22vw] font-extralight tracking-[-0.02em] leading-[0.85];
+    transform-style: preserve-3d;
+    -webkit-font-smoothing: antialiased;
   }
 
   /* Film Grain / Noise Texture Overlay */
