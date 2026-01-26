@@ -13,6 +13,7 @@ import { useAbandonedCart } from "@/hooks/useAbandonedCart";
 import { useStripeCheckout } from "@/hooks/useStripeCheckout";
 import { useDiscountCode, AppliedDiscount } from "@/hooks/useDiscountCode";
 import { useEmailTypoDetection } from "@/hooks/useEmailTypoDetection";
+import { useAuth } from "@/hooks/useAuth";
 import CheckoutProgress from "@/components/checkout/CheckoutProgress";
 import SavingsSummary from "@/components/checkout/SavingsSummary";
 import UrgencyTimer from "@/components/checkout/UrgencyTimer";
@@ -23,9 +24,11 @@ import OrderConfirmation from "@/components/checkout/OrderConfirmation";
 import PostPurchaseOffer from "@/components/checkout/PostPurchaseOffer";
 import MobileStickyCheckout from "@/components/checkout/MobileStickyCheckout";
 import ExpressCheckout from "@/components/checkout/ExpressCheckout";
+import SavedAddressSelector from "@/components/checkout/SavedAddressSelector";
 import FreeShippingBar from "@/components/cart/FreeShippingBar";
 import EmailTypoSuggestion from "@/components/ui/EmailTypoSuggestion";
 import { toast } from "sonner";
+import { Address } from "@/types/account";
 
 const Checkout = () => {
   const navigate = useNavigate();
@@ -78,6 +81,10 @@ const Checkout = () => {
   const [paymentComplete, setPaymentComplete] = useState(false);
   const [showPostPurchaseOffer, setShowPostPurchaseOffer] = useState(false);
   const [orderNumber, setOrderNumber] = useState("");
+  const [selectedShippingAddressId, setSelectedShippingAddressId] = useState<string | undefined>();
+  const [selectedBillingAddressId, setSelectedBillingAddressId] = useState<string | undefined>();
+  
+  const { user } = useAuth();
 
   // Email typo detection hooks
   const customerEmailTypo = useEmailTypoDetection({
@@ -595,6 +602,31 @@ const Checkout = () => {
                       <div className="border-t border-muted-foreground/20 pt-6 mt-8">
                         <h3 className="text-base font-light text-foreground mb-4">Shipping Address</h3>
                         
+                        {/* Saved Address Selector - only for authenticated users */}
+                        {user && (
+                          <SavedAddressSelector
+                            type="shipping"
+                            selectedId={selectedShippingAddressId}
+                            onSelect={(checkoutAddr, rawAddr) => {
+                              setSelectedShippingAddressId(rawAddr.id);
+                              setCustomerDetails(prev => ({
+                                ...prev,
+                                firstName: checkoutAddr.firstName,
+                                lastName: checkoutAddr.lastName,
+                                phone: checkoutAddr.phone || prev.phone,
+                              }));
+                              setShippingAddress({
+                                address: checkoutAddr.address,
+                                city: checkoutAddr.city,
+                                postalCode: checkoutAddr.postalCode,
+                                country: checkoutAddr.country,
+                              });
+                              toast.success("Address applied");
+                            }}
+                            className="mb-6"
+                          />
+                        )}
+                        
                         <div className="space-y-4">
                           <div>
                             <Label htmlFor="shippingAddress" className="text-sm font-light text-foreground">
@@ -604,7 +636,10 @@ const Checkout = () => {
                               id="shippingAddress"
                               type="text"
                               value={shippingAddress.address}
-                              onChange={(e) => handleShippingAddressChange("address", e.target.value)}
+                              onChange={(e) => {
+                                handleShippingAddressChange("address", e.target.value);
+                                setSelectedShippingAddressId(undefined); // Clear selection on manual edit
+                              }}
                               className="mt-2 rounded-none"
                               placeholder="Street address"
                             />
@@ -619,7 +654,10 @@ const Checkout = () => {
                                 id="shippingCity"
                                 type="text"
                                 value={shippingAddress.city}
-                                onChange={(e) => handleShippingAddressChange("city", e.target.value)}
+                                onChange={(e) => {
+                                  handleShippingAddressChange("city", e.target.value);
+                                  setSelectedShippingAddressId(undefined);
+                                }}
                                 className="mt-2 rounded-none"
                                 placeholder="City"
                               />
@@ -632,7 +670,10 @@ const Checkout = () => {
                                 id="shippingPostalCode"
                                 type="text"
                                 value={shippingAddress.postalCode}
-                                onChange={(e) => handleShippingAddressChange("postalCode", e.target.value)}
+                                onChange={(e) => {
+                                  handleShippingAddressChange("postalCode", e.target.value);
+                                  setSelectedShippingAddressId(undefined);
+                                }}
                                 className="mt-2 rounded-none"
                                 placeholder="Postal code"
                               />
@@ -647,7 +688,10 @@ const Checkout = () => {
                               id="shippingCountry"
                               type="text"
                               value={shippingAddress.country}
-                              onChange={(e) => handleShippingAddressChange("country", e.target.value)}
+                              onChange={(e) => {
+                                handleShippingAddressChange("country", e.target.value);
+                                setSelectedShippingAddressId(undefined);
+                              }}
                               className="mt-2 rounded-none"
                               placeholder="Country"
                             />

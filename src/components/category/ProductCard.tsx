@@ -6,9 +6,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import FavoriteButton from "@/components/favorites/FavoriteButton";
 import InlineQuickSizePicker from "@/components/ui/InlineQuickSizePicker";
+import CartQuantityBadge from "@/components/category/CartQuantityBadge";
 import { useQuickAdd, ProductForQuickAdd } from "@/hooks/useQuickAdd";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
-
+import { useCart } from "@/hooks/useCart";
 interface ProductImage {
   image_url: string;
   is_primary: boolean;
@@ -49,6 +50,12 @@ interface ProductCardProps {
 const ProductCard = ({ product, onQuickView, index = 0, onAuthRequired }: ProductCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
   const prefersReducedMotion = useReducedMotion();
+  const { items } = useCart();
+
+  // Check if product is in cart
+  const productHex = product.id.replace(/-/g, '').slice(0, 8);
+  const cartItemId = parseInt(productHex, 16);
+  const isInCart = items.some(item => item.id === cartItemId);
 
   // Map product to QuickAdd format
   const quickAddProduct: ProductForQuickAdd = {
@@ -155,9 +162,31 @@ const ProductCard = ({ product, onQuickView, index = 0, onAuthRequired }: Produc
             {/* Overlay */}
             <div className="absolute inset-0 bg-black/[0.02]" />
 
-            {/* Badges */}
-            {badges.length > 0 && (
+            {/* Cart Quantity Badge - shows when item is in cart */}
+            {isInCart && !isHovered && (
+              <CartQuantityBadge 
+                productId={product.id} 
+                productName={product.name}
+                variant="badge"
+              />
+            )}
+
+            {/* Badges - positioned to not overlap with cart badge */}
+            {badges.length > 0 && !isInCart && (
               <div className="absolute top-3 left-3 flex flex-col gap-1.5">
+                {badges.map((badge, i) => (
+                  <span
+                    key={i}
+                    className={`px-2 py-1 text-[10px] font-medium tracking-wider ${badge.className}`}
+                  >
+                    {badge.label}
+                  </span>
+                ))}
+              </div>
+            )}
+            {/* Badges when item is in cart - show on right side */}
+            {badges.length > 0 && isInCart && !isHovered && (
+              <div className="absolute top-3 right-12 flex flex-col gap-1.5">
                 {badges.map((badge, i) => (
                   <span
                     key={i}
