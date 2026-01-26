@@ -21,6 +21,7 @@ import OrderStatsBadge from "@/components/checkout/OrderStatsBadge";
 import OrderConfirmation from "@/components/checkout/OrderConfirmation";
 import PostPurchaseOffer from "@/components/checkout/PostPurchaseOffer";
 import MobileStickyCheckout from "@/components/checkout/MobileStickyCheckout";
+import ExpressCheckout from "@/components/checkout/ExpressCheckout";
 import FreeShippingBar from "@/components/cart/FreeShippingBar";
 import { toast } from "sonner";
 
@@ -800,6 +801,15 @@ const Checkout = () => {
                       </div>
                     </RadioGroup>
                   </div>
+
+                  {/* Express Checkout - Apple Pay / Google Pay */}
+                  <ExpressCheckout 
+                    variant="checkout"
+                    onSuccess={() => {
+                      // Cart will be cleared and redirect handled by the hook
+                    }}
+                    className="rounded-none"
+                  />
 
                   {/* Payment Section */}
                   <div id="payment-section" className="bg-muted/20 p-6 lg:p-8 rounded-none">
