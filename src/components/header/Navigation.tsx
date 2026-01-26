@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "@/hooks/useCart";
 import { useAuth } from "@/hooks/useAuth";
 import { useFavorites } from "@/hooks/useFavorites";
+import { useSavedForLater } from "@/hooks/useSavedForLater";
 import CartDrawer from "@/components/cart/CartDrawer";
 import NavLink from "./NavLink";
 import MegaMenu from "./MegaMenu";
@@ -26,6 +27,7 @@ const Navigation = () => {
   const { user } = useAuth();
   const { itemCount, openCart, addItem, items } = useCart();
   const { favoritesCount } = useFavorites();
+  const { savedCount } = useSavedForLater();
 
   useEffect(() => {
     if (items.length === 0) {
@@ -253,6 +255,20 @@ const Navigation = () => {
                   className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-[30%] text-[0.5rem] font-semibold text-foreground pointer-events-none z-10"
                 >
                   {itemCount}
+                </motion.span>
+              )}
+            </AnimatePresence>
+            {/* Saved items indicator */}
+            <AnimatePresence>
+              {savedCount > 0 && (
+                <motion.span 
+                  initial={{ scale: 0 }} 
+                  animate={{ scale: 1 }} 
+                  exit={{ scale: 0 }}
+                  transition={{ type: "spring" as const, stiffness: 500, damping: 15 }} 
+                  className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-amber-500 text-white text-[0.5rem] font-semibold rounded-full flex items-center justify-center pointer-events-none z-20"
+                >
+                  +{savedCount > 9 ? '9+' : savedCount}
                 </motion.span>
               )}
             </AnimatePresence>
