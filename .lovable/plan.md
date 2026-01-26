@@ -1,277 +1,391 @@
 
 
-# TEMU-Tier Conversion Engineering: Gap Analysis and Next Steps
+# Lookbook Swipe Interface - Mobile-First Tinder-Style Shopping
 
-## Current State Assessment
+## Overview
 
-Based on my analysis of the codebase, here's what's **already implemented** vs **missing**:
-
-### Already Implemented (Strong Foundation)
-
-| Pillar | Feature | Status |
-|--------|---------|--------|
-| Size Memory | Database sync with `user_size_preferences` | Complete |
-| Size Memory | Guest-to-auth migration | Complete |
-| Size Memory | Size confidence scoring via `size_confidence_stats` view | Complete |
-| Size Memory | Category mapping (tops/bottoms/hats) | Complete |
-| Quick Add | Universal `useQuickAdd` hook | Complete |
-| Quick Add | Stock-aware with nearest-size fallback | Complete |
-| Quick Add | Haptic feedback (50ms vibrate) | Complete |
-| Quick Add | Toast notifications with product thumbnail | Complete |
-| Bundle Engine | `bundle_discounts` table with rules | Complete |
-| Bundle Engine | `useBundleDiscounts` hook with `BundleMatch` | Complete |
-| Bundle Engine | `BundleProgress` and `BundleSavingsRow` components | Complete |
-| Bundle Engine | `MissingProduct` fetching for smart prompts | Complete |
-| Cart Drawer | Email capture for abandoned cart | Complete |
-| Cart Drawer | `SmartUpsell` component | Complete |
-| Cart Drawer | `SavedForLaterShelf` | Complete |
-| Cart Drawer | Bundle progress cards | Complete |
-| Free Shipping | Progress bar with milestone celebrations | Complete |
-| Free Shipping | Haptic feedback at 50% and 100% | Complete |
-| Free Shipping | Color temperature transitions | Complete |
-| Threshold Upsells | `threshold_upsell_products` table | Complete |
-| Threshold Upsells | `useThresholdUpsells` hook | Complete |
-| Favorites | Database-backed with RLS | Complete |
-| Checkout | Stripe integration with hosted checkout | Complete |
-| Checkout | Discount code validation (server-side) | Complete |
-| Checkout | Order modification window (mentioned) | Partial |
+Build a world-class, mobile-optimized swipe-to-shop interface that transforms the lookbook experience into a gamified, friction-free shopping session. Users swipe right to add products to their bag, left to skip, with running totals, haptic feedback, and satisfying micro-animations throughout.
 
 ---
 
-## Critical Gaps for TEMU-Tier Status
-
-### Gap 1: Express Checkout (Apple Pay / Google Pay)
-
-**Current State:** 
-- Only redirects to Stripe hosted checkout
-- No inline Apple Pay / Google Pay buttons
-- Full form required before payment
-
-**Impact:** High friction on mobile. TEMU and Shein show express payment buttons at cart level.
-
-**Implementation:**
-```text
-Files to create/modify:
-- src/components/checkout/ExpressCheckout.tsx (new)
-- src/hooks/useExpressPay.ts (new)
-- supabase/functions/create-payment-intent/index.ts (new)
-- Install @stripe/react-stripe-js
-```
-
----
-
-### Gap 2: Behavioral Intent Signals Collection
-
-**Current State:**
-- `RecentlyViewedContext` tracks last 20 viewed products
-- No tracking of high-intent signals (time on page, zoom interactions, repeat views)
-
-**Impact:** Cannot trigger "Ready to buy?" prompts or predictive pre-loading.
-
-**Implementation:**
-```text
-Database:
-- Create `user_behavior_signals` table with:
-  - product_id, view_count, total_time_ms, zoom_count, add_remove_count
-
-Hooks:
-- src/hooks/useBehaviorTracking.ts (new)
-- Attach to ProductDetail.tsx: track time, zoom, scroll depth
-
-UI:
-- "You've viewed this 3 times—ready to buy?" prompt
-```
-
----
-
-### Gap 3: Predictive Pre-Loading
-
-**Current State:**
-- No pre-fetching of checkout sessions
-- No pre-warming of cart API on hover
-
-**Impact:** Perceived latency on high-intent actions.
-
-**Implementation:**
-```text
-- Create usePreloadCheckout() hook
-- On 3+ views of same product: prefetch checkout session in background
-- On hover over "Add to Bag": prefetch cart drawer data
-- Store prefetch state in React Query cache
-```
-
----
-
-### Gap 4: Size Quiz / Onboarding Flow
-
-**Current State:**
-- Size preferences saved per-product interaction
-- No first-time visitor onboarding flow
-
-**Impact:** New visitors must add items to learn their sizes.
-
-**Implementation:**
-```text
-- src/components/size-guide/SizeQuizModal.tsx (new)
-- 3-question flow: height, fit preference, primary category
-- Populates all size categories at once
-- Gamified: "You'll save 12 seconds on future purchases!"
-- Trigger: first add-to-cart attempt without saved sizes
-```
-
----
-
-### Gap 5: Return Customer Recognition
-
-**Current State:**
-- No personalized greetings
-- No "buy again" functionality
-
-**Impact:** Repeat customers treated same as new.
-
-**Implementation:**
-```text
-- src/hooks/useReturnCustomer.ts (new)
-- On auth: fetch last order, greet by name
-- "Your last order was M in tops—still your size?"
-- Quick reorder from order history
-```
-
----
-
-### Gap 6: Lookbook Swipe Interface (Mobile)
-
-**Current State:**
-- Standard scroll-based lookbook
-- "Shop The Look" drawer exists
-
-**Impact:** Lower engagement vs swipe-to-shop patterns.
-
-**Implementation:**
-```text
-- src/components/lookbook/SwipeLookbook.tsx (new)
-- Tinder-like: swipe right = add to bag, left = skip
-- Running total at bottom
-- Uses existing useQuickAdd hook
-```
-
----
-
-### Gap 7: Real-Time Stock Urgency (Live)
-
-**Current State:**
-- Stock awareness in `useQuickAdd`
-- No "added to X carts today" messaging
-
-**Impact:** Missing social proof urgency.
-
-**Implementation:**
-```text
-Database:
-- Track cart_adds in last 24h per product
-
-UI:
-- "Only 2 left—added to 3 carts today"
-- Real query, not fake urgency
-```
-
----
-
-## Prioritized Roadmap
-
-### Phase 1: High Impact, Low Risk (This Week)
-
-| Feature | Effort | Impact | Files |
-|---------|--------|--------|-------|
-| Size Quiz Onboarding | Medium | High | New modal, trigger logic |
-| Behavioral Intent Tracking | Medium | High | New hook, PDP integration |
-| Return Customer Recognition | Low | Medium | New hook, Header greeting |
-
-### Phase 2: Express Checkout (Week 2)
-
-| Feature | Effort | Impact | Files |
-|---------|--------|--------|-------|
-| Apple Pay / Google Pay buttons | High | Very High | New Stripe Elements integration |
-| Payment intent API | High | Very High | New edge function |
-| Cart-level express pay | Medium | High | CartDrawer update |
-
-### Phase 3: Engagement Loops (Week 3)
-
-| Feature | Effort | Impact | Files |
-|---------|--------|--------|-------|
-| Lookbook swipe interface | Medium | Medium | New component |
-| Predictive pre-loading | Medium | Medium | New hook |
-| Real-time stock urgency | Medium | Medium | Database + UI |
-
-### Phase 4: Advanced Personalization (Week 4)
-
-| Feature | Effort | Impact | Files |
-|---------|--------|--------|-------|
-| "You viewed 3x" prompts | Low | Medium | PDP enhancement |
-| Quick reorder from history | Medium | Medium | Account orders page |
-| Size confidence display | Low | Medium | SizeSelector badge |
-
----
-
-## Immediate Next Step: Size Quiz Onboarding
-
-The highest-leverage first implementation is the **Size Quiz Onboarding Flow**:
-
-1. **Trigger**: First-time visitor attempts quick-add without saved size
-2. **Modal**: 3 questions (height range, fit preference, primary category)
-3. **Output**: Populates `tops_size`, `bottoms_size`, `hats_size` in one interaction
-4. **Gamification**: "You'll save 12 seconds on future purchases!"
-5. **Integration**: `useSizeMemory.rememberSize()` for each category
-
-This reduces future friction across **all** product surfaces instantly.
-
----
-
-## Technical Notes
-
-### Database Changes Required
-
-```sql
--- Behavioral signals table
-CREATE TABLE user_behavior_signals (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
-  session_id TEXT NOT NULL, -- for anonymous tracking
-  product_id UUID REFERENCES products(id) ON DELETE CASCADE,
-  view_count INT DEFAULT 1,
-  total_time_ms INT DEFAULT 0,
-  zoom_count INT DEFAULT 0,
-  add_remove_count INT DEFAULT 0,
-  last_viewed_at TIMESTAMPTZ DEFAULT now(),
-  created_at TIMESTAMPTZ DEFAULT now()
-);
-
--- RLS: Users can only see their own signals
-ALTER TABLE user_behavior_signals ENABLE ROW LEVEL SECURITY;
-```
-
-### New Hooks Architecture
+## Architecture
 
 ```text
-src/hooks/
-├── useBehaviorTracking.ts    # Track view time, zooms, scrolls
-├── usePreloadCheckout.ts     # Pre-fetch checkout on high intent
-├── useReturnCustomer.ts      # Personalized greetings + reorder
-├── useExpressPay.ts          # Apple Pay / Google Pay integration
-└── useSizeQuiz.ts            # Onboarding flow state management
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                          SwipeLookbook.tsx                                   │
+│  ┌─────────────────────────────────────────────────────────────────────────┐│
+│  │                    SwipeCard Stack (framer-motion)                      ││
+│  │  ┌─────────────────────────────────────────────────────────────────────┐││
+│  │  │                      Current Product Card                           │││
+│  │  │  ┌───────────────────────────────────────────────────────────────┐  │││
+│  │  │  │  Product Image (full-bleed)                                   │  │││
+│  │  │  │  ┌─────────────┐                           ┌─────────────┐   │  │││
+│  │  │  │  │ Position    │                           │ Low Stock   │   │  │││
+│  │  │  │  │ Badge (TOP) │                           │ Indicator   │   │  │││
+│  │  │  │  └─────────────┘                           └─────────────┘   │  │││
+│  │  │  │                                                               │  │││
+│  │  │  │                    ← SKIP │ ADD →                             │  │││
+│  │  │  │              (visual swipe direction hints)                   │  │││
+│  │  │  │                                                               │  │││
+│  │  │  └───────────────────────────────────────────────────────────────┘  │││
+│  │  │  ┌───────────────────────────────────────────────────────────────┐  │││
+│  │  │  │  Product Name + Price                    Size: M (remembered) │  │││
+│  │  │  └───────────────────────────────────────────────────────────────┘  │││
+│  │  └─────────────────────────────────────────────────────────────────────┘││
+│  │                                                                         ││
+│  │  ┌────────── Swipe Direction Indicators ──────────┐                    ││
+│  │  │    ✕ SKIP    ←  [swipe zone]  →    ✓ ADD      │                    ││
+│  │  └────────────────────────────────────────────────┘                    ││
+│  └─────────────────────────────────────────────────────────────────────────┘│
+│                                                                              │
+│  ┌─────────────────────────────────────────────────────────────────────────┐│
+│  │                      Running Total Bar (sticky)                         ││
+│  │  ┌───────────────────────────────────────────────────────────────────┐  ││
+│  │  │  3 items • €180                          [View Bag →]             │  ││
+│  │  │  ████████████████░░░░░░░░ €30 to free shipping                   │  ││
+│  │  └───────────────────────────────────────────────────────────────────┘  ││
+│  └─────────────────────────────────────────────────────────────────────────┘│
+│                                                                              │
+│  ┌─────────────────────────────────────────────────────────────────────────┐│
+│  │                         Action Buttons (a11y)                           ││
+│  │              [← Skip]              [Add →]                              ││
+│  └─────────────────────────────────────────────────────────────────────────┘│
+└─────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## Summary
+## Technical Implementation
 
-The current implementation is **70% TEMU-tier**. The foundation (size memory, quick add, bundle engine, free shipping gamification) is solid.
+### 1. New Files to Create
 
-The gaps are primarily in:
-1. **Express checkout friction** (no Apple/Google Pay inline)
-2. **Behavioral intelligence** (no high-intent signal collection)
-3. **Onboarding** (no size quiz for new visitors)
-4. **Return customer recognition** (no personalized greetings)
+| File | Purpose |
+|------|---------|
+| `src/components/lookbook/SwipeLookbook.tsx` | Main swipe interface container |
+| `src/components/lookbook/SwipeCard.tsx` | Individual draggable product card |
+| `src/components/lookbook/SwipeActions.tsx` | Skip/Add button controls |
+| `src/components/lookbook/SwipeProgress.tsx` | Running total bar with progress |
+| `src/hooks/useSwipeSession.ts` | Session state management |
 
-Implementing the **Size Quiz Onboarding** first will have the highest ROI, followed by **Express Checkout** for mobile conversion lift.
+### 2. Core State Management: `useSwipeSession`
+
+```typescript
+interface SwipeSessionState {
+  // Current look context
+  lookId: string;
+  lookName: string;
+  products: LookProduct[];
+  
+  // Swipe state
+  currentIndex: number;
+  addedProducts: LookProduct[];
+  skippedProducts: LookProduct[];
+  
+  // Session progress
+  totalValue: number;
+  itemCount: number;
+  isComplete: boolean;
+  
+  // Actions
+  handleSwipeRight: (product: LookProduct) => void;
+  handleSwipeLeft: (product: LookProduct) => void;
+  undoLastSwipe: () => void;
+  reset: () => void;
+}
+```
+
+**Key behaviors:**
+- Integrates with existing `useQuickAdd` for size memory
+- Syncs with `useCart` for cart operations
+- Triggers haptic feedback on swipe completion
+- Auto-shows size picker if no remembered size
+
+### 3. SwipeCard Component (Framer Motion Drag)
+
+```typescript
+// Gesture physics configuration
+const dragConstraints = {
+  left: -window.innerWidth * 0.6,
+  right: window.innerWidth * 0.6,
+  top: 0,
+  bottom: 0,
+};
+
+const swipeThreshold = window.innerWidth * 0.25; // 25% of screen = commit
+const throwVelocity = 500; // px/s to auto-commit swipe
+
+// Card stack transforms
+const cardVariants = {
+  current: { scale: 1, y: 0, opacity: 1 },
+  upcoming: { scale: 0.92, y: 24, opacity: 0.6 },
+  hidden: { scale: 0.85, y: 48, opacity: 0 },
+  exitLeft: { x: -400, rotate: -15, opacity: 0 },
+  exitRight: { x: 400, rotate: 15, opacity: 0 },
+};
+```
+
+**Swipe mechanics:**
+- Full-bleed product images with position badges (TOP, BOTTOM, etc.)
+- Real-time rotation/tilt as user drags
+- Direction indicators appear during drag
+- Velocity-aware "throw" detection
+- Spring-back if below threshold
+- Stacked card preview (next 2 cards visible behind)
+
+### 4. Visual Feedback System
+
+**During drag:**
+- Card tilts up to ±15° based on x-offset
+- Background shifts: left = red tint, right = green tint
+- "SKIP" / "ADD" labels fade in at edges
+- Haptic pulse at 50% threshold (soft warning)
+
+**On commit:**
+- Card flies out with physics-based animation
+- Strong haptic pulse (50ms vibrate)
+- Success: green flash + check icon overlay
+- Skip: fade out with subtle X
+
+**Reduced motion mode:**
+- Instant transitions, no physics
+- Button-only navigation (no swipe required)
+
+### 5. Running Total Bar (Sticky)
+
+```typescript
+interface SwipeProgressProps {
+  addedCount: number;
+  totalValue: number;
+  freeShippingThreshold: number;
+  onViewBag: () => void;
+}
+```
+
+**Features:**
+- Always visible at bottom of viewport
+- Shows: "X items • €XXX"
+- Free shipping progress bar
+- Pulses when item added
+- "View Bag" CTA opens cart drawer
+- Bundle discount preview if eligible
+
+### 6. Entry Point Integration
+
+**Option A: Dedicated route** `/lookbook/swipe/:lookId`
+- Full-screen immersive experience
+- Link from LookSection "Swipe to Shop" button
+
+**Option B: Bottom sheet from existing lookbook**
+- Trigger from mobile ShopTheLook component
+- Drawer opens as swipe interface
+
+**Recommended: Option B** - keeps user in lookbook context, reduces navigation friction.
+
+### 7. Mobile UX Optimizations
+
+| Aspect | Implementation |
+|--------|----------------|
+| Touch targets | Minimum 48x48px for all buttons |
+| Thumb zone | All primary actions in bottom 60% |
+| Swipe sensitivity | 25% of screen width to commit |
+| Velocity detection | >500px/s auto-commits swipe |
+| Undo support | "Undo" toast for 3s after each swipe |
+| Safe area | Respect `env(safe-area-inset-*)` on iOS |
+| Scroll lock | Prevent body scroll during swipe session |
+| Touch-action | `pan-y` only on card, allow vertical scroll elsewhere |
+
+### 8. Accessibility Requirements
+
+```tsx
+// SwipeCard.tsx accessibility
+<motion.div
+  role="button"
+  tabIndex={0}
+  aria-label={`${product.name}, ${formatPrice(product.price)}. 
+    Swipe right or press Enter to add to bag. 
+    Swipe left or press Escape to skip.`}
+  aria-describedby={`swipe-instructions-${product.id}`}
+  onKeyDown={(e) => {
+    if (e.key === 'Enter' || e.key === 'ArrowRight') handleAddToBag();
+    if (e.key === 'Escape' || e.key === 'ArrowLeft') handleSkip();
+  }}
+>
+```
+
+- Full keyboard navigation (Arrow keys, Enter, Escape)
+- Screen reader announcements for swipe actions
+- High contrast mode support
+- Reduce-motion fallback to button-only mode
+
+---
+
+## Integration Points
+
+### Files to Modify
+
+| File | Changes |
+|------|---------|
+| `src/pages/Lookbook.tsx` | Conditional render SwipeLookbook on mobile |
+| `src/components/lookbook/LookSection.tsx` | Add "Swipe to Shop" CTA for mobile |
+| `src/components/lookbook/ShopTheLook.tsx` | Add trigger for swipe mode |
+
+### Hook Dependencies
+
+```typescript
+// useSwipeSession.ts imports
+import { useQuickAdd } from '@/hooks/useQuickAdd';
+import { useCart } from '@/hooks/useCart';
+import { useSizeMemory } from '@/hooks/useSizeMemory';
+import { useBundleDiscounts } from '@/hooks/useBundleDiscounts';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
+import { triggerHapticFeedback } from '@/lib/cartUtils';
+```
+
+---
+
+## Session Flow
+
+```text
+1. User enters swipe mode (taps "Swipe to Shop" on mobile)
+   ↓
+2. Full-screen swipe interface opens (bottom sheet)
+   ↓
+3. First product card displayed with stacked preview behind
+   ↓
+4. User swipes right → useQuickAdd.handleQuickAdd() called
+   │  ├─ If remembered size exists → instant add + haptic
+   │  └─ If no size → inline picker appears on card
+   ↓
+5. Card animates out, next card springs forward
+   ↓
+6. Running total updates with pulse animation
+   ↓
+7. Repeat until all products swiped
+   ↓
+8. "All Done!" completion screen with:
+   ├─ Summary: "4 items added • €240"
+   ├─ Bundle discount: "10% off complete look!"
+   ├─ CTA: "View Bag" or "Continue Browsing"
+   └─ Share: "Share Your Picks"
+```
+
+---
+
+## Micro-Interactions Detail
+
+### Card Drag Physics
+
+```typescript
+const dragConfig = {
+  drag: 'x',
+  dragConstraints: { left: 0, right: 0 },
+  dragElastic: 0.9,
+  onDrag: (event, info) => {
+    // Real-time rotation
+    const rotation = info.offset.x / 15;
+    // Direction indicator opacity
+    const addOpacity = Math.min(1, info.offset.x / 100);
+    const skipOpacity = Math.min(1, -info.offset.x / 100);
+  },
+  onDragEnd: (event, info) => {
+    const velocity = info.velocity.x;
+    const offset = info.offset.x;
+    
+    // Commit swipe if:
+    // - Dragged past threshold (25% of viewport)
+    // - OR velocity exceeds throw threshold
+    if (offset > swipeThreshold || velocity > throwVelocity) {
+      handleSwipeRight();
+    } else if (offset < -swipeThreshold || velocity < -throwVelocity) {
+      handleSwipeLeft();
+    } else {
+      // Spring back to center
+      animateSpringBack();
+    }
+  },
+};
+```
+
+### Haptic Feedback Pattern
+
+| Event | Haptic | Duration |
+|-------|--------|----------|
+| Swipe past 50% threshold | Soft pulse | 10ms |
+| Swipe committed (add) | Strong pulse | 50ms |
+| Swipe committed (skip) | None | - |
+| Undo triggered | Double tap | 10ms + 10ms |
+| Session complete | Celebration | 50ms + 30ms + 50ms |
+
+### Success Animation
+
+```typescript
+const successVariants = {
+  initial: { scale: 0, opacity: 0 },
+  animate: { 
+    scale: 1, 
+    opacity: 1,
+    transition: { type: 'spring', stiffness: 500, damping: 25 }
+  },
+  exit: { 
+    scale: 1.2, 
+    opacity: 0,
+    transition: { duration: 0.2 }
+  },
+};
+```
+
+---
+
+## Performance Considerations
+
+1. **Image optimization**: Preload next 2 cards in stack
+2. **Animation**: GPU-accelerated transforms only (`transform`, `opacity`)
+3. **No layout thrashing**: Use `motion.div` with fixed dimensions
+4. **Event throttling**: Throttle drag callbacks to 60fps
+5. **Memory**: Unmount swiped cards after animation
+
+---
+
+## Analytics Events
+
+| Event | Properties |
+|-------|------------|
+| `swipe_session_start` | `look_id`, `product_count` |
+| `swipe_right` | `product_id`, `size`, `value`, `index` |
+| `swipe_left` | `product_id`, `index` |
+| `swipe_undo` | `product_id`, `action` |
+| `swipe_session_complete` | `added_count`, `skipped_count`, `total_value`, `duration_ms` |
+
+---
+
+## Deliverables Summary
+
+### New Files (5)
+1. `src/components/lookbook/SwipeLookbook.tsx` - Container component
+2. `src/components/lookbook/SwipeCard.tsx` - Draggable card with gesture handling
+3. `src/components/lookbook/SwipeActions.tsx` - Skip/Add buttons (a11y)
+4. `src/components/lookbook/SwipeProgress.tsx` - Running total bar
+5. `src/hooks/useSwipeSession.ts` - Session state management
+
+### Modified Files (2)
+1. `src/pages/Lookbook.tsx` - Add mobile swipe mode toggle
+2. `src/components/lookbook/ShopTheLook.tsx` - Add "Swipe to Shop" trigger
+
+### Dependencies
+- All existing: `framer-motion`, `lucide-react`, `vaul` (drawer)
+- No new packages required
+
+---
+
+## Acceptance Criteria
+
+- Swipe right adds product to cart with remembered size (or shows picker)
+- Swipe left skips product with no action
+- Running total updates in real-time with pulse animation
+- Haptic feedback on all swipe commits (mobile)
+- Full keyboard navigation for accessibility
+- Reduced motion mode uses buttons instead of swipe
+- Session completes with summary and bag CTA
+- Bundle discount preview visible when applicable
+- Performance: <16ms frame time during swipe animations
 
