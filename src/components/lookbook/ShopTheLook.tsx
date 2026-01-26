@@ -1,15 +1,17 @@
 import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
-import { Plus, ShoppingBag, Check } from "lucide-react";
+import { Plus, ShoppingBag, Check, Sparkles } from "lucide-react";
 import { motion, useReducedMotion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useCart } from "@/hooks/useCart";
 import { useQuickAdd, ProductForQuickAdd } from "@/hooks/useQuickAdd";
+import { useIsMobile } from "@/hooks/use-mobile";
 import StaggerContainer from "@/components/motion/StaggerContainer";
 import InlineQuickSizePicker from "@/components/ui/InlineQuickSizePicker";
 import { DrawCheckIcon } from "@/components/ui/draw-check-icon";
 import { productIdToCartId } from "@/lib/cartUtils";
+import SwipeLookbook from "./SwipeLookbook";
 
 interface LookProduct {
   id: string;
@@ -207,8 +209,12 @@ function getPositionLabel(position: string | null) {
 
 const ShopTheLook = ({ products, lookName, lookId }: ShopTheLookProps) => {
   const { toast } = useToast();
-  const { addItem, items } = useCart();
+  const { addItem, items, openCart } = useCart();
   const prefersReducedMotion = useReducedMotion();
+  const isMobile = useIsMobile();
+  
+  // Swipe mode state
+  const [isSwipeOpen, setIsSwipeOpen] = useState(false);
   
   // Track recently added products for the "complete look" logic
   const [addedProducts, setAddedProducts] = useState<Set<string>>(new Set());
@@ -295,6 +301,24 @@ const ShopTheLook = ({ products, lookName, lookId }: ShopTheLookProps) => {
         )}
       </div>
 
+      {/* Mobile: Swipe to Shop CTA */}
+      {isMobile && products.length > 0 && (
+        <motion.div
+          whileHover={prefersReducedMotion ? {} : { scale: 1.02 }}
+          whileTap={prefersReducedMotion ? {} : { scale: 0.98 }}
+          transition={springConfig}
+        >
+          <Button
+            onClick={() => setIsSwipeOpen(true)}
+            className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-white h-12 rounded-lg font-light tracking-wide flex items-center justify-center gap-2"
+          >
+            <Sparkles className="w-4 h-4" />
+            Swipe to Shop
+            <span className="text-white/70 text-sm ml-1">({products.length} items)</span>
+          </Button>
+        </motion.div>
+      )}
+
       {/* Products Grid */}
       <StaggerContainer className="grid grid-cols-2 gap-3" staggerDelay={0.1} delayChildren={0}>
         {products.slice(0, 4).map((product) => (
@@ -352,6 +376,16 @@ const ShopTheLook = ({ products, lookName, lookId }: ShopTheLookProps) => {
           Tap + to instantly add in your size
         </p>
       )}
+
+      {/* Swipe Lookbook Drawer */}
+      <SwipeLookbook
+        isOpen={isSwipeOpen}
+        onClose={() => setIsSwipeOpen(false)}
+        onViewBag={openCart}
+        lookId={lookId || ''}
+        lookName={lookName}
+        products={products}
+      />
     </div>
   );
 };
