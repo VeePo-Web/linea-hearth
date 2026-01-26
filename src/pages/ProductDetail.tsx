@@ -14,6 +14,7 @@ import GuaranteeBadge from "../components/product/GuaranteeBadge";
 import MobileStickyATC from "../components/product/MobileStickyATC";
 import ProductCarousel from "../components/content/ProductCarousel";
 import HighIntentPrompt from "../components/product/HighIntentPrompt";
+import RecentlyViewed from "../components/homepage/RecentlyViewed";
 import { 
   Breadcrumb, 
   BreadcrumbItem, 
@@ -22,13 +23,15 @@ import {
   BreadcrumbPage, 
   BreadcrumbSeparator 
 } from "@/components/ui/breadcrumb";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useBehaviorTracking } from "@/hooks/useBehaviorTracking";
 import { useQuickAdd } from "@/hooks/useQuickAdd";
+import { useRecentlyViewed } from "@/contexts/RecentlyViewedContext";
 
 const ProductDetail = () => {
   const { productId } = useParams();
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
+  const { addProduct } = useRecentlyViewed();
 
   const { data: product, isLoading } = useQuery({
     queryKey: ["product", productId],
@@ -50,6 +53,25 @@ const ProductDetail = () => {
     },
     enabled: !!productId,
   });
+
+  // Track in recently viewed
+  useEffect(() => {
+    if (product) {
+      const primaryImage = product.product_images?.find(img => img.is_primary) 
+        || product.product_images?.[0];
+      
+      addProduct({
+        id: product.id,
+        name: product.name,
+        slug: product.slug,
+        price: product.price,
+        sale_price: product.sale_price,
+        is_on_sale: product.is_on_sale,
+        category_slug: product.categories?.slug,
+        image_url: primaryImage?.image_url || '/placeholder.svg',
+      });
+    }
+  }, [product, addProduct]);
 
   // Behavioral tracking for high-intent signals
   const { trackZoom, getViewCount, isHighIntent } = useBehaviorTracking(product?.id);
@@ -198,6 +220,15 @@ const ProductDetail = () => {
 
       {/* Guarantee Badge */}
       <GuaranteeBadge />
+      
+      {/* Recently Viewed */}
+      <section className="w-full mt-8 lg:mt-16">
+        <RecentlyViewed 
+          excludeProductId={product.id}
+          maxItems={6}
+          title="Recently Viewed"
+        />
+      </section>
       
       {/* You might also like */}
       <section className="w-full mt-8 lg:mt-16">

@@ -1,7 +1,11 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { X, Clock, TrendingUp } from "lucide-react";
+import { X, Clock, TrendingUp, Plus, Check } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useQuickAdd, ProductForQuickAdd } from "@/hooks/useQuickAdd";
+import { cn } from "@/lib/utils";
 
 interface SearchOverlayProps {
   isOpen: boolean;
@@ -46,14 +50,123 @@ const popularSearches = [
   "Premium Tees",
 ];
 
-const trendingProducts = [
-  { name: "Stay Holy Hoodie", category: "Hoodies", href: "/product/stay-holy-hoodie", image: "/products/stay-holy-hoodie/flat-front.png" },
-  { name: "Heavenly Crewneck", category: "Tees", href: "/product/heavenly-crewneck", image: "/products/heavenly-crewneck/flat-lay.png" },
-];
+// Individual trending product with quick-add
+interface TrendingProductProps {
+  product: ProductForQuickAdd & { image_url: string; category_name: string };
+  onClose: () => void;
+}
+
+const TrendingProduct = ({ product, onClose }: TrendingProductProps) => {
+  const quickAdd = useQuickAdd(product);
+
+  return (
+    <motion.div
+      variants={itemVariants}
+      whileHover={{ x: 4 }}
+      className="flex items-center gap-4 group"
+    >
+      <Link
+        to={`/product/${product.slug}`}
+        className="flex items-center gap-4 flex-1"
+        onClick={onClose}
+      >
+        <div className="w-16 h-16 bg-muted overflow-hidden">
+          <motion.img
+            src={product.image_url}
+            alt={product.name}
+            className="w-full h-full object-cover"
+            whileHover={{ scale: 1.1 }}
+            transition={{ duration: 0.3 }}
+          />
+        </div>
+        <div>
+          <p className="text-sm font-normal text-foreground group-hover:underline">
+            {product.name}
+          </p>
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-muted-foreground">
+              {product.category_name}
+            </span>
+            {quickAdd.canOneTap && (
+              <span className="text-[10px] text-amber-600 font-medium px-1.5 py-0.5 bg-amber-500/10 rounded-sm">
+                {quickAdd.rememberedSize}
+              </span>
+            )}
+          </div>
+        </div>
+      </Link>
+      
+      {/* Quick Add Button */}
+      <motion.button
+        onClick={(e) => quickAdd.handleQuickAdd(e)}
+        disabled={quickAdd.isAdding || quickAdd.isAdded}
+        className={cn(
+          "flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center transition-all",
+          "border border-border hover:border-foreground hover:bg-foreground hover:text-background",
+          quickAdd.isAdded && "bg-emerald-500 border-emerald-500 text-white"
+        )}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        aria-label={quickAdd.canOneTap ? `Quick add in ${quickAdd.rememberedSize}` : "Add to bag"}
+      >
+        {quickAdd.isAdded ? (
+          <Check className="w-4 h-4" />
+        ) : quickAdd.isAdding ? (
+          <span className="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin" />
+        ) : (
+          <Plus className="w-4 h-4" />
+        )}
+      </motion.button>
+    </motion.div>
+  );
+};
 
 const SearchOverlay = ({ isOpen, onClose }: SearchOverlayProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [searchValue, setSearchValue] = useState("");
+
+  // Fetch trending products from database with variants for quick-add
+  const { data: trendingProducts } = useQuery({
+    queryKey: ['trending-products-search'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('products')
+        .select(`
+          id, name, slug, price, sale_price, is_on_sale,
+          categories:category_id(name, slug),
+          product_images(image_url, is_primary, display_order),
+          product_variants(size, color, stock_quantity)
+        `)
+        .eq('status', 'active')
+        .eq('is_featured', true)
+        .limit(4);
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: isOpen,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+
+  // Map to quick-add format
+  const productsForDisplay = trendingProducts?.map(product => {
+    const primaryImage = product.product_images?.find(img => img.is_primary) 
+      || product.product_images?.[0];
+    
+    return {
+      id: product.id,
+      name: product.name,
+      slug: product.slug,
+      price: product.price,
+      sale_price: product.sale_price,
+      is_on_sale: product.is_on_sale,
+      category_slug: product.categories?.slug,
+      product_images: product.product_images,
+      product_variants: product.product_variants,
+      image_url: primaryImage?.image_url || '/placeholder.svg',
+      category_name: product.categories?.name || 'Apparel',
+    };
+  }) || [];
 
   useEffect(() => {
     if (isOpen && inputRef.current) {
@@ -154,43 +267,19 @@ const SearchOverlay = ({ isOpen, onClose }: SearchOverlayProps) => {
                   </div>
                 </motion.div>
 
-                {/* Right: Trending products */}
+                {/* Right: Trending products with quick-add */}
                 <motion.div variants={itemVariants}>
                   <h3 className="flex items-center gap-2 text-foreground text-xs uppercase tracking-[0.15em] font-medium mb-5">
                     <TrendingUp size={14} />
                     Trending Now
                   </h3>
-                  <div className="space-y-3">
-                    {trendingProducts.map((product, index) => (
-                      <motion.div
-                        key={index}
-                        variants={itemVariants}
-                        whileHover={{ x: 4 }}
-                      >
-                        <Link
-                          to={product.href}
-                          className="flex items-center gap-4 group"
-                          onClick={onClose}
-                        >
-                          <div className="w-16 h-16 bg-muted overflow-hidden">
-                            <motion.img
-                              src={product.image}
-                              alt={product.name}
-                              className="w-full h-full object-cover"
-                              whileHover={{ scale: 1.1 }}
-                              transition={{ duration: 0.3 }}
-                            />
-                          </div>
-                          <div>
-                            <p className="text-sm font-normal text-foreground group-hover:underline">
-                              {product.name}
-                            </p>
-                            <p className="text-xs text-muted-foreground">
-                              {product.category}
-                            </p>
-                          </div>
-                        </Link>
-                      </motion.div>
+                  <div className="space-y-4">
+                    {productsForDisplay.map((product) => (
+                      <TrendingProduct 
+                        key={product.id} 
+                        product={product} 
+                        onClose={onClose} 
+                      />
                     ))}
                   </div>
                 </motion.div>

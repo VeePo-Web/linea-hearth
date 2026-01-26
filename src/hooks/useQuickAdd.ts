@@ -1,6 +1,7 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useRef } from 'react';
 import { useCart } from '@/hooks/useCart';
 import { useSizeMemory } from '@/hooks/useSizeMemory';
+import { useSizeQuizContext } from '@/contexts/SizeQuizContext';
 import { showAddedToast } from '@/lib/toastUtils';
 import { toast } from 'sonner';
 import { 
@@ -132,6 +133,17 @@ export function useQuickAdd(
   
   const { addItem, items, openCart } = useCart();
   const { getRememberedSize, rememberSize, getSizeConfidence, getSizeConfidenceMessage } = useSizeMemory();
+  
+  // Size quiz integration for first-time users
+  let sizeQuizContext: { shouldTriggerQuiz: () => boolean; openQuizWithPending: (action: any) => void } | null = null;
+  try {
+    sizeQuizContext = useSizeQuizContext();
+  } catch {
+    // SizeQuizContext not available (e.g., in tests)
+  }
+  
+  // Track if we've already prompted for quiz this session
+  const hasPromptedQuizRef = useRef(false);
 
   // UI state
   const [isAdding, setIsAdding] = useState(false);
@@ -326,12 +338,24 @@ export function useQuickAdd(
     }, ADDING_DELAY);
   }, [product, rememberedSize, displayPrice, categorySlug, addItem, rememberSize, showToast, onSuccess]);
 
-  // Quick add handler - one-tap if possible, else opens picker
+  // Quick add handler - one-tap if possible, else opens picker or quiz
   const handleQuickAdd = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
 
     if (!product || isAdding || isAdded || isInCart) return;
+
+    // Check if we should trigger size quiz for first-time users
+    if (sizeQuizContext && !hasPromptedQuizRef.current && sizeQuizContext.shouldTriggerQuiz()) {
+      hasPromptedQuizRef.current = true;
+      sizeQuizContext.openQuizWithPending({
+        productId: product.id,
+        callback: (size: string, color?: string) => {
+          addToCart({ size, color });
+        },
+      });
+      return;
+    }
 
     if (canOneTap && rememberedSize) {
       // One-tap add
@@ -349,7 +373,7 @@ export function useQuickAdd(
       // Show size picker
       setIsPickerOpen(true);
     }
-  }, [product, isAdding, isAdded, isInCart, canOneTap, rememberedSize, suggestedFallback, availableSizes, addToCart, showToast]);
+  }, [product, isAdding, isAdded, isInCart, canOneTap, rememberedSize, suggestedFallback, availableSizes, addToCart, showToast, sizeQuizContext]);
 
   // Handle size selection from picker
   const handleSizeSelect = useCallback((size: string, e?: React.MouseEvent) => {
