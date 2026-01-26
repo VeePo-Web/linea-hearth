@@ -5,6 +5,8 @@ import { DrawCheckIcon } from "@/components/ui/draw-check-icon";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
+import { useEmailTypoDetection } from "@/hooks/useEmailTypoDetection";
+import EmailTypoSuggestion from "@/components/ui/EmailTypoSuggestion";
 
 const emailSchema = z.string().email("Please enter a valid email");
 
@@ -14,6 +16,12 @@ const FooterEmailCapture = () => {
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState("");
   const { toast } = useToast();
+  
+  // Email typo detection
+  const emailTypo = useEmailTypoDetection({
+    initialEmail: email,
+    onSuggestionAccepted: (correctedEmail) => setEmail(correctedEmail),
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -96,10 +104,21 @@ const FooterEmailCapture = () => {
               <input
                 type="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  emailTypo.setEmail(e.target.value);
+                }}
+                onBlur={() => emailTypo.checkForTypos(email)}
                 placeholder="Your email — enlist now"
                 className="w-full bg-transparent border-b border-white/20 py-2 text-sm text-white placeholder-white/40 focus:outline-none focus:border-amber-500 transition-colors duration-300"
                 disabled={isLoading}
+              />
+              <EmailTypoSuggestion
+                suggestion={emailTypo.suggestion || ''}
+                show={emailTypo.showSuggestion}
+                onAccept={emailTypo.acceptSuggestion}
+                onDismiss={emailTypo.dismissSuggestion}
+                variant="compact"
               />
               {error && (
                 <p className="absolute -bottom-5 left-0 text-[10px] text-red-400">

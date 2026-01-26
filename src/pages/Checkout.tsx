@@ -12,6 +12,7 @@ import { useCart } from "@/hooks/useCart";
 import { useAbandonedCart } from "@/hooks/useAbandonedCart";
 import { useStripeCheckout } from "@/hooks/useStripeCheckout";
 import { useDiscountCode, AppliedDiscount } from "@/hooks/useDiscountCode";
+import { useEmailTypoDetection } from "@/hooks/useEmailTypoDetection";
 import CheckoutProgress from "@/components/checkout/CheckoutProgress";
 import SavingsSummary from "@/components/checkout/SavingsSummary";
 import UrgencyTimer from "@/components/checkout/UrgencyTimer";
@@ -23,6 +24,7 @@ import PostPurchaseOffer from "@/components/checkout/PostPurchaseOffer";
 import MobileStickyCheckout from "@/components/checkout/MobileStickyCheckout";
 import ExpressCheckout from "@/components/checkout/ExpressCheckout";
 import FreeShippingBar from "@/components/cart/FreeShippingBar";
+import EmailTypoSuggestion from "@/components/ui/EmailTypoSuggestion";
 import { toast } from "sonner";
 
 const Checkout = () => {
@@ -77,6 +79,14 @@ const Checkout = () => {
   const [showPostPurchaseOffer, setShowPostPurchaseOffer] = useState(false);
   const [orderNumber, setOrderNumber] = useState("");
 
+  // Email typo detection hooks
+  const customerEmailTypo = useEmailTypoDetection({
+    initialEmail: customerDetails.email,
+  });
+  const billingEmailTypo = useEmailTypoDetection({
+    initialEmail: billingDetails.email,
+  });
+
   // Calculate discount amount from validated discount
   const discountAmount = appliedDiscount ? Math.round(appliedDiscount.discountAmountCents / 100) : 0;
 
@@ -119,12 +129,42 @@ const Checkout = () => {
   const handleCustomerDetailsChange = (field: string, value: string) => {
     setCustomerDetails(prev => ({ ...prev, [field]: value }));
     
+    // Sync typo detection for email field
+    if (field === 'email') {
+      customerEmailTypo.setEmail(value);
+    }
+    
     // Sync cart when email is entered
     if (field === 'email' && value && items.length > 0) {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (emailRegex.test(value)) {
         syncCart(value, items, subtotal);
       }
+    }
+  };
+
+  // Handle email typo acceptance for customer email
+  const handleCustomerEmailTypoAccept = useCallback(() => {
+    if (customerEmailTypo.suggestion) {
+      setCustomerDetails(prev => ({ ...prev, email: customerEmailTypo.suggestion! }));
+      customerEmailTypo.acceptSuggestion();
+    }
+  }, [customerEmailTypo]);
+
+  // Handle email typo acceptance for billing email
+  const handleBillingEmailTypoAccept = useCallback(() => {
+    if (billingEmailTypo.suggestion) {
+      setBillingDetails(prev => ({ ...prev, email: billingEmailTypo.suggestion! }));
+      billingEmailTypo.acceptSuggestion();
+    }
+  }, [billingEmailTypo]);
+
+  const handleBillingDetailsChange = (field: string, value: string) => {
+    setBillingDetails(prev => ({ ...prev, [field]: value }));
+    
+    // Sync typo detection for email field
+    if (field === 'email') {
+      billingEmailTypo.setEmail(value);
     }
   };
 
@@ -145,10 +185,6 @@ const Checkout = () => {
 
   const handleShippingAddressChange = (field: string, value: string) => {
     setShippingAddress(prev => ({ ...prev, [field]: value }));
-  };
-
-  const handleBillingDetailsChange = (field: string, value: string) => {
-    setBillingDetails(prev => ({ ...prev, [field]: value }));
   };
 
   const handlePaymentDetailsChange = (field: string, value: string) => {
@@ -494,8 +530,16 @@ const Checkout = () => {
                           type="email"
                           value={customerDetails.email}
                           onChange={(e) => handleCustomerDetailsChange("email", e.target.value)}
+                          onBlur={() => customerEmailTypo.checkForTypos(customerDetails.email)}
                           className="mt-2 rounded-none"
                           placeholder="Enter your email"
+                        />
+                        <EmailTypoSuggestion
+                          suggestion={customerEmailTypo.suggestion || ''}
+                          show={customerEmailTypo.showSuggestion}
+                          onAccept={handleCustomerEmailTypoAccept}
+                          onDismiss={customerEmailTypo.dismissSuggestion}
+                          variant="compact"
                         />
                         {savedEmail && customerDetails.email === savedEmail && (
                           <p className="mt-1.5 text-[10px] text-muted-foreground">
@@ -642,8 +686,16 @@ const Checkout = () => {
                               type="email"
                               value={billingDetails.email}
                               onChange={(e) => handleBillingDetailsChange("email", e.target.value)}
+                              onBlur={() => billingEmailTypo.checkForTypos(billingDetails.email)}
                               className="mt-2 rounded-none"
                               placeholder="Enter billing email"
+                            />
+                            <EmailTypoSuggestion
+                              suggestion={billingEmailTypo.suggestion || ''}
+                              show={billingEmailTypo.showSuggestion}
+                              onAccept={handleBillingEmailTypoAccept}
+                              onDismiss={billingEmailTypo.dismissSuggestion}
+                              variant="compact"
                             />
                           </div>
 
