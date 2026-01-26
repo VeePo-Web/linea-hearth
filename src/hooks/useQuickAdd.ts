@@ -1,7 +1,8 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useCart } from '@/hooks/useCart';
 import { useSizeMemory } from '@/hooks/useSizeMemory';
-import { useToast } from '@/hooks/use-toast';
+import { showAddedToast } from '@/lib/toastUtils';
+import { toast } from 'sonner';
 import { 
   productIdToCartId, 
   triggerHapticFeedback, 
@@ -131,7 +132,6 @@ export function useQuickAdd(
   
   const { addItem, items } = useCart();
   const { getRememberedSize, rememberSize, getSizeConfidence, getSizeConfidenceMessage } = useSizeMemory();
-  const { toast } = useToast();
 
   // UI state
   const [isAdding, setIsAdding] = useState(false);
@@ -302,11 +302,13 @@ export function useQuickAdd(
       setAddedColor(color || null);
       setIsPickerOpen(false);
 
-      // Toast notification
+      // Toast notification with product thumbnail
       if (showToast) {
-        toast({
-          title: `Added in size ${sizeToUse}`,
-          description: product.name,
+        showAddedToast({
+          productName: product.name,
+          productImage: primaryImage?.image_url || '/placeholder.svg',
+          size: sizeToUse,
+          color: color,
         });
       }
 
@@ -321,7 +323,7 @@ export function useQuickAdd(
       }, SUCCESS_ANIMATION_DURATION);
 
     }, ADDING_DELAY);
-  }, [product, rememberedSize, displayPrice, categorySlug, addItem, rememberSize, toast, showToast, onSuccess]);
+  }, [product, rememberedSize, displayPrice, categorySlug, addItem, rememberSize, showToast, onSuccess]);
 
   // Quick add handler - one-tap if possible, else opens picker
   const handleQuickAdd = useCallback((e: React.MouseEvent) => {
@@ -337,10 +339,7 @@ export function useQuickAdd(
       // Use fallback if remembered is OOS
       addToCart({ size: suggestedFallback });
       if (showToast) {
-        toast({
-          title: `Your size ${rememberedSize} sold out`,
-          description: `Added ${suggestedFallback} instead`,
-        });
+        toast.info(`Your size ${rememberedSize} sold out — added ${suggestedFallback} instead`);
       }
     } else if (availableSizes.length === 1) {
       // Only one size available, auto-select
@@ -349,7 +348,7 @@ export function useQuickAdd(
       // Show size picker
       setIsPickerOpen(true);
     }
-  }, [product, isAdding, isAdded, isInCart, canOneTap, rememberedSize, suggestedFallback, availableSizes, addToCart, showToast, toast]);
+  }, [product, isAdding, isAdded, isInCart, canOneTap, rememberedSize, suggestedFallback, availableSizes, addToCart, showToast]);
 
   // Handle size selection from picker
   const handleSizeSelect = useCallback((size: string, e?: React.MouseEvent) => {
