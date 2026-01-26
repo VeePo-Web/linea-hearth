@@ -4,7 +4,9 @@ import { Package, Mail, CheckCircle, ArrowRight, ShoppingBag } from "lucide-reac
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useCart } from "@/hooks/useCart";
+import { useAuth } from "@/hooks/useAuth";
 import Layout from "@/components/layout/Layout";
+import PostPurchaseSignup from "@/components/checkout/PostPurchaseSignup";
 
 interface ShippingAddress {
   address?: string;
@@ -25,6 +27,7 @@ interface OrderDetails {
   total_cents: number;
   shipping_method: string | null;
   created_at: string;
+  user_id: string | null;
 }
 
 interface OrderItem {
@@ -42,10 +45,12 @@ const CheckoutSuccess = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { clearCart } = useCart();
+  const { user } = useAuth();
   const [order, setOrder] = useState<OrderDetails | null>(null);
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showSignupPrompt, setShowSignupPrompt] = useState(true);
 
   const sessionId = searchParams.get("session_id");
 
@@ -207,6 +212,19 @@ const CheckoutSuccess = () => {
             <Mail className="w-4 h-4" />
             <span>Confirmation sent to {order.customer_email}</span>
           </div>
+
+          {/* Post-Purchase Signup Prompt (for guest checkouts only) */}
+          {!user && !order.user_id && showSignupPrompt && (
+            <div className="mb-10">
+              <PostPurchaseSignup
+                orderEmail={order.customer_email}
+                orderFirstName={order.customer_first_name}
+                orderId={order.id}
+                onSuccess={() => setShowSignupPrompt(false)}
+                onSkip={() => setShowSignupPrompt(false)}
+              />
+            </div>
+          )}
 
           {/* Order Items */}
           <div className="mb-10">
