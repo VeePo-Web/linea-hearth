@@ -5,10 +5,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useEmailTypoDetection } from "@/hooks/useEmailTypoDetection";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
+import EmailTypoSuggestion from "@/components/ui/EmailTypoSuggestion";
 import {
   Form,
   FormControl,
@@ -92,6 +94,13 @@ const AmbassadorForm = () => {
       content_frequency: "",
       agreed_to_terms: false,
     },
+  });
+
+  const emailValue = form.watch('email');
+
+  const emailTypo = useEmailTypoDetection({
+    initialEmail: emailValue || '',
+    onSuggestionAccepted: (correctedEmail) => form.setValue('email', correctedEmail),
   });
 
   const onSubmit = async (data: FormData) => {
@@ -230,8 +239,20 @@ const AmbassadorForm = () => {
                           type="email"
                           className="bg-transparent border-0 border-b border-background/20 rounded-none px-0 text-background placeholder:text-background/30 focus-visible:ring-0 focus-visible:border-accent"
                           placeholder="you@email.com"
+                          onChange={(e) => {
+                            field.onChange(e);
+                            emailTypo.setEmail(e.target.value);
+                          }}
+                          onBlur={() => emailTypo.checkForTypos(emailValue)}
                         />
                       </FormControl>
+                      <EmailTypoSuggestion
+                        suggestion={emailTypo.suggestion || ''}
+                        show={emailTypo.showSuggestion}
+                        onAccept={emailTypo.acceptSuggestion}
+                        onDismiss={emailTypo.dismissSuggestion}
+                        variant="compact"
+                      />
                       <FormMessage className="text-destructive" />
                     </FormItem>
                   )}
