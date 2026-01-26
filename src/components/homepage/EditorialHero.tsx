@@ -94,12 +94,12 @@ const EditorialHero = () => {
 
       {/* Content Container */}
       <motion.div
-        className="relative z-10 min-h-screen flex flex-col justify-between px-6 md:px-12 lg:px-16 py-12 lg:py-16"
+        className="relative z-10 min-h-screen flex flex-col justify-between px-6 md:px-12 lg:px-16 pt-24 md:pt-28 lg:pt-32 pb-12 lg:pb-16"
         style={{ opacity: prefersReducedMotion ? 1 : textOpacity }}
       >
 
         {/* Center Section - Massive Typography */}
-        <div className="flex-1 flex flex-col justify-center -mt-16 lg:-mt-24">
+        <div className="flex-1 flex flex-col justify-center">
           {/* Mobile Typography */}
           <div className="block lg:hidden">
             <h1 className="text-hero-massive-mobile text-background leading-[0.85]">
