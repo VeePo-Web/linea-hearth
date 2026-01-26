@@ -1,205 +1,197 @@
 
 
-# Post-Purchase Account Creation Prompt
+# Quick Reorder from Order History
 
 ## Overview
 
-Implement a high-conversion guest-to-account flow on the CheckoutSuccess page. This feature captures the 95% of guest checkout users who never return because they have no account relationship with the brand.
+Implement a one-tap "Buy Again" feature for order history that allows users to instantly repurchase items from past orders using their saved sizes. This is a high-impact Phase 4 conversion feature targeting a +10-15% repeat purchase rate lift.
 
 ---
 
 ## Architecture
 
-```
-                      POST-PURCHASE ACCOUNT CREATION FLOW
- ─────────────────────────────────────────────────────────────────────
- 
- ┌──────────────────────────────────────────────────────────────────┐
- │                    CheckoutSuccess Page                          │
- │                                                                  │
- │   [Order Confirmation]                                           │
- │   Order #ABC123 - Thank you for your purchase!                   │
- │                                                                  │
- │   ┌──────────────────────────────────────────────────────────┐  │
- │   │           PostPurchaseSignup Component                   │  │
- │   │  ┌────────────────────────────────────────────────────┐  │  │
- │   │  │  🎁 Save your info for next time                   │  │  │
- │   │  │                                                    │  │  │
- │   │  │  Create an account to:                             │  │  │
- │   │  │  ✓ Track this order in real-time                   │  │  │
- │   │  │  ✓ Checkout faster next time (sizes saved)         │  │  │
- │   │  │  ✓ Get 10% off your next order                     │  │  │
- │   │  │                                                    │  │  │
- │   │  │  Email: john@gmail.com (from order)                │  │  │
- │   │  │  Password: [________________]                      │  │  │
- │   │  │                                                    │  │  │
- │   │  │  [ Create Account & Get 10% Off ]                  │  │  │
- │   │  │                                                    │  │  │
- │   │  │  Skip for now                                      │  │  │
- │   │  └────────────────────────────────────────────────────┘  │  │
- │   └──────────────────────────────────────────────────────────┘  │
- │                                                                  │
- └──────────────────────────────────────────────────────────────────┘
- 
+```text
+                         QUICK REORDER FLOW
+ ────────────────────────────────────────────────────────────────
+
+ ┌─────────────────────────────────────────────────────────────┐
+ │                    AccountOrders.tsx                        │
+ │                                                             │
+ │   Order #ABC123 • March 15, 2024                            │
+ │   ┌─────────────────────────────────────────────────────┐  │
+ │   │ [img] Stay Holy Hoodie                              │  │
+ │   │       Size L • Carolina Blue                        │  │
+ │   │       €79.99                                        │  │
+ │   │                          ┌───────────────────────┐  │  │
+ │   │                          │ Buy Again (Size L)    │  │  │
+ │   │                          └───────────────────────┘  │  │
+ │   └─────────────────────────────────────────────────────┘  │
+ │                                                             │
+ │   ┌─────────────────────────────────────────────────────┐  │
+ │   │ [img] Heavenly Crewneck                             │  │
+ │   │       Size M • White                                │  │
+ │   │       €69.99                                        │  │
+ │   │                          ┌───────────────────────┐  │  │
+ │   │                          │ Buy Again (Size M)    │  │  │
+ │   │                          └───────────────────────┘  │  │
+ │   └─────────────────────────────────────────────────────┘  │
+ │                                                             │
+ │   [ Reorder Entire Order (2 items) ]                        │
+ │                                                             │
+ └─────────────────────────────────────────────────────────────┘
+
                               │
-                              ▼ On Success
- 
- ┌──────────────────────────────────────────────────────────────────┐
- │  1. Create auth.user with email + password                       │
- │  2. Link order.user_id to new auth.user.id                       │
- │  3. Migrate size preferences from localStorage                   │
- │  4. Create "WELCOME10" discount for next order                   │
- │  5. Show success state with confetti                             │
- └──────────────────────────────────────────────────────────────────┘
+                              ▼ On Click
+
+ ┌─────────────────────────────────────────────────────────────┐
+ │  1. Uses variant_size from order history (not size memory)  │
+ │  2. Triggers addItem() directly to cart                     │
+ │  3. Shows success toast with product thumbnail              │
+ │  4. Haptic feedback on mobile                               │
+ │  5. Cart drawer opens automatically                         │
+ └─────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
 ## Implementation Details
 
-### New File: `src/components/checkout/PostPurchaseSignup.tsx`
+### New Component: `src/components/account/OrderReorderButton.tsx`
 
-This component will:
-1. Accept order email, first name, and order ID as props
-2. Pre-fill the email (read-only - already captured)
-3. Only require password input (friction minimization)
-4. Include email typo detection for password confirmation
-5. Show compelling value propositions (10% off, track order, saved sizes)
-6. Handle signup via `useAuth().signUp`
-7. On success, link the order to the new account
-8. Migrate localStorage preferences (sizes, cart context)
+A reusable button component for reordering individual items or entire orders.
 
 **Props Interface**:
 ```typescript
-interface PostPurchaseSignupProps {
-  orderEmail: string;
-  orderFirstName: string | null;
-  orderId: string;
-  onSuccess: () => void;
-  onSkip: () => void;
+interface OrderReorderButtonProps {
+  /** Single item to reorder */
+  item?: OrderItem;
+  /** Array of items (for "Reorder All") */
+  items?: OrderItem[];
+  /** Button variant */
+  variant?: 'item' | 'order';
+  /** Size of the button */
+  size?: 'sm' | 'default';
 }
 ```
 
 **Component States**:
-- `idle` - Initial state, showing form
-- `loading` - Signup in progress
-- `success` - Account created successfully
-- `error` - Signup failed (email already registered, etc.)
+- `idle` - Default state showing "Buy Again" or "Reorder All"
+- `adding` - Loading spinner while adding to cart
+- `success` - Animated check icon with color shift
 
-### Key UI Elements
-
-1. **Value Stack (Above Form)**:
-   - "Track this order in real-time" (immediate value)
-   - "Checkout faster next time (sizes saved)" (future convenience)
-   - "Get 10% off your next order" (incentive)
-
-2. **Pre-filled Email (Read-only)**:
-   - Shows email from order with lock icon
-   - "This is the email we'll use for your account"
-
-3. **Password Field Only**:
-   - Single field signup - minimum friction
-   - "Create a password to secure your account"
-   - Show/hide toggle
-   - 6+ character requirement indicator
-
-4. **CTA Button**:
-   - Primary: "Create Account & Get 10% Off"
-   - Full-width, prominent styling
-   - Loading state with spinner
-
-5. **Skip Option**:
-   - Subtle link: "No thanks, continue as guest"
-   - Track skip analytics for optimization
+**Key Features**:
+1. Uses order history size (not size memory) - the user bought this exact size before
+2. Integrates with existing cart context via `useCart()`
+3. Shows "Buy Again (Size M)" with the original purchased size
+4. Batch add functionality for "Reorder Entire Order"
+5. Uses DrawCheckIcon for success animation
+6. Triggers haptic feedback via `triggerHapticFeedback()`
 
 ---
 
-## Changes to CheckoutSuccess.tsx
+### Changes to `AccountOrders.tsx`
 
-1. **Import `useAuth` hook** to check if user is already authenticated
-2. **Add state for signup flow**:
-   - `showSignup` - whether to show the prompt
-   - `signupCompleted` - track if user created account
-3. **Conditional rendering**:
-   - Only show `PostPurchaseSignup` if `!user` (guest checkout)
-   - Hide after successful signup or skip
-4. **Position**: Between "Email Confirmation" and "Order Items" sections
+1. **Import the new component**:
+   ```typescript
+   import OrderReorderButton from '@/components/account/OrderReorderButton';
+   ```
+
+2. **Add per-item Buy Again buttons** in the order items section (around line 90-114)
+
+3. **Add "Reorder Entire Order" button** in the footer section (around line 127-136)
+
+**Integration Points**:
+- Each order item thumbnail row gets a `OrderReorderButton` with `variant="item"`
+- Order footer gets `OrderReorderButton` with `variant="order"` and all items
 
 ---
 
-## Order-to-Account Linking
+### Changes to `AccountOrderDetail.tsx`
 
-After successful signup, we need to link the order to the new user:
+1. **Add per-item Buy Again buttons** next to each order item (around line 190-220)
 
+2. **Add "Reorder This Order" button** in the order summary section
+
+---
+
+### Conversion Logic
+
+**Single Item Reorder**:
 ```typescript
-// After signUp succeeds, link order to new user
-const linkOrderToUser = async (orderId: string, userId: string) => {
-  await supabase
-    .from('orders')
-    .update({ user_id: userId })
-    .eq('id', orderId);
-};
-```
-
-This is safe because:
-- The `orders` table already has a nullable `user_id` column
-- Guest orders have `user_id = null`
-- RLS policies should allow updating own order (by session email match)
-
----
-
-## Preference Migration
-
-On successful signup, migrate localStorage preferences:
-
-```typescript
-const migratePreferences = async (userId: string) => {
-  // Migrate size memory
-  const sizePrefs = localStorage.getItem('linea-size-preferences');
-  if (sizePrefs) {
-    await supabase
-      .from('user_size_preferences')
-      .upsert({ user_id: userId, preferences: JSON.parse(sizePrefs) });
-  }
+const handleReorderItem = (item: OrderItem) => {
+  // Use exact size/color from order history
+  addItem({
+    id: productIdToCartId(item.product_id),
+    name: item.product_name,
+    price: item.unit_price_cents / 100,
+    priceFormatted: formatPrice(item.unit_price_cents / 100),
+    image: item.product_image_url || '/placeholder.svg',
+    category: 'tops', // Inferred or default
+    size: item.variant_size,
+    color: item.variant_color,
+    quantity: item.quantity,
+  });
   
-  // Migrate recently viewed
-  const recentlyViewed = localStorage.getItem('linea-recently-viewed');
-  if (recentlyViewed) {
-    await supabase
-      .from('user_behavior_signals')
-      .insert({ user_id: userId, recently_viewed: JSON.parse(recentlyViewed) });
-  }
+  triggerHapticFeedback();
+  showAddedToast({ ... });
+  openCart();
+};
+```
+
+**Batch Reorder**:
+```typescript
+const handleReorderAll = (items: OrderItem[]) => {
+  items.forEach(item => {
+    addItem({ ... });
+  });
+  
+  triggerHapticFeedback();
+  toast.success(`${items.length} items added to bag!`);
+  openCart();
 };
 ```
 
 ---
 
-## Welcome Discount Code
+## UI Design (No Layout Changes)
 
-Create a personal discount code for the new user:
+### AccountOrders.tsx - Order Card
 
-```typescript
-const createWelcomeDiscount = async (email: string) => {
-  const code = `WELCOME10-${Date.now().toString(36).toUpperCase()}`;
-  
-  await supabase
-    .from('discount_codes')
-    .insert({
-      code,
-      name: 'Welcome 10% Off',
-      discount_type: 'percentage',
-      discount_value: 10,
-      per_user_limit: 1,
-      usage_limit: 1,
-      is_active: true,
-      expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days
-    });
-    
-  return code;
-};
+**Current** (lines 90-114):
+- Shows 4 product thumbnails in a row
+- No action buttons
+
+**After**:
+- Each thumbnail becomes a mini-card with hover "Buy Again" button
+- On mobile: tap to reveal "Buy Again" overlay
+- Order footer adds "Reorder All" button
+
+**Visual Treatment**:
+```text
+┌──────────────────────────────────────────────────────────────┐
+│  Order #ABC123 • Delivered                                   │
+│  March 15, 2024 • 2 items                                    │
+│                                                              │
+│  ┌────────┐  ┌────────┐                                      │
+│  │ [img]  │  │ [img]  │                                      │
+│  │ +Buy   │  │ +Buy   │   ← Hover/tap reveals button         │
+│  └────────┘  └────────┘                                      │
+│                                                              │
+│  Stay Holy Hoodie, Heavenly Crewneck                         │
+│                                                              │
+│  €149.98                    [ Reorder All (2) ]  View →      │
+└──────────────────────────────────────────────────────────────┘
 ```
 
-Show the code prominently after signup: "Your code: WELCOME10-XYZ123 (10% off your next order)"
+### AccountOrderDetail.tsx - Item List
+
+**Current** (lines 190-220):
+- Shows product name, size/color, quantity, price
+- No action buttons
+
+**After**:
+- Each item row gets "Buy Again" button on the right
+- Compact button to preserve layout
 
 ---
 
@@ -207,56 +199,9 @@ Show the code prominently after signup: "Your code: WELCOME10-XYZ123 (10% off yo
 
 | File | Changes |
 |------|---------|
-| `src/components/checkout/PostPurchaseSignup.tsx` | **NEW** - Post-purchase account creation component |
-| `src/pages/CheckoutSuccess.tsx` | Add `useAuth` check, render `PostPurchaseSignup` for guests |
-
----
-
-## Analytics Events
-
-| Event | Properties | When |
-|-------|------------|------|
-| `post_purchase_signup_shown` | `order_id` | Component renders |
-| `post_purchase_signup_started` | `order_id` | User focuses password field |
-| `post_purchase_signup_completed` | `order_id`, `user_id` | Account created |
-| `post_purchase_signup_skipped` | `order_id` | User clicks "No thanks" |
-| `post_purchase_signup_error` | `order_id`, `error_type` | Signup fails |
-
----
-
-## Success State UI
-
-After account creation, transform the signup box into a success confirmation:
-
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│  ✓ Account Created!                                                 │
-│                                                                     │
-│  Welcome to LINEA, John!                                            │
-│                                                                     │
-│  ┌───────────────────────────────────────────────────────────────┐  │
-│  │  Your 10% discount code:                                      │  │
-│  │  ┌─────────────────────────────────────────────────────────┐  │  │
-│  │  │  WELCOME10-XYZ123                              [Copy]   │  │  │
-│  │  └─────────────────────────────────────────────────────────┘  │  │
-│  │  Valid for 30 days • One-time use                             │  │
-│  └───────────────────────────────────────────────────────────────┘  │
-│                                                                     │
-│  ✓ Your sizes have been saved                                       │
-│  ✓ This order is now linked to your account                         │
-│                                                                     │
-└─────────────────────────────────────────────────────────────────────┘
-```
-
----
-
-## Conversion Psychology
-
-1. **Reciprocity**: "You just bought from us, we'll give you 10% off"
-2. **Sunk Cost**: "Don't lose your order tracking - create an account"
-3. **Immediate Gratification**: Discount code visible immediately
-4. **Social Proof**: "Join X,XXX members" (future enhancement)
-5. **Loss Aversion**: "Track this order" implies they'll lose visibility otherwise
+| `src/components/account/OrderReorderButton.tsx` | **NEW** - Reusable reorder button component |
+| `src/pages/account/AccountOrders.tsx` | Add OrderReorderButton to each order card |
+| `src/pages/account/AccountOrderDetail.tsx` | Add OrderReorderButton to each item row |
 
 ---
 
@@ -264,11 +209,63 @@ After account creation, transform the signup box into a success confirmation:
 
 | Scenario | Handling |
 |----------|----------|
-| Email already registered | Show "Already have an account? Sign in" option |
-| User is already authenticated | Don't show PostPurchaseSignup at all |
-| Signup fails | Show error, allow retry |
-| User closes page before finishing | Order stays as guest order (no loss) |
-| User signs in later with same email | Manual order linking (future enhancement) |
+| Item no longer exists | Show "Unavailable" state, disabled button |
+| Size out of stock | Show "Size M sold out" toast, offer alternative |
+| Product deleted | Skip silently in batch, show count of successful adds |
+| Already in cart | Add to existing quantity (default cart behavior) |
+| Guest user | Not applicable - order history requires auth |
+
+---
+
+## Optimistic Update Flow
+
+1. **Immediate**: Button shows spinner + disabled state
+2. **Background**: Cart context adds item(s)
+3. **Success**: Button shows animated check for 2s
+4. **Feedback**: Toast + haptic + cart drawer opens
+5. **Reset**: Button returns to "Buy Again" state
+
+---
+
+## Analytics Events
+
+| Event | Properties | When |
+|-------|------------|------|
+| `order_reorder_item_clicked` | `order_id`, `product_id`, `variant_size` | Single item Buy Again clicked |
+| `order_reorder_item_success` | `order_id`, `product_id`, `variant_size` | Item added to cart |
+| `order_reorder_all_clicked` | `order_id`, `item_count` | Reorder All clicked |
+| `order_reorder_all_success` | `order_id`, `item_count`, `total_value` | All items added |
+
+---
+
+## Technical Implementation Notes
+
+1. **No Database Changes Required**: Uses existing `order_items` table data
+
+2. **No New API Calls**: Reads from already-fetched order data
+
+3. **Reuses Existing Utilities**:
+   - `productIdToCartId()` from cartUtils
+   - `triggerHapticFeedback()` from cartUtils
+   - `formatPrice()` from cartUtils
+   - `showAddedToast()` from toastUtils
+   - `DrawCheckIcon` for success animation
+
+4. **Cart Context Integration**: Uses `addItem()` and `openCart()` from `useCart()`
+
+5. **Size Priority**:
+   - Order history size takes precedence (user already bought this exact size)
+   - Falls back to size memory only if order size is null
+   - This is intentional: "Buy what you bought before"
+
+---
+
+## Mobile-First Considerations
+
+1. **Touch Targets**: Buttons are 44px minimum height
+2. **Thumb Zone**: "Reorder All" positioned in bottom-right of card
+3. **Haptic Feedback**: 50ms vibration on add
+4. **Reduced Motion**: Respects `prefers-reduced-motion` preference
 
 ---
 
@@ -276,18 +273,18 @@ After account creation, transform the signup box into a success confirmation:
 
 | Metric | Current | Expected |
 |--------|---------|----------|
-| Guest-to-account rate | ~5% | 15-25% |
-| Repeat purchase rate | ~8% | 12-18% |
-| Next-order conversion (with code) | 0% | 35-45% |
-| Email list growth | - | +15% active subscribers |
+| Repeat purchase rate | ~12% | 18-25% |
+| Days between orders | 45 | 30 |
+| Items per repeat order | 1.5 | 2.2 |
+| Order history page engagement | Low | High |
 
 ---
 
-## Implementation Priority
+## Dependencies
 
-This is a **Sprint 1 Quick Win** with:
-- Low complexity (one new component, minor page changes)
-- High impact (direct conversion lift)
-- No database schema changes required
-- No new edge functions needed
+All dependencies are already in the project:
+- `framer-motion` for animations
+- `lucide-react` for icons
+- `sonner` for toasts
+- Existing cart context and utilities
 
