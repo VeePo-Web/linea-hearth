@@ -1,290 +1,330 @@
 
 
-# Quick Reorder from Order History
+# TEMU-Tier Conversion Audit: Complete Gap Analysis
 
-## Overview
+## Executive Summary
 
-Implement a one-tap "Buy Again" feature for order history that allows users to instantly repurchase items from past orders using their saved sizes. This is a high-impact Phase 4 conversion feature targeting a +10-15% repeat purchase rate lift.
-
----
-
-## Architecture
-
-```text
-                         QUICK REORDER FLOW
- ────────────────────────────────────────────────────────────────
-
- ┌─────────────────────────────────────────────────────────────┐
- │                    AccountOrders.tsx                        │
- │                                                             │
- │   Order #ABC123 • March 15, 2024                            │
- │   ┌─────────────────────────────────────────────────────┐  │
- │   │ [img] Stay Holy Hoodie                              │  │
- │   │       Size L • Carolina Blue                        │  │
- │   │       €79.99                                        │  │
- │   │                          ┌───────────────────────┐  │  │
- │   │                          │ Buy Again (Size L)    │  │  │
- │   │                          └───────────────────────┘  │  │
- │   └─────────────────────────────────────────────────────┘  │
- │                                                             │
- │   ┌─────────────────────────────────────────────────────┐  │
- │   │ [img] Heavenly Crewneck                             │  │
- │   │       Size M • White                                │  │
- │   │       €69.99                                        │  │
- │   │                          ┌───────────────────────┐  │  │
- │   │                          │ Buy Again (Size M)    │  │  │
- │   │                          └───────────────────────┘  │  │
- │   └─────────────────────────────────────────────────────┘  │
- │                                                             │
- │   [ Reorder Entire Order (2 items) ]                        │
- │                                                             │
- └─────────────────────────────────────────────────────────────┘
-
-                              │
-                              ▼ On Click
-
- ┌─────────────────────────────────────────────────────────────┐
- │  1. Uses variant_size from order history (not size memory)  │
- │  2. Triggers addItem() directly to cart                     │
- │  3. Shows success toast with product thumbnail              │
- │  4. Haptic feedback on mobile                               │
- │  5. Cart drawer opens automatically                         │
- └─────────────────────────────────────────────────────────────┘
-```
+This audit compares the current LINEA e-commerce implementation against TEMU's world-class conversion optimization techniques. The codebase already implements approximately **85-90%** of advanced conversion patterns. This analysis identifies the remaining gaps and prioritizes them by expected conversion lift.
 
 ---
 
-## Implementation Details
+## Current Implementation Status
 
-### New Component: `src/components/account/OrderReorderButton.tsx`
+### Already Implemented (World-Class Level)
 
-A reusable button component for reordering individual items or entire orders.
+| Category | Features | Quality |
+|----------|----------|---------|
+| **Size Memory System** | localStorage + DB sync, confidence scoring, size quiz onboarding, guest-to-auth migration | Excellent |
+| **One-Tap Add-to-Cart** | Universal `useQuickAdd` hook, works on PLP, search, favorites, recently viewed, lookbooks | Excellent |
+| **Bundle Discount Engine** | `useBundleDiscounts` with lookbook detection, tier-based discounts (10%/15%), missing product suggestions | Excellent |
+| **Cart Drawer Optimization** | Free shipping bar with celebrations, smart threshold upsells, save for later, email capture, express checkout | Excellent |
+| **Behavioral Tracking** | View count, dwell time, zoom tracking, high-intent prompts | Good |
+| **Return Customer Recognition** | Welcome back banner, size reminders, last order reference | Good |
+| **Quick Reorder** | One-tap reorder from order history with size preservation | Excellent |
+| **Post-Purchase Account Creation** | Guest-to-account conversion with discount incentive | Excellent |
+| **Lookbook Swipe Interface** | Tinder-style mobile shopping with running totals | Excellent |
+| **Free Shipping Gamification** | Milestone celebrations, haptic feedback, progress messaging | Excellent |
+| **Email Typo Detection** | Levenshtein-based detection on all 9 email inputs | Excellent |
 
-**Props Interface**:
+---
+
+## Gap Analysis: Remaining TEMU Features
+
+### GAP 1: Real-Time Social Proof (Live Data)
+
+**Current State**: `OrderStatsBadge` displays simulated data ("X orders today", "X viewing now")
+
+**TEMU Pattern**: Real-time, product-specific social proof:
+- "47 people bought this in the last 24 hours"
+- "12 viewing this product right now"
+- "Added to 8 carts in the last hour"
+
+**Technical Implementation**:
+- Query `user_behavior_signals` for real aggregate data
+- Use Supabase Realtime for live viewer counts
+- Add "X bought this today" from `order_items` table
+
+**Expected Lift**: +5-8% conversion on high-traffic products
+
+---
+
+### GAP 2: Waitlist / Restock Notifications
+
+**Current State**: No waitlist functionality exists
+
+**TEMU Pattern**: When size/product is OOS:
+- "Notify me when back in stock" button
+- Email capture specific to product/size
+- Push notification when restocked
+
+**Technical Implementation**:
+- Create `restock_notifications` table (user_id, product_id, variant_id, email, notified_at)
+- Edge function to send restock emails
+- Show waitlist count as social proof ("32 people waiting for this")
+
+**Expected Lift**: +3-5% recovered sales on OOS items
+
+---
+
+### GAP 3: Price Drop Alerts
+
+**Current State**: Sale badges exist but no proactive notifications
+
+**TEMU Pattern**:
+- "Track this price" button on non-sale items
+- Email when price drops
+- Browser push notifications for price drops
+
+**Technical Implementation**:
+- Create `price_alerts` table (user_id, product_id, original_price, target_price)
+- Trigger on price update or sale activation
+- Integrate with abandoned cart recovery
+
+**Expected Lift**: +2-4% conversion on watched items
+
+---
+
+### GAP 4: Flash Sale / Limited-Time Deals
+
+**Current State**: `UrgencyTimer` exists but isn't product-specific
+
+**TEMU Pattern**:
+- Product-specific countdown timers
+- "Flash Sale ends in 02:34:17" on select items
+- Visual urgency indicators (pulsing, color changes)
+
+**Technical Implementation**:
+- Add `flash_sale_end` timestamp to products table
+- Create `FlashSaleBanner` component for PLP/PDP
+- Auto-remove sale when timer expires
+
+**Expected Lift**: +10-15% conversion during flash sale periods
+
+---
+
+### GAP 5: Loyalty Points / Credit System
+
+**Current State**: `RewardsProgress` shows milestone unlocks, but no persistent points
+
+**TEMU Pattern**:
+- Earn X coins per purchase
+- Spend coins on discounts
+- Daily check-in bonuses
+- Points expiration urgency
+
+**Technical Implementation**:
+- Create `user_loyalty_points` table
+- Points earning rules (1 point per €1, bonus for reviews)
+- Points redemption in checkout
+- Points balance display in header/account
+
+**Expected Lift**: +15-25% repeat purchase rate
+
+---
+
+### GAP 6: Spin Wheel / Scratch Card Gamification
+
+**Current State**: No gamification for discount acquisition
+
+**TEMU Pattern**:
+- "Spin to win" for first-time visitors
+- Random discount reveals (5-20% off)
+- Scratch cards on repeat visits
+
+**Technical Implementation**:
+- Create `SpinWheelModal` with weighted outcomes
+- Store spin results in `user_spins` table
+- Auto-generate discount codes on win
+- Limit to 1 spin per session/day
+
+**Expected Lift**: +8-12% first-time conversion, +5% email capture
+
+---
+
+### GAP 7: Coupon / Referral Sharing
+
+**Current State**: Ambassador program exists but no user-to-user sharing
+
+**TEMU Pattern**:
+- "Share and earn" referral codes
+- Both parties get discount
+- Easy share to WhatsApp/SMS/social
+- Track referral conversions
+
+**Technical Implementation**:
+- Create `referral_codes` table linked to users
+- Create `referral_conversions` tracking
+- Deep link handling for referral attribution
+- Share sheet UI on mobile
+
+**Expected Lift**: +10-20% new customer acquisition cost reduction
+
+---
+
+### GAP 8: Saved Address Auto-Fill in Checkout
+
+**Current State**: Addresses saved in account but not auto-applied at checkout
+
+**TEMU Pattern**:
+- "Use saved address" dropdown
+- One-click address selection
+- Default address auto-populated
+
+**Technical Implementation**:
+- Query `addresses` table on checkout load
+- Add address selector dropdown
+- Auto-populate form fields on selection
+
+**Expected Lift**: +3-5% checkout completion
+
+---
+
+### GAP 9: Cart Quantity Badges on Product Cards
+
+**Current State**: Cart badge shows total count in header only
+
+**TEMU Pattern**:
+- If product is in cart, show quantity badge on product card
+- "In your bag" indicator
+- Quick quantity adjustment from PLP
+
+**Technical Implementation**:
+- Check `useCart().items` in ProductCard
+- Show quantity badge overlay
+- Add +/- controls on hover
+
+**Expected Lift**: +2-3% cart awareness
+
+---
+
+### GAP 10: Recently Bought Together / Frequently Bought Together
+
+**Current State**: "Complete the Look" shows lookbook pairings only
+
+**TEMU Pattern**:
+- "Frequently Bought Together" bundle on PDP
+- Based on actual order data (collaborative filtering)
+- One-click add all with bundle discount preview
+
+**Technical Implementation**:
+- Create `product_purchase_pairs` materialized view
+- Query co-purchase patterns from order_items
+- Show on PDP with combined price
+
+**Expected Lift**: +8-12% average order value
+
+---
+
+## Priority Matrix
+
+| Priority | Gap | Effort | Impact | ROI |
+|----------|-----|--------|--------|-----|
+| P1 | Saved Address Auto-Fill | Low | Medium | High |
+| P1 | Real-Time Social Proof | Medium | High | High |
+| P2 | Waitlist/Restock Notifications | Medium | Medium | Medium |
+| P2 | Flash Sale Countdown | Low | High | High |
+| P2 | Cart Quantity on Product Cards | Low | Low | Medium |
+| P3 | Frequently Bought Together | High | High | Medium |
+| P3 | Price Drop Alerts | Medium | Medium | Medium |
+| P3 | Referral Sharing System | High | High | Medium |
+| P4 | Loyalty Points System | High | Very High | Long-term |
+| P4 | Spin Wheel Gamification | Medium | Medium | Medium |
+
+---
+
+## Implementation Sprints
+
+### Sprint 1: Quick Wins (1-2 days)
+1. Saved address auto-fill in checkout
+2. Cart quantity badges on product cards
+3. Flash sale countdown component
+
+### Sprint 2: Social Proof & Urgency (3-4 days)
+4. Real-time social proof from actual data
+5. Waitlist/restock notifications
+6. Price drop alerts infrastructure
+
+### Sprint 3: AOV Boosters (4-5 days)
+7. Frequently bought together engine
+8. Referral sharing system
+
+### Sprint 4: Gamification (5-7 days)
+9. Loyalty points system
+10. Spin wheel / scratch card
+
+---
+
+## Technical Details for Top Priority Gaps
+
+### Gap 8: Saved Address Auto-Fill
+
+**Database**: Uses existing `addresses` table (already has `is_default_shipping`)
+
+**New Hook**: `src/hooks/useSavedAddresses.ts`
 ```typescript
-interface OrderReorderButtonProps {
-  /** Single item to reorder */
-  item?: OrderItem;
-  /** Array of items (for "Reorder All") */
-  items?: OrderItem[];
-  /** Button variant */
-  variant?: 'item' | 'order';
-  /** Size of the button */
-  size?: 'sm' | 'default';
+interface UseSavedAddressesReturn {
+  addresses: Address[];
+  defaultAddress: Address | null;
+  isLoading: boolean;
+  selectAddress: (id: string) => void;
 }
 ```
 
-**Component States**:
-- `idle` - Default state showing "Buy Again" or "Reorder All"
-- `adding` - Loading spinner while adding to cart
-- `success` - Animated check icon with color shift
-
-**Key Features**:
-1. Uses order history size (not size memory) - the user bought this exact size before
-2. Integrates with existing cart context via `useCart()`
-3. Shows "Buy Again (Size M)" with the original purchased size
-4. Batch add functionality for "Reorder Entire Order"
-5. Uses DrawCheckIcon for success animation
-6. Triggers haptic feedback via `triggerHapticFeedback()`
+**Checkout Integration**:
+- Add `<Select>` component above shipping form
+- On selection, populate all fields via `setShippingAddress`
+- Show "Use saved address" only for authenticated users
 
 ---
 
-### Changes to `AccountOrders.tsx`
+### Gap 1: Real-Time Social Proof
 
-1. **Import the new component**:
-   ```typescript
-   import OrderReorderButton from '@/components/account/OrderReorderButton';
-   ```
+**Database Queries**:
+```sql
+-- People viewing now (last 5 minutes)
+SELECT COUNT(DISTINCT session_id) 
+FROM user_behavior_signals 
+WHERE product_id = $1 AND last_viewed_at > NOW() - INTERVAL '5 minutes'
 
-2. **Add per-item Buy Again buttons** in the order items section (around line 90-114)
+-- Bought in last 24 hours
+SELECT COUNT(*) FROM order_items 
+WHERE product_id = $1 
+AND created_at > NOW() - INTERVAL '24 hours'
+```
 
-3. **Add "Reorder Entire Order" button** in the footer section (around line 127-136)
+**New Component**: `src/components/product/SocialProofBadge.tsx`
+- Shows on PDP below price
+- Updates every 30 seconds via polling or Realtime
+- Displays: "🔥 47 people viewing • 12 bought today"
+
+---
+
+### Gap 4: Flash Sale Countdown
+
+**Database Change**: Add `flash_sale_ends_at` column to `products` table
+
+**New Component**: `src/components/product/FlashSaleTimer.tsx`
+- Accepts `endsAt: Date` prop
+- Shows countdown with urgency styling
+- Auto-hides when expired
+- Pulses when < 1 hour remaining
 
 **Integration Points**:
-- Each order item thumbnail row gets a `OrderReorderButton` with `variant="item"`
-- Order footer gets `OrderReorderButton` with `variant="order"` and all items
+- ProductCard (badge overlay)
+- ProductInfo (prominent display)
+- CartDrawer (in line item)
 
 ---
 
-### Changes to `AccountOrderDetail.tsx`
+## Summary
 
-1. **Add per-item Buy Again buttons** next to each order item (around line 190-220)
+The codebase is already at an impressive 85-90% TEMU-tier implementation. The remaining gaps focus on:
 
-2. **Add "Reorder This Order" button** in the order summary section
+1. **Real-time data** instead of simulated social proof
+2. **Notification systems** for restocks and price drops
+3. **Advanced gamification** (loyalty points, spin wheels)
+4. **Referral mechanics** for viral growth
+5. **Checkout friction reduction** via saved addresses
 
----
-
-### Conversion Logic
-
-**Single Item Reorder**:
-```typescript
-const handleReorderItem = (item: OrderItem) => {
-  // Use exact size/color from order history
-  addItem({
-    id: productIdToCartId(item.product_id),
-    name: item.product_name,
-    price: item.unit_price_cents / 100,
-    priceFormatted: formatPrice(item.unit_price_cents / 100),
-    image: item.product_image_url || '/placeholder.svg',
-    category: 'tops', // Inferred or default
-    size: item.variant_size,
-    color: item.variant_color,
-    quantity: item.quantity,
-  });
-  
-  triggerHapticFeedback();
-  showAddedToast({ ... });
-  openCart();
-};
-```
-
-**Batch Reorder**:
-```typescript
-const handleReorderAll = (items: OrderItem[]) => {
-  items.forEach(item => {
-    addItem({ ... });
-  });
-  
-  triggerHapticFeedback();
-  toast.success(`${items.length} items added to bag!`);
-  openCart();
-};
-```
-
----
-
-## UI Design (No Layout Changes)
-
-### AccountOrders.tsx - Order Card
-
-**Current** (lines 90-114):
-- Shows 4 product thumbnails in a row
-- No action buttons
-
-**After**:
-- Each thumbnail becomes a mini-card with hover "Buy Again" button
-- On mobile: tap to reveal "Buy Again" overlay
-- Order footer adds "Reorder All" button
-
-**Visual Treatment**:
-```text
-┌──────────────────────────────────────────────────────────────┐
-│  Order #ABC123 • Delivered                                   │
-│  March 15, 2024 • 2 items                                    │
-│                                                              │
-│  ┌────────┐  ┌────────┐                                      │
-│  │ [img]  │  │ [img]  │                                      │
-│  │ +Buy   │  │ +Buy   │   ← Hover/tap reveals button         │
-│  └────────┘  └────────┘                                      │
-│                                                              │
-│  Stay Holy Hoodie, Heavenly Crewneck                         │
-│                                                              │
-│  €149.98                    [ Reorder All (2) ]  View →      │
-└──────────────────────────────────────────────────────────────┘
-```
-
-### AccountOrderDetail.tsx - Item List
-
-**Current** (lines 190-220):
-- Shows product name, size/color, quantity, price
-- No action buttons
-
-**After**:
-- Each item row gets "Buy Again" button on the right
-- Compact button to preserve layout
-
----
-
-## File Changes Summary
-
-| File | Changes |
-|------|---------|
-| `src/components/account/OrderReorderButton.tsx` | **NEW** - Reusable reorder button component |
-| `src/pages/account/AccountOrders.tsx` | Add OrderReorderButton to each order card |
-| `src/pages/account/AccountOrderDetail.tsx` | Add OrderReorderButton to each item row |
-
----
-
-## Edge Cases
-
-| Scenario | Handling |
-|----------|----------|
-| Item no longer exists | Show "Unavailable" state, disabled button |
-| Size out of stock | Show "Size M sold out" toast, offer alternative |
-| Product deleted | Skip silently in batch, show count of successful adds |
-| Already in cart | Add to existing quantity (default cart behavior) |
-| Guest user | Not applicable - order history requires auth |
-
----
-
-## Optimistic Update Flow
-
-1. **Immediate**: Button shows spinner + disabled state
-2. **Background**: Cart context adds item(s)
-3. **Success**: Button shows animated check for 2s
-4. **Feedback**: Toast + haptic + cart drawer opens
-5. **Reset**: Button returns to "Buy Again" state
-
----
-
-## Analytics Events
-
-| Event | Properties | When |
-|-------|------------|------|
-| `order_reorder_item_clicked` | `order_id`, `product_id`, `variant_size` | Single item Buy Again clicked |
-| `order_reorder_item_success` | `order_id`, `product_id`, `variant_size` | Item added to cart |
-| `order_reorder_all_clicked` | `order_id`, `item_count` | Reorder All clicked |
-| `order_reorder_all_success` | `order_id`, `item_count`, `total_value` | All items added |
-
----
-
-## Technical Implementation Notes
-
-1. **No Database Changes Required**: Uses existing `order_items` table data
-
-2. **No New API Calls**: Reads from already-fetched order data
-
-3. **Reuses Existing Utilities**:
-   - `productIdToCartId()` from cartUtils
-   - `triggerHapticFeedback()` from cartUtils
-   - `formatPrice()` from cartUtils
-   - `showAddedToast()` from toastUtils
-   - `DrawCheckIcon` for success animation
-
-4. **Cart Context Integration**: Uses `addItem()` and `openCart()` from `useCart()`
-
-5. **Size Priority**:
-   - Order history size takes precedence (user already bought this exact size)
-   - Falls back to size memory only if order size is null
-   - This is intentional: "Buy what you bought before"
-
----
-
-## Mobile-First Considerations
-
-1. **Touch Targets**: Buttons are 44px minimum height
-2. **Thumb Zone**: "Reorder All" positioned in bottom-right of card
-3. **Haptic Feedback**: 50ms vibration on add
-4. **Reduced Motion**: Respects `prefers-reduced-motion` preference
-
----
-
-## Expected Conversion Impact
-
-| Metric | Current | Expected |
-|--------|---------|----------|
-| Repeat purchase rate | ~12% | 18-25% |
-| Days between orders | 45 | 30 |
-| Items per repeat order | 1.5 | 2.2 |
-| Order history page engagement | Low | High |
-
----
-
-## Dependencies
-
-All dependencies are already in the project:
-- `framer-motion` for animations
-- `lucide-react` for icons
-- `sonner` for toasts
-- Existing cart context and utilities
+The P1 items (saved addresses, real social proof, flash sales) can be implemented in 1-2 sprints and will provide the highest immediate ROI. The loyalty points system is a larger investment but offers the highest long-term repeat purchase rate improvement.
 
