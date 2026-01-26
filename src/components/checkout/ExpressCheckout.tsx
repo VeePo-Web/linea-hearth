@@ -6,6 +6,7 @@ import { Loader2, AlertCircle } from "lucide-react";
 import { useExpressPay } from "@/hooks/useExpressPay";
 import { useCart } from "@/hooks/useCart";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
+import { useStripeAvailable } from "./StripeProvider";
 import ExpressPayButton from "./ExpressPayButton";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -25,6 +26,44 @@ interface ExpressCheckoutProps {
  * - checkout: Prominent layout for checkout page
  */
 export const ExpressCheckout = ({
+  onSuccess,
+  onError,
+  variant = "cart",
+  className = "",
+}: ExpressCheckoutProps) => {
+  // CRITICAL: Check Stripe availability BEFORE calling any Stripe hooks
+  const isStripeAvailable = useStripeAvailable();
+  
+  // Early return if Stripe is not configured - MUST be before useStripe/useElements
+  if (!isStripeAvailable) {
+    // Show subtle dev message only in development
+    if (import.meta.env.DEV) {
+      return (
+        <div className={`text-center py-2 ${className}`}>
+          <p className="text-xs text-muted-foreground/50">
+            [DEV] Add VITE_STRIPE_PUBLISHABLE_KEY to enable Express Checkout
+          </p>
+        </div>
+      );
+    }
+    return null;
+  }
+  
+  // Now safe to render the inner component that uses Stripe hooks
+  return (
+    <ExpressCheckoutInner
+      onSuccess={onSuccess}
+      onError={onError}
+      variant={variant}
+      className={className}
+    />
+  );
+};
+
+/**
+ * Inner component that uses Stripe hooks - only rendered when Stripe is available
+ */
+const ExpressCheckoutInner = ({
   onSuccess,
   onError,
   variant = "cart",
@@ -111,21 +150,6 @@ export const ExpressCheckout = ({
     },
     [stripe, elements, createPaymentIntent, handlePaymentSuccess, onSuccess, onError]
   );
-
-  // Don't render if Stripe is not configured or not available
-  if (!isStripeConfigured) {
-    // Show subtle dev message only in development
-    if (import.meta.env.DEV) {
-      return (
-        <div className={`text-center py-2 ${className}`}>
-          <p className="text-xs text-muted-foreground/50">
-            [DEV] Add VITE_STRIPE_PUBLISHABLE_KEY to enable Express Checkout
-          </p>
-        </div>
-      );
-    }
-    return null;
-  }
 
   // Still loading Stripe
   if (!stripe || !elements) {
