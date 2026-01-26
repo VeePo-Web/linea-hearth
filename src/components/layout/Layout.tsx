@@ -1,11 +1,13 @@
 import Header from "@/components/header/Header";
 import Footer from "@/components/footer/Footer";
 import EmailOptIn from "@/components/homepage/EmailOptIn";
+import WelcomeBackBanner from "@/components/customer/WelcomeBackBanner";
 
 interface LayoutProps {
   children: React.ReactNode;
   showFooter?: boolean;
   showNewsletter?: boolean;
+  showWelcomeBanner?: boolean;
   className?: string;
 }
 
@@ -17,6 +19,7 @@ const Layout = ({
   children, 
   showFooter = true, 
   showNewsletter = true,
+  showWelcomeBanner = true,
   className = "" 
 }: LayoutProps) => {
   return (
@@ -25,6 +28,9 @@ const Layout = ({
       
       {/* Main content with header offset */}
       <main className="pt-[var(--header-height)]">
+        {/* Return customer greeting */}
+        {showWelcomeBanner && <WelcomeBackBanner />}
+        
         {children}
       </main>
       

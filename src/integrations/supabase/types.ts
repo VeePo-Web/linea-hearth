@@ -1265,6 +1265,53 @@ export type Database = {
         }
         Relationships: []
       }
+      user_behavior_signals: {
+        Row: {
+          add_remove_count: number | null
+          created_at: string | null
+          id: string
+          last_viewed_at: string | null
+          product_id: string
+          session_id: string
+          total_time_ms: number | null
+          user_id: string | null
+          view_count: number | null
+          zoom_count: number | null
+        }
+        Insert: {
+          add_remove_count?: number | null
+          created_at?: string | null
+          id?: string
+          last_viewed_at?: string | null
+          product_id: string
+          session_id: string
+          total_time_ms?: number | null
+          user_id?: string | null
+          view_count?: number | null
+          zoom_count?: number | null
+        }
+        Update: {
+          add_remove_count?: number | null
+          created_at?: string | null
+          id?: string
+          last_viewed_at?: string | null
+          product_id?: string
+          session_id?: string
+          total_time_ms?: number | null
+          user_id?: string | null
+          view_count?: number | null
+          zoom_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_behavior_signals_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string
