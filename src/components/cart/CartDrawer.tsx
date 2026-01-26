@@ -14,6 +14,7 @@ import TrustRow from "./TrustRow";
 import AffirmationStrip from "./AffirmationStrip";
 import BundleProgress from "./BundleProgress";
 import BundleSavingsRow from "./BundleSavingsRow";
+import SavedForLaterShelf from "./SavedForLaterShelf";
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 
@@ -379,6 +380,9 @@ const CartDrawer = ({ onViewFavorites }: CartDrawerProps) => {
                       )}
                     </div>
                   )}
+
+                  {/* Saved For Later Shelf */}
+                  <SavedForLaterShelf />
 
                   {/* Smart upsell */}
                   <SmartUpsell />
