@@ -98,6 +98,11 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     setLastAddedItem({ ...newItem, quantity } as CartItem);
     setIsCartOpen(true);
     
+    // Haptic feedback for mobile
+    if (typeof navigator !== 'undefined' && navigator.vibrate) {
+      navigator.vibrate(10);
+    }
+    
     // Clear last added item after animation
     setTimeout(() => setLastAddedItem(null), 2000);
   }, []);

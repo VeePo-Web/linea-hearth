@@ -6,6 +6,7 @@ import { useCart } from "@/hooks/useCart";
 import { useAuth } from "@/hooks/useAuth";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useSavedForLater } from "@/hooks/useSavedForLater";
+import { useReducedMotion } from "@/hooks/useReducedMotion";
 import CartDrawer from "@/components/cart/CartDrawer";
 import NavLink from "./NavLink";
 import MegaMenu from "./MegaMenu";
@@ -28,6 +29,7 @@ const Navigation = () => {
   const { itemCount, openCart, addItem, items } = useCart();
   const { favoritesCount } = useFavorites();
   const { savedCount } = useSavedForLater();
+  const prefersReducedMotion = useReducedMotion();
 
   useEffect(() => {
     if (items.length === 0) {
@@ -245,13 +247,24 @@ const Navigation = () => {
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-5 h-5 relative z-10">
               <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
             </svg>
-            <AnimatePresence>
+            <AnimatePresence mode="wait">
               {itemCount > 0 && (
                 <motion.span 
-                  initial={{ scale: 0 }} 
-                  animate={{ scale: 1 }} 
-                  exit={{ scale: 0 }}
-                  transition={{ type: "spring" as const, stiffness: 500, damping: 15 }} 
+                  key={`cart-badge-${itemCount}`}
+                  initial={{ scale: 0, opacity: 0 }} 
+                  animate={{ 
+                    scale: prefersReducedMotion ? 1 : [0, 1.35, 0.95, 1],
+                    opacity: 1 
+                  }} 
+                  exit={{ scale: 0, opacity: 0 }}
+                  transition={{ 
+                    scale: {
+                      duration: prefersReducedMotion ? 0 : 0.3,
+                      times: [0, 0.3, 0.7, 1],
+                      ease: "easeOut"
+                    },
+                    opacity: { duration: 0.1 }
+                  }} 
                   className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-[30%] text-[0.5rem] font-semibold text-foreground pointer-events-none z-10"
                 >
                   {itemCount}
