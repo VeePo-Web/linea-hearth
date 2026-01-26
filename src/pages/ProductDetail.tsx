@@ -13,6 +13,7 @@ import LookbookLookSection from "../components/product/LookbookLookSection";
 import GuaranteeBadge from "../components/product/GuaranteeBadge";
 import MobileStickyATC from "../components/product/MobileStickyATC";
 import ProductCarousel from "../components/content/ProductCarousel";
+import HighIntentPrompt from "../components/product/HighIntentPrompt";
 import { 
   Breadcrumb, 
   BreadcrumbItem, 
@@ -22,6 +23,8 @@ import {
   BreadcrumbSeparator 
 } from "@/components/ui/breadcrumb";
 import { useState } from "react";
+import { useBehaviorTracking } from "@/hooks/useBehaviorTracking";
+import { useQuickAdd } from "@/hooks/useQuickAdd";
 
 const ProductDetail = () => {
   const { productId } = useParams();
@@ -47,6 +50,22 @@ const ProductDetail = () => {
     },
     enabled: !!productId,
   });
+
+  // Behavioral tracking for high-intent signals
+  const { trackZoom, getViewCount, isHighIntent } = useBehaviorTracking(product?.id);
+
+  // Quick add for high-intent prompt
+  const quickAdd = useQuickAdd(product ? {
+    id: product.id,
+    name: product.name,
+    slug: product.slug,
+    price: product.price,
+    sale_price: product.sale_price,
+    is_on_sale: product.is_on_sale,
+    category_slug: product.categories?.slug,
+    product_images: product.product_images,
+    product_variants: product.product_variants,
+  } : null);
 
   // Calculate price for mobile sticky
   const displayPrice = product?.is_on_sale && product?.sale_price 
@@ -139,6 +158,15 @@ const ProductDetail = () => {
             />
           </div>
         </div>
+      </section>
+
+      {/* High Intent Prompt - shows when behavioral signals indicate purchase intent */}
+      <section className="w-full px-6 mt-4">
+        <HighIntentPrompt
+          isVisible={isHighIntent()}
+          viewCount={getViewCount()}
+          onAddToCart={() => quickAdd.handleQuickAdd({ preventDefault: () => {}, stopPropagation: () => {} } as React.MouseEvent)}
+        />
       </section>
 
       {/* How It Ministers - Faith-based storytelling */}
