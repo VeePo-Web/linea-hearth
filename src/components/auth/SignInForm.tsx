@@ -12,6 +12,8 @@ import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import GoogleAuthButton from './GoogleAuthButton';
 import AuthDivider from './AuthDivider';
+import { useEmailTypoDetection } from '@/hooks/useEmailTypoDetection';
+import EmailTypoSuggestion from '@/components/ui/EmailTypoSuggestion';
 
 const signInSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -44,11 +46,24 @@ export default function SignInForm({ onSuccess, onSwitchToSignUp }: SignInFormPr
     formState: { errors },
     setError,
     watch,
+    setValue,
   } = useForm<SignInFormData>({
     resolver: zodResolver(signInSchema),
   });
 
   const emailValue = watch('email');
+
+  // Email typo detection for sign-in email
+  const signInEmailTypo = useEmailTypoDetection({
+    initialEmail: emailValue || '',
+    onSuggestionAccepted: (correctedEmail) => setValue('email', correctedEmail),
+  });
+
+  // Email typo detection for reset password email
+  const resetEmailTypo = useEmailTypoDetection({
+    initialEmail: resetEmail,
+    onSuggestionAccepted: (correctedEmail) => setResetEmail(correctedEmail),
+  });
 
   const onSubmit = async (data: SignInFormData) => {
     setIsLoading(true);
@@ -157,7 +172,17 @@ export default function SignInForm({ onSuccess, onSwitchToSignUp }: SignInFormPr
                 className={`h-12 bg-background border-border focus:border-foreground transition-colors ${
                   errors.email ? 'border-destructive' : ''
                 }`}
-                {...register('email')}
+                {...register('email', {
+                  onChange: (e) => signInEmailTypo.setEmail(e.target.value),
+                })}
+                onBlur={() => signInEmailTypo.checkForTypos(emailValue)}
+              />
+              <EmailTypoSuggestion
+                suggestion={signInEmailTypo.suggestion || ''}
+                show={signInEmailTypo.showSuggestion}
+                onAccept={signInEmailTypo.acceptSuggestion}
+                onDismiss={signInEmailTypo.dismissSuggestion}
+                variant="compact"
               />
               {errors.email && (
                 <p className="text-sm text-destructive">{errors.email.message}</p>
@@ -277,7 +302,11 @@ export default function SignInForm({ onSuccess, onSwitchToSignUp }: SignInFormPr
                 id="reset-email"
                 type="email"
                 value={resetEmail}
-                onChange={(e) => setResetEmail(e.target.value)}
+                onChange={(e) => {
+                  setResetEmail(e.target.value);
+                  resetEmailTypo.setEmail(e.target.value);
+                }}
+                onBlur={() => resetEmailTypo.checkForTypos(resetEmail)}
                 placeholder="you@example.com"
                 autoFocus
                 className="h-12 bg-background border-border focus:border-foreground transition-colors"
@@ -287,6 +316,13 @@ export default function SignInForm({ onSuccess, onSwitchToSignUp }: SignInFormPr
                     handleResetPassword();
                   }
                 }}
+              />
+              <EmailTypoSuggestion
+                suggestion={resetEmailTypo.suggestion || ''}
+                show={resetEmailTypo.showSuggestion}
+                onAccept={resetEmailTypo.acceptSuggestion}
+                onDismiss={resetEmailTypo.dismissSuggestion}
+                variant="compact"
               />
             </div>
 
