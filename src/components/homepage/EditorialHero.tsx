@@ -97,17 +97,6 @@ const EditorialHero = () => {
         className="relative z-10 min-h-screen flex flex-col justify-between px-6 md:px-12 lg:px-16 py-12 lg:py-16"
         style={{ opacity: prefersReducedMotion ? 1 : textOpacity }}
       >
-        {/* Top Section - Eyebrow */}
-        <div className="pt-8">
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.4, duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
-            className="text-[10px] md:text-xs font-light tracking-[0.4em] uppercase text-muted-foreground"
-          >
-            Not a costume. Armor.
-          </motion.p>
-        </div>
 
         {/* Center Section - Massive Typography */}
         <div className="flex-1 flex flex-col justify-center -mt-16 lg:-mt-24">
