@@ -7,6 +7,7 @@ import { Order } from '@/types/account';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
+import OrderReorderButton from '@/components/account/OrderReorderButton';
 
 export default function AccountOrderDetail() {
   const { orderId } = useParams<{ orderId: string }>();
@@ -212,6 +213,13 @@ export default function AccountOrderDetail() {
                     </p>
                   )}
                   <p className="text-xs text-muted-foreground mt-1">Qty: {item.quantity}</p>
+                  <div className="mt-2">
+                    <OrderReorderButton
+                      item={item}
+                      variant="item"
+                      size="sm"
+                    />
+                  </div>
                 </div>
                 <p className="text-sm font-medium text-foreground">
                   €{(item.total_cents / 100).toFixed(2)}
@@ -219,6 +227,18 @@ export default function AccountOrderDetail() {
               </div>
             ))}
           </div>
+          
+          {/* Reorder entire order button */}
+          {order.order_items && order.order_items.length > 1 && (
+            <div className="mt-4">
+              <OrderReorderButton
+                items={order.order_items}
+                variant="order"
+                size="default"
+                className="w-full"
+              />
+            </div>
+          )}
         </motion.div>
 
         {/* Order summary */}

@@ -5,6 +5,7 @@ import { useOrders } from '@/hooks/useOrders';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { format } from 'date-fns';
+import OrderReorderButton from '@/components/account/OrderReorderButton';
 
 export default function AccountOrders() {
   const { orders, isLoading } = useOrders();
@@ -91,7 +92,7 @@ export default function AccountOrders() {
                 {order.order_items?.slice(0, 4).map((item) => (
                   <div
                     key={item.id}
-                    className="w-16 h-16 bg-secondary/50 flex items-center justify-center overflow-hidden"
+                    className="group relative w-16 h-16 bg-secondary/50 flex items-center justify-center overflow-hidden"
                   >
                     {item.product_image_url ? (
                       <img
@@ -128,12 +129,21 @@ export default function AccountOrders() {
                 <p className="text-sm font-medium text-foreground">
                   €{(order.total_cents / 100).toFixed(2)}
                 </p>
-                <Link
-                  to={`/account/orders/${order.id}`}
-                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  View Details →
-                </Link>
+                <div className="flex items-center gap-3">
+                  {order.order_items && order.order_items.length > 0 && (
+                    <OrderReorderButton
+                      items={order.order_items}
+                      variant="order"
+                      size="sm"
+                    />
+                  )}
+                  <Link
+                    to={`/account/orders/${order.id}`}
+                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    View Details →
+                  </Link>
+                </div>
               </div>
             </motion.div>
           ))
