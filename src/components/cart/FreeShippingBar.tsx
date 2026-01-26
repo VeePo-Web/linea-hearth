@@ -43,9 +43,15 @@ const FreeShippingBar = () => {
     setActiveCelebration(tier);
     setCelebratedMilestones(prev => new Set([...prev, tier]));
     
-    // Haptic feedback only on unlock (subtle single pulse)
-    if (tier === 'unlocked' && navigator.vibrate) {
-      navigator.vibrate(50);
+    // Tiered haptic feedback for milestone celebrations (mobile)
+    // Skip haptics if user prefers reduced motion
+    if (!prefersReducedMotion && 'vibrate' in navigator) {
+      if (tier === 'halfway') {
+        navigator.vibrate(30); // Lighter celebration pulse
+      } else if (tier === 'unlocked') {
+        navigator.vibrate(50); // Stronger achievement pulse
+      }
+      // No haptic for 'almost' — urgency messaging is sufficient
     }
     
     // Clear celebration after animation completes
