@@ -200,7 +200,7 @@ const LookSection = ({ look, index }: LookSectionProps) => {
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: timing.slow, ease: easing.editorial, delay: 1.0 }}
           >
-            <ShopTheLook products={look.products} lookName={look.name} />
+            <ShopTheLook products={look.products} lookName={look.name} lookId={look.id} />
           </motion.div>
         </div>
       </div>

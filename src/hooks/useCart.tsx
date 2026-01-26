@@ -11,6 +11,10 @@ export interface CartItem {
   size?: string;
   color?: string;
   stock?: number;
+  // Bundle tracking for lookbook items
+  lookId?: string;
+  lookName?: string;
+  productId?: string;
 }
 
 interface CartContextType {

@@ -16,6 +16,13 @@ interface CartItem {
   color?: string;
 }
 
+interface BundleDiscountClaim {
+  bundleRuleId: string;
+  lookId: string;
+  itemProductIds: string[];
+  claimedSavings: number;
+}
+
 interface CheckoutRequest {
   items: CartItem[];
   customerEmail: string;
@@ -37,6 +44,7 @@ interface CheckoutRequest {
   shippingMethod: "standard" | "express" | "overnight";
   discountCodeId?: string;
   abandonedCartId?: string;
+  bundleDiscounts?: BundleDiscountClaim[];
 }
 
 // Shipping costs in cents
@@ -92,6 +100,7 @@ Deno.serve(async (req) => {
       shippingMethod,
       discountCodeId,
       abandonedCartId,
+      bundleDiscounts,
     } = body;
 
     // Validate required fields
@@ -199,8 +208,57 @@ Deno.serve(async (req) => {
       discountCodeRecord = codeData;
     }
 
-    // Calculate total
-    const totalCents = subtotalCents + shippingCents - discountCents;
+    // Validate and calculate bundle discounts server-side
+    let bundleDiscountCents = 0;
+    const validatedBundles: Array<{ lookId: string; discountPercent: number; savingsCents: number }> = [];
+
+    if (bundleDiscounts && bundleDiscounts.length > 0) {
+      for (const bundle of bundleDiscounts) {
+        // Verify the items belong to the claimed look
+        const { data: lookProducts } = await supabase
+          .from("lookbook_look_products")
+          .select("product_id")
+          .eq("look_id", bundle.lookId);
+
+        if (!lookProducts) continue;
+
+        const validLookProductIds = new Set(lookProducts.map((lp: any) => lp.product_id));
+        const validItems = bundle.itemProductIds.filter((id) => validLookProductIds.has(id));
+
+        if (validItems.length < 2) continue; // Need at least 2 items for bundle
+
+        // Find applicable bundle rule
+        const { data: rules } = await supabase
+          .from("bundle_discounts")
+          .select("*")
+          .eq("source_type", "lookbook")
+          .eq("is_active", true)
+          .lte("min_items", validItems.length)
+          .order("min_items", { ascending: false })
+          .limit(1);
+
+        if (!rules || rules.length === 0) continue;
+
+        const rule = rules[0];
+
+        // Calculate bundle subtotal from matching items
+        const bundleItemSubtotal = items
+          .filter((item) => validItems.includes(item.productId))
+          .reduce((sum, item) => sum + Math.round(item.price * 100) * item.quantity, 0);
+
+        const bundleSavingsCents = Math.round(bundleItemSubtotal * rule.discount_value / 100);
+        bundleDiscountCents += bundleSavingsCents;
+
+        validatedBundles.push({
+          lookId: bundle.lookId,
+          discountPercent: rule.discount_value,
+          savingsCents: bundleSavingsCents,
+        });
+      }
+    }
+
+    // Calculate total (now including bundle discounts)
+    const totalCents = subtotalCents + shippingCents - discountCents - bundleDiscountCents;
 
     // Get user ID from auth header if available
     let userId: string | null = null;
@@ -226,7 +284,7 @@ Deno.serve(async (req) => {
         billing_address: billingAddress || shippingAddress,
         subtotal_cents: subtotalCents,
         shipping_cents: shippingCents,
-        discount_cents: discountCents,
+        discount_cents: discountCents + bundleDiscountCents, // Include bundle discount
         total_cents: totalCents,
         currency: "eur",
         discount_code: validatedDiscountCode,
@@ -234,6 +292,7 @@ Deno.serve(async (req) => {
         metadata: { 
           abandoned_cart_id: abandonedCartId,
           discount_code_id: discountCodeId,
+          bundle_discounts: validatedBundles.length > 0 ? validatedBundles : undefined,
         },
       })
       .select()
@@ -337,7 +396,7 @@ Deno.serve(async (req) => {
       stripeParams.append(`line_items[${index}][quantity]`, String(item.quantity));
     });
 
-    // Apply discount if provided
+    // Apply discount if provided (discount code)
     if (discountCents > 0 && discountCodeRecord) {
       // Create a coupon for the discount
       const couponResponse = await fetch("https://api.stripe.com/v1/coupons", {
@@ -373,6 +432,30 @@ Deno.serve(async (req) => {
           customer_email: customerEmail,
           discount_applied_cents: discountCents,
         });
+    }
+
+    // Apply bundle discount if present (separate coupon)
+    if (bundleDiscountCents > 0) {
+      const bundleCouponResponse = await fetch("https://api.stripe.com/v1/coupons", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${stripeSecretKey}`,
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: new URLSearchParams({
+          amount_off: String(bundleDiscountCents),
+          currency: "eur",
+          duration: "once",
+          name: "Complete Look Bundle Discount",
+        }),
+      });
+
+      if (bundleCouponResponse.ok) {
+        const bundleCoupon = await bundleCouponResponse.json();
+        // If we already have a discount coupon, add this as a second one
+        const discountIndex = discountCents > 0 ? 1 : 0;
+        stripeParams.append(`discounts[${discountIndex}][coupon]`, bundleCoupon.id);
+      }
     }
 
     // Create Stripe session
