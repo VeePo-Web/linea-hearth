@@ -8,6 +8,7 @@ interface AddedToCartToastProps {
   size?: string;
   color?: string;
   toastId?: string | number;
+  onViewCart?: () => void;
 }
 
 const AddedToCartToast = ({
@@ -16,8 +17,15 @@ const AddedToCartToast = ({
   size,
   color,
   toastId,
+  onViewCart,
 }: AddedToCartToastProps) => {
   const prefersReducedMotion = useReducedMotion();
+
+  const handleViewCart = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (toastId) sonnerToast.dismiss(toastId);
+    onViewCart?.();
+  };
 
   return (
     <motion.div
@@ -55,6 +63,19 @@ const AddedToCartToast = ({
           {!size && !color && <>Added to bag</>}
         </p>
       </div>
+
+      {/* View Cart CTA */}
+      {onViewCart && (
+        <motion.button
+          onClick={handleViewCart}
+          whileTap={prefersReducedMotion ? {} : { scale: 0.97 }}
+          transition={{ duration: 0.1 }}
+          className="text-sm font-medium text-foreground hover:underline underline-offset-4 transition-all whitespace-nowrap px-2 py-1.5 min-h-[44px] min-w-[44px] flex items-center justify-center flex-shrink-0"
+          aria-label="View shopping cart"
+        >
+          View Cart
+        </motion.button>
+      )}
     </motion.div>
   );
 };

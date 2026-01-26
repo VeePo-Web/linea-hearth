@@ -130,7 +130,7 @@ export function useQuickAdd(
 ): UseQuickAddReturn {
   const { categoryOverride, onSuccess, showToast = true } = options;
   
-  const { addItem, items } = useCart();
+  const { addItem, items, openCart } = useCart();
   const { getRememberedSize, rememberSize, getSizeConfidence, getSizeConfidenceMessage } = useSizeMemory();
 
   // UI state
@@ -309,6 +309,7 @@ export function useQuickAdd(
           productImage: primaryImage?.image_url || '/placeholder.svg',
           size: sizeToUse,
           color: color,
+          onViewCart: openCart,
         });
       }
 
