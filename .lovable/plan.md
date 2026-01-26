@@ -1,187 +1,333 @@
 
-
-# Milestone Celebration Haptics - Implementation Plan
+# Smart Free Shipping Threshold Upsell System - Implementation Plan
 
 ## Overview
 
-Enhance the FreeShippingBar with tiered haptic feedback that provides tactile celebration when users hit free shipping milestones, reinforcing the dopamine loop of progress toward free shipping.
+Build an intelligent product suggestion engine that automatically recommends low-priced items (accessories, hats, stickers) specifically priced to help users reach the €150 free shipping threshold. The system features **one-click add-to-cart** with size memory integration, creating a frictionless path to unlocking free shipping.
 
 ---
 
 ## TEMU Conversion Psychology
 
-**Why milestone haptics matter:**
-- **Gamification reinforcement**: Haptics make abstract progress feel physical
-- **Dopamine loop completion**: See progress bar fill → Feel vibration → Brain registers achievement
-- **Reduced cognitive load**: "Did I unlock something?" → Physical confirmation says yes
-- **Mobile-native expectation**: Gaming apps, banking apps, fitness trackers all use milestone haptics
+**Why this matters:**
+- **Threshold anxiety**: Users hate paying €8 shipping when they're €20 away from free
+- **Decision fatigue reduction**: "Here's exactly what you need" vs "browse accessories"
+- **One-tap friction physics**: Every tap saved = 3% conversion lift
+- **Price anchoring**: A €25 hat to save €8 shipping = perceived €17 gain
+- **Gamification completion**: Progress bar goes 100% → dopamine hit
 
-**Pulse Duration Selection (based on existing patterns):**
-
-| Milestone | Pulse Duration | Rationale |
-|-----------|----------------|-----------|
-| Halfway (50%) | 30ms | Lighter celebration — "you're on your way" |
-| Almost (90%) | No haptic | Urgency messaging is enough — don't over-vibrate |
-| Unlocked (100%) | 50ms | Strongest celebration — achievement unlocked |
-
-The tiered approach creates a "crescendo" effect: 30ms → (nothing) → 50ms. This makes the final unlock feel more rewarding.
+**Expected Impact:**
+| Metric | Expected Lift | Mechanism |
+|--------|---------------|-----------|
+| Free shipping unlock rate | +15-25% | Targeted threshold-gap products |
+| Average order value | +€18-30 | Strategic add-on suggestions |
+| Cart-to-checkout rate | +5% | Friction elimination via one-tap |
 
 ---
 
-## Current State Analysis
-
-The `celebrateMilestone` function (lines 42-54) currently:
-1. Sets active celebration state
-2. Adds tier to celebrated set
-3. Only triggers haptic for 'unlocked' tier (50ms)
-4. **Does NOT check `prefersReducedMotion`** — this is a bug we should fix
-
-```typescript
-const celebrateMilestone = (tier: MilestoneType) => {
-  setActiveCelebration(tier);
-  setCelebratedMilestones(prev => new Set([...prev, tier]));
-  
-  // Haptic feedback only on unlock (subtle single pulse)
-  if (tier === 'unlocked' && navigator.vibrate) {
-    navigator.vibrate(50);
-  }
-  
-  // ...
-};
-```
-
----
-
-## Implementation
-
-### File: `src/components/cart/FreeShippingBar.tsx`
-
-**Changes:**
-1. Add 30ms haptic for 'halfway' tier
-2. Keep 50ms haptic for 'unlocked' tier
-3. Respect `prefersReducedMotion` preference
-4. Check for `navigator.vibrate` support
-
-**Updated `celebrateMilestone` function:**
-
-```typescript
-const celebrateMilestone = (tier: MilestoneType) => {
-  setActiveCelebration(tier);
-  setCelebratedMilestones(prev => new Set([...prev, tier]));
-  
-  // Tiered haptic feedback for milestone celebrations (mobile)
-  // Skip haptics if user prefers reduced motion
-  if (!prefersReducedMotion && 'vibrate' in navigator) {
-    if (tier === 'halfway') {
-      navigator.vibrate(30); // Lighter celebration pulse
-    } else if (tier === 'unlocked') {
-      navigator.vibrate(50); // Stronger achievement pulse
-    }
-    // No haptic for 'almost' — urgency messaging is sufficient
-  }
-  
-  // Clear celebration after animation completes
-  const duration = tier === 'unlocked' ? 2000 : 1500;
-  setTimeout(() => setActiveCelebration(null), duration);
-};
-```
-
----
-
-## Haptic Signature Design
+## System Architecture
 
 ```text
-Cart Value:    €0 ──────────────────────────────────────── €150+
-Progress:      0%        50%              90%           100%
-
-Haptics:       ─────────[30ms]─────────────────────────[50ms]
-                          ↑                                ↑
-                    "Halfway there"               "Free shipping!"
+┌─────────────────────────────────────────────────────────────────┐
+│                    FREE SHIPPING BAR                           │
+│  "You're €23 away from FREE shipping"                          │
+│  ████████████████████░░░░░░░░░  85%                            │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│              SMART THRESHOLD UPSELL SECTION                    │
+│  "Unlock free shipping with one tap"                           │
+│                                                                 │
+│  ┌──────────────────────────────────────────────────────────┐  │
+│  │  [IMG] Dad Hat - €25        [+ Add M] ← One-tap (amber)  │  │
+│  │        + Unlocks free shipping!                          │  │
+│  └──────────────────────────────────────────────────────────┘  │
+│                                                                 │
+│  ┌────────────┐  ┌────────────┐  ┌────────────┐                │
+│  │ Sticker €5 │  │ Socks €15  │  │ Beanie €20 │  ← Alternatives │
+│  │   [+Add]   │  │  [+Add M]  │  │  [+Add M]  │                │
+│  └────────────┘  └────────────┘  └────────────┘                │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
-**Why no haptic at 90%?**
-- Users are already highly engaged at this point (so close to goal)
-- The urgency messaging ("Just €15 more!") creates psychological pull
-- Over-vibrating reduces the perceived specialness of haptics
-- The 100% unlock feels more impactful as a distinct tactile event
+---
+
+## Technical Implementation
+
+### 1. Database: Threshold Upsell Products Table
+
+Create a dedicated table for tracking products eligible for threshold upsells:
+
+```sql
+-- Track which products are good for threshold upsells
+CREATE TABLE threshold_upsell_products (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  product_id uuid REFERENCES products(id) ON DELETE CASCADE NOT NULL,
+  priority integer DEFAULT 0,  -- Higher = shown first
+  min_threshold_gap numeric,   -- Show when gap is >= this (e.g., €5)
+  max_threshold_gap numeric,   -- Show when gap is <= this (e.g., €30)
+  is_active boolean DEFAULT true,
+  created_at timestamptz DEFAULT now(),
+  updated_at timestamptz DEFAULT now()
+);
+
+-- Index for efficient querying
+CREATE INDEX idx_threshold_upsell_active ON threshold_upsell_products (is_active, priority DESC);
+
+-- RLS: Public read, admin write
+ALTER TABLE threshold_upsell_products ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Anyone can view active threshold upsells" ON threshold_upsell_products
+FOR SELECT USING (is_active = true);
+
+CREATE POLICY "Admins can manage threshold upsells" ON threshold_upsell_products
+FOR ALL USING (has_role(auth.uid(), 'admin'));
+```
+
+### 2. New Hook: useThresholdUpsells
+
+```typescript
+// src/hooks/useThresholdUpsells.ts
+
+interface ThresholdProduct {
+  id: string;
+  name: string;
+  slug: string;
+  price: number;
+  sale_price: number | null;
+  is_on_sale: boolean;
+  category_slug: string;
+  product_images: Array<{ image_url: string; is_primary: boolean }>;
+  product_variants: Array<{ size: string | null; color: string | null; stock_quantity: number }>;
+  // Computed
+  willUnlockShipping: boolean;      // True if price >= amountToFreeShipping
+  gapMatch: 'exact' | 'close' | 'over';  // How well it matches the gap
+}
+
+interface UseThresholdUpsellsReturn {
+  // Primary recommendation (best match for gap)
+  primaryProduct: ThresholdProduct | null;
+  
+  // Alternative suggestions (2-3 more options)
+  alternatives: ThresholdProduct[];
+  
+  // State
+  isLoading: boolean;
+  
+  // Context
+  amountToFreeShipping: number;
+  hasFreeShipping: boolean;
+}
+```
+
+**Logic:**
+1. Query products priced between `amountToFreeShipping - 10` and `amountToFreeShipping + 50`
+2. Prioritize products that exactly or closely match the gap
+3. Exclude products already in cart
+4. Sort by: exact match → close match → accessories → hats → lower price variance
+5. Limit to 4 products (1 primary + 3 alternatives)
+
+### 3. Enhanced SmartUpsell Component
+
+Upgrade the existing `SmartUpsell.tsx` to become a "Threshold-Aware Upsell Engine":
+
+```text
+Current State:
+- Uses hardcoded mock products
+- Basic price matching logic
+- Single product display
+
+Upgraded State:
+- Fetches real products from database
+- Smart price-gap matching algorithm
+- Shows 1 primary + 3 scrollable alternatives
+- All use useQuickAdd for one-tap functionality
+- Tracks which products actually unlock shipping
+```
+
+**Visual Sections:**
+
+**A. Primary Upsell (when close to threshold):**
+```
+┌─────────────────────────────────────────────────┐
+│ "Unlock free shipping with one tap"             │
+│ ┌─────┐ Dad Hat                    [+ Add M]    │
+│ │ IMG │ €25  • Your size M                      │
+│ └─────┘ + Unlocks free shipping!                │
+└─────────────────────────────────────────────────┘
+```
+
+**B. Alternative Grid (horizontal scroll on mobile):**
+```
+┌──────────────────────────────────────────────────────────┐
+│ Or try these:                                            │
+│ ┌────────┐ ┌────────┐ ┌────────┐                        │
+│ │ [IMG]  │ │ [IMG]  │ │ [IMG]  │  ← Scroll →            │
+│ │Sticker │ │ Socks  │ │ Beanie │                        │
+│ │  €5    │ │  €15   │ │  €20   │                        │
+│ │ [+Add] │ │[+Add M]│ │[+Add M]│                        │
+│ └────────┘ └────────┘ └────────┘                        │
+└──────────────────────────────────────────────────────────┘
+```
+
+### 4. ThresholdUpsellCard Component
+
+New compact card component optimized for threshold suggestions:
+
+```typescript
+// src/components/cart/ThresholdUpsellCard.tsx
+
+interface ThresholdUpsellCardProps {
+  product: ThresholdProduct;
+  variant: 'primary' | 'compact';  // Primary = full details, compact = grid item
+  willUnlockShipping: boolean;
+}
+```
+
+**Features:**
+- Integrates with `useQuickAdd` for one-tap functionality
+- Shows remembered size badge (amber color)
+- "Unlocks free shipping!" badge when applicable
+- Inline size picker if no remembered size
+- Success animation (check overlay) on add
+- Haptic feedback (10ms) on tap
+
+### 5. Query Logic for Smart Product Selection
+
+```typescript
+// Product selection algorithm
+function selectThresholdProducts(
+  allProducts: Product[],
+  cartItems: CartItem[],
+  amountToFreeShipping: number
+): ThresholdProduct[] {
+  const cartIds = new Set(cartItems.map(i => i.id));
+  
+  // Filter: in stock, not in cart, priced appropriately
+  const candidates = allProducts.filter(p => {
+    const inCart = cartIds.has(productIdToCartId(p.id));
+    const hasStock = p.product_variants?.some(v => v.stock_quantity > 0);
+    const priceMatch = p.price >= amountToFreeShipping * 0.5 && 
+                       p.price <= amountToFreeShipping + 50;
+    return !inCart && hasStock && priceMatch;
+  });
+  
+  // Score and sort
+  const scored = candidates.map(p => ({
+    ...p,
+    willUnlock: p.price >= amountToFreeShipping,
+    gapDelta: Math.abs(p.price - amountToFreeShipping),
+    // Prioritize accessories for impulse buys
+    categoryBonus: ['hats', 'accessories', 'socks', 'stickers'].includes(p.category_slug) ? 10 : 0,
+  }));
+  
+  // Sort: exact matches first, then close, then by category bonus
+  scored.sort((a, b) => {
+    // Prefer products that unlock shipping
+    if (a.willUnlock && !b.willUnlock) return -1;
+    if (!a.willUnlock && b.willUnlock) return 1;
+    
+    // Then by gap closeness
+    if (a.gapDelta !== b.gapDelta) return a.gapDelta - b.gapDelta;
+    
+    // Then by category bonus
+    return b.categoryBonus - a.categoryBonus;
+  });
+  
+  return scored.slice(0, 4);
+}
+```
+
+### 6. Display Conditions
+
+The threshold upsell section appears when:
+1. Cart has items (`items.length > 0`)
+2. Free shipping NOT yet unlocked (`!hasFreeShipping`)
+3. User is "within reach" (`shippingProgress >= 50%` OR `amountToFreeShipping <= 75`)
+4. At least one threshold product is available
 
 ---
 
-## Technical Considerations
+## Component Integration Points
 
-### Reduced Motion Compliance
-
-The current code triggers haptics without checking `prefersReducedMotion`. While haptics aren't technically "motion," users who prefer reduced motion often have sensory sensitivities that extend to vibration. We respect this preference.
-
-### Browser Compatibility
-
-- `'vibrate' in navigator` check handles unsupported browsers
-- Works on: Android Chrome, Firefox Mobile
-- Gracefully no-ops on: iOS Safari, Desktop browsers
-
-### Why `'vibrate' in navigator` Instead of `navigator.vibrate`?
-
-The property check is safer because:
-- `navigator.vibrate` can be `undefined` in some browsers
-- Property existence check prevents potential errors
-- Follows the existing pattern in `AddedToCartToast.tsx`
+| Component | Changes |
+|-----------|---------|
+| `src/components/cart/CartDrawer.tsx` | Replace `<SmartUpsell />` with new threshold-aware component |
+| `src/components/cart/SmartUpsell.tsx` | Complete rewrite with database query + multi-product grid |
+| `src/hooks/useCart.tsx` | Already exports needed values (no changes) |
+| `src/hooks/useQuickAdd.ts` | Already works with ProductForQuickAdd (no changes) |
 
 ---
 
-## Files to Modify
+## New Files to Create
 
-| File | Changes |
+| File | Purpose |
 |------|---------|
-| `src/components/cart/FreeShippingBar.tsx` | Update `celebrateMilestone` function to add tiered haptics with reduced motion check |
+| `src/hooks/useThresholdUpsells.ts` | Hook for fetching and scoring threshold products |
+| `src/components/cart/ThresholdUpsellCard.tsx` | Compact card with one-tap add functionality |
+| Database migration | `threshold_upsell_products` table |
 
 ---
 
-## Acceptance Criteria
+## Haptic Feedback Integration
 
-- [ ] 30ms haptic pulse triggers when 50% threshold is crossed (going up)
-- [ ] 50ms haptic pulse triggers when 100% threshold is crossed
-- [ ] No haptic triggers for 90% threshold
-- [ ] No haptics if `prefers-reduced-motion` is enabled
-- [ ] No JavaScript errors on devices without `navigator.vibrate`
-- [ ] Haptics only fire once per session (existing milestone tracking prevents re-fire)
-- [ ] Works on Android Chrome and Firefox Mobile
+Follows existing patterns:
+- **10ms pulse**: One-tap add (matches cart addItem pattern)
+- **50ms pulse**: Free shipping unlocked (triggers in FreeShippingBar)
 
 ---
 
-## Code Diff Preview
+## One-Tap Flow
 
-```diff
-  const celebrateMilestone = (tier: MilestoneType) => {
-    setActiveCelebration(tier);
-    setCelebratedMilestones(prev => new Set([...prev, tier]));
-    
--   // Haptic feedback only on unlock (subtle single pulse)
--   if (tier === 'unlocked' && navigator.vibrate) {
--     navigator.vibrate(50);
-+   // Tiered haptic feedback for milestone celebrations (mobile)
-+   // Skip haptics if user prefers reduced motion
-+   if (!prefersReducedMotion && 'vibrate' in navigator) {
-+     if (tier === 'halfway') {
-+       navigator.vibrate(30); // Lighter celebration pulse
-+     } else if (tier === 'unlocked') {
-+       navigator.vibrate(50); // Stronger achievement pulse
-+     }
-+     // No haptic for 'almost' — urgency messaging is sufficient
-    }
-    
-    // Clear celebration after animation completes
-    const duration = tier === 'unlocked' ? 2000 : 1500;
-    setTimeout(() => setActiveCelebration(null), duration);
-  };
+```text
+1. User sees "€23 away from free shipping"
+2. User sees Dad Hat suggestion: "€25 • Your size M • [+ Add M]"
+3. User taps amber "Add M" button
+4. Haptic pulse (10ms) → Check animation → Product added
+5. Progress bar animates to 100% → Haptic pulse (50ms)
+6. Message: "Free shipping unlocked 🎉"
 ```
 
 ---
 
-## Conversion Impact
+## Fallback Behavior
 
-| Metric | Expected Impact | Mechanism |
-|--------|-----------------|-----------|
-| Free shipping unlock rate | +5% | Gamification reinforcement creates goal commitment |
-| Average order value | +3% | Users add items specifically to hit thresholds |
-| User satisfaction | +8% | Multi-sensory feedback feels premium/native |
+| Scenario | Behavior |
+|----------|----------|
+| No threshold products in DB | Use existing mock products |
+| No products match gap | Show closest available product |
+| All suggestions in cart | Hide threshold upsell section |
+| User already has free shipping | Hide threshold upsell section entirely |
 
+---
+
+## Analytics Events
+
+| Event | Properties | Trigger |
+|-------|------------|---------|
+| `threshold_upsell_viewed` | `gap_amount`, `products_shown`, `primary_product_id` | Section visible |
+| `threshold_upsell_added` | `product_id`, `price`, `gap_before`, `unlocked_shipping` | Product added via threshold section |
+| `free_shipping_unlocked_via_upsell` | `product_id`, `total_upsell_value` | Threshold crossed after upsell add |
+
+---
+
+## Files to Modify/Create Summary
+
+### Create:
+1. `src/hooks/useThresholdUpsells.ts` - Fetch and score products
+2. `src/components/cart/ThresholdUpsellCard.tsx` - Compact product card
+3. Database migration for `threshold_upsell_products` table
+
+### Modify:
+1. `src/components/cart/SmartUpsell.tsx` - Complete rewrite with new logic
+2. `src/components/cart/CartDrawer.tsx` - Update import if component renamed
+
+---
+
+## Phase 2 Enhancements (Future)
+
+1. **Personalized suggestions**: Factor in recently viewed products
+2. **A/B test layouts**: Primary + grid vs. carousel
+3. **Dynamic pricing display**: Show "Save €8 on shipping!" when product > gap
+4. **Re-engagement**: If user removes item and drops below threshold, surface upsell with urgency
