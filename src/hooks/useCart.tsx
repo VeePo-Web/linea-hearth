@@ -17,6 +17,8 @@ export interface CartItem {
   productId?: string;
 }
 
+export type ShippingProgressTier = 'start' | 'halfway' | 'almost' | 'unlocked';
+
 interface CartContextType {
   items: CartItem[];
   addItem: (item: Omit<CartItem, 'quantity'> & { quantity?: number }) => void;
@@ -28,6 +30,8 @@ interface CartContextType {
   freeShippingThreshold: number;
   amountToFreeShipping: number;
   hasFreeShipping: boolean;
+  shippingProgress: number;
+  progressTier: ShippingProgressTier;
   isCartOpen: boolean;
   openCart: () => void;
   closeCart: () => void;
@@ -127,6 +131,11 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   const subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const amountToFreeShipping = Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal);
   const hasFreeShipping = subtotal >= FREE_SHIPPING_THRESHOLD;
+  const shippingProgress = Math.min((subtotal / FREE_SHIPPING_THRESHOLD) * 100, 100);
+  const progressTier: ShippingProgressTier = 
+    hasFreeShipping ? 'unlocked' :
+    shippingProgress >= 90 ? 'almost' :
+    shippingProgress >= 50 ? 'halfway' : 'start';
 
   return (
     <CartContext.Provider
@@ -141,6 +150,8 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         freeShippingThreshold: FREE_SHIPPING_THRESHOLD,
         amountToFreeShipping,
         hasFreeShipping,
+        shippingProgress,
+        progressTier,
         isCartOpen,
         openCart,
         closeCart,

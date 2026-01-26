@@ -1,73 +1,161 @@
-import { Truck, Sparkles } from "lucide-react";
+import { Truck } from "lucide-react";
 import { useCart } from "@/hooks/useCart";
-import { cn } from "@/lib/utils";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { DrawCheckIcon } from "@/components/ui/draw-check-icon";
+import { useReducedMotion } from "@/hooks/useReducedMotion";
+import { easing } from "@/lib/animations";
+
+type MilestoneType = 'halfway' | 'almost' | 'unlocked';
 
 const FreeShippingBar = () => {
-  const { subtotal, freeShippingThreshold, amountToFreeShipping, hasFreeShipping } = useCart();
-  const [showCelebration, setShowCelebration] = useState(false);
-  const [prevHasFreeShipping, setPrevHasFreeShipping] = useState(hasFreeShipping);
+  const { 
+    shippingProgress, 
+    progressTier, 
+    amountToFreeShipping, 
+    hasFreeShipping 
+  } = useCart();
+  
+  const prefersReducedMotion = useReducedMotion();
+  
+  // Milestone tracking state
+  const [celebratedMilestones, setCelebratedMilestones] = useState<Set<MilestoneType>>(new Set());
+  const [activeCelebration, setActiveCelebration] = useState<MilestoneType | null>(null);
+  const prevProgressRef = useRef(shippingProgress);
 
-  const progress = Math.min((subtotal / freeShippingThreshold) * 100, 100);
-
-  // Trigger celebration animation when threshold is reached
+  // Detect milestone crossings (only when progress increases)
   useEffect(() => {
-    if (hasFreeShipping && !prevHasFreeShipping) {
-      setShowCelebration(true);
-      const timer = setTimeout(() => setShowCelebration(false), 2000);
-      return () => clearTimeout(timer);
+    const prevProgress = prevProgressRef.current;
+    
+    // Only celebrate if crossing UP (not when removing items)
+    if (progressTier === 'halfway' && !celebratedMilestones.has('halfway') && prevProgress < 50 && shippingProgress >= 50) {
+      celebrateMilestone('halfway');
+    } else if (progressTier === 'almost' && !celebratedMilestones.has('almost') && prevProgress < 90 && shippingProgress >= 90) {
+      celebrateMilestone('almost');
+    } else if (progressTier === 'unlocked' && !celebratedMilestones.has('unlocked') && prevProgress < 100) {
+      celebrateMilestone('unlocked');
     }
-    setPrevHasFreeShipping(hasFreeShipping);
-  }, [hasFreeShipping, prevHasFreeShipping]);
+    
+    prevProgressRef.current = shippingProgress;
+  }, [shippingProgress, progressTier, celebratedMilestones]);
+
+  const celebrateMilestone = (tier: MilestoneType) => {
+    setActiveCelebration(tier);
+    setCelebratedMilestones(prev => new Set([...prev, tier]));
+    
+    // Haptic feedback only on unlock (subtle single pulse)
+    if (tier === 'unlocked' && navigator.vibrate) {
+      navigator.vibrate(50);
+    }
+    
+    // Clear celebration after animation completes
+    const duration = tier === 'unlocked' ? 2000 : 1500;
+    setTimeout(() => setActiveCelebration(null), duration);
+  };
+
+  // Determine progress bar gradient based on tier
+  const getProgressGradient = () => {
+    if (hasFreeShipping) {
+      return 'linear-gradient(90deg, hsl(var(--primary)), hsl(var(--primary)))';
+    }
+    if (shippingProgress >= 90) {
+      return 'linear-gradient(90deg, hsl(38, 92%, 50%), hsl(43, 96%, 56%))';
+    }
+    return 'linear-gradient(90deg, hsl(32, 95%, 44%), hsl(38, 92%, 50%))';
+  };
+
+  // Message key for AnimatePresence - changes when tier or celebration changes
+  const getMessageKey = () => {
+    if (activeCelebration === 'halfway') return 'halfway-celebration';
+    return progressTier;
+  };
 
   return (
     <div className="px-6 py-4 border-b border-border bg-muted/30">
-      {/* Progress bar container */}
+      {/* Progress bar container with milestone markers */}
       <div className="relative h-2 bg-muted rounded-full overflow-hidden mb-3">
-        {/* Animated fill */}
-        <div
-          className={cn(
-            "absolute inset-y-0 left-0 rounded-full transition-all duration-500 ease-out",
-            hasFreeShipping 
-              ? "bg-gradient-to-r from-emerald-500 to-emerald-400" 
-              : "bg-gradient-to-r from-amber-500 to-amber-400"
-          )}
-          style={{ width: `${progress}%` }}
+        {/* Milestone markers at 50% and 90% */}
+        <div 
+          className="absolute top-1/2 -translate-y-1/2 left-[50%] w-1 h-1 rounded-full bg-border/60 z-10" 
+          style={{ transform: 'translate(-50%, -50%)' }}
+        />
+        <div 
+          className="absolute top-1/2 -translate-y-1/2 left-[90%] w-1 h-1 rounded-full bg-border/60 z-10" 
+          style={{ transform: 'translate(-50%, -50%)' }}
         />
         
-        {/* Shimmer effect on progress */}
-        {!hasFreeShipping && progress > 0 && (
-          <div 
-            className="absolute inset-y-0 left-0 w-full bg-gradient-to-r from-transparent via-white/30 to-transparent animate-pulse"
-            style={{ width: `${progress}%` }}
-          />
-        )}
+        {/* Animated fill with color temperature transition */}
+        <motion.div
+          className="absolute inset-y-0 left-0 rounded-full"
+          style={{ background: getProgressGradient() }}
+          initial={false}
+          animate={{ width: `${shippingProgress}%` }}
+          transition={{ 
+            duration: prefersReducedMotion ? 0 : 0.6, 
+            ease: easing.editorial 
+          }}
+        />
+        
+        {/* Celebration glow overlay */}
+        <AnimatePresence>
+          {activeCelebration && !prefersReducedMotion && (
+            <motion.div
+              className="absolute inset-0 rounded-full pointer-events-none"
+              initial={{ opacity: 0.4 }}
+              animate={{ opacity: 0 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.8 }}
+              style={{
+                background: activeCelebration === 'unlocked' 
+                  ? 'hsl(var(--primary) / 0.3)' 
+                  : 'hsl(38, 92%, 50%, 0.2)',
+                filter: 'blur(4px)',
+                width: `${shippingProgress}%`,
+              }}
+            />
+          )}
+        </AnimatePresence>
       </div>
 
-      {/* Text + icon */}
-      <div className="flex items-center justify-center gap-2 text-sm">
-        {hasFreeShipping ? (
-          <>
-            <div className={cn(
-              "flex items-center gap-2",
-              showCelebration && "animate-bounce"
-            )}>
-              {showCelebration && <Sparkles className="h-4 w-4 text-amber-500" />}
-              <DrawCheckIcon size="sm" className="text-emerald-500" delay={0} />
-              <span className="font-medium text-emerald-600">Free shipping unlocked!</span>
-              {showCelebration && <Sparkles className="h-4 w-4 text-amber-500" />}
+      {/* Text messaging with crossfade */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={getMessageKey()}
+          initial={prefersReducedMotion ? false : { opacity: 0, y: 4 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={prefersReducedMotion ? undefined : { opacity: 0, y: -4 }}
+          transition={{ 
+            duration: prefersReducedMotion ? 0 : 0.25,
+            ease: easing.smooth
+          }}
+          className="flex items-center justify-center gap-2 text-sm"
+        >
+          {hasFreeShipping ? (
+            <div className="flex items-center gap-2">
+              <DrawCheckIcon size="sm" className="text-primary" delay={0} />
+              <span className="font-medium text-primary">Free shipping unlocked</span>
             </div>
-          </>
-        ) : (
-          <>
-            <Truck className="h-4 w-4 text-muted-foreground" />
-            <span className="text-muted-foreground">
-              You're <span className="font-medium text-foreground">€{amountToFreeShipping.toFixed(0)}</span> away from FREE shipping
+          ) : shippingProgress >= 90 ? (
+            <>
+              <Truck className="h-4 w-4 text-amber-500" />
+              <span className="text-muted-foreground">
+                Almost there—<span className="font-medium text-amber-600">€{amountToFreeShipping.toFixed(0)}</span> more
+              </span>
+            </>
+          ) : activeCelebration === 'halfway' ? (
+            <span className="font-medium text-foreground">
+              Halfway there
             </span>
-          </>
-        )}
-      </div>
+          ) : (
+            <>
+              <Truck className="h-4 w-4 text-muted-foreground" />
+              <span className="text-muted-foreground">
+                You're <span className="font-medium text-foreground">€{amountToFreeShipping.toFixed(0)}</span> away from FREE shipping
+              </span>
+            </>
+          )}
+        </motion.div>
+      </AnimatePresence>
     </div>
   );
 };
