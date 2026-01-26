@@ -6,6 +6,8 @@ import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { DrawCheckIcon } from "@/components/ui/draw-check-icon";
+import { useEmailTypoDetection } from "@/hooks/useEmailTypoDetection";
+import EmailTypoSuggestion from "@/components/ui/EmailTypoSuggestion";
 
 const emailSchema = z.string().email("Please enter a valid email address");
 
@@ -23,6 +25,12 @@ const EmailOptIn = ({ variant = "default" }: EmailOptInProps) => {
   const ref = useRef<HTMLElement>(null);
   const isInView = useInView(ref, { once: true, amount: 0.3 });
   const prefersReducedMotion = useReducedMotion();
+  
+  // Email typo detection
+  const emailTypo = useEmailTypoDetection({
+    initialEmail: email,
+    onSuggestionAccepted: (correctedEmail) => setEmail(correctedEmail),
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -236,14 +244,27 @@ const EmailOptIn = ({ variant = "default" }: EmailOptInProps) => {
                     id="newsletter-email"
                     type="email"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      emailTypo.setEmail(e.target.value);
+                    }}
                     onFocus={() => setIsFocused(true)}
-                    onBlur={() => setIsFocused(false)}
+                    onBlur={() => {
+                      setIsFocused(false);
+                      emailTypo.checkForTypos(email);
+                    }}
                     className={`w-full bg-transparent border-0 border-b-2 py-2 text-lg text-background placeholder-transparent focus:outline-none transition-colors duration-300 ${
                       isFocused ? "border-amber-400" : "border-background/30"
                     }`}
                     placeholder="your@email.com"
                     disabled={isLoading}
+                  />
+                  <EmailTypoSuggestion
+                    suggestion={emailTypo.suggestion || ''}
+                    show={emailTypo.showSuggestion}
+                    onAccept={emailTypo.acceptSuggestion}
+                    onDismiss={emailTypo.dismissSuggestion}
+                    variant="compact"
                   />
                   {error && (
                     <motion.p

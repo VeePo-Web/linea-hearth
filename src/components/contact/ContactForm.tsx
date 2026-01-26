@@ -16,6 +16,8 @@ import { Send, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import DrawCheckIcon from "@/components/ui/draw-check-icon";
+import { useEmailTypoDetection } from "@/hooks/useEmailTypoDetection";
+import EmailTypoSuggestion from "@/components/ui/EmailTypoSuggestion";
 
 const inquiryTypes = [
   { value: "general", label: "General Question" },
@@ -40,6 +42,12 @@ const ContactForm = () => {
   
   const { toast } = useToast();
   const prefersReducedMotion = useReducedMotion();
+  
+  // Email typo detection
+  const emailTypo = useEmailTypoDetection({
+    initialEmail: email,
+    onSuggestionAccepted: (correctedEmail) => setEmail(correctedEmail),
+  });
   
   const showOrderField = ["order-status", "returns"].includes(inquiryType);
   
@@ -111,10 +119,21 @@ const ContactForm = () => {
             id="email"
             type="email"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              emailTypo.setEmail(e.target.value);
+            }}
+            onBlur={() => emailTypo.checkForTypos(email)}
             required
             placeholder="you@example.com"
             className="h-12"
+          />
+          <EmailTypoSuggestion
+            suggestion={emailTypo.suggestion || ''}
+            show={emailTypo.showSuggestion}
+            onAccept={emailTypo.acceptSuggestion}
+            onDismiss={emailTypo.dismissSuggestion}
+            variant="compact"
           />
         </div>
       </div>

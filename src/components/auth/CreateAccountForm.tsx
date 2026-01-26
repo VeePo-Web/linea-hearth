@@ -10,6 +10,8 @@ import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import GoogleAuthButton from './GoogleAuthButton';
 import AuthDivider from './AuthDivider';
+import { useEmailTypoDetection } from '@/hooks/useEmailTypoDetection';
+import EmailTypoSuggestion from '@/components/ui/EmailTypoSuggestion';
 
 const createAccountSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -35,12 +37,20 @@ export default function CreateAccountForm({ onSuccess, onSwitchToSignIn }: Creat
     formState: { errors },
     setError,
     watch,
+    setValue,
   } = useForm<CreateAccountFormData>({
     resolver: zodResolver(createAccountSchema),
   });
 
   const password = watch('password', '');
+  const emailValue = watch('email', '');
   const isPasswordValid = password.length >= 6;
+  
+  // Email typo detection
+  const emailTypo = useEmailTypoDetection({
+    initialEmail: emailValue,
+    onSuggestionAccepted: (correctedEmail) => setValue('email', correctedEmail),
+  });
 
   const onSubmit = async (data: CreateAccountFormData) => {
     setIsLoading(true);
@@ -111,7 +121,17 @@ export default function CreateAccountForm({ onSuccess, onSwitchToSignIn }: Creat
           className={`h-12 bg-background border-border focus:border-foreground transition-colors ${
             errors.email ? 'border-destructive' : ''
           }`}
-          {...register('email')}
+          {...register('email', {
+            onBlur: () => emailTypo.checkForTypos(emailValue),
+            onChange: (e) => emailTypo.setEmail(e.target.value),
+          })}
+        />
+        <EmailTypoSuggestion
+          suggestion={emailTypo.suggestion || ''}
+          show={emailTypo.showSuggestion}
+          onAccept={emailTypo.acceptSuggestion}
+          onDismiss={emailTypo.dismissSuggestion}
+          variant="compact"
         />
         {errors.email && (
           <p className="text-sm text-destructive">{errors.email.message}</p>
