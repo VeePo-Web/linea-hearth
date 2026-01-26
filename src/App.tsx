@@ -8,6 +8,7 @@ import { AuthProvider } from "@/hooks/useAuth";
 import { CartProvider } from "@/hooks/useCart";
 import { SizeQuizProvider } from "@/contexts/SizeQuizContext";
 import { RecentlyViewedProvider } from "@/contexts/RecentlyViewedContext";
+import { StripeProvider } from "@/components/checkout/StripeProvider";
 import ScrollToTop from "./components/ScrollToTop";
 import PageTransition from "./components/motion/PageTransition";
 import Index from "./pages/Index";
@@ -105,14 +106,16 @@ const App = () => (
       <CartProvider>
         <RecentlyViewedProvider>
           <SizeQuizProvider>
-            <TooltipProvider>
-              <Toaster />
-              <Sonner />
-              <BrowserRouter>
-                <ScrollToTop />
-                <AnimatedRoutes />
-              </BrowserRouter>
-            </TooltipProvider>
+            <StripeProvider>
+              <TooltipProvider>
+                <Toaster />
+                <Sonner />
+                <BrowserRouter>
+                  <ScrollToTop />
+                  <AnimatedRoutes />
+                </BrowserRouter>
+              </TooltipProvider>
+            </StripeProvider>
           </SizeQuizProvider>
         </RecentlyViewedProvider>
       </CartProvider>
