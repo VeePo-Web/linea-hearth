@@ -455,21 +455,27 @@ export type Database = {
       }
       favorites: {
         Row: {
+          cart_context: Json | null
           created_at: string
           id: string
           product_id: string
+          saved_from_cart: boolean | null
           user_id: string
         }
         Insert: {
+          cart_context?: Json | null
           created_at?: string
           id?: string
           product_id: string
+          saved_from_cart?: boolean | null
           user_id: string
         }
         Update: {
+          cart_context?: Json | null
           created_at?: string
           id?: string
           product_id?: string
+          saved_from_cart?: boolean | null
           user_id?: string
         }
         Relationships: [
