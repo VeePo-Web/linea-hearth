@@ -33,8 +33,11 @@ const SizeSelector = ({
 }: SizeSelectorProps) => {
   const [sizeGuideOpen, setSizeGuideOpen] = useState(false);
   const [hasAutoSelected, setHasAutoSelected] = useState(false);
-  const { getRememberedSize, rememberSize } = useSizeMemory();
+  const { getRememberedSize, rememberSize, getSizeConfidence } = useSizeMemory();
   const { toast } = useToast();
+  
+  // Get confidence for category
+  const confidenceForCategory = categorySlug ? getSizeConfidence(categorySlug) : null;
 
   const rememberedSize = categorySlug ? getRememberedSize(categorySlug) : null;
 
@@ -187,11 +190,18 @@ const SizeSelector = ({
               
               {/* "Your size" badge for remembered size */}
               {isRemembered && stock > 0 && (
-                <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 text-[8px] 
-                                 uppercase tracking-wider bg-amber-500 text-white px-1.5 py-0.5 
-                                 rounded-full whitespace-nowrap font-medium">
-                  Your size
-                </span>
+                <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 flex flex-col items-center">
+                  <span className="text-[8px] uppercase tracking-wider bg-amber-500 text-white px-1.5 py-0.5 
+                                   rounded-full whitespace-nowrap font-medium">
+                    Your size
+                  </span>
+                  {/* Confidence indicator */}
+                  {confidenceForCategory && confidenceForCategory >= 50 && (
+                    <span className="text-[7px] text-muted-foreground mt-0.5 whitespace-nowrap">
+                      {Math.round(confidenceForCategory)}% fit
+                    </span>
+                  )}
+                </div>
               )}
               
               {/* Low stock indicator */}

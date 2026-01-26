@@ -89,6 +89,10 @@ interface QuickAddFeedback {
   addedColor: string | null;
   /** Whether the size picker is visible */
   isPickerOpen: boolean;
+  /** Confidence percentage for remembered size */
+  confidenceForRemembered: number | null;
+  /** Human-readable confidence message */
+  confidenceMessage: string | null;
 }
 
 export type UseQuickAddReturn = QuickAddState & QuickAddActions & QuickAddFeedback;
@@ -126,7 +130,7 @@ export function useQuickAdd(
   const { categoryOverride, onSuccess, showToast = true } = options;
   
   const { addItem, items } = useCart();
-  const { getRememberedSize, rememberSize } = useSizeMemory();
+  const { getRememberedSize, rememberSize, getSizeConfidence, getSizeConfidenceMessage } = useSizeMemory();
   const { toast } = useToast();
 
   // UI state
@@ -360,6 +364,16 @@ export function useQuickAdd(
   const showSizePicker = useCallback(() => setIsPickerOpen(true), []);
   const hideSizePicker = useCallback(() => setIsPickerOpen(false), []);
 
+  // Confidence for remembered size
+  const confidenceForRemembered = useMemo(() => {
+    if (!rememberedSize) return null;
+    return getSizeConfidence(categorySlug);
+  }, [rememberedSize, getSizeConfidence, categorySlug]);
+
+  const confidenceMessage = useMemo(() => {
+    return getSizeConfidenceMessage(categorySlug);
+  }, [getSizeConfidenceMessage, categorySlug]);
+
   return {
     // State
     canOneTap,
@@ -388,6 +402,10 @@ export function useQuickAdd(
     addedSize,
     addedColor,
     isPickerOpen,
+    
+    // Confidence
+    confidenceForRemembered,
+    confidenceMessage,
   };
 }
 
