@@ -1185,6 +1185,47 @@ export type Database = {
         }
         Relationships: []
       }
+      threshold_upsell_products: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          max_threshold_gap: number | null
+          min_threshold_gap: number | null
+          priority: number | null
+          product_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          max_threshold_gap?: number | null
+          min_threshold_gap?: number | null
+          priority?: number | null
+          product_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          max_threshold_gap?: number | null
+          min_threshold_gap?: number | null
+          priority?: number | null
+          product_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "threshold_upsell_products_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: true
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       try_on_avatars: {
         Row: {
           body_type: string
