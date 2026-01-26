@@ -7,6 +7,7 @@ interface ShowAddedToastOptions {
   size?: string;
   color?: string;
   duration?: number;
+  onViewCart?: () => void;
 }
 
 /**
@@ -19,6 +20,7 @@ export function showAddedToast({
   size,
   color,
   duration = 2500,
+  onViewCart,
 }: ShowAddedToastOptions): string | number {
   return toast.custom(
     (t) => (
@@ -28,6 +30,7 @@ export function showAddedToast({
         size={size}
         color={color}
         toastId={t}
+        onViewCart={onViewCart}
       />
     ),
     {
