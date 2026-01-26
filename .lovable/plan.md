@@ -1,333 +1,239 @@
 
-# Smart Free Shipping Threshold Upsell System - Implementation Plan
 
-## Overview
+# Hero Text Rendering Fix - Comprehensive Plan
 
-Build an intelligent product suggestion engine that automatically recommends low-priced items (accessories, hats, stickers) specifically priced to help users reach the €150 free shipping threshold. The system features **one-click add-to-cart** with size memory integration, creating a frictionless path to unlocking free shipping.
+## Problem Diagnosis
+
+Based on my analysis, the text appearing "messed up and behind itself" on your Mac screen is caused by a combination of three interacting issues:
+
+### Root Cause #1: 3D Transform Without Perspective Context
+The `CharacterReveal` component uses `rotateX: -60` (a 3D rotation) but lacks a `perspective` property on the parent container. On Mac Retina displays, WebKit (Safari) and Chrome render 3D transforms differently when perspective is undefined—characters can literally appear to rotate "behind" each other.
+
+### Root Cause #2: Aggressive Typography + Transform Collision
+The hero text uses:
+- `tracking-[-0.04em]` (negative letter spacing)
+- `leading-[0.85]` (tight line height)
+- Each character wrapped in `display: inline-block` with individual transforms
+
+When characters are mid-animation with different delays, some are at `y: 40` and `rotateX: -60` while others are at `y: 0` and `rotateX: 0`. Combined with negative letter spacing, they visually overlap and appear "behind themselves."
+
+### Root Cause #3: Missing Transform Style Declaration
+The animated character spans don't declare `transform-style: preserve-3d`, causing Safari/Mac to flatten the 3D space and stack characters incorrectly during animation.
+
+### Console Warning Clue
+The Framer Motion warning about "non-static position" on containers confirms the scroll-linked animations are measuring incorrectly, which can compound rendering issues.
 
 ---
 
-## TEMU Conversion Psychology
+## The Fix Strategy
 
-**Why this matters:**
-- **Threshold anxiety**: Users hate paying €8 shipping when they're €20 away from free
-- **Decision fatigue reduction**: "Here's exactly what you need" vs "browse accessories"
-- **One-tap friction physics**: Every tap saved = 3% conversion lift
-- **Price anchoring**: A €25 hat to save €8 shipping = perceived €17 gain
-- **Gamification completion**: Progress bar goes 100% → dopamine hit
+**Swedish Design Principle Applied**: Restraint over decoration—simplify the 3D effect while preserving the editorial drama.
 
-**Expected Impact:**
-| Metric | Expected Lift | Mechanism |
-|--------|---------------|-----------|
-| Free shipping unlock rate | +15-25% | Targeted threshold-gap products |
-| Average order value | +€18-30 | Strategic add-on suggestions |
-| Cart-to-checkout rate | +5% | Friction elimination via one-tap |
+**032c/DAZED Reference**: These magazines use bold type reveals but keep them 2D on screen; the "drama" comes from timing, not geometry.
+
+### Fix Overview
+
+| Issue | Fix | Impact |
+|-------|-----|--------|
+| Missing perspective | Add `perspective: 1000px` to parent | Characters render in proper 3D space |
+| Missing transform-style | Add `transform-style: preserve-3d` | 3D hierarchy maintained during animation |
+| Aggressive rotateX | Reduce from -60 to -15 degrees | Less dramatic, but stable across browsers |
+| Character stacking | Add `will-change: transform` | GPU layer hint for smoother rendering |
+| No backface control | Add `backface-visibility: hidden` | Prevents "seeing through" flipped characters |
 
 ---
 
-## System Architecture
+## Implementation Details
+
+### File 1: `src/components/motion/CharacterReveal.tsx`
+
+**Current Code (problematic):**
+```tsx
+<motion.span
+  style={{
+    display: "inline-block",
+    whiteSpace: char === " " ? "pre" : "normal",
+  }}
+  variants={{
+    hidden: {
+      opacity: 0,
+      y: 40,
+      rotateX: -60,  // ← Too aggressive
+    },
+    visible: {
+      opacity: 1,
+      y: 0,
+      rotateX: 0,
+      // ...
+    },
+  }}
+>
+```
+
+**Fixed Code:**
+1. Add `perspective: 1000px` and `transformStyle: "preserve-3d"` to the parent wrapper
+2. Reduce `rotateX` from `-60` to `-15` (still dramatic, but browser-stable)
+3. Add `willChange: "transform, opacity"` for GPU optimization
+4. Add `backfaceVisibility: "hidden"` to prevent character "bleed-through"
+
+**Specific Changes:**
+
+```tsx
+// Line 34-38: Add perspective to parent wrapper
+<motion.span
+  ref={ref}
+  style={{ 
+    display: "inline-block",
+    perspective: "1000px",  // NEW: 3D rendering context
+    transformStyle: "preserve-3d",  // NEW: maintain 3D hierarchy
+  }}
+  initial="hidden"
+  animate={isInView ? "visible" : "hidden"}
+>
+
+// Line 41-67: Update character span styles and variants
+{characters.map((char, index) => (
+  <motion.span
+    key={index}
+    style={{
+      display: "inline-block",
+      whiteSpace: char === " " ? "pre" : "normal",
+      willChange: "transform, opacity",  // NEW: GPU hint
+      backfaceVisibility: "hidden",  // NEW: prevent bleed-through
+    }}
+    variants={{
+      hidden: {
+        opacity: 0,
+        y: 30,        // REDUCED from 40
+        rotateX: -15, // REDUCED from -60 (major fix)
+      },
+      visible: {
+        opacity: 1,
+        y: 0,
+        rotateX: 0,
+        transition: {
+          type: "spring",
+          stiffness: 120,  // Slightly increased for snappier feel
+          damping: 14,     // Slightly increased for less bounce
+          delay: delay + index * staggerDelay,
+        },
+      },
+    }}
+  >
+    {char}
+  </motion.span>
+))}
+```
+
+---
+
+### File 2: `src/components/homepage/EditorialHero.tsx`
+
+**Issue**: The content container uses `useTransform` for opacity but the parent section doesn't have `position: relative` explicitly set (Tailwind's `relative` is there, but the Framer warning suggests measurement issues).
+
+**Fix**: Add explicit positioning context for scroll measurement.
+
+```tsx
+// Line 25-28: Ensure container has position for scroll calculation
+<section 
+  ref={containerRef}
+  className="relative w-full min-h-screen bg-foreground overflow-hidden hero-noise group"
+  style={{ position: "relative" }}  // Explicit fallback for Framer scroll tracking
+>
+```
+
+---
+
+### File 3: `src/index.css`
+
+**Typography Breathing Room Adjustment**
+
+The `text-hero-massive` class is currently:
+```css
+.text-hero-massive {
+  @apply text-[18vw] md:text-[14vw] lg:text-[12vw] font-extralight tracking-[-0.04em] leading-[0.85];
+}
+```
+
+**Adjustment for Mac rendering stability:**
+```css
+.text-hero-massive {
+  @apply text-[18vw] md:text-[14vw] lg:text-[12vw] font-extralight tracking-[-0.02em] leading-[0.88];
+  /* Slightly looser letter-spacing (-0.02 vs -0.04) and line-height (0.88 vs 0.85) */
+  /* Still tight and editorial, but gives characters room during animation */
+  transform-style: preserve-3d;  /* CSS fallback for 3D context */
+  -webkit-font-smoothing: antialiased;  /* Consistent Mac text rendering */
+}
+
+.text-hero-massive-mobile {
+  @apply text-[22vw] font-extralight tracking-[-0.02em] leading-[0.85];
+  transform-style: preserve-3d;
+  -webkit-font-smoothing: antialiased;
+}
+```
+
+---
+
+## Visual Comparison: Before vs After
 
 ```text
-┌─────────────────────────────────────────────────────────────────┐
-│                    FREE SHIPPING BAR                           │
-│  "You're €23 away from FREE shipping"                          │
-│  ████████████████████░░░░░░░░░  85%                            │
-└─────────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────────┐
-│              SMART THRESHOLD UPSELL SECTION                    │
-│  "Unlock free shipping with one tap"                           │
-│                                                                 │
-│  ┌──────────────────────────────────────────────────────────┐  │
-│  │  [IMG] Dad Hat - €25        [+ Add M] ← One-tap (amber)  │  │
-│  │        + Unlocks free shipping!                          │  │
-│  └──────────────────────────────────────────────────────────┘  │
-│                                                                 │
-│  ┌────────────┐  ┌────────────┐  ┌────────────┐                │
-│  │ Sticker €5 │  │ Socks €15  │  │ Beanie €20 │  ← Alternatives │
-│  │   [+Add]   │  │  [+Add M]  │  │  [+Add M]  │                │
-│  └────────────┘  └────────────┘  └────────────┘                │
-└─────────────────────────────────────────────────────────────────┘
+BEFORE (problematic):
+┌────────────────────────────────────────────────┐
+│   W E A R                                      │
+│  ▒▒▒A▒R▒                   ← Characters        │
+│   (characters "behind" each other)             │
+│                                                │
+│   Y O U R                                      │
+│  ▒O▒U▒R▒                   ← Text "ghosting"   │
+│                                                │
+│   F A I T H .                                  │
+└────────────────────────────────────────────────┘
+
+AFTER (fixed):
+┌────────────────────────────────────────────────┐
+│   W E A R                                      │
+│                            ← Clean reveal      │
+│                                                │
+│           Y O U R                              │
+│                            ← Offset intact     │
+│                                                │
+│   F A I T H .              ← Accent color      │
+└────────────────────────────────────────────────┘
 ```
 
 ---
 
-## Technical Implementation
+## Files to Modify Summary
 
-### 1. Database: Threshold Upsell Products Table
-
-Create a dedicated table for tracking products eligible for threshold upsells:
-
-```sql
--- Track which products are good for threshold upsells
-CREATE TABLE threshold_upsell_products (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  product_id uuid REFERENCES products(id) ON DELETE CASCADE NOT NULL,
-  priority integer DEFAULT 0,  -- Higher = shown first
-  min_threshold_gap numeric,   -- Show when gap is >= this (e.g., €5)
-  max_threshold_gap numeric,   -- Show when gap is <= this (e.g., €30)
-  is_active boolean DEFAULT true,
-  created_at timestamptz DEFAULT now(),
-  updated_at timestamptz DEFAULT now()
-);
-
--- Index for efficient querying
-CREATE INDEX idx_threshold_upsell_active ON threshold_upsell_products (is_active, priority DESC);
-
--- RLS: Public read, admin write
-ALTER TABLE threshold_upsell_products ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Anyone can view active threshold upsells" ON threshold_upsell_products
-FOR SELECT USING (is_active = true);
-
-CREATE POLICY "Admins can manage threshold upsells" ON threshold_upsell_products
-FOR ALL USING (has_role(auth.uid(), 'admin'));
-```
-
-### 2. New Hook: useThresholdUpsells
-
-```typescript
-// src/hooks/useThresholdUpsells.ts
-
-interface ThresholdProduct {
-  id: string;
-  name: string;
-  slug: string;
-  price: number;
-  sale_price: number | null;
-  is_on_sale: boolean;
-  category_slug: string;
-  product_images: Array<{ image_url: string; is_primary: boolean }>;
-  product_variants: Array<{ size: string | null; color: string | null; stock_quantity: number }>;
-  // Computed
-  willUnlockShipping: boolean;      // True if price >= amountToFreeShipping
-  gapMatch: 'exact' | 'close' | 'over';  // How well it matches the gap
-}
-
-interface UseThresholdUpsellsReturn {
-  // Primary recommendation (best match for gap)
-  primaryProduct: ThresholdProduct | null;
-  
-  // Alternative suggestions (2-3 more options)
-  alternatives: ThresholdProduct[];
-  
-  // State
-  isLoading: boolean;
-  
-  // Context
-  amountToFreeShipping: number;
-  hasFreeShipping: boolean;
-}
-```
-
-**Logic:**
-1. Query products priced between `amountToFreeShipping - 10` and `amountToFreeShipping + 50`
-2. Prioritize products that exactly or closely match the gap
-3. Exclude products already in cart
-4. Sort by: exact match → close match → accessories → hats → lower price variance
-5. Limit to 4 products (1 primary + 3 alternatives)
-
-### 3. Enhanced SmartUpsell Component
-
-Upgrade the existing `SmartUpsell.tsx` to become a "Threshold-Aware Upsell Engine":
-
-```text
-Current State:
-- Uses hardcoded mock products
-- Basic price matching logic
-- Single product display
-
-Upgraded State:
-- Fetches real products from database
-- Smart price-gap matching algorithm
-- Shows 1 primary + 3 scrollable alternatives
-- All use useQuickAdd for one-tap functionality
-- Tracks which products actually unlock shipping
-```
-
-**Visual Sections:**
-
-**A. Primary Upsell (when close to threshold):**
-```
-┌─────────────────────────────────────────────────┐
-│ "Unlock free shipping with one tap"             │
-│ ┌─────┐ Dad Hat                    [+ Add M]    │
-│ │ IMG │ €25  • Your size M                      │
-│ └─────┘ + Unlocks free shipping!                │
-└─────────────────────────────────────────────────┘
-```
-
-**B. Alternative Grid (horizontal scroll on mobile):**
-```
-┌──────────────────────────────────────────────────────────┐
-│ Or try these:                                            │
-│ ┌────────┐ ┌────────┐ ┌────────┐                        │
-│ │ [IMG]  │ │ [IMG]  │ │ [IMG]  │  ← Scroll →            │
-│ │Sticker │ │ Socks  │ │ Beanie │                        │
-│ │  €5    │ │  €15   │ │  €20   │                        │
-│ │ [+Add] │ │[+Add M]│ │[+Add M]│                        │
-│ └────────┘ └────────┘ └────────┘                        │
-└──────────────────────────────────────────────────────────┘
-```
-
-### 4. ThresholdUpsellCard Component
-
-New compact card component optimized for threshold suggestions:
-
-```typescript
-// src/components/cart/ThresholdUpsellCard.tsx
-
-interface ThresholdUpsellCardProps {
-  product: ThresholdProduct;
-  variant: 'primary' | 'compact';  // Primary = full details, compact = grid item
-  willUnlockShipping: boolean;
-}
-```
-
-**Features:**
-- Integrates with `useQuickAdd` for one-tap functionality
-- Shows remembered size badge (amber color)
-- "Unlocks free shipping!" badge when applicable
-- Inline size picker if no remembered size
-- Success animation (check overlay) on add
-- Haptic feedback (10ms) on tap
-
-### 5. Query Logic for Smart Product Selection
-
-```typescript
-// Product selection algorithm
-function selectThresholdProducts(
-  allProducts: Product[],
-  cartItems: CartItem[],
-  amountToFreeShipping: number
-): ThresholdProduct[] {
-  const cartIds = new Set(cartItems.map(i => i.id));
-  
-  // Filter: in stock, not in cart, priced appropriately
-  const candidates = allProducts.filter(p => {
-    const inCart = cartIds.has(productIdToCartId(p.id));
-    const hasStock = p.product_variants?.some(v => v.stock_quantity > 0);
-    const priceMatch = p.price >= amountToFreeShipping * 0.5 && 
-                       p.price <= amountToFreeShipping + 50;
-    return !inCart && hasStock && priceMatch;
-  });
-  
-  // Score and sort
-  const scored = candidates.map(p => ({
-    ...p,
-    willUnlock: p.price >= amountToFreeShipping,
-    gapDelta: Math.abs(p.price - amountToFreeShipping),
-    // Prioritize accessories for impulse buys
-    categoryBonus: ['hats', 'accessories', 'socks', 'stickers'].includes(p.category_slug) ? 10 : 0,
-  }));
-  
-  // Sort: exact matches first, then close, then by category bonus
-  scored.sort((a, b) => {
-    // Prefer products that unlock shipping
-    if (a.willUnlock && !b.willUnlock) return -1;
-    if (!a.willUnlock && b.willUnlock) return 1;
-    
-    // Then by gap closeness
-    if (a.gapDelta !== b.gapDelta) return a.gapDelta - b.gapDelta;
-    
-    // Then by category bonus
-    return b.categoryBonus - a.categoryBonus;
-  });
-  
-  return scored.slice(0, 4);
-}
-```
-
-### 6. Display Conditions
-
-The threshold upsell section appears when:
-1. Cart has items (`items.length > 0`)
-2. Free shipping NOT yet unlocked (`!hasFreeShipping`)
-3. User is "within reach" (`shippingProgress >= 50%` OR `amountToFreeShipping <= 75`)
-4. At least one threshold product is available
-
----
-
-## Component Integration Points
-
-| Component | Changes |
-|-----------|---------|
-| `src/components/cart/CartDrawer.tsx` | Replace `<SmartUpsell />` with new threshold-aware component |
-| `src/components/cart/SmartUpsell.tsx` | Complete rewrite with database query + multi-product grid |
-| `src/hooks/useCart.tsx` | Already exports needed values (no changes) |
-| `src/hooks/useQuickAdd.ts` | Already works with ProductForQuickAdd (no changes) |
-
----
-
-## New Files to Create
-
-| File | Purpose |
+| File | Changes |
 |------|---------|
-| `src/hooks/useThresholdUpsells.ts` | Hook for fetching and scoring threshold products |
-| `src/components/cart/ThresholdUpsellCard.tsx` | Compact card with one-tap add functionality |
-| Database migration | `threshold_upsell_products` table |
+| `src/components/motion/CharacterReveal.tsx` | Add perspective, reduce rotateX, add will-change, add backface-visibility |
+| `src/components/homepage/EditorialHero.tsx` | Add explicit position style for scroll measurement |
+| `src/index.css` | Loosen letter-spacing slightly, add transform-style and font-smoothing |
 
 ---
 
-## Haptic Feedback Integration
+## Acceptance Criteria
 
-Follows existing patterns:
-- **10ms pulse**: One-tap add (matches cart addItem pattern)
-- **50ms pulse**: Free shipping unlocked (triggers in FreeShippingBar)
-
----
-
-## One-Tap Flow
-
-```text
-1. User sees "€23 away from free shipping"
-2. User sees Dad Hat suggestion: "€25 • Your size M • [+ Add M]"
-3. User taps amber "Add M" button
-4. Haptic pulse (10ms) → Check animation → Product added
-5. Progress bar animates to 100% → Haptic pulse (50ms)
-6. Message: "Free shipping unlocked 🎉"
-```
+- [ ] Hero text "WEAR YOUR FAITH." renders cleanly on Mac Safari
+- [ ] Hero text "WEAR YOUR FAITH." renders cleanly on Mac Chrome
+- [ ] Character reveal animation still has editorial drama
+- [ ] No visual regression on Windows/PC browsers
+- [ ] Console warning about "non-static position" is resolved
+- [ ] Animation respects `prefers-reduced-motion` (already implemented)
 
 ---
 
-## Fallback Behavior
+## Performance Impact
 
-| Scenario | Behavior |
-|----------|----------|
-| No threshold products in DB | Use existing mock products |
-| No products match gap | Show closest available product |
-| All suggestions in cart | Hide threshold upsell section |
-| User already has free shipping | Hide threshold upsell section entirely |
+- **Zero new dependencies**
+- **Reduced paint complexity** (less aggressive 3D transforms)
+- **GPU optimization** via `will-change` hint
+- **Lighthouse score**: Expected improvement due to less layout thrashing during animation
 
 ---
 
-## Analytics Events
+## Fallback Safety
 
-| Event | Properties | Trigger |
-|-------|------------|---------|
-| `threshold_upsell_viewed` | `gap_amount`, `products_shown`, `primary_product_id` | Section visible |
-| `threshold_upsell_added` | `product_id`, `price`, `gap_before`, `unlocked_shipping` | Product added via threshold section |
-| `free_shipping_unlocked_via_upsell` | `product_id`, `total_upsell_value` | Threshold crossed after upsell add |
+If any rendering issues persist after these changes, the `useReducedMotion` hook already provides a graceful fallback that renders static text without any transforms—ensuring the hero is always readable.
 
----
-
-## Files to Modify/Create Summary
-
-### Create:
-1. `src/hooks/useThresholdUpsells.ts` - Fetch and score products
-2. `src/components/cart/ThresholdUpsellCard.tsx` - Compact product card
-3. Database migration for `threshold_upsell_products` table
-
-### Modify:
-1. `src/components/cart/SmartUpsell.tsx` - Complete rewrite with new logic
-2. `src/components/cart/CartDrawer.tsx` - Update import if component renamed
-
----
-
-## Phase 2 Enhancements (Future)
-
-1. **Personalized suggestions**: Factor in recently viewed products
-2. **A/B test layouts**: Primary + grid vs. carousel
-3. **Dynamic pricing display**: Show "Save €8 on shipping!" when product > gap
-4. **Re-engagement**: If user removes item and drops below threshold, surface upsell with urgency
