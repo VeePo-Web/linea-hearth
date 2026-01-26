@@ -1,346 +1,287 @@
 
-# Smart Bundle Progress Indicator - World-Class Enhancement
+
+# "Just Added" Toast Notification - Premium Micro-Feedback
 
 ## Overview
 
-Transform the existing `BundleProgress` component into a TEMU-tier conversion machine with:
-- **Contextual urgency messaging** based on completion percentage
-- **Inline quick-add** for missing items without leaving cart drawer
-- **Visual incentive pulses** when close to completion threshold
-- **Real product data** for missing items (names, prices, thumbnails)
-- **Tiered celebrations** when unlocking new discount tiers
+Implement a world-class "Just Added" toast notification that appears when items are added to cart. The design will be:
+- **Premium editorial aesthetic** - matching the LINEA brand's high-fashion feel
+- **Clean and minimal** - no cheap emojis, icons, or distracting elements
+- **Product-focused** - featuring the product thumbnail and name
+- **Brief and non-blocking** - appears for ~2.5 seconds, auto-dismisses
+- **TEMU-tier functionality** - immediate feedback, haptic support, reduced motion aware
 
 ---
 
-## Current State Analysis
+## Design Philosophy
 
-**Existing BundleProgress.tsx Features:**
-- Shows "X of Y items from Look" with progress bar
-- Expandable accordion with items in cart
-- Shows missing product count
-- Links to lookbook for browsing
-- Discount tier progression hints
+**What makes it "TEMU-style" but classy:**
+- Instant feedback (≤100ms perceived latency)
+- Product thumbnail creates emotional connection
+- Minimal text, maximum impact
+- Slide-in from bottom (thumb-reachable on mobile)
+- Subtle entrance/exit animations (not bouncy or flashy)
+- Size confirmation for quick visual verification
 
-**Gaps to Address:**
-1. Missing items show only as count, not actual products
-2. No inline quick-add for missing items
-3. No urgency messaging based on proximity to completion
-4. No visual celebration when reaching new tiers
-5. "Browse Lookbook" link requires leaving the cart drawer
+**Anti-patterns to avoid:**
+- No checkmark emoji (✓)
+- No "Added to cart!" exclamation
+- No bag/cart icons
+- No green success colors
+- No confetti or sparkles
+- No bouncing animations
+
+---
+
+## Visual Design Specification
+
+```text
+┌─────────────────────────────────────────────────────────┐
+│                                                         │
+│  ┌─────────┐                                           │
+│  │         │  Heavenly Crewneck                        │
+│  │  [IMG]  │  Size M                                   │
+│  │         │                                           │
+│  └─────────┘                                           │
+│                                                         │
+└─────────────────────────────────────────────────────────┘
+
+Position: Fixed bottom center, 16px margin
+Width: Max 320px on mobile, auto-fit on desktop
+Animation: Slide up + fade in, slide down + fade out
+Duration: 2.5 seconds display, 0.3s entrance, 0.2s exit
+```
+
+**Color scheme:**
+- Background: `bg-background` (theme-aware)
+- Border: `border-border` (subtle 1px)
+- Shadow: Refined drop shadow (`shadow-lg`)
+- Text: `text-foreground` for name, `text-muted-foreground` for size
 
 ---
 
 ## Implementation Architecture
 
-### Phase 1: Enhanced useBundleDiscounts Hook
+### Approach: Custom Toast Component + Sonner Integration
 
-**File:** `src/hooks/useBundleDiscounts.ts`
+Rather than modifying the existing Radix toast system, we'll use **Sonner** (already installed) with a custom JSX renderer. This gives us:
+1. Full control over the toast content/layout
+2. Built-in positioning and stacking
+3. Swipe-to-dismiss on mobile
+4. Proper accessibility
 
-**Enhancements:**
-1. **Fetch missing product details** - Query actual product info for `missingProductIds`
-2. **Add completion percentage calculation** - For contextual messaging
-3. **Track tier progression** - For milestone celebrations
+### Phase 1: Create AddedToCartToast Component
 
-**New Return Interface:**
+**File:** `src/components/cart/AddedToCartToast.tsx`
+
+A standalone component that renders the toast content with product thumbnail, name, and size.
+
 ```typescript
-interface MissingProduct {
-  id: string;
-  name: string;
-  price: number;
-  salePrice: number | null;
-  imageUrl: string;
-  slug: string;
-  variants: Array<{ id: string; size: string; stock: number }>;
-}
-
-export interface BundleMatch {
-  // ... existing fields
-  completionPercent: number;          // NEW: 0-100
-  missingProducts: MissingProduct[];  // NEW: Full product details
-  isCloseToCompletion: boolean;       // NEW: 1 item away
-  tierJustUnlocked: boolean;          // NEW: For celebration
+interface AddedToCartToastProps {
+  productName: string;
+  productImage: string;
+  size?: string;
+  color?: string;
 }
 ```
 
-### Phase 2: Enhanced BundleProgress Component
+**Component features:**
+- 48x64px thumbnail (3:4 ratio, matching cart items)
+- Product name (1 line, truncated)
+- Size badge (subtle, muted)
+- Optional color indicator
+- Slide-in animation via Framer Motion
+- Reduced motion support
 
-**File:** `src/components/cart/BundleProgress.tsx`
+### Phase 2: Create showAddedToast Utility
 
-**New Features:**
+**File:** `src/lib/toastUtils.ts`
 
-#### 1. Contextual Urgency Messaging
+A utility function that wraps Sonner's `toast.custom()` with our styled component:
 
-Based on completion percentage, show different messages:
-
-| Completion | Message |
-|------------|---------|
-| 25% | "Add {3} more items to complete this look" |
-| 50% | "Halfway there! Add {2} more to unlock {X}% off" |
-| 75% | "Almost complete! Just {1} item away from saving €{X}" |
-| 100% | "Look complete! Saving €{X}" |
-
-#### 2. Inline Quick-Add for Missing Products
-
-Replace generic "Browse Lookbook" link with actual product cards:
-
-```tsx
-{/* Missing Products Quick-Add */}
-{bundle.missingProducts.slice(0, 3).map((product) => (
-  <MissingProductCard
-    key={product.id}
-    product={product}
-    lookId={bundle.lookId}
-    lookName={bundle.lookName}
-    onAdd={handleQuickAdd}
-  />
-))}
-```
-
-**MissingProductCard features:**
-- 40x40px thumbnail
-- Product name (truncated)
-- Price
-- Size selector (inline dropdown) using `useSizeMemory`
-- One-tap "+" add button
-- Success checkmark animation on add
-
-#### 3. Visual Completion Incentive
-
-When user is 1 item away (`isCloseToCompletion`):
-- Subtle amber pulse on the progress bar
-- Enhanced border glow
-- "Just 1 item away!" badge
-
-```tsx
-{bundle.isCloseToCompletion && (
-  <motion.div
-    className="absolute inset-0 rounded-lg pointer-events-none"
-    animate={{ 
-      boxShadow: [
-        '0 0 0 1px rgba(245, 158, 11, 0.2)',
-        '0 0 0 3px rgba(245, 158, 11, 0.1)',
-        '0 0 0 1px rgba(245, 158, 11, 0.2)'
-      ]
-    }}
-    transition={{ duration: 2, repeat: Infinity }}
-  />
-)}
-```
-
-#### 4. Tier Celebration
-
-When user crosses a discount tier threshold:
-- Brief emerald flash on progress bar
-- Haptic feedback (30ms vibrate)
-- Toast notification: "Discount upgraded! Now saving {X}%"
-
----
-
-## New Component: MissingProductCard
-
-**File:** `src/components/cart/MissingProductCard.tsx`
-
-**Purpose:** Inline quick-add card for missing lookbook items
-
-**Features:**
-1. Compact layout (fits 3 per row on mobile)
-2. Thumbnail + name + price
-3. Size selector with memory (uses `useSizeMemory`)
-4. One-tap add with `useQuickAdd`
-5. Success animation with `DrawCheckIcon`
-6. Stock-aware (shows "Only X left" if low)
-
-**Component Structure:**
-```tsx
-interface MissingProductCardProps {
-  product: MissingProduct;
-  lookId: string;
-  lookName: string;
-  onAdd?: () => void;
-}
-
-const MissingProductCard = ({ product, lookId, lookName, onAdd }) => {
-  const { rememberedSize, getSizeForCategory } = useSizeMemory();
-  const { addItem } = useCart();
-  const [state, setState] = useState<'idle' | 'selecting' | 'adding' | 'added'>('idle');
-  const [selectedSize, setSelectedSize] = useState<string | null>(null);
-  
-  // Auto-select remembered size or single available size
-  useEffect(() => {
-    const remembered = getSizeForCategory('tops');
-    const inStockVariants = product.variants.filter(v => v.stock > 0);
-    
-    if (remembered && inStockVariants.find(v => v.size === remembered)) {
-      setSelectedSize(remembered);
-    } else if (inStockVariants.length === 1) {
-      setSelectedSize(inStockVariants[0].size);
-    }
-  }, [product.variants]);
-  
-  const handleAdd = () => {
-    setState('adding');
-    addItem({
-      id: productIdToCartId(product.id),
-      name: product.name,
-      price: product.salePrice ?? product.price,
-      priceFormatted: `€${product.salePrice ?? product.price}`,
-      image: product.imageUrl,
-      category: 'Lookbook',
-      size: selectedSize,
-      lookId,
-      lookName,
-      productId: product.id,
-    });
-    
-    setTimeout(() => {
-      setState('added');
-      onAdd?.();
-      setTimeout(() => setState('idle'), 1500);
-    }, 200);
-  };
-  
-  return (
-    <motion.div className="flex items-center gap-2 p-2 bg-muted/30 rounded">
-      {/* Thumbnail */}
-      <img 
-        src={product.imageUrl} 
-        alt={product.name}
-        className="w-10 h-10 object-cover rounded"
+```typescript
+export function showAddedToast({
+  productName,
+  productImage,
+  size,
+  color,
+}: AddedToCartToastProps) {
+  toast.custom(
+    (t) => (
+      <AddedToCartToast
+        productName={productName}
+        productImage={productImage}
+        size={size}
+        color={color}
+        toastId={t}
       />
-      
-      {/* Info */}
-      <div className="flex-1 min-w-0">
-        <p className="text-xs font-medium truncate">{product.name}</p>
-        <p className="text-[10px] text-muted-foreground">
-          €{product.salePrice ?? product.price}
-        </p>
-      </div>
-      
-      {/* Action */}
-      <AnimatePresence mode="wait">
-        {state === 'added' ? (
-          <DrawCheckIcon size="xs" className="text-emerald-500" />
-        ) : state === 'adding' ? (
-          <Loader2 className="w-4 h-4 animate-spin" />
-        ) : selectedSize ? (
-          <Button 
-            size="icon" 
-            variant="outline" 
-            className="w-7 h-7 rounded-full"
-            onClick={handleAdd}
-          >
-            <Plus className="w-3 h-3" />
-          </Button>
-        ) : (
-          <InlineQuickSizePicker
-            variants={product.variants}
-            onSelect={(size) => {
-              setSelectedSize(size);
-              handleAdd();
-            }}
-          />
-        )}
-      </AnimatePresence>
-    </motion.div>
+    ),
+    {
+      duration: 2500,
+      position: 'bottom-center',
+    }
   );
-};
+}
 ```
 
----
+### Phase 3: Integration Points
 
-## Enhanced useBundleDiscounts Hook
+**Update `useQuickAdd.ts` (lines 305-311):**
 
-**File:** `src/hooks/useBundleDiscounts.ts`
-
-**New Query: Fetch Missing Products**
+Replace the current generic toast with the new product-focused toast:
 
 ```typescript
-// NEW: Fetch actual product details for missing items
-function useMissingProducts(productIds: string[]) {
-  return useQuery({
-    queryKey: ["missing-products", productIds],
-    queryFn: async () => {
-      if (productIds.length === 0) return [];
+// Before
+if (showToast) {
+  toast({
+    title: `Added in size ${sizeToUse}`,
+    description: product.name,
+  });
+}
 
-      const { data, error } = await supabase
-        .from("products")
-        .select(`
-          id,
-          name,
-          slug,
-          price,
-          sale_price,
-          product_images!inner (
-            image_url,
-            is_primary
-          ),
-          product_variants (
-            id,
-            size,
-            stock_quantity
-          )
-        `)
-        .in("id", productIds)
-        .eq("status", "active");
-
-      if (error) throw error;
-      
-      return (data || []).map(p => ({
-        id: p.id,
-        name: p.name,
-        slug: p.slug,
-        price: p.price,
-        salePrice: p.sale_price,
-        imageUrl: p.product_images?.find(i => i.is_primary)?.image_url 
-          || p.product_images?.[0]?.image_url || '',
-        variants: (p.product_variants || []).map(v => ({
-          id: v.id,
-          size: v.size,
-          stock: v.stock_quantity
-        }))
-      }));
-    },
-    enabled: productIds.length > 0,
-    staleTime: 2 * 60 * 1000,
+// After
+if (showToast) {
+  showAddedToast({
+    productName: product.name,
+    productImage: primaryImage?.image_url || '/placeholder.svg',
+    size: sizeToUse,
+    color: color,
   });
 }
 ```
 
-**Updated BundleMatch calculation:**
+**Update `useCart.tsx` (after line 97):**
+
+For direct `addItem` calls that don't go through `useQuickAdd`, optionally trigger the toast:
 
 ```typescript
-// Add to bundleMatches computation
-const completionPercent = Math.round((lookItems.length / lookInfo.total_products) * 100);
-const isCloseToCompletion = missingProductIds.length === 1;
+// The addItem function already sets lastAddedItem
+// We can use this in a dedicated observer component
+```
 
-matches.push({
-  // ... existing fields
-  completionPercent,
-  isCloseToCompletion,
-  // missingProducts will be populated from the separate query
-});
+### Phase 4: Update Sonner Configuration
+
+**Update `src/components/ui/sonner.tsx`:**
+
+Adjust positioning for our custom toast to appear at bottom-center on mobile:
+
+```typescript
+<Sonner
+  // ... existing props
+  position="bottom-center"
+  offset={16}
+  gap={8}
+/>
 ```
 
 ---
 
-## Visual Mockup
+## Component Implementation Details
 
-```text
-┌──────────────────────────────────────────────────────────┐
-│  🎁 Almost Complete! Save €12 more                       │
-│  "Summer Essentials" — 2 of 3 items                      │
-│                                                          │
-│  ████████████████████████████░░░░░░░░░░ (67%)           │
-│                                                          │
-│  ↓ Just 1 item away from 10% off                        │
-│                                                          │
-│  ┌────────────────────────────────────────────────────┐ │
-│  │  [IMG] Holy Joggers              €59    [+]        │ │
-│  │        Size M remembered                           │ │
-│  └────────────────────────────────────────────────────┘ │
-│                                                          │
-│  ✓ In Bag: Heavenly Crewneck (M), Faith Cap (OS)        │
-└──────────────────────────────────────────────────────────┘
+### AddedToCartToast.tsx
+
+```tsx
+import { motion } from 'framer-motion';
+import { toast as sonnerToast } from 'sonner';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
+
+interface AddedToCartToastProps {
+  productName: string;
+  productImage: string;
+  size?: string;
+  color?: string;
+  toastId?: string | number;
+}
+
+const AddedToCartToast = ({
+  productName,
+  productImage,
+  size,
+  color,
+  toastId,
+}: AddedToCartToastProps) => {
+  const prefersReducedMotion = useReducedMotion();
+
+  return (
+    <motion.div
+      initial={prefersReducedMotion ? { opacity: 1 } : { opacity: 0, y: 20, scale: 0.95 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: 10, scale: 0.98 }}
+      transition={{ 
+        duration: prefersReducedMotion ? 0 : 0.25,
+        ease: [0.25, 0.46, 0.45, 0.94] // Editorial easing
+      }}
+      className="flex items-center gap-3 p-3 bg-background border border-border rounded-lg shadow-lg max-w-[320px] w-full"
+      role="status"
+      aria-live="polite"
+      onClick={() => toastId && sonnerToast.dismiss(toastId)}
+    >
+      {/* Product Thumbnail */}
+      <div className="w-12 h-16 bg-muted/30 overflow-hidden flex-shrink-0 rounded">
+        <img
+          src={productImage}
+          alt=""
+          className="w-full h-full object-cover"
+          loading="eager"
+        />
+      </div>
+
+      {/* Product Info */}
+      <div className="flex-1 min-w-0 py-0.5">
+        <p className="text-sm font-medium text-foreground truncate">
+          {productName}
+        </p>
+        <p className="text-xs text-muted-foreground mt-0.5">
+          {size && <>Size {size}</>}
+          {size && color && <span className="mx-1">·</span>}
+          {color && <>{color}</>}
+          {!size && !color && <>Added to bag</>}
+        </p>
+      </div>
+    </motion.div>
+  );
+};
+
+export default AddedToCartToast;
+```
+
+### toastUtils.ts
+
+```typescript
+import { toast } from 'sonner';
+import AddedToCartToast from '@/components/cart/AddedToCartToast';
+
+interface ShowAddedToastOptions {
+  productName: string;
+  productImage: string;
+  size?: string;
+  color?: string;
+  duration?: number;
+}
+
+export function showAddedToast({
+  productName,
+  productImage,
+  size,
+  color,
+  duration = 2500,
+}: ShowAddedToastOptions): string | number {
+  return toast.custom(
+    (t) => (
+      <AddedToCartToast
+        productName={productName}
+        productImage={productImage}
+        size={size}
+        color={color}
+        toastId={t}
+      />
+    ),
+    {
+      duration,
+      position: 'bottom-center',
+    }
+  );
+}
 ```
 
 ---
@@ -349,64 +290,74 @@ matches.push({
 
 | File | Action | Changes |
 |------|--------|---------|
-| `src/components/cart/MissingProductCard.tsx` | CREATE | New component for inline quick-add |
-| `src/hooks/useBundleDiscounts.ts` | MODIFY | Add missing products query, completion %, close-to-completion flag |
-| `src/components/cart/BundleProgress.tsx` | MODIFY | Enhanced messaging, inline quick-add, visual incentives |
+| `src/components/cart/AddedToCartToast.tsx` | CREATE | Custom toast component with product thumbnail |
+| `src/lib/toastUtils.ts` | CREATE | `showAddedToast` utility function |
+| `src/hooks/useQuickAdd.ts` | MODIFY | Replace generic toast with `showAddedToast` |
+| `src/components/ui/sonner.tsx` | MODIFY | Adjust position to `bottom-center` |
 
 ---
 
-## Technical Considerations
+## Animation Specification
 
-### Performance
-- Missing products query is cached for 2 minutes
-- Only fetch when bundle has missing items
-- Limit to 3 missing products per bundle (prevent UI overload)
+| Phase | Property | Value | Duration |
+|-------|----------|-------|----------|
+| **Entrance** | opacity | 0 → 1 | 250ms |
+| **Entrance** | y | 20px → 0 | 250ms |
+| **Entrance** | scale | 0.95 → 1 | 250ms |
+| **Display** | - | Static | 2500ms |
+| **Exit** | opacity | 1 → 0 | 200ms |
+| **Exit** | y | 0 → 10px | 200ms |
+| **Exit** | scale | 1 → 0.98 | 200ms |
 
-### Accessibility
-- All interactive elements have proper ARIA labels
-- Focus management for inline size picker
-- Reduced motion support for all animations
+**Easing:** Editorial `[0.25, 0.46, 0.45, 0.94]`
 
-### State Management
-- Local component state for add-to-cart flow
-- Size memory integration via `useSizeMemory`
-- Optimistic UI updates
+**Reduced Motion:** All animations bypass to instant opacity change
+
+---
+
+## Accessibility
+
+- `role="status"` for screen reader announcement
+- `aria-live="polite"` for non-interruptive notification
+- Tap-to-dismiss for touch users
+- Auto-dismiss after 2.5s (no action required)
+- Text content is readable and concise
+
+---
+
+## Performance Considerations
+
+1. **Image loading:** Use `loading="eager"` since toast is visible immediately
+2. **Animation:** Use GPU-accelerated transforms (translate, scale, opacity)
+3. **Bundle size:** Reuses existing Sonner + Framer Motion (no new deps)
+4. **Render:** Toast renders outside main app tree via Sonner portal
 
 ---
 
 ## Conversion Impact
 
-| Feature | Expected Lift | Mechanism |
-|---------|---------------|-----------|
-| Inline quick-add | +15% bundle completion | Removes friction of leaving cart |
-| Urgency messaging | +8% add rate | Creates FOMO for savings |
-| Visual incentive pulse | +5% when close | Draws attention to opportunity |
-| Size memory auto-select | +12% quick-add usage | One-tap instead of two |
-
-**Total Expected Lift:** 20-30% increase in bundle completion rate
+| Mechanism | Expected Effect |
+|-----------|-----------------|
+| **Immediate feedback** | Confirms action, reduces anxiety |
+| **Product image** | Emotional reinforcement of purchase |
+| **Size confirmation** | Reduces "did I pick the right size?" doubt |
+| **Non-blocking** | Doesn't interrupt shopping flow |
+| **Bottom position** | Thumb-reachable, doesn't obscure header |
 
 ---
 
 ## Acceptance Criteria
 
-- [ ] Missing products show actual thumbnails, names, prices
-- [ ] One-tap add for items where size is remembered
-- [ ] Inline size picker for items without remembered size
-- [ ] Contextual messaging based on completion percentage
-- [ ] Subtle pulse animation when 1 item away from completion
-- [ ] Success animation (DrawCheckIcon) on add
-- [ ] Progress bar updates instantly when item added
-- [ ] Haptic feedback on mobile when adding
-- [ ] Reduced motion support for all animations
-- [ ] Loads missing products only when bundle card is visible
+- [ ] Toast appears within 100ms of add-to-cart
+- [ ] Product thumbnail displays correctly (48x64px)
+- [ ] Product name truncates gracefully if too long
+- [ ] Size displays when available
+- [ ] Color displays when available
+- [ ] Auto-dismisses after 2.5 seconds
+- [ ] Tap-to-dismiss works on mobile
+- [ ] Animation is smooth and editorial
+- [ ] Reduced motion users see instant appearance/disappearance
+- [ ] Toast stacks correctly if multiple items added quickly
+- [ ] No layout shift when toast appears/disappears
+- [ ] Matches existing visual design language
 
----
-
-## Analytics Events
-
-| Event | Properties | Trigger |
-|-------|------------|---------|
-| `bundle_progress_viewed` | `lookId`, `completionPercent`, `missingCount` | Component mounts |
-| `bundle_missing_product_add` | `productId`, `lookId`, `sizeUsed`, `wasRemembered` | Quick-add clicked |
-| `bundle_completed` | `lookId`, `totalItems`, `totalSavings` | 100% completion |
-| `bundle_tier_unlocked` | `lookId`, `newTier`, `discountPercent` | Crossing tier threshold |
