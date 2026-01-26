@@ -25,6 +25,7 @@ const EditorialHero = () => {
     <section 
       ref={containerRef}
       className="relative w-full min-h-screen bg-foreground overflow-hidden hero-noise group"
+      style={{ position: "relative" }}
     >
       {/* Index Number - 032c Editorial Watermark */}
       <motion.div

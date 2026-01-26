@@ -33,7 +33,11 @@ const CharacterReveal = ({
     <Tag className={className}>
       <motion.span
         ref={ref}
-        style={{ display: "inline-block" }}
+        style={{ 
+          display: "inline-block",
+          perspective: "1000px",
+          transformStyle: "preserve-3d",
+        }}
         initial="hidden"
         animate={isInView ? "visible" : "hidden"}
       >
@@ -43,12 +47,14 @@ const CharacterReveal = ({
             style={{
               display: "inline-block",
               whiteSpace: char === " " ? "pre" : "normal",
+              willChange: "transform, opacity",
+              backfaceVisibility: "hidden",
             }}
             variants={{
               hidden: {
                 opacity: 0,
-                y: 40,
-                rotateX: -60,
+                y: 30,
+                rotateX: -15,
               },
               visible: {
                 opacity: 1,
@@ -56,8 +62,8 @@ const CharacterReveal = ({
                 rotateX: 0,
                 transition: {
                   type: "spring",
-                  stiffness: 100,
-                  damping: 12,
+                  stiffness: 120,
+                  damping: 14,
                   delay: delay + index * staggerDelay,
                 },
               },
