@@ -42,6 +42,7 @@ interface LocalStorageSavedItem {
 interface UseSavedForLaterReturn {
   savedItems: SavedItem[];
   savedCount: number;
+  totalSavedValue: number;
   isLoading: boolean;
   saveForLater: (cartItem: CartItem) => Promise<void>;
   removeFromSaved: (productId: string) => Promise<void>;
@@ -239,6 +240,14 @@ export function useSavedForLater(): UseSavedForLaterReturn {
   const savedCount = savedItems.length;
   const waitingMessage = getWaitingMessage(savedCount);
 
+  // Compute total value of saved items for display
+  const totalSavedValue = useMemo(() => {
+    return savedItems.reduce((sum, item) => {
+      const price = item.product.sale_price ?? item.product.price;
+      return sum + (price * item.savedQuantity);
+    }, 0);
+  }, [savedItems]);
+
   // Check if product is saved
   const isSaved = useCallback((productId: string): boolean => {
     return savedItems.some(item => item.productId === productId);
@@ -418,6 +427,7 @@ export function useSavedForLater(): UseSavedForLaterReturn {
   return {
     savedItems,
     savedCount,
+    totalSavedValue,
     isLoading: user ? isDbLoading : isLocalLoading,
     saveForLater,
     removeFromSaved,

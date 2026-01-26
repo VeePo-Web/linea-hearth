@@ -7,15 +7,43 @@ import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import SavedItem from "./SavedItem";
 import { cn } from "@/lib/utils";
+import { DrawCheckIcon } from "@/components/ui/draw-check-icon";
 
 interface SavedForLaterShelfProps {
   defaultOpen?: boolean;
 }
 
 const SavedForLaterShelf = ({ defaultOpen = false }: SavedForLaterShelfProps) => {
-  const { savedItems, savedCount, waitingMessage, moveToCart, removeFromSaved, moveAllToCart, isLoading } = useSavedForLater();
+  const { savedItems, savedCount, totalSavedValue, waitingMessage, moveToCart, removeFromSaved, moveAllToCart, isLoading } = useSavedForLater();
   const [isOpen, setIsOpen] = useState(defaultOpen);
   const prefersReducedMotion = useReducedMotion();
+  
+  // Button state machine: 'idle' | 'adding' | 'success'
+  const [buttonState, setButtonState] = useState<'idle' | 'adding' | 'success'>('idle');
+
+  const handleMoveAllToCart = () => {
+    if (buttonState !== 'idle' || savedCount === 0) return;
+    
+    setButtonState('adding');
+    
+    // Execute the move
+    moveAllToCart();
+    
+    // Transition to success after brief loading
+    setTimeout(() => {
+      setButtonState('success');
+      
+      // Haptic feedback for success (3-pulse pattern)
+      if (navigator.vibrate) {
+        navigator.vibrate([10, 50, 10, 50, 10]);
+      }
+      
+      // Reset after success display (shelf will collapse anyway)
+      setTimeout(() => {
+        setButtonState('idle');
+      }, 1500);
+    }, prefersReducedMotion ? 0 : 300);
+  };
 
   // Don't render if no saved items
   if (savedCount === 0 && !isLoading) {
@@ -88,8 +116,8 @@ const SavedForLaterShelf = ({ defaultOpen = false }: SavedForLaterShelfProps) =>
               </AnimatePresence>
             )}
 
-            {/* Add all to bag button */}
-            {!isLoading && savedCount > 1 && (
+            {/* Add all to bag button - shows for 1+ items */}
+            {!isLoading && savedCount >= 1 && (
               <motion.div
                 initial={prefersReducedMotion ? {} : { opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -100,12 +128,51 @@ const SavedForLaterShelf = ({ defaultOpen = false }: SavedForLaterShelfProps) =>
                   variant="outline"
                   size="sm"
                   className={cn(
-                    "w-full rounded-none text-xs uppercase tracking-[0.15em]",
-                    "border-foreground hover:bg-foreground hover:text-background transition-colors"
+                    "w-full rounded-none text-xs uppercase tracking-[0.15em] transition-all duration-200",
+                    buttonState === 'success'
+                      ? "bg-primary text-primary-foreground border-primary"
+                      : "border-foreground hover:bg-foreground hover:text-background"
                   )}
-                  onClick={moveAllToCart}
+                  onClick={handleMoveAllToCart}
+                  disabled={buttonState !== 'idle'}
                 >
-                  Add All to Bag ({savedCount})
+                  <AnimatePresence mode="wait">
+                    {buttonState === 'adding' ? (
+                      <motion.span
+                        key="adding"
+                        initial={prefersReducedMotion ? {} : { opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={prefersReducedMotion ? {} : { opacity: 0, scale: 0.9 }}
+                        transition={{ duration: 0.15 }}
+                        className="flex items-center gap-2"
+                      >
+                        <span className="w-3 h-3 border border-current border-t-transparent rounded-full animate-spin" />
+                        Adding...
+                      </motion.span>
+                    ) : buttonState === 'success' ? (
+                      <motion.span
+                        key="success"
+                        initial={prefersReducedMotion ? {} : { opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={prefersReducedMotion ? {} : { opacity: 0, scale: 0.9 }}
+                        transition={{ duration: 0.15 }}
+                        className="flex items-center gap-2"
+                      >
+                        <DrawCheckIcon size="xs" delay={0} duration={300} />
+                        Added!
+                      </motion.span>
+                    ) : (
+                      <motion.span
+                        key="default"
+                        initial={prefersReducedMotion ? {} : { opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={prefersReducedMotion ? {} : { opacity: 0 }}
+                        transition={{ duration: 0.15 }}
+                      >
+                        {savedCount === 1 ? 'Add to Bag' : 'Add All to Bag'} • €{totalSavedValue.toFixed(2)}
+                      </motion.span>
+                    )}
+                  </AnimatePresence>
                 </Button>
               </motion.div>
             )}
