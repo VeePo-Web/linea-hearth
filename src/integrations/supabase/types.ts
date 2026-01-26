@@ -188,6 +188,63 @@ export type Database = {
         }
         Relationships: []
       }
+      bundle_discounts: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          discount_type: string
+          discount_value: number
+          expires_at: string | null
+          id: string
+          is_active: boolean | null
+          max_items: number | null
+          min_items: number
+          name: string
+          priority: number | null
+          source_id: string | null
+          source_type: string
+          stacks_with_codes: boolean | null
+          starts_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          discount_type?: string
+          discount_value: number
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          max_items?: number | null
+          min_items?: number
+          name: string
+          priority?: number | null
+          source_id?: string | null
+          source_type: string
+          stacks_with_codes?: boolean | null
+          starts_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          discount_type?: string
+          discount_value?: number
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          max_items?: number | null
+          min_items?: number
+          name?: string
+          priority?: number | null
+          source_id?: string | null
+          source_type?: string
+          stacks_with_codes?: boolean | null
+          starts_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       categories: {
         Row: {
           created_at: string

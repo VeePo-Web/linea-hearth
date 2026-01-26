@@ -28,6 +28,7 @@ interface LookProduct {
 interface ShopTheLookProps {
   products: LookProduct[];
   lookName: string;
+  lookId?: string;
 }
 
 // Individual product card with integrated quick add
@@ -204,7 +205,7 @@ function getPositionLabel(position: string | null) {
   return labels[position.toLowerCase()] || position.toUpperCase();
 }
 
-const ShopTheLook = ({ products, lookName }: ShopTheLookProps) => {
+const ShopTheLook = ({ products, lookName, lookId }: ShopTheLookProps) => {
   const { toast } = useToast();
   const { addItem, items } = useCart();
   const prefersReducedMotion = useReducedMotion();
@@ -222,12 +223,17 @@ const ShopTheLook = ({ products, lookName }: ShopTheLookProps) => {
     return sum + (product.is_on_sale && product.sale_price ? product.sale_price : product.price);
   }, 0);
 
+  // Calculate bundle discount preview (10% for complete look)
+  const bundleDiscountPercent = products.length >= 4 ? 15 : products.length >= 2 ? 10 : 0;
+  const bundleDiscount = totalPrice * (bundleDiscountPercent / 100);
+  const discountedTotal = totalPrice - bundleDiscount;
+
   const addedCount = products.filter(p => {
     const cartId = productIdToCartId(p.id);
     return addedProducts.has(p.id) || productsInCart.has(cartId);
   }).length;
 
-  // Handle add all with size memory
+  // Handle add all with size memory and bundle tracking
   const handleAddAll = () => {
     let addedAny = false;
     
@@ -238,16 +244,19 @@ const ShopTheLook = ({ products, lookName }: ShopTheLookProps) => {
       const primaryImage = product.product_images?.find(img => img.is_primary) || product.product_images?.[0];
       const price = product.is_on_sale && product.sale_price ? product.sale_price : product.price;
       
-      // Note: Individual size selection would come from the quick add hook
-      // For "add all", we use 'M' as sensible default
+      // Add with lookId and lookName for bundle tracking
       addItem({
         id: cartId,
         name: product.name,
         price: price,
-        priceFormatted: `$${price}`,
+        priceFormatted: `€${price}`,
         image: primaryImage?.image_url || '',
         category: product.position || 'Lookbook',
         size: 'M',
+        // Bundle tracking
+        lookId: lookId,
+        lookName: lookName,
+        productId: product.id,
       });
 
       setAddedProducts(prev => new Set(prev).add(product.id));
@@ -257,7 +266,7 @@ const ShopTheLook = ({ products, lookName }: ShopTheLookProps) => {
     if (addedAny) {
       toast({
         title: "Complete look added",
-        description: `"${lookName}" added to your bag`,
+        description: `"${lookName}" added to your bag${bundleDiscountPercent > 0 ? ` — ${bundleDiscountPercent}% bundle discount applied!` : ''}`,
       });
     }
   };
@@ -322,7 +331,16 @@ const ShopTheLook = ({ products, lookName }: ShopTheLookProps) => {
           ) : (
             <>
               <ShoppingBag className="w-4 h-4 mr-2" />
-              Add Complete Look — ${totalPrice.toFixed(0)}
+              <span>Add Complete Look</span>
+              {bundleDiscountPercent > 0 && (
+                <span className="ml-2 flex items-center gap-1.5">
+                  <span className="line-through text-white/50 text-sm">€{totalPrice.toFixed(0)}</span>
+                  <span className="text-white font-medium">€{discountedTotal.toFixed(0)}</span>
+                  <span className="text-[10px] bg-white/20 px-1.5 py-0.5 rounded">
+                    -{bundleDiscountPercent}%
+                  </span>
+                </span>
+              )}
             </>
           )}
         </Button>

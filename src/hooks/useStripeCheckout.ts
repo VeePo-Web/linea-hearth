@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
 import { useCart } from "./useCart";
+import { useBundleDiscounts } from "./useBundleDiscounts";
 import { supabase } from "@/integrations/supabase/client";
 
 interface ShippingAddress {
@@ -7,6 +8,13 @@ interface ShippingAddress {
   city: string;
   postalCode: string;
   country: string;
+}
+
+interface BundleDiscountClaim {
+  bundleRuleId: string;
+  lookId: string;
+  itemProductIds: string[];
+  claimedSavings: number;
 }
 
 interface CheckoutData {
@@ -19,6 +27,7 @@ interface CheckoutData {
   shippingMethod: "standard" | "express" | "overnight";
   discountCodeId?: string;
   abandonedCartId?: string;
+  bundleDiscounts?: BundleDiscountClaim[];
 }
 
 interface CheckoutResult {
@@ -35,6 +44,7 @@ export const useStripeCheckout = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { items } = useCart();
+  const { bundleDataForCheckout } = useBundleDiscounts();
 
   const initiateCheckout = useCallback(
     async (data: CheckoutData): Promise<CheckoutResult> => {
@@ -44,7 +54,7 @@ export const useStripeCheckout = () => {
       try {
         // Transform cart items to checkout format
         const checkoutItems = items.map((item) => ({
-          productId: item.id?.toString() || "",
+          productId: item.productId || item.id?.toString() || "",
           variantId: undefined,
           name: item.name,
           image: item.image.startsWith("http") 
@@ -73,6 +83,8 @@ export const useStripeCheckout = () => {
             body: JSON.stringify({
               items: checkoutItems,
               ...data,
+              // Include bundle discounts for server-side validation
+              bundleDiscounts: bundleDataForCheckout,
             }),
           }
         );
@@ -105,7 +117,7 @@ export const useStripeCheckout = () => {
         setIsLoading(false);
       }
     },
-    [items]
+    [items, bundleDataForCheckout]
   );
 
   const checkStripeConfigured = useCallback(async (): Promise<boolean> => {

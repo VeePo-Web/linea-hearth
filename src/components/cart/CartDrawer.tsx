@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "@/hooks/useCart";
 import { useAbandonedCart } from "@/hooks/useAbandonedCart";
+import { useBundleDiscounts } from "@/hooks/useBundleDiscounts";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DrawCheckIcon } from "@/components/ui/draw-check-icon";
@@ -11,6 +12,8 @@ import CartItem from "./CartItem";
 import SmartUpsell from "./SmartUpsell";
 import TrustRow from "./TrustRow";
 import AffirmationStrip from "./AffirmationStrip";
+import BundleProgress from "./BundleProgress";
+import BundleSavingsRow from "./BundleSavingsRow";
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 
@@ -66,6 +69,7 @@ const itemVariants = {
 const CartDrawer = ({ onViewFavorites }: CartDrawerProps) => {
   const { items, itemCount, subtotal, isCartOpen, closeCart } = useCart();
   const { email: savedEmail, isSyncing, isSynced, syncCart } = useAbandonedCart();
+  const { activeBundles, totalBundleSavings, hasActiveBundles, bestIncompleteBundle } = useBundleDiscounts();
   const drawerRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const prefersReducedMotion = useReducedMotion();
@@ -364,6 +368,18 @@ const CartDrawer = ({ onViewFavorites }: CartDrawerProps) => {
                     )}
                   </AnimatePresence>
 
+                  {/* Bundle Progress Cards */}
+                  {(activeBundles.length > 0 || bestIncompleteBundle) && (
+                    <div className="px-6 py-4 space-y-3">
+                      {activeBundles.map((bundle) => (
+                        <BundleProgress key={bundle.lookId} bundle={bundle} />
+                      ))}
+                      {bestIncompleteBundle && !activeBundles.find(b => b.lookId === bestIncompleteBundle.lookId) && (
+                        <BundleProgress bundle={bestIncompleteBundle} />
+                      )}
+                    </div>
+                  )}
+
                   {/* Smart upsell */}
                   <SmartUpsell />
 
@@ -401,11 +417,21 @@ const CartDrawer = ({ onViewFavorites }: CartDrawerProps) => {
 
                 {/* Subtotal + CTA */}
                 <div className="px-6 py-4 space-y-4">
+                  {/* Bundle Savings Row */}
+                  <BundleSavingsRow />
+                  
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-muted-foreground">Subtotal</span>
-                    <span className="text-lg font-medium text-foreground">
-                      €{subtotal.toLocaleString('en-EU', { minimumFractionDigits: 2 })}
-                    </span>
+                    <div className="text-right">
+                      {hasActiveBundles && (
+                        <span className="text-sm text-muted-foreground line-through mr-2">
+                          €{subtotal.toLocaleString('en-EU', { minimumFractionDigits: 2 })}
+                        </span>
+                      )}
+                      <span className="text-lg font-medium text-foreground">
+                        €{(subtotal - totalBundleSavings).toLocaleString('en-EU', { minimumFractionDigits: 2 })}
+                      </span>
+                    </div>
                   </div>
 
                   <p className="text-xs text-muted-foreground">
