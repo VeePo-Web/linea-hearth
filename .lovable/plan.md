@@ -1,9 +1,10 @@
 
-# Express Checkout Infrastructure - Apple Pay & Google Pay Ready
+
+# Email Typo Detection - Friction Reduction Feature
 
 ## Overview
 
-Build complete Express Checkout infrastructure using Stripe's Payment Request API pattern. When `STRIPE_SECRET_KEY` is added, Apple Pay and Google Pay will work instantly with minimal configuration changes.
+Implement intelligent email typo detection that catches common mistakes and suggests corrections before the user proceeds with checkout. This follows TEMU-tier conversion psychology: **Error Prevention, Not Correction**.
 
 ---
 
@@ -11,293 +12,308 @@ Build complete Express Checkout infrastructure using Stripe's Payment Request AP
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────────────────┐
-│                            EXPRESS CHECKOUT FLOW                                │
+│                         EMAIL TYPO DETECTION SYSTEM                             │
 ├─────────────────────────────────────────────────────────────────────────────────┤
 │                                                                                 │
-│  ┌─────────────────────┐     ┌─────────────────────┐     ┌──────────────────┐  │
-│  │    CartDrawer.tsx   │     │    Checkout.tsx     │     │  Edge Function   │  │
-│  │                     │     │                     │     │                  │  │
-│  │  ┌───────────────┐  │     │  ┌───────────────┐  │     │  create-payment  │  │
-│  │  │ ExpressCheckout│  │     │  │ ExpressCheckout│  │     │  -intent/        │  │
-│  │  │               │  │     │  │               │  │     │                  │  │
-│  │  │ [Apple Pay]   │  │     │  │ [Apple Pay]   │  │     │  • Creates       │  │
-│  │  │ [Google Pay]  │  │     │  │ [Google Pay]  │  │     │    PaymentIntent │  │
-│  │  │               │  │     │  │               │  │     │  • Returns       │  │
-│  │  │ — OR —        │  │     │  │ — OR —        │  │     │    client_secret │  │
-│  │  │               │  │     │  │               │  │     │  • Creates order │  │
-│  │  │ [Checkout]    │  │     │  │ [Stripe Form] │  │     │                  │  │
-│  │  └───────────────┘  │     │  └───────────────┘  │     └──────────────────┘  │
-│  └─────────────────────┘     └─────────────────────┘                           │
+│  ┌──────────────────────────────────────────────────────────────────────────┐   │
+│  │                    useEmailTypoDetection Hook                            │   │
+│  │  • Detects common domain typos (gmial → gmail)                          │   │
+│  │  • Suggests TLD corrections (.con → .com)                               │   │
+│  │  • Catches keyboard adjacency errors (gmai; → gmail)                    │   │
+│  │  • Triggers on blur (not keystroke - avoids annoyance)                  │   │
+│  └──────────────────────────────────────────────────────────────────────────┘   │
+│                                    │                                            │
+│                                    ▼                                            │
+│  ┌──────────────────────────────────────────────────────────────────────────┐   │
+│  │                   EmailTypoSuggestion Component                          │   │
+│  │  ┌────────────────────────────────────────────────────────────────────┐  │   │
+│  │  │  Did you mean user@gmail.com?                                      │  │   │
+│  │  │  [Yes, fix it]  [No, keep it]                                      │  │   │
+│  │  └────────────────────────────────────────────────────────────────────┘  │   │
+│  └──────────────────────────────────────────────────────────────────────────┘   │
 │                                                                                 │
-│  ┌─────────────────────────────────────────────────────────────────────────┐   │
-│  │                         useExpressPay Hook                              │   │
-│  │  • canMakePayment state (device capability detection)                   │   │
-│  │  • paymentRequest object (Stripe Payment Request API)                   │   │
-│  │  • handlePaymentSuccess (post-payment cleanup + redirect)               │   │
-│  │  • isStripeConfigured (graceful fallback when no key)                   │   │
-│  └─────────────────────────────────────────────────────────────────────────┘   │
-│                                                                                 │
+│  Integration Points:                                                            │
+│  • Checkout.tsx - Customer email, billing email                                 │
+│  • ContactForm.tsx - Contact email                                              │
+│  • EmailOptIn.tsx - Newsletter signup                                           │
+│  • FooterEmailCapture.tsx - Footer newsletter                                   │
+│  • AmbassadorForm.tsx - Ambassador application                                  │
+│  • SignInForm.tsx / CreateAccountForm.tsx - Auth flows                          │
 └─────────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## Implementation Details
+## Technical Implementation
 
-### 1. New Edge Function: `create-payment-intent`
+### 1. Email Typo Detection Utility
 
-Creates a Stripe PaymentIntent for inline payment (instead of redirecting to hosted checkout).
+**New File:** `src/lib/emailTypoDetection.ts`
 
-```typescript
-// supabase/functions/create-payment-intent/index.ts
+This utility contains the core typo detection logic, supporting:
 
-interface PaymentIntentRequest {
-  items: CartItem[];
-  customerEmail: string;
-  shippingAddress?: ShippingAddress;
-  discountCodeId?: string;
-  bundleDiscounts?: BundleDiscountClaim[];
-}
-
-// Response:
-interface PaymentIntentResponse {
-  success: boolean;
-  clientSecret?: string;    // For Stripe Elements
-  paymentIntentId?: string;
-  orderId?: string;
-  configured?: boolean;     // false if STRIPE_SECRET_KEY missing
-  total: number;           // cents
-}
+**Common Domain Typos (Levenshtein-based):**
+```text
+gmial.com → gmail.com
+gamil.com → gmail.com
+gmal.com → gmail.com
+gmail.co → gmail.com
+gnail.com → gmail.com
+yahooo.com → yahoo.com
+yaho.com → yahoo.com
+hotmal.com → hotmail.com
+outloook.com → outlook.com
+iclould.com → icloud.com
 ```
 
-**Key behavior:**
-- Returns `configured: false` if `STRIPE_SECRET_KEY` is not set
-- Creates pending order in database (same as existing checkout)
-- Creates Stripe PaymentIntent with `automatic_payment_methods` enabled
-- Returns `client_secret` for frontend Stripe Elements
+**TLD Corrections:**
+```text
+.con → .com
+.cmo → .com
+.vom → .com
+.ney → .net
+.ogr → .org
+.co.ik → .co.uk
+```
 
-### 2. New Hook: `useExpressPay`
+**Keyboard Adjacency Errors:**
+```text
+gmail;com → gmail.com (semicolon for period)
+user@gmail,com → user@gmail.com
+```
 
-Central hook managing express checkout state.
+**Algorithm:**
+1. Parse email into `local@domain`
+2. Split domain into `name.tld`
+3. Compare domain name against common providers using Levenshtein distance (threshold ≤ 2)
+4. Check TLD against common typos
+5. Return suggestion only if confidence is high
+
+### 2. useEmailTypoDetection Hook
+
+**New File:** `src/hooks/useEmailTypoDetection.ts`
 
 ```typescript
-// src/hooks/useExpressPay.ts
-
-interface UseExpressPayReturn {
-  // State
-  isStripeConfigured: boolean;     // STRIPE_PUBLISHABLE_KEY exists
-  canMakePayment: boolean | null;  // Device supports Apple/Google Pay
-  isLoading: boolean;
-  error: string | null;
+interface UseEmailTypoDetectionReturn {
+  // Current email value
+  email: string;
+  setEmail: (email: string) => void;
+  
+  // Suggestion state
+  suggestion: string | null;
+  showSuggestion: boolean;
   
   // Actions
-  createPaymentIntent: () => Promise<{ clientSecret: string; orderId: string } | null>;
-  handlePaymentSuccess: (paymentIntentId: string) => Promise<void>;
+  acceptSuggestion: () => void;
+  dismissSuggestion: () => void;
   
-  // Express pay specific
-  expressPayAvailable: boolean;    // canMakePayment && isStripeConfigured
+  // Event handlers to spread on input
+  inputProps: {
+    value: string;
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    onBlur: () => void;
+  };
 }
 ```
 
-**Device detection logic:**
-- Creates `PaymentRequest` with `canMakePayment()` check
-- Cached to avoid repeated API calls
-- Falls back gracefully if Stripe not loaded
+**Key Behaviors:**
+- Detects typos on **blur only** (not on every keystroke to avoid annoyance)
+- Debounces detection to prevent flicker
+- Auto-dismisses suggestion after 10 seconds if ignored
+- Tracks dismissed suggestions to avoid re-showing for same typo
+- Respects user choice - if they dismiss, don't show again for that input
 
-### 3. New Component: `ExpressCheckout`
+### 3. EmailTypoSuggestion Component
 
-Renders Apple Pay / Google Pay buttons with graceful fallbacks.
+**New File:** `src/components/ui/EmailTypoSuggestion.tsx`
 
-```typescript
-// src/components/checkout/ExpressCheckout.tsx
+A subtle, non-intrusive inline suggestion that appears below the email input:
 
-interface ExpressCheckoutProps {
-  total: number;              // in euros
-  onSuccess?: () => void;     // Called after payment success
-  onError?: (error: string) => void;
-  variant?: 'cart' | 'checkout';  // Styling differences
-  className?: string;
-}
+```text
+┌─────────────────────────────────────────────────────────┐
+│  Email Address *                                         │
+│  ┌─────────────────────────────────────────────────┐    │
+│  │ user@gmial.com                                   │    │
+│  └─────────────────────────────────────────────────┘    │
+│  ┌─────────────────────────────────────────────────┐    │
+│  │ 💡 Did you mean user@gmail.com?                 │    │
+│  │    [Yes, fix it]  [No, keep user@gmial.com]     │    │
+│  └─────────────────────────────────────────────────┘    │
+└─────────────────────────────────────────────────────────┘
 ```
 
-**Visual states:**
-1. **Loading**: Skeleton placeholder while checking capabilities
-2. **Available**: Apple Pay / Google Pay button(s) visible
-3. **Not available**: Nothing rendered (no device support)
-4. **Not configured**: Subtle message (only in dev mode)
+**Visual Design (preserves existing UI identity):**
+- Background: `bg-amber-500/10` (matches existing warning styles)
+- Border: `border-amber-500/30`
+- Text: `text-amber-600` for the suggestion
+- Buttons: ghost style, small size
+- Animation: slide-in with opacity fade (respects reduce-motion)
+- Auto-dismiss: subtle fade after 10s
 
-### 4. Stripe Provider Setup
+### 4. Integration Points
+
+**Checkout.tsx (Primary):**
+```text
+Location: Line 492-505 (customer email input)
+Location: Line 637-648 (billing email input)
+
+Changes:
+- Replace direct state management with useEmailTypoDetection hook
+- Add EmailTypoSuggestion component below each email input
+- Update handleCustomerDetailsChange to use hook's setEmail
+```
+
+**Other Forms (Secondary):**
+| File | Priority | Notes |
+|------|----------|-------|
+| `ContactForm.tsx` | Medium | Replace email state with hook |
+| `EmailOptIn.tsx` | Medium | Newsletter signups |
+| `FooterEmailCapture.tsx` | Low | Footer capture |
+| `AmbassadorForm.tsx` | Low | Uses react-hook-form, may need adapter |
+| `SignInForm.tsx` | Low | Auth form, less critical |
+
+---
+
+## Common Domain Database
+
+The detection system maintains a curated list of common email providers:
 
 ```typescript
-// src/components/checkout/StripeProvider.tsx
-
-const stripePromise = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY
-  ? loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY)
-  : null;
-
-// Wraps app/checkout routes with Elements provider
-// No-ops gracefully if Stripe not configured
+const COMMON_DOMAINS = [
+  // Global giants
+  'gmail.com',
+  'yahoo.com',
+  'hotmail.com',
+  'outlook.com',
+  'icloud.com',
+  'aol.com',
+  'protonmail.com',
+  'mail.com',
+  
+  // Regional (Europe)
+  'gmx.com',
+  'gmx.de',
+  'web.de',
+  'orange.fr',
+  'free.fr',
+  
+  // Business
+  'live.com',
+  'msn.com',
+  
+  // Country-specific
+  'yahoo.co.uk',
+  'outlook.co.uk',
+  'btinternet.com',
+];
 ```
 
 ---
 
-## Integration Points
+## Typo Detection Rules
 
-### CartDrawer.tsx Changes
-
+### Rule 1: Domain Typos (Levenshtein Distance ≤ 2)
 ```text
-Location: Between BundleSavingsRow and "Proceed to Checkout" button
-
-┌──────────────────────────────────────────────┐
-│  Subtotal                           €180.00  │
-│                                              │
-│  ┌────────────────────────────────────────┐  │
-│  │         Express Checkout               │  │
-│  │  ┌────────────┐  ┌────────────────────┐│  │
-│  │  │ Apple Pay  │  │   Google Pay       ││  │
-│  │  └────────────┘  └────────────────────┘│  │
-│  │                                        │  │
-│  │  ────────── OR ──────────              │  │
-│  └────────────────────────────────────────┘  │
-│                                              │
-│  [      Proceed to Checkout      ]           │
-└──────────────────────────────────────────────┘
+gmial.com (distance 1 from gmail.com) → SUGGEST gmail.com
+gamil.com (distance 1 from gmail.com) → SUGGEST gmail.com
+gmal.com (distance 1 from gmail.com) → SUGGEST gmail.com
+htomail.com (distance 2 from hotmail.com) → SUGGEST hotmail.com
 ```
 
-### Checkout.tsx Changes
-
+### Rule 2: TLD Typos
 ```text
-Location: Above payment form, after shipping options
+.con → .com
+.cmo → .com
+.vom → .com
+.ocm → .com
+.ney → .net
+.ogr → .org
+.oi → .io
+```
 
-┌──────────────────────────────────────────────┐
-│  Express Checkout                            │
-│  ┌────────────────────────────────────────┐  │
-│  │  ┌────────────┐  ┌────────────────────┐│  │
-│  │  │ Apple Pay  │  │   Google Pay       ││  │
-│  │  └────────────┘  └────────────────────┘│  │
-│  └────────────────────────────────────────┘  │
-│                                              │
-│  ─────────── OR ENTER CARD DETAILS ────────  │
-│                                              │
-│  [Card form fields...]                       │
-└──────────────────────────────────────────────┘
+### Rule 3: Missing TLD Parts
+```text
+gmail.co → gmail.com
+outlook.c → outlook.com
+yahoo → yahoo.com
+```
+
+### Rule 4: Keyboard Adjacency
+```text
+Semicolon for period: user@gmail;com → user@gmail.com
+Comma for period: user@gmail,com → user@gmail.com
+```
+
+### Rule 5: Double Letters
+```text
+yahooo.com → yahoo.com
+gmaill.com → gmail.com
+outloook.com → outlook.com
 ```
 
 ---
 
 ## File Changes Summary
 
-### New Files (5)
+### New Files (3)
 
 | File | Purpose |
 |------|---------|
-| `src/hooks/useExpressPay.ts` | Express checkout state & device detection |
-| `src/components/checkout/ExpressCheckout.tsx` | Apple/Google Pay button component |
-| `src/components/checkout/StripeProvider.tsx` | Stripe Elements context wrapper |
-| `src/components/checkout/ExpressPayButton.tsx` | Styled payment request button |
-| `supabase/functions/create-payment-intent/index.ts` | PaymentIntent edge function |
+| `src/lib/emailTypoDetection.ts` | Core typo detection algorithms |
+| `src/hooks/useEmailTypoDetection.ts` | React hook for managing detection state |
+| `src/components/ui/EmailTypoSuggestion.tsx` | Suggestion UI component |
 
-### Modified Files (4)
+### Modified Files (6)
 
 | File | Changes |
 |------|---------|
-| `src/components/cart/CartDrawer.tsx` | Add ExpressCheckout above checkout CTA |
-| `src/pages/Checkout.tsx` | Add ExpressCheckout above payment form |
-| `src/App.tsx` | Wrap with StripeProvider |
-| `supabase/config.toml` | Add create-payment-intent function config |
+| `src/pages/Checkout.tsx` | Integrate hook for customer email + billing email |
+| `src/components/contact/ContactForm.tsx` | Integrate hook for contact email |
+| `src/components/homepage/EmailOptIn.tsx` | Integrate hook for newsletter |
+| `src/components/footer/FooterEmailCapture.tsx` | Integrate hook for footer capture |
+| `src/components/ambassador/AmbassadorForm.tsx` | Integrate with react-hook-form |
+| `src/components/auth/CreateAccountForm.tsx` | Integrate for signup flow |
 
 ---
 
-## Graceful Degradation
+## UX Considerations
 
-The implementation handles missing Stripe configuration at every level:
+### Non-Intrusive Design
+- Only triggers on **blur**, not during typing
+- Suggestion appears subtly below input
+- Auto-dismisses after 10 seconds
+- User can easily dismiss without friction
 
-### Level 1: Environment Variables
-```typescript
-// StripeProvider.tsx
-const stripePromise = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY
-  ? loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY)
-  : null;
+### Conversion Psychology
+- Frames as helpful, not corrective: "Did you mean...?"
+- Positive action is prominent: "Yes, fix it"
+- Respects user choice: "No, keep it" doesn't shame
 
-// If null, ExpressCheckout renders nothing
-```
-
-### Level 2: Edge Function
-```typescript
-// create-payment-intent/index.ts
-if (!Deno.env.get("STRIPE_SECRET_KEY")) {
-  return { success: false, configured: false };
-}
-```
-
-### Level 3: useExpressPay Hook
-```typescript
-// Returns safe defaults when Stripe unavailable
-{
-  isStripeConfigured: false,
-  canMakePayment: false,
-  expressPayAvailable: false,
-}
-```
-
-### Level 4: Component
-```typescript
-// ExpressCheckout.tsx
-if (!expressPayAvailable) return null; // Silent fallback
-```
+### Accessibility
+- Suggestion has proper ARIA live region for screen readers
+- Buttons have clear focus states
+- Works with keyboard navigation
+- Respects `prefers-reduced-motion`
 
 ---
 
-## Environment Variables Required
+## Performance Considerations
 
-To activate express checkout:
-
-### Frontend (.env)
-```
-VITE_STRIPE_PUBLISHABLE_KEY=pk_test_... or pk_live_...
-```
-
-### Backend (Supabase Secrets)
-```
-STRIPE_SECRET_KEY=sk_test_... or sk_live_...
-```
-
-That's it. Once both are set, Apple Pay and Google Pay will appear automatically on supported devices.
+1. **No external dependencies** - pure TypeScript implementation
+2. **Lazy evaluation** - only runs Levenshtein on blur, not keystroke
+3. **Memoized domain list** - compiled once at import time
+4. **< 1ms detection time** - negligible impact on interaction
 
 ---
 
-## Button Styling
+## Analytics Events
 
-Following TEMU/Shein patterns:
-
-```text
-Cart Drawer (compact):
-┌─────────────────────────────────────┐
-│ [Apple Pay]  [Google Pay]           │
-│            — OR —                    │
-└─────────────────────────────────────┘
-
-Checkout Page (prominent):
-┌─────────────────────────────────────────────────────┐
-│                  Express Checkout                    │
-│  ┌─────────────────────────────────────────────┐    │
-│  │              [Apple Pay]                     │    │
-│  └─────────────────────────────────────────────┘    │
-│  ┌─────────────────────────────────────────────┐    │
-│  │            [Google Pay]                      │    │
-│  └─────────────────────────────────────────────┘    │
-│               Pay in 2 taps                          │
-└─────────────────────────────────────────────────────┘
-```
-
----
-
-## Accessibility
-
-- Payment request buttons have native accessibility
-- Fallback button group for keyboard navigation
-- Screen reader announcements for payment states
-- Focus management after payment completion
+| Event | Properties | Trigger |
+|-------|------------|---------|
+| `email_typo_detected` | `original_email`, `suggested_email`, `surface` | Typo detected |
+| `email_typo_accepted` | `original_email`, `suggested_email`, `surface` | User accepts suggestion |
+| `email_typo_dismissed` | `original_email`, `suggested_email`, `surface` | User dismisses suggestion |
+| `email_typo_auto_dismissed` | `original_email`, `suggested_email`, `surface` | Suggestion times out |
 
 ---
 
@@ -305,22 +321,20 @@ Checkout Page (prominent):
 
 | Metric | Expected Lift |
 |--------|--------------|
-| Mobile checkout completion | +15-20% |
-| Time to purchase | -60% (2 taps vs form) |
-| Cart abandonment | -10% |
-| First-time buyer conversion | +8% |
+| Checkout form abandonment | -2-3% |
+| Order confirmation delivery rate | +5-8% (fewer bounced emails) |
+| Abandoned cart recovery emails | +10% (correct email = deliverable) |
+| Customer support tickets | -5% (fewer "didn't get confirmation" tickets) |
 
-Express checkout is the single highest-impact conversion upgrade remaining. This infrastructure ensures you're ready to activate it the moment Stripe is configured.
+Email typo detection is a low-effort, high-impact feature that silently saves users from errors they would otherwise only discover when their confirmation email never arrives.
 
 ---
 
-## Activation Checklist (When Ready)
+## Implementation Order
 
-When you have your Stripe keys:
+1. Create `emailTypoDetection.ts` utility with all detection algorithms
+2. Create `useEmailTypoDetection.ts` hook
+3. Create `EmailTypoSuggestion.tsx` component
+4. Integrate into `Checkout.tsx` (highest impact surface)
+5. Integrate into remaining forms (progressive rollout)
 
-1. Add `VITE_STRIPE_PUBLISHABLE_KEY` to `.env`
-2. Add `STRIPE_SECRET_KEY` to Supabase secrets
-3. Test on mobile Safari (Apple Pay) and Chrome (Google Pay)
-4. Verify webhook for payment success handling
-
-The code will "just work" with no additional changes.
