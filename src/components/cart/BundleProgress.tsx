@@ -1,32 +1,79 @@
-import { useState } from "react";
-import { Gift, ChevronDown, ChevronUp, Plus, Check } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { Gift, ChevronDown, ChevronUp, Check, Sparkles } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Link } from "react-router-dom";
 import { BundleMatch } from "@/hooks/useBundleDiscounts";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { cn } from "@/lib/utils";
+import MissingProductCard from "./MissingProductCard";
 
 interface BundleProgressProps {
   bundle: BundleMatch;
   variant?: "drawer" | "checkout";
 }
 
+/**
+ * Contextual messages based on completion percentage
+ */
+const getContextualMessage = (bundle: BundleMatch): { headline: string; subtext: string } => {
+  const { completionPercent, missingProducts, potentialSavings, savingsAmount, isComplete, discountPercent, nextTierDiscountPercent } = bundle;
+  const missingCount = missingProducts.length;
+  
+  if (isComplete) {
+    return {
+      headline: `Look Complete! Saving €${savingsAmount.toFixed(2)}`,
+      subtext: `You're getting ${discountPercent}% off this bundle`,
+    };
+  }
+  
+  if (completionPercent >= 75 || missingCount === 1) {
+    return {
+      headline: `Almost Complete! Just ${missingCount} item${missingCount > 1 ? 's' : ''} away`,
+      subtext: `Add to save €${potentialSavings.toFixed(2)} (${nextTierDiscountPercent || discountPercent}% off)`,
+    };
+  }
+  
+  if (completionPercent >= 50) {
+    return {
+      headline: `Halfway There! Add ${missingCount} more`,
+      subtext: `Unlock ${nextTierDiscountPercent || discountPercent}% bundle discount`,
+    };
+  }
+  
+  return {
+    headline: savingsAmount > 0 
+      ? `Bundle Discount Applied — Save €${savingsAmount.toFixed(2)}`
+      : `Complete Look & Save ${nextTierDiscountPercent || discountPercent}%`,
+    subtext: `"${bundle.lookName}" — ${bundle.itemsInCart.length} of ${bundle.totalItemsInLook} items`,
+  };
+};
+
 const BundleProgress = ({ bundle, variant = "drawer" }: BundleProgressProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const prefersReducedMotion = useReducedMotion();
+  const prevSavingsRef = useRef(bundle.savingsAmount);
+  const [showTierCelebration, setShowTierCelebration] = useState(false);
   
   const progress = (bundle.itemsInCart.length / bundle.totalItemsInLook) * 100;
   const hasDiscount = bundle.savingsAmount > 0;
-  const canUpgrade = bundle.nextTierDiscountPercent && bundle.nextTierItemsNeeded > 0;
+  const { isCloseToCompletion, missingProducts, completionPercent, isComplete } = bundle;
   
-  // Calculate potential additional savings if they complete the bundle
-  const currentItemsTotal = bundle.itemsInCart.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0
-  );
-  const avgItemPrice = currentItemsTotal / bundle.itemsInCart.length || 50;
-  const potentialTotal = currentItemsTotal + (bundle.missingProductIds.length * avgItemPrice);
-  const potentialSavings = potentialTotal * (bundle.discountPercent / 100);
+  // Contextual messaging
+  const { headline, subtext } = getContextualMessage(bundle);
+
+  // Tier celebration when savings increase
+  useEffect(() => {
+    if (bundle.savingsAmount > prevSavingsRef.current && bundle.savingsAmount > 0) {
+      setShowTierCelebration(true);
+      
+      // Haptic feedback
+      if ('vibrate' in navigator) {
+        navigator.vibrate(30);
+      }
+      
+      setTimeout(() => setShowTierCelebration(false), 1500);
+    }
+    prevSavingsRef.current = bundle.savingsAmount;
+  }, [bundle.savingsAmount]);
 
   return (
     <motion.div
@@ -34,12 +81,42 @@ const BundleProgress = ({ bundle, variant = "drawer" }: BundleProgressProps) => 
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
       className={cn(
-        "border rounded-lg overflow-hidden",
-        hasDiscount 
-          ? "border-emerald-500/30 bg-emerald-50/50 dark:bg-emerald-950/20" 
-          : "border-amber-500/30 bg-amber-50/50 dark:bg-amber-950/20"
+        "relative border rounded-lg overflow-hidden",
+        isComplete
+          ? "border-emerald-500/40 bg-emerald-50/50 dark:bg-emerald-950/20"
+          : hasDiscount 
+            ? "border-emerald-500/30 bg-emerald-50/50 dark:bg-emerald-950/20" 
+            : "border-amber-500/30 bg-amber-50/50 dark:bg-amber-950/20"
       )}
     >
+      {/* Close-to-completion pulse effect */}
+      {isCloseToCompletion && !isComplete && !prefersReducedMotion && (
+        <motion.div
+          className="absolute inset-0 rounded-lg pointer-events-none"
+          animate={{ 
+            boxShadow: [
+              '0 0 0 1px rgba(245, 158, 11, 0.15)',
+              '0 0 0 4px rgba(245, 158, 11, 0.08)',
+              '0 0 0 1px rgba(245, 158, 11, 0.15)'
+            ]
+          }}
+          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+        />
+      )}
+
+      {/* Tier celebration flash */}
+      <AnimatePresence>
+        {showTierCelebration && !prefersReducedMotion && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: [0, 0.3, 0] }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.6 }}
+            className="absolute inset-0 bg-emerald-400 rounded-lg pointer-events-none"
+          />
+        )}
+      </AnimatePresence>
+
       {/* Header */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
@@ -47,31 +124,37 @@ const BundleProgress = ({ bundle, variant = "drawer" }: BundleProgressProps) => 
       >
         <div className="flex items-center gap-3">
           <motion.div
-            animate={hasDiscount ? { 
-              scale: [1, 1.1, 1],
+            animate={isComplete ? { 
+              scale: [1, 1.15, 1],
               rotate: [0, -5, 5, 0]
+            } : showTierCelebration ? {
+              scale: [1, 1.2, 1],
             } : {}}
-            transition={{ duration: 0.5, delay: 0.2 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
           >
-            <Gift className={cn(
-              "w-4 h-4",
-              hasDiscount ? "text-emerald-600" : "text-amber-600"
-            )} />
+            {isComplete ? (
+              <Sparkles className="w-4 h-4 text-emerald-600" />
+            ) : (
+              <Gift className={cn(
+                "w-4 h-4",
+                hasDiscount ? "text-emerald-600" : "text-amber-600"
+              )} />
+            )}
           </motion.div>
           
           <div className="text-left">
             <p className={cn(
               "text-xs font-medium",
-              hasDiscount ? "text-emerald-700 dark:text-emerald-400" : "text-amber-700 dark:text-amber-400"
+              isComplete
+                ? "text-emerald-700 dark:text-emerald-400"
+                : hasDiscount 
+                  ? "text-emerald-700 dark:text-emerald-400" 
+                  : "text-amber-700 dark:text-amber-400"
             )}>
-              {hasDiscount ? (
-                <>Bundle Discount Applied — Save €{bundle.savingsAmount.toFixed(2)}</>
-              ) : (
-                <>Complete Look & Save {bundle.discountPercent}%</>
-              )}
+              {headline}
             </p>
             <p className="text-[10px] text-muted-foreground mt-0.5">
-              "{bundle.lookName}" — {bundle.itemsInCart.length} of {bundle.totalItemsInLook} items
+              {subtext}
             </p>
           </div>
         </div>
@@ -85,25 +168,47 @@ const BundleProgress = ({ bundle, variant = "drawer" }: BundleProgressProps) => 
       
       {/* Progress Bar */}
       <div className="px-4 pb-3">
-        <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+        <div className="relative h-1.5 bg-muted rounded-full overflow-hidden">
           <motion.div
             className={cn(
               "h-full rounded-full",
-              hasDiscount 
-                ? "bg-gradient-to-r from-emerald-500 to-emerald-400" 
-                : "bg-gradient-to-r from-amber-500 to-amber-400"
+              isComplete
+                ? "bg-gradient-to-r from-emerald-500 to-emerald-400"
+                : hasDiscount 
+                  ? "bg-gradient-to-r from-emerald-500 to-emerald-400" 
+                  : "bg-gradient-to-r from-amber-500 to-amber-400"
             )}
             initial={{ width: 0 }}
             animate={{ width: `${progress}%` }}
             transition={{ duration: 0.5, ease: "easeOut" }}
           />
+          
+          {/* Milestone dots */}
+          {!isComplete && (
+            <div className="absolute inset-y-0 right-0 flex items-center">
+              {[50, 75].map((milestone) => (
+                completionPercent < milestone && (
+                  <div
+                    key={milestone}
+                    className="absolute w-1 h-1 rounded-full bg-muted-foreground/20"
+                    style={{ left: `${milestone}%`, transform: 'translateX(-50%)' }}
+                  />
+                )
+              ))}
+            </div>
+          )}
         </div>
         
-        {/* Next tier hint */}
-        {canUpgrade && !bundle.isComplete && (
-          <p className="text-[10px] text-muted-foreground mt-2">
-            Add {bundle.nextTierItemsNeeded} more to unlock {bundle.nextTierDiscountPercent}% off
-          </p>
+        {/* Close to completion badge */}
+        {isCloseToCompletion && !isComplete && (
+          <motion.p 
+            initial={{ opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-[10px] text-amber-600 dark:text-amber-400 mt-2 font-medium flex items-center gap-1"
+          >
+            <span className="inline-block w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+            Just 1 item away from {bundle.nextTierDiscountPercent || bundle.discountPercent}% off!
+          </motion.p>
         )}
       </div>
       
@@ -125,30 +230,38 @@ const BundleProgress = ({ bundle, variant = "drawer" }: BundleProgressProps) => 
                 </p>
                 {bundle.itemsInCart.map((item) => (
                   <div key={item.id} className="flex items-center gap-2 text-xs">
-                    <Check className="w-3 h-3 text-emerald-500" />
+                    <Check className="w-3 h-3 text-emerald-500 flex-shrink-0" />
                     <span className="text-foreground/80 truncate flex-1">{item.name}</span>
-                    <span className="text-muted-foreground">Size {item.size}</span>
+                    <span className="text-muted-foreground flex-shrink-0">Size {item.size}</span>
                   </div>
                 ))}
               </div>
               
-              {/* Missing items */}
-              {bundle.missingProductIds.length > 0 && (
-                <div className="space-y-1.5">
+              {/* Missing items with quick-add */}
+              {missingProducts.length > 0 && (
+                <div className="space-y-2">
                   <p className="text-[10px] uppercase tracking-wide text-muted-foreground font-medium">
-                    Missing ({bundle.missingProductIds.length})
+                    Add to Complete ({missingProducts.length})
                   </p>
-                  <p className="text-xs text-muted-foreground">
-                    Add {bundle.missingProductIds.length} more item{bundle.missingProductIds.length > 1 ? 's' : ''} to 
-                    {!hasDiscount ? ' unlock' : ' maximize'} your bundle discount
-                  </p>
-                  <Link
-                    to="/lookbook"
-                    className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline mt-1"
-                  >
-                    <Plus className="w-3 h-3" />
-                    Browse Lookbook
-                  </Link>
+                  
+                  {/* Show up to 3 missing products with inline quick-add */}
+                  <div className="space-y-2">
+                    {missingProducts.slice(0, 3).map((product) => (
+                      <MissingProductCard
+                        key={product.id}
+                        product={product}
+                        lookId={bundle.lookId}
+                        lookName={bundle.lookName}
+                      />
+                    ))}
+                  </div>
+                  
+                  {/* Show "and X more" if there are more than 3 */}
+                  {missingProducts.length > 3 && (
+                    <p className="text-[10px] text-muted-foreground text-center">
+                      +{missingProducts.length - 3} more item{missingProducts.length - 3 > 1 ? 's' : ''} in this look
+                    </p>
+                  )}
                 </div>
               )}
               
@@ -157,7 +270,9 @@ const BundleProgress = ({ bundle, variant = "drawer" }: BundleProgressProps) => 
                 <div className="pt-2 border-t border-border/50">
                   <div className="flex justify-between text-xs">
                     <span className="text-muted-foreground">Bundle items subtotal</span>
-                    <span className="text-foreground">€{currentItemsTotal.toFixed(2)}</span>
+                    <span className="text-foreground">
+                      €{bundle.itemsInCart.reduce((sum, item) => sum + item.price * item.quantity, 0).toFixed(2)}
+                    </span>
                   </div>
                   <div className="flex justify-between text-xs mt-1">
                     <span className="text-emerald-600 font-medium">{bundle.discountPercent}% bundle discount</span>

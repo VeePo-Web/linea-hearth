@@ -24,6 +24,17 @@ interface LookProductInfo {
   product_ids: string[];
 }
 
+export interface MissingProduct {
+  id: string;
+  name: string;
+  slug: string;
+  price: number;
+  salePrice: number | null;
+  imageUrl: string;
+  position?: string | null;
+  variants: Array<{ id: string; size: string | null; stock: number }>;
+}
+
 export interface BundleMatch {
   bundleRuleId: string;
   bundleName: string;
@@ -37,6 +48,11 @@ export interface BundleMatch {
   missingProductIds: string[];
   nextTierItemsNeeded: number;
   nextTierDiscountPercent: number | null;
+  // NEW: Enhanced fields for smart progress indicator
+  completionPercent: number;
+  missingProducts: MissingProduct[];
+  isCloseToCompletion: boolean;
+  potentialSavings: number;
 }
 
 export interface UseBundleDiscountsReturn {
@@ -84,6 +100,7 @@ function useLookProductInfo(lookIds: string[]) {
         .select(`
           look_id,
           product_id,
+          position,
           lookbook_looks!inner (
             id,
             name
@@ -94,7 +111,7 @@ function useLookProductInfo(lookIds: string[]) {
       if (error) throw error;
 
       // Group by look_id
-      const lookMap = new Map<string, LookProductInfo>();
+      const lookMap = new Map<string, LookProductInfo & { positions: Map<string, string | null> }>();
       
       (data || []).forEach((row: any) => {
         const lookId = row.look_id;
@@ -106,18 +123,73 @@ function useLookProductInfo(lookIds: string[]) {
             look_name: lookName,
             total_products: 0,
             product_ids: [],
+            positions: new Map(),
           });
         }
         
         const info = lookMap.get(lookId)!;
         info.total_products++;
         info.product_ids.push(row.product_id);
+        info.positions.set(row.product_id, row.position);
       });
 
       return Array.from(lookMap.values());
     },
     enabled: lookIds.length > 0,
     staleTime: 5 * 60 * 1000,
+  });
+}
+
+// Fetch actual product details for missing items
+function useMissingProducts(productIds: string[]) {
+  return useQuery({
+    queryKey: ["missing-products", productIds.sort().join(",")],
+    queryFn: async () => {
+      if (productIds.length === 0) return [];
+
+      const { data, error } = await supabase
+        .from("products")
+        .select(`
+          id,
+          name,
+          slug,
+          price,
+          sale_price,
+          product_images (
+            image_url,
+            is_primary,
+            display_order
+          ),
+          product_variants (
+            id,
+            size,
+            stock_quantity
+          )
+        `)
+        .in("id", productIds)
+        .eq("status", "active");
+
+      if (error) throw error;
+      
+      return (data || []).map(p => ({
+        id: p.id,
+        name: p.name,
+        slug: p.slug,
+        price: p.price,
+        salePrice: p.sale_price,
+        imageUrl: 
+          p.product_images?.find((i: any) => i.is_primary)?.image_url || 
+          p.product_images?.sort((a: any, b: any) => (a.display_order ?? 0) - (b.display_order ?? 0))?.[0]?.image_url || 
+          '/placeholder.svg',
+        variants: (p.product_variants || []).map((v: any) => ({
+          id: v.id,
+          size: v.size,
+          stock: v.stock_quantity,
+        })),
+      }));
+    },
+    enabled: productIds.length > 0,
+    staleTime: 2 * 60 * 1000, // Cache for 2 minutes
   });
 }
 
@@ -137,6 +209,53 @@ export function useBundleDiscounts(): UseBundleDiscountsReturn {
   }, [items]);
 
   const { data: lookInfos = [], isLoading: lookInfoLoading } = useLookProductInfo(lookIds);
+
+  // Collect all missing product IDs across all bundles
+  const allMissingProductIds = useMemo(() => {
+    if (bundleRules.length === 0 || lookIds.length === 0) return [];
+
+    const missingIds = new Set<string>();
+
+    // Group cart items by lookId
+    const itemsByLook = new Map<string, CartItem[]>();
+    items.forEach((item) => {
+      if (item.lookId) {
+        if (!itemsByLook.has(item.lookId)) {
+          itemsByLook.set(item.lookId, []);
+        }
+        itemsByLook.get(item.lookId)!.push(item);
+      }
+    });
+
+    // For each look in cart, find missing products
+    itemsByLook.forEach((lookItems, lookId) => {
+      const lookInfo = lookInfos.find((l) => l.look_id === lookId);
+      if (!lookInfo) return;
+
+      const cartProductIds = new Set(
+        lookItems.map((item) => item.productId).filter(Boolean)
+      );
+      
+      lookInfo.product_ids.forEach((id) => {
+        if (!cartProductIds.has(id)) {
+          missingIds.add(id);
+        }
+      });
+    });
+
+    return Array.from(missingIds);
+  }, [items, bundleRules, lookInfos, lookIds]);
+
+  // Fetch missing product details
+  const { data: missingProductsData = [], isLoading: missingProductsLoading } = 
+    useMissingProducts(allMissingProductIds);
+
+  // Create a map for quick lookup
+  const missingProductsMap = useMemo(() => {
+    const map = new Map<string, MissingProduct>();
+    missingProductsData.forEach((p) => map.set(p.id, p));
+    return map;
+  }, [missingProductsData]);
 
   // Calculate bundle matches
   const bundleMatches = useMemo((): BundleMatch[] => {
@@ -198,6 +317,34 @@ export function useBundleDiscounts(): UseBundleDiscountsReturn {
         (id) => !cartProductIds.has(id)
       );
 
+      // Get full missing product details with positions
+      const missingProducts: MissingProduct[] = missingProductIds
+        .map((id) => {
+          const product = missingProductsMap.get(id);
+          if (!product) return null;
+          const position = (lookInfo as any).positions?.get(id) || null;
+          return {
+            ...product,
+            position,
+          } as MissingProduct;
+        })
+        .filter((p): p is MissingProduct => p !== null);
+
+      // Calculate completion percentage
+      const completionPercent = Math.round((lookItems.length / lookInfo.total_products) * 100);
+      
+      // Check if close to completion (1 item away)
+      const isCloseToCompletion = missingProductIds.length === 1;
+
+      // Calculate potential savings if they complete the bundle
+      const missingItemsValue = missingProducts.reduce(
+        (sum, p) => sum + (p.salePrice ?? p.price),
+        0
+      );
+      const potentialTotal = bundleSubtotal + missingItemsValue;
+      const potentialDiscountPercent = nextTierRule?.discount_value || discountPercent;
+      const potentialSavings = potentialTotal * (potentialDiscountPercent / 100);
+
       matches.push({
         bundleRuleId: bestRule?.id || "",
         bundleName: bestRule?.name || "",
@@ -213,11 +360,16 @@ export function useBundleDiscounts(): UseBundleDiscountsReturn {
           ? nextTierRule.min_items - itemCount
           : 0,
         nextTierDiscountPercent: nextTierRule?.discount_value || null,
+        // NEW: Enhanced fields
+        completionPercent,
+        missingProducts,
+        isCloseToCompletion,
+        potentialSavings,
       });
     });
 
     return matches;
-  }, [items, bundleRules, lookInfos, lookIds]);
+  }, [items, bundleRules, lookInfos, lookIds, missingProductsMap]);
 
   // Calculate totals
   const totalBundleSavings = useMemo(
@@ -256,7 +408,7 @@ export function useBundleDiscounts(): UseBundleDiscountsReturn {
     totalBundleSavings,
     hasActiveBundles: totalBundleSavings > 0,
     bestIncompleteBundle,
-    isLoading: rulesLoading || lookInfoLoading,
+    isLoading: rulesLoading || lookInfoLoading || missingProductsLoading,
     bundleDataForCheckout,
   };
 }
