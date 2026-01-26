@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { toast as sonnerToast } from 'sonner';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
@@ -20,6 +21,13 @@ const AddedToCartToast = ({
   onViewCart,
 }: AddedToCartToastProps) => {
   const prefersReducedMotion = useReducedMotion();
+
+  // Subtle haptic feedback when toast appears (mobile)
+  useEffect(() => {
+    if (!prefersReducedMotion && 'vibrate' in navigator) {
+      navigator.vibrate(10);
+    }
+  }, [prefersReducedMotion]);
 
   const handleViewCart = (e: React.MouseEvent) => {
     e.stopPropagation();
