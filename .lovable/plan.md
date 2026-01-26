@@ -1,120 +1,110 @@
 
 
-# Add Email Typo Detection to SignInForm.tsx
+# Add Email Typo Detection to AmbassadorForm.tsx
 
 ## Overview
 
-Integrate the existing email typo detection system into `SignInForm.tsx` for consistency across all auth flows. The form has two email inputs that need typo detection:
+Integrate email typo detection into the Ambassador application form, completing the rollout to all email capture surfaces in the codebase. This is the final form that needs the integration.
 
-1. **Sign-in email** - Main login form (uses react-hook-form)
-2. **Reset password email** - Forgot password flow (uses local state)
+---
+
+## Current Implementation
+
+The `AmbassadorForm.tsx` uses:
+- **react-hook-form** with `zodResolver` for validation
+- **shadcn/ui Form components** (`FormField`, `FormControl`, `FormItem`, etc.)
+- Email field is at lines 219-238, using the `field` spread from react-hook-form
 
 ---
 
 ## Implementation Details
 
-### Changes to SignInForm.tsx
+### 1. Add Imports
 
-**1. Add Imports**
 ```typescript
 import { useEmailTypoDetection } from '@/hooks/useEmailTypoDetection';
 import EmailTypoSuggestion from '@/components/ui/EmailTypoSuggestion';
 ```
 
-**2. Add Two Email Typo Detection Hooks**
+### 2. Watch Email Value
 
-For sign-in email:
+The form already has access to `form.watch()` - we need to watch the email field to feed it to the typo detection hook:
+
 ```typescript
-const signInEmailTypo = useEmailTypoDetection({
+const emailValue = form.watch('email');
+```
+
+### 3. Add Email Typo Detection Hook
+
+```typescript
+const emailTypo = useEmailTypoDetection({
   initialEmail: emailValue || '',
-  onSuggestionAccepted: (correctedEmail) => setValue('email', correctedEmail),
+  onSuggestionAccepted: (correctedEmail) => form.setValue('email', correctedEmail),
 });
 ```
 
-For reset password email:
-```typescript
-const resetEmailTypo = useEmailTypoDetection({
-  initialEmail: resetEmail,
-  onSuggestionAccepted: (correctedEmail) => setResetEmail(correctedEmail),
-});
-```
+### 4. Modify Email FormField (Lines 219-238)
 
-**3. Modify Sign-In Email Input (Line 151-160)**
+Update the Input component to trigger typo detection:
 
-Add `onBlur` and `onChange` handlers to trigger typo detection:
-```typescript
+**Before:**
+```tsx
 <Input
-  {...register('email', {
-    onBlur: () => signInEmailTypo.checkForTypos(emailValue),
-    onChange: (e) => signInEmailTypo.setEmail(e.target.value),
-  })}
-/>
-<EmailTypoSuggestion
-  suggestion={signInEmailTypo.suggestion || ''}
-  show={signInEmailTypo.showSuggestion}
-  onAccept={signInEmailTypo.acceptSuggestion}
-  onDismiss={signInEmailTypo.dismissSuggestion}
-  variant="compact"
+  {...field}
+  type="email"
+  className="..."
+  placeholder="you@email.com"
 />
 ```
 
-**4. Modify Reset Password Email Input (Line 276-290)**
-
-Add `onBlur` handler and suggestion component:
-```typescript
+**After:**
+```tsx
 <Input
-  value={resetEmail}
+  {...field}
+  type="email"
+  className="..."
+  placeholder="you@email.com"
   onChange={(e) => {
-    setResetEmail(e.target.value);
-    resetEmailTypo.setEmail(e.target.value);
+    field.onChange(e);
+    emailTypo.setEmail(e.target.value);
   }}
-  onBlur={() => resetEmailTypo.checkForTypos(resetEmail)}
+  onBlur={() => emailTypo.checkForTypos(emailValue)}
 />
 <EmailTypoSuggestion
-  suggestion={resetEmailTypo.suggestion || ''}
-  show={resetEmailTypo.showSuggestion}
-  onAccept={resetEmailTypo.acceptSuggestion}
-  onDismiss={resetEmailTypo.dismissSuggestion}
+  suggestion={emailTypo.suggestion || ''}
+  show={emailTypo.showSuggestion}
+  onAccept={emailTypo.acceptSuggestion}
+  onDismiss={emailTypo.dismissSuggestion}
   variant="compact"
 />
 ```
 
-**5. Add `setValue` to react-hook-form Destructuring**
+---
 
-The `useForm` call needs to include `setValue` for updating the email field when a typo correction is accepted (currently only has `register`, `handleSubmit`, `formState`, `setError`, and `watch`).
+## File Changes Summary
+
+| File | Changes |
+|------|---------|
+| `src/components/ambassador/AmbassadorForm.tsx` | Add imports, watch email value, add emailTypo hook, update email input with handlers, add EmailTypoSuggestion component |
 
 ---
 
 ## Technical Notes
 
-- Both hooks operate independently since they manage different email fields
-- The `resetEmailTypo` hook needs to sync with the `resetEmail` local state
-- Pre-filling reset email from sign-in email (line 79-81) will automatically work since we call `setResetEmail` which triggers the hook
-- Both typo suggestions use `variant="compact"` for consistent styling in the auth modal
-
----
-
-## File Changes
-
-| File | Changes |
-|------|---------|
-| `src/components/auth/SignInForm.tsx` | Add imports, two typo detection hooks, update email inputs with handlers, add suggestion components |
+- The `field.onChange(e)` must be called first to maintain react-hook-form's internal state
+- Using `variant="compact"` for consistent styling with other dark-background forms
+- The suggestion component appears below the input, above the `FormMessage` error display
+- No layout changes - the suggestion appears inline and disappears gracefully
 
 ---
 
 ## UX Flow
 
-**Sign-In Email:**
-1. User types `user@gmial.com`
-2. User tabs/clicks away (blur event)
-3. Suggestion appears: "Did you mean user@gmail.com?"
-4. User clicks "Yes, fix it" → email updates, suggestion disappears
+1. User types `applicant@gmial.com` in the email field
+2. User clicks/tabs away (blur event triggers)
+3. Suggestion appears: "Did you mean applicant@gmail.com?"
+4. User clicks "Yes, fix it" → email updates, form validation re-runs
 5. OR user clicks "No, keep it" → suggestion dismissed
-
-**Reset Password Email:**
-1. If user had typo in sign-in email, it pre-fills into reset email field
-2. Same typo detection flow applies
-3. Prevents sending reset link to wrong email address
 
 ---
 
@@ -122,9 +112,27 @@ The `useForm` call needs to include `setValue` for updating the email field when
 
 | Metric | Expected Lift |
 |--------|--------------|
-| Failed sign-in attempts due to email typo | -5-10% |
-| "Didn't receive reset email" support tickets | -8% |
-| Password reset completion rate | +3% |
+| Ambassador application completion rate | +2% |
+| Valid email capture rate | +5-8% |
+| Follow-up email delivery rate | +10% (fewer bounced emails) |
 
-This completes the email typo detection rollout across all authentication flows.
+---
+
+## Completion Status
+
+After this change, email typo detection will be integrated across **all email capture surfaces**:
+
+| Surface | Status |
+|---------|--------|
+| Checkout (customer email) | Done |
+| Checkout (billing email) | Done |
+| Contact Form | Done |
+| Newsletter (EmailOptIn) | Done |
+| Footer Email Capture | Done |
+| Create Account Form | Done |
+| Sign In Form | Done |
+| Sign In Reset Password | Done |
+| **Ambassador Form** | **This PR** |
+
+All 9 email inputs now have intelligent typo detection for maximum conversion protection.
 
