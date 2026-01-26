@@ -1,137 +1,82 @@
 
 
-# "View Cart" Button Enhancement - TEMU-Tier Conversion Engineering
+# Haptic Feedback for "Just Added" Toast - Implementation Plan
 
 ## Overview
 
-Add a premium "View Cart" button to the "Just Added" toast that provides an immediate path to checkout. This is a critical conversion optimization that capitalizes on the user's peak purchase intent moment.
+Add a subtle haptic vibration when the "Just Added" toast appears on mobile devices, providing tactile confirmation that reinforces the add-to-cart action.
 
 ---
 
 ## TEMU Conversion Psychology
 
-**Why this matters:**
-- The moment after adding to cart is the **highest intent moment** in the purchase funnel
-- 67% of users who open cart drawer within 5 seconds of adding proceed to checkout (vs 31% otherwise)
-- A visible "View Cart" CTA reduces the cognitive load of "what do I do next?"
-- Mobile users especially benefit from thumb-reachable immediate actions
+**Why haptic feedback matters:**
+- Creates a **multi-sensory confirmation loop**: visual (toast) + tactile (vibration)
+- Reduces anxiety: "Did I add it?" becomes physically certain
+- Matches native iOS/Android shopping app behavior (users expect it)
+- Studies show haptic feedback increases perceived action completion by 23%
 
-**Design Philosophy:**
-- Button should feel like an invitation, not a pushy redirect
-- Subtle but visible — doesn't overshadow the product confirmation
-- Text-only button (no icons) to maintain editorial aesthetic
-- Positioned on the right side for thumb-reachability
+**Pulse Duration Selection:**
+Based on the existing codebase patterns:
 
----
+| Existing Action | Pulse Duration |
+|-----------------|----------------|
+| Cart addItem (direct) | 10ms |
+| Save for later | 10ms |
+| Quick add success | 50ms |
+| Tier unlock | 30ms |
+| Free shipping unlock | 50ms |
 
-## Visual Design
-
-```text
-┌───────────────────────────────────────────────────────────┐
-│                                                           │
-│  ┌─────────┐                                              │
-│  │         │  Heavenly Crewneck              View Cart    │
-│  │  [IMG]  │  Size M                                      │
-│  │         │                                              │
-│  └─────────┘                                              │
-│                                                           │
-└───────────────────────────────────────────────────────────┘
-```
-
-**Button Specs:**
-- Text: "View Cart" (not "View Bag" — testing shows "Cart" converts 8% better)
-- Style: Text button, no background, `text-foreground` with subtle underline on hover
-- Font: Same as product name (sm, medium weight)
-- Position: Right-aligned, vertically centered
-- Touch target: Minimum 44x44px for accessibility
+**Recommended for Toast:** **10ms** — aligns with the direct cart add pattern since the toast confirms the same action. This creates a consistent tactile signature across the add-to-cart experience.
 
 ---
 
-## Implementation Architecture
+## Implementation
 
-### Challenge: Hook Access in Toast
-
-The toast component is rendered inside Sonner's portal, outside the React component tree. This means it **cannot directly use `useCart()` hook**.
-
-**Solution:** Pass an `onViewCart` callback from the caller through the utility function.
-
-### Phase 1: Update AddedToCartToast Component
-
-**File:** `src/components/cart/AddedToCartToast.tsx`
+### File: `src/components/cart/AddedToCartToast.tsx`
 
 **Changes:**
-1. Add `onViewCart?: () => void` prop
-2. Add "View Cart" button that calls `onViewCart` and dismisses toast
-3. Prevent event bubbling so toast doesn't dismiss twice
-4. Style button to match editorial aesthetic
+1. Add `useEffect` hook to trigger haptic feedback on mount
+2. Only trigger once when toast first appears
+3. No vibration if `prefersReducedMotion` is true (accessibility)
 
 ```typescript
-interface AddedToCartToastProps {
-  productName: string;
-  productImage: string;
-  size?: string;
-  color?: string;
-  toastId?: string | number;
-  onViewCart?: () => void;  // NEW
-}
+import { useEffect } from 'react';
+
+// Inside the component, after prefersReducedMotion:
+useEffect(() => {
+  // Subtle haptic pulse when toast appears (mobile)
+  if (!prefersReducedMotion && 'vibrate' in navigator) {
+    navigator.vibrate(10);
+  }
+}, []); // Empty deps = run once on mount
 ```
 
-**Button Implementation:**
-```tsx
-{/* View Cart CTA */}
-{onViewCart && (
-  <button
-    onClick={(e) => {
-      e.stopPropagation(); // Prevent toast dismiss
-      if (toastId) sonnerToast.dismiss(toastId);
-      onViewCart();
-    }}
-    className="text-sm font-medium text-foreground hover:underline underline-offset-4 transition-all whitespace-nowrap ml-2 px-2 py-1.5 -mr-1"
-    aria-label="View shopping cart"
-  >
-    View Cart
-  </button>
-)}
-```
+---
 
-### Phase 2: Update toastUtils.tsx
+## Technical Considerations
 
-**File:** `src/lib/toastUtils.tsx`
+### Why in the Toast Component (not the utility)?
 
-**Changes:**
-1. Add `onViewCart?: () => void` to `ShowAddedToastOptions`
-2. Pass callback through to `AddedToCartToast` component
+The `showAddedToast` function in `toastUtils.tsx` is just a function call — it doesn't have access to the React lifecycle or the `prefersReducedMotion` hook. By placing the haptic trigger in the component:
 
-```typescript
-interface ShowAddedToastOptions {
-  productName: string;
-  productImage: string;
-  size?: string;
-  color?: string;
-  duration?: number;
-  onViewCart?: () => void;  // NEW
-}
-```
+1. We respect reduced motion preferences
+2. We trigger at the exact moment the toast becomes visible
+3. We follow the existing pattern (e.g., `FreeShippingBar.tsx` triggers haptics in component effects)
 
-### Phase 3: Update useQuickAdd.ts
+### Avoiding Double Vibration
 
-**File:** `src/hooks/useQuickAdd.ts`
+The `useCart.tsx` already has a 10ms vibration on `addItem` (line 102-104). However:
+- That fires when the item is added to the cart state
+- This toast fires when the visual confirmation appears
+- These happen nearly simultaneously (~100ms apart)
+- For a 10ms pulse, users won't perceive a "double tap" — it reinforces the action
 
-**Changes:**
-1. Pass `openCart` from `useCart()` as `onViewCart` callback to `showAddedToast`
+If this becomes an issue, we could add a `skipHaptic` prop to the toast, but this is unlikely to be needed.
 
-```typescript
-// In addToCart callback (around line 306-313)
-if (showToast) {
-  showAddedToast({
-    productName: product.name,
-    productImage: primaryImage?.image_url || '/placeholder.svg',
-    size: sizeToUse,
-    color: color,
-    onViewCart: openCart,  // NEW - passes cart context's openCart function
-  });
-}
-```
+### Reduced Motion Handling
+
+Already handled: the component checks `prefersReducedMotion` and skips the vibration if true.
 
 ---
 
@@ -139,86 +84,41 @@ if (showToast) {
 
 | File | Changes |
 |------|---------|
-| `src/components/cart/AddedToCartToast.tsx` | Add `onViewCart` prop and "View Cart" button |
-| `src/lib/toastUtils.tsx` | Add `onViewCart` to options interface and pass through |
-| `src/hooks/useQuickAdd.ts` | Extract `openCart` from `useCart()` and pass to `showAddedToast` |
-
----
-
-## Technical Considerations
-
-### Why Not Use Context in Toast?
-
-The toast is rendered via Sonner's portal system, which means:
-- It's outside the normal React tree
-- Using hooks like `useCart()` would require wrapping Sonner in our CartProvider
-- This is fragile and not recommended
-
-The callback pattern is more robust and follows React best practices for cross-tree communication.
-
-### Event Handling
-
-The "View Cart" button must:
-1. Call `e.stopPropagation()` to prevent the parent's click handler from firing
-2. Dismiss the toast after triggering the cart open
-3. Fire the `onViewCart` callback which opens the cart drawer
-
-### Accessibility
-
-- `aria-label="View shopping cart"` for screen readers
-- Minimum 44x44px touch target
-- Focus visible state for keyboard users
-- Button is properly focusable in the toast
-
----
-
-## Animation Enhancement
-
-When the button is clicked, add a micro-interaction:
-- Brief scale-down (0.97) on press
-- Smooth scale-up (1.0) on release
-- This provides tactile feedback without being flashy
-
-```tsx
-<motion.button
-  whileTap={{ scale: 0.97 }}
-  transition={{ duration: 0.1 }}
-  // ... rest of props
->
-```
+| `src/components/cart/AddedToCartToast.tsx` | Add `useEffect` with haptic trigger on mount |
 
 ---
 
 ## Acceptance Criteria
 
-- [ ] "View Cart" button appears on all "Just Added" toasts
-- [ ] Tapping button opens cart drawer
-- [ ] Toast dismisses when button is tapped
-- [ ] Button has minimum 44x44px touch target
-- [ ] Button text is "View Cart" (not "View Bag")
-- [ ] Button has subtle hover underline effect
-- [ ] Button has press animation feedback
-- [ ] Button is properly accessible (aria-label, focusable)
-- [ ] Button works on both mobile and desktop
-- [ ] Reduced motion: skip press animation
+- [ ] Toast triggers 10ms haptic pulse on mobile devices
+- [ ] No haptic if `prefers-reduced-motion` is enabled
+- [ ] Haptic fires only once per toast (not on re-render)
+- [ ] Works on Android Chrome and iOS Safari (where supported)
+- [ ] No JavaScript errors on devices without `navigator.vibrate`
 
 ---
 
-## Conversion Impact
+## Code Diff Preview
 
-| Metric | Expected Lift | Mechanism |
-|--------|---------------|-----------|
-| Cart open rate | +15% | Secondary path to cart beyond auto-open |
-| Checkout initiation | +8% | Faster path to checkout from toast |
-| Cart abandonment | -5% | Reduces friction in funnel |
-| Mobile conversion | +12% | Thumb-reachable CTA at peak intent |
+```diff
+import { motion } from 'framer-motion';
++import { useEffect } from 'react';
+import { toast as sonnerToast } from 'sonner';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
 
----
+const AddedToCartToast = ({...}) => {
+  const prefersReducedMotion = useReducedMotion();
 
-## Analytics Events
++  // Subtle haptic feedback when toast appears (mobile)
++  useEffect(() => {
++    if (!prefersReducedMotion && 'vibrate' in navigator) {
++      navigator.vibrate(10);
++    }
++  }, [prefersReducedMotion]);
 
-| Event | Properties | Trigger |
-|-------|------------|---------|
-| `toast_view_cart_clicked` | `productId`, `size`, `color`, `cartCount` | Button click |
-| `cart_opened_from_toast` | `productId`, `timeAfterAdd` | Cart opens via toast button |
+  const handleViewCart = (e: React.MouseEvent) => {...};
+  
+  return (...);
+};
+```
 
