@@ -1,324 +1,245 @@
 
-# CAD Dollar Currency Conversion - Premium Implementation Blueprint
+# Size Quiz Debug & Fix Plan
 
-## Executive Summary
-
-This implementation converts ALL pricing display across the LINEA e-commerce platform from the current mixed EUR/USD system to unified **CAD (Canadian Dollars)** with proper `$` symbol formatting. This affects **45+ files** across frontend components, hooks, edge functions, and copy/content.
-
----
-
-## Current State Audit
-
-### Identified Currency Inconsistencies
-
-The codebase currently has a **critical inconsistency**:
-
-| Location | Current Currency | Symbol |
-|----------|------------------|--------|
-| `cartUtils.ts` formatPrice | USD | `$` |
-| `ProductCard.tsx` formatPrice | USD | `$` |
-| `ProductInfo.tsx` | USD | `$69.99` |
-| `FeaturedDrop.tsx` | USD | `$65` |
-| `ProductCarousel.tsx` | Hardcoded USD | `$65`, `$85` |
-| `CartDrawer.tsx` | EUR | `€` |
-| `FreeShippingBar.tsx` | EUR | `€` |
-| `Checkout.tsx` | EUR | `€` |
-| `OrderDetail/Dashboard` | EUR | `€` |
-| `Try-On components` | EUR | `€` |
-| `StatusBar.tsx` | EUR | `€50` |
-| Edge Functions | EUR | `currency: "eur"` |
-| Database `orders.currency` | EUR | `'eur'` default |
-| Shipping thresholds | Mixed | `€150`, `$75+` |
-
-**This creates customer confusion and must be unified to CAD.**
+## Problem Summary
+The Size Quiz system has a critical architectural flaw: **dual state management** where `useSizeQuiz` hook and `SizeQuizContext` maintain separate, unsynchronized state. This causes the quiz to behave unpredictably, fail to save sizes correctly, and not properly execute pending actions after completion.
 
 ---
 
-## Implementation Architecture
+## Identified Bugs
 
-```text
-                    CURRENCY SYSTEM REFACTOR
- ──────────────────────────────────────────────────────────
+### Bug 1: Dual State Management Conflict (CRITICAL)
+**Location**: `src/hooks/useSizeQuiz.ts` + `src/contexts/SizeQuizContext.tsx`
 
- ┌─────────────────────────────────────────────────────────┐
- │              src/lib/currency.ts (NEW)                  │
- │  ─────────────────────────────────────────────────────  │
- │  export const CURRENCY = {                              │
- │    code: 'CAD',                                         │
- │    symbol: '$',                                         │
- │    locale: 'en-CA',                                     │
- │    freeShippingThreshold: 99,  // $99 CAD               │
- │  };                                                     │
- │                                                         │
- │  export function formatPrice(price: number): string {   │
- │    return new Intl.NumberFormat('en-CA', {              │
- │      style: 'currency',                                 │
- │      currency: 'CAD',                                   │
- │    }).format(price);                                    │
- │  }                                                      │
- │  // Output: "$69.99" (proper CAD formatting)            │
- └─────────────────────────────────────────────────────────┘
-                          │
-                          ▼
- ┌─────────────────────────────────────────────────────────┐
- │           All Components Import From Here               │
- │  ─────────────────────────────────────────────────────  │
- │  import { formatPrice, CURRENCY } from '@/lib/currency' │
- └─────────────────────────────────────────────────────────┘
-```
+**Problem**: Two separate state systems for the same quiz:
+- `useSizeQuiz` hook has its own `isOpen`, `currentStep`, `answers` state
+- `SizeQuizContext` has its own `isOpen`, `hasCompletedQuiz` state
+- Modal receives `isOpen` from context, but internally uses hook state
 
----
+**Impact**: Quiz steps don't advance properly, answers don't persist between open/close cycles
 
-## Files Requiring Changes
+### Bug 2: Pending Action Category Mismatch (HIGH)
+**Location**: `src/contexts/SizeQuizContext.tsx` lines 85-90
 
-### TIER 1: Core Currency Infrastructure (Critical Path)
-
-| File | Change Type | Details |
-|------|-------------|---------|
-| `src/lib/currency.ts` | **NEW** | Central currency config + formatPrice function |
-| `src/lib/cartUtils.ts` | UPDATE | Replace formatPrice with import from currency.ts |
-| `src/hooks/useCart.tsx` | UPDATE | Change `FREE_SHIPPING_THRESHOLD = 99` (CAD), update comments |
-
-### TIER 2: Cart & Checkout (High Visibility)
-
-| File | Lines | Current | Change To |
-|------|-------|---------|-----------|
-| `src/components/cart/CartDrawer.tsx` | 437-441 | `€{subtotal.toLocaleString('en-EU'...)}` | `${formatPrice(subtotal)}` |
-| `src/components/cart/FreeShippingBar.tsx` | 148, 159 | `€{amountToFreeShipping...}` | `${formatPrice(amountToFreeShipping)}` |
-| `src/components/cart/BundleSavingsRow.tsx` | 65 | `-€{totalBundleSavings...}` | `-${formatPrice(totalBundleSavings)}` |
-| `src/components/cart/ThresholdUpsellCard.tsx` | 61, 167 | `€{effectivePrice}` | `${formatPrice(effectivePrice)}` |
-| `src/pages/Checkout.tsx` | 870, 883, 895, 997-1066 | All `€` symbols | All `$` symbols with formatPrice() |
-| `src/components/checkout/MobileStickyCheckout.tsx` | 63 | `€{total...}` | `${formatPrice(total)}` |
-| `src/components/checkout/OrderConfirmation.tsx` | 89 | `€{subtotal...}` | `${formatPrice(subtotal)}` |
-
-### TIER 3: Product Display
-
-| File | Lines | Change |
-|------|-------|--------|
-| `src/components/product/ProductInfo.tsx` | 230-234, 259 | Already uses `$` - verify consistency |
-| `src/components/product/MobileStickyATC.tsx` | 67-68, 108-109 | Already uses `$` - verify consistency |
-| `src/components/product/WearWithSection.tsx` | 122-127, 229-240 | Already uses `$` - verify consistency |
-| `src/components/category/ProductCard.tsx` | 112-116 | formatPrice uses USD - change to CAD |
-| `src/components/homepage/FeaturedDrop.tsx` | 65 | Hardcoded `$65` - keep symbol, adjust if needed |
-| `src/components/content/ProductCarousel.tsx` | 24-69 | Hardcoded `$65`, `$85` strings |
-| `src/components/homepage/RecentlyViewed.tsx` | 72-77 | `€{displayPrice...}` → `${formatPrice(...)}` |
-
-### TIER 4: Try-On Room Components
-
-| File | Lines | Change |
-|------|-------|--------|
-| `src/components/try-on/SaveLookModal.tsx` | 144, 150 | `€{item?.price...}` → `${formatPrice(...)}` |
-| `src/components/try-on/ProductDrawer.tsx` | 174 | `€{product.price...}` → `${formatPrice(...)}` |
-| `src/components/try-on/ClothingSlot.tsx` | 54 | `€{equippedItem.price...}` → `${formatPrice(...)}` |
-| `src/components/try-on/MobileTryOnBar.tsx` | 48, 137, 146, 189 | `€` → `$` with formatPrice |
-| `src/components/try-on/OutfitSummary.tsx` | 27, 95, 105 | `€` → `$` with formatPrice |
-
-### TIER 5: Account & Orders
-
-| File | Lines | Change |
-|------|-------|--------|
-| `src/pages/account/AccountOrderDetail.tsx` | 225, 284, 291, 297, 303, 308 | All `€` → `$` |
-| `src/pages/account/AccountDashboard.tsx` | 25, 167 | `€{totalSpent...}` → `${formatPrice(...)}` |
-| `src/pages/account/AccountFavorites.tsx` | 20-22, 28 | Already uses `$` - verify |
-
-### TIER 6: Header & Global UI
-
-| File | Lines | Change |
-|------|-------|--------|
-| `src/components/header/StatusBar.tsx` | 15 | `"Free shipping over €50"` → `"Free shipping over $99"` |
-| `src/components/header/ShoppingBag.tsx` | 127 | `€{subtotal...}` → `${formatPrice(subtotal)}` |
-| `src/components/homepage/ValueStackBanner.tsx` | 33 | `"Free Shipping $75+"` → `"Free Shipping $99+"` |
-| `src/components/homepage/MobileStickyBar.tsx` | 63 | `"Free shipping on orders $75+"` → `"$99+"` |
-
-### TIER 7: Content & Copy Pages
-
-| File | Lines | Change |
-|------|-------|--------|
-| `src/pages/FAQ.tsx` | 31 | `$75` threshold mentions → `$99` |
-| `src/pages/Contact.tsx` | 124 | Shipping threshold copy |
-| `src/pages/ShippingInfo.tsx` | 14, 53, 115 | All `$75` → `$99` |
-| `src/components/shipping/ShippingCalculator.tsx` | 49 | `"Free over $75"` → `"Free over $99"` |
-| `src/components/product/ShippingReturnsAccordion.tsx` | 32 | `"Orders over $75"` → `"Orders over $99"` |
-| `src/components/product/ProductInfo.tsx` | 186 | `"Free shipping $75+"` → `"Free shipping $99+"` |
-| `src/components/category/FilterSortBar.tsx` | 50 | Price range filters (keep as-is for now) |
-
-### TIER 8: Edge Functions (Backend)
-
-| File | Lines | Change |
-|------|-------|--------|
-| `supabase/functions/create-checkout-session/index.ts` | 53-57, 174, 289, 340, 360, 410, 447 | `"eur"` → `"cad"`, `€` → `$` in comments |
-| `supabase/functions/create-payment-intent/index.ts` | 162, 282, 310 | `"eur"` → `"cad"` |
-| `supabase/functions/validate-discount-code/index.ts` | TBD | Check for currency mentions |
-
----
-
-## New File: `src/lib/currency.ts`
-
+**Problem**: When resolving pending action size, always picks `tops` first:
 ```typescript
-/**
- * Centralized currency configuration for LINEA
- * All pricing display must use these utilities for consistency
- */
+const size = parsed.tops || parsed.bottoms || parsed.hats;
+```
 
-export const CURRENCY = {
-  /** ISO 4217 currency code */
-  code: 'CAD' as const,
-  /** Display symbol */
-  symbol: '$',
-  /** Locale for formatting */
-  locale: 'en-CA',
-  /** Free shipping threshold in dollars */
-  freeShippingThreshold: 99,
-  /** Express shipping cost */
-  expressShippingCost: 15,
-  /** Overnight shipping cost */
-  overnightShippingCost: 35,
-  /** Standard shipping cost (under threshold) */
-  standardShippingCost: 10,
-};
+**Impact**: User shopping for bottoms gets assigned their tops size instead
 
-/**
- * Formats a numeric price as a CAD currency string
- * @param price - Price in dollars (not cents)
- * @returns Formatted string like "$69.99"
- */
-export function formatPrice(price: number): string {
-  return new Intl.NumberFormat(CURRENCY.locale, {
-    style: 'currency',
-    currency: CURRENCY.code,
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(price);
-}
+### Bug 3: Missing DialogDescription (MEDIUM)
+**Location**: `src/components/size-guide/SizeQuizModal.tsx`
 
-/**
- * Formats a price from cents to CAD string
- * @param cents - Price in cents
- * @returns Formatted string like "$69.99"
- */
-export function formatPriceCents(cents: number): string {
-  return formatPrice(cents / 100);
-}
+**Problem**: `DialogContent` lacks `DialogDescription`, causing console warning
 
-/**
- * Formats a price without the currency symbol
- * @param price - Price in dollars
- * @returns Formatted string like "69.99"
- */
-export function formatPriceNumeric(price: number): string {
-  return price.toFixed(2);
-}
+**Impact**: Accessibility warning, screen readers don't announce dialog purpose
+
+### Bug 4: Race Condition on Quiz Completion (HIGH)
+**Location**: `src/contexts/SizeQuizContext.tsx` lines 73-104
+
+**Problem**: `closeQuiz()` calls `hasCompletedQuizBefore()` immediately after quiz submits, but localStorage write may not be complete
+
+**Impact**: Pending actions fail to execute because completion status isn't detected
+
+### Bug 5: Size Memory Format Mismatch (MEDIUM)
+**Location**: `src/contexts/SizeQuizContext.tsx` vs `src/hooks/useSizeMemory.ts`
+
+**Problem**: Context reads `localStorage.getItem('linea-size-memory')` expecting `{ tops: 'M' }` format, but `useSizeMemory` stores with additional timestamp fields
+
+**Impact**: Size resolution works but could fail on edge cases
+
+---
+
+## Solution Architecture
+
+### Approach: Unify State Management
+Eliminate the dual-state problem by removing the standalone `useSizeQuiz` hook's state and using only the context's state. The modal becomes a pure presentation component that receives all state/actions from context.
+
+```
+                     CURRENT (Broken)
+┌─────────────────────────────────────────────────────────┐
+│  SizeQuizContext                                        │
+│  ├── isOpen (state)                                     │
+│  ├── hasCompletedQuiz (state)                           │
+│  └── pendingAction (ref)                                │
+│                                                         │
+│  └── <SizeQuizModal isOpen={isOpen} onClose={...}>      │
+│       └── useSizeQuiz() ← SEPARATE STATE!               │
+│            ├── isOpen (state) ← NEVER USED              │
+│            ├── currentStep (state)                      │
+│            └── answers (state)                          │
+└─────────────────────────────────────────────────────────┘
+
+                      FIXED
+┌─────────────────────────────────────────────────────────┐
+│  SizeQuizContext                                        │
+│  ├── isOpen (state)                                     │
+│  ├── hasCompletedQuiz (state)                           │
+│  ├── currentStep (state) ← MOVED HERE                   │
+│  ├── answers (state) ← MOVED HERE                       │
+│  ├── pendingAction (ref)                                │
+│  └── recommendedSizes (derived)                         │
+│                                                         │
+│  └── <SizeQuizModal                                     │
+│         isOpen={isOpen}                                 │
+│         currentStep={currentStep}                       │
+│         answers={answers}                               │
+│         onSetAnswer={setAnswer}                         │
+│         ... />                                          │
+└─────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## Shipping Threshold Alignment
+## Implementation Plan
 
-| Current | New (CAD) | Notes |
-|---------|-----------|-------|
-| €150 (edge functions) | $99 CAD | Standard market threshold |
-| €100 (checkout) | $99 CAD | Unified |
-| $75 (copy) | $99 CAD | Unified |
-| €50 (StatusBar) | $99 CAD | Unified |
+### Phase 1: Consolidate State in Context
 
-**Rationale**: $99 CAD is a common Canadian e-commerce free shipping threshold that balances conversion incentive with margin protection.
+**File: `src/contexts/SizeQuizContext.tsx`**
 
----
+1. Move quiz logic from `useSizeQuiz` into context:
+   - Add `currentStep` state
+   - Add `answers` state  
+   - Add `recommendedSizes` derived value
+   - Add `setAnswer`, `nextStep`, `prevStep` actions
+   - Add `submitQuiz` that saves sizes and handles pending action
 
-## Database Considerations
+2. Update `closeQuiz` to:
+   - Reset `currentStep` to 0
+   - Reset `answers` to null values
+   - Clear pending action if quiz wasn't completed
 
-The `orders` table has `currency` column defaulting to `'eur'`. This stores the transaction currency, but since we're converting the entire store to CAD, new orders will use `'cad'`.
+3. Fix pending action category resolution:
+   - Store the product's category in pending action
+   - Use category-specific size when executing callback
 
-**No migration needed** - the column accepts any string. Edge functions will insert `'cad'` for new orders.
+### Phase 2: Update Modal Component
 
----
+**File: `src/components/size-guide/SizeQuizModal.tsx`**
 
-## Implementation Sequence
+1. Remove `useSizeQuiz()` hook usage
+2. Receive all state and actions from props
+3. Add `DialogDescription` for accessibility
+4. Add `VisuallyHidden` wrapper if description shouldn't be visible
 
-### Phase 1: Infrastructure (Must Do First)
-1. Create `src/lib/currency.ts` with centralized config
-2. Update `src/lib/cartUtils.ts` to re-export from currency.ts (backward compat)
-3. Update `src/hooks/useCart.tsx` threshold to 99
+### Phase 3: Fix Pending Action Logic
 
-### Phase 2: Cart & Checkout Flow
-4. Update `CartDrawer.tsx`, `FreeShippingBar.tsx`, `BundleSavingsRow.tsx`
-5. Update `Checkout.tsx` (large file, many instances)
-6. Update `MobileStickyCheckout.tsx`, `OrderConfirmation.tsx`
+**File: `src/contexts/SizeQuizContext.tsx`**
 
-### Phase 3: Product Display
-7. Update `ProductCard.tsx`, `RecentlyViewed.tsx`
-8. Update Try-On components (5 files)
-9. Verify `ProductInfo.tsx` consistency
+Update pending action interface:
+```typescript
+interface PendingAction {
+  productId: string;
+  categorySlug: string; // ADD: to resolve correct size
+  size?: string;
+  color?: string;
+  callback: (size: string, color?: string) => void;
+}
+```
 
-### Phase 4: Account & History
-10. Update `AccountOrderDetail.tsx`, `AccountDashboard.tsx`
+Update `openQuizWithPending` call sites:
+- `src/hooks/useQuickAdd.ts` - pass `categorySlug`
 
-### Phase 5: Global & Copy
-11. Update `StatusBar.tsx`, `ValueStackBanner.tsx`, `MobileStickyBar.tsx`
-12. Update content pages (FAQ, Contact, ShippingInfo)
+### Phase 4: Fix Race Condition
 
-### Phase 6: Edge Functions (Deploy Required)
-13. Update `create-checkout-session/index.ts`
-14. Update `create-payment-intent/index.ts`
-15. Deploy edge functions
-
----
-
-## Copy Standardization
-
-All shipping/pricing copy will follow this pattern:
-
-| Element | Copy |
-|---------|------|
-| Free shipping threshold | "Free shipping on orders $99+" |
-| Short form | "Free over $99" |
-| Trust signal | "Free shipping $99+ • Easy 30-day returns" |
-| Checkout shipping option | "Standard Shipping — FREE over $99" |
+In `submitQuiz`:
+1. Save sizes synchronously to localStorage
+2. Mark quiz completed
+3. Update `hasCompletedQuiz` state
+4. Execute pending action BEFORE calling `closeQuiz`
+5. Reset quiz state
 
 ---
 
-## Quality Assurance Checklist
+## Detailed Code Changes
 
-### Visual Regression
-- [ ] Homepage hero shows correct currency
-- [ ] PLP product cards show `$XX.XX` format
-- [ ] PDP price displays correctly
-- [ ] Cart drawer shows CAD prices
-- [ ] Checkout totals display correctly
-- [ ] Order confirmation shows correct amounts
-- [ ] Account order history displays CAD
+### 1. `src/contexts/SizeQuizContext.tsx` - Complete Rewrite
 
-### Functional Testing
-- [ ] Add to cart calculates correct totals
-- [ ] Free shipping unlocks at $99
-- [ ] Discount codes apply correctly
-- [ ] Stripe checkout uses CAD
-- [ ] Express Pay uses CAD
-- [ ] Order database stores 'cad' currency
+Key changes:
+- Import `useSizeMemory` for size persistence
+- Move all quiz state into context
+- Move size recommendation logic into context
+- Fix pending action to use category-aware size resolution
+- Ensure synchronous completion before callback execution
+
+### 2. `src/components/size-guide/SizeQuizModal.tsx`
+
+Key changes:
+- Import `useSizeQuizContext` instead of `useSizeQuiz`
+- Remove local hook usage
+- Add `DialogDescription` with `sr-only` class for accessibility
+- Receive `onSubmit` handler from context
+
+### 3. `src/hooks/useQuickAdd.ts`
+
+Key changes:
+- Update `openQuizWithPending` call to include `categorySlug`:
+```typescript
+sizeQuizContext.openQuizWithPending({
+  productId: product.id,
+  categorySlug: categorySlug, // ADD THIS
+  callback: (size: string, color?: string) => {
+    addToCart({ size, color });
+  },
+});
+```
+
+### 4. `src/hooks/useSizeQuiz.ts` - Deprecate
+
+- Keep file for backwards compatibility
+- Have it consume context instead of maintaining its own state
+- Or remove entirely if no other consumers
+
+---
+
+## Testing Checklist
+
+### Functional Tests
+- [ ] Open quiz from Size Guide page manually
+- [ ] Complete all 3 steps and verify sizes save
+- [ ] Verify toast appears on completion
+- [ ] Open quiz again - verify it doesn't re-appear (completed state)
+- [ ] Clear localStorage, trigger quiz via Quick Add
+- [ ] Complete quiz, verify item gets added to cart
+- [ ] Test quiz with pending action for TOPS product
+- [ ] Test quiz with pending action for BOTTOMS product
+- [ ] Test closing quiz without completing (Skip button)
+- [ ] Test Back button navigation through steps
+- [ ] Verify "Your Recommended Sizes" preview on step 3
 
 ### Edge Cases
-- [ ] Bundle discounts calculate correctly
-- [ ] Sale prices display with proper formatting
-- [ ] Price filters work (if enabled)
-- [ ] Reorder from history uses correct pricing
+- [ ] Open quiz, close immediately, reopen - state should reset
+- [ ] Complete quiz as guest, login, verify sizes sync
+- [ ] Complete quiz, add item, remove item, add again - no quiz
+- [ ] Rapidly click Next button - steps shouldn't skip
+
+### Accessibility
+- [ ] No console warnings about DialogDescription
+- [ ] Screen reader announces dialog purpose
+- [ ] Focus traps correctly in modal
+- [ ] Escape key closes modal
 
 ---
 
-## Risk Mitigation
+## Files Modified
 
-| Risk | Mitigation |
-|------|------------|
-| Stripe currency mismatch | Test checkout flow after deploy |
-| Existing EUR orders display | Orders store their transaction currency - historical orders show correctly |
-| Price filter breakage | Filters use numeric values, unaffected by display currency |
-| SEO impact | Product schema uses numeric prices with currency code |
+| File | Change Type | Description |
+|------|-------------|-------------|
+| `src/contexts/SizeQuizContext.tsx` | Major rewrite | Consolidate all quiz state, fix pending action |
+| `src/components/size-guide/SizeQuizModal.tsx` | Update | Use context, add DialogDescription |
+| `src/hooks/useQuickAdd.ts` | Minor update | Pass categorySlug to pending action |
+| `src/hooks/useSizeQuiz.ts` | Deprecate/Remove | No longer needed |
 
 ---
 
-## Success Metrics
+## Success Criteria
 
-After implementation:
-- 100% of frontend price displays use `$` symbol
-- 100% of new transactions use `cad` currency code
-- Zero customer confusion reports about currency
-- Free shipping threshold unified across all touchpoints
+1. Size quiz opens and progresses through all 3 steps without bugs
+2. Completing quiz saves sizes to localStorage (and DB if authenticated)
+3. Quick Add triggers quiz for first-time users WITHOUT saved sizes
+4. After quiz completion, pending add-to-cart action executes correctly
+5. Correct size is selected based on product category (tops vs bottoms)
+6. No console warnings about DialogDescription
+7. Quiz state resets properly when closed without completing
+8. Quiz doesn't reappear for users who have completed it
