@@ -11,7 +11,7 @@ import { CheckCircle } from "lucide-react";
 import { toast } from "sonner";
 
 const heroValueProps = [
-  { icon: Truck, text: "Free Over $75" },
+  { icon: Truck, text: "Free Over $99" },
   { icon: Clock, text: "2-5 Days Production" },
   { icon: Package, text: "Full Tracking" },
   { icon: Globe, text: "50+ Countries" },
@@ -50,7 +50,7 @@ const shippingOptions = [
     title: "STANDARD",
     description: "5-9 business days total (includes 2-5 days production + 3-4 days shipping).",
     variant: "default" as const,
-    badge: "FREE OVER $75"
+    badge: "FREE OVER $99"
   },
   {
     icon: Zap,
@@ -112,7 +112,7 @@ const ShippingInfo = () => {
   return (
     <ServicePageLayout
       title="Reliable Delivery. Every Order."
-      subtitle="Free shipping on orders over $75. Full tracking included. Worldwide delivery to 50+ countries."
+      subtitle="Free shipping on orders over $99. Full tracking included. Worldwide delivery to 50+ countries."
       eyebrow="SHIPPING & DELIVERY"
       heroAlignment="center"
       heroValueProps={heroValueProps}

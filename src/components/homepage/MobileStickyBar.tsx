@@ -60,7 +60,7 @@ const MobileStickyBar = () => {
 
         {/* Promo Text */}
         <p className="text-white/50 text-[10px] text-center mt-2 uppercase tracking-wider">
-          Free shipping on orders $75+ • Easy returns
+          Free shipping on orders $99+ • Easy returns
         </p>
       </div>
     </div>

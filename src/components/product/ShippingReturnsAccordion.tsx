@@ -29,7 +29,7 @@ const ShippingReturnsAccordion = () => {
               </div>
               <div className="flex justify-between">
                 <span>Free Shipping</span>
-                <span className="text-foreground">Orders over $75</span>
+                <span className="text-foreground">Orders over $99</span>
               </div>
             </div>
             <p className="text-xs font-light text-muted-foreground pt-2">

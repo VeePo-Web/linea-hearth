@@ -40,7 +40,7 @@ interface CartContextType {
 }
 
 const CART_STORAGE_KEY = 'linea-cart';
-const FREE_SHIPPING_THRESHOLD = 150; // €150 for free shipping
+const FREE_SHIPPING_THRESHOLD = 99; // $99 CAD for free shipping
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 

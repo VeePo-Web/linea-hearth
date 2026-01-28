@@ -434,11 +434,11 @@ const CartDrawer = ({ onViewFavorites }: CartDrawerProps) => {
                     <div className="text-right">
                       {hasActiveBundles && (
                         <span className="text-sm text-muted-foreground line-through mr-2">
-                          €{subtotal.toLocaleString('en-EU', { minimumFractionDigits: 2 })}
+                          ${subtotal.toLocaleString('en-CA', { minimumFractionDigits: 2 })}
                         </span>
                       )}
                       <span className="text-lg font-medium text-foreground">
-                        €{(subtotal - totalBundleSavings).toLocaleString('en-EU', { minimumFractionDigits: 2 })}
+                        ${(subtotal - totalBundleSavings).toLocaleString('en-CA', { minimumFractionDigits: 2 })}
                       </span>
                     </div>
                   </div>

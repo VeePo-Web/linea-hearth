@@ -46,7 +46,7 @@ const ShippingCalculator = () => {
         method: "Standard Shipping",
         minDays: productionMin + standardShipping.min,
         maxDays: productionMax + standardShipping.max,
-        price: "Free over $75",
+        price: "Free over $99",
         carrier: "USPS Priority Mail",
         includesProduction: true
       },

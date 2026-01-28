@@ -24,7 +24,7 @@ export const OutfitSummary = () => {
           id: item.productId.charCodeAt(0) + Date.now() + Math.random(),
           name: item.name,
           price: Number(item.price),
-          priceFormatted: `€${Number(item.price).toLocaleString()}`,
+          priceFormatted: `$${Number(item.price).toLocaleString()}`,
           image: item.imageUrl || '/placeholder.svg',
           category: slot,
           size: item.size,
@@ -92,7 +92,7 @@ export const OutfitSummary = () => {
                 </div>
               </div>
               <div className="text-sm font-medium">
-                €{item?.price.toLocaleString()}
+                ${item?.price.toLocaleString()}
               </div>
             </div>
           ))}
@@ -102,7 +102,7 @@ export const OutfitSummary = () => {
         <div className="p-4 bg-muted/30 space-y-3">
           <div className="flex items-center justify-between">
             <span className="text-sm font-light">Total</span>
-            <span className="text-lg font-medium">€{totalPrice.toLocaleString()}</span>
+            <span className="text-lg font-medium">${totalPrice.toLocaleString()}</span>
           </div>
           
           {/* Primary CTAs */}

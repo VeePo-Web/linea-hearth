@@ -60,7 +60,7 @@ const MobileStickyCheckout = ({ total, onPayNow, isProcessing }: MobileStickyChe
         </button>
 
         <div className="flex items-center gap-4">
-          <span className="font-medium text-foreground">€{total.toLocaleString()}</span>
+          <span className="font-medium text-foreground">${total.toLocaleString()}</span>
           <Button
             onClick={onPayNow}
             disabled={isProcessing}

@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import { useQuickAdd, type ProductForQuickAdd } from "@/hooks/useQuickAdd";
 import { AnimatePresence, motion } from "framer-motion";
 import type { ThresholdProduct } from "@/hooks/useThresholdUpsells";
+import { formatPrice } from "@/lib/currency";
 
 interface ThresholdUpsellCardProps {
   product: ThresholdProduct;
@@ -58,7 +59,7 @@ const ThresholdUpsellCard = ({
           {product.name}
         </p>
         <p className="text-xs font-medium text-foreground mb-2">
-          €{effectivePrice}
+          {formatPrice(effectivePrice)}
         </p>
 
         {/* Inline size picker */}
@@ -164,7 +165,7 @@ const ThresholdUpsellCard = ({
       <div className="flex-1 min-w-0 relative">
         <h4 className="text-sm font-medium text-foreground truncate">{product.name}</h4>
         <div className="flex items-center gap-2">
-          <p className="text-sm text-muted-foreground">€{effectivePrice}</p>
+          <p className="text-sm text-muted-foreground">{formatPrice(effectivePrice)}</p>
           {/* Size memory indicator */}
           {quickAdd.rememberedSize && quickAdd.stockForRemembered > 0 && (
             <span className="text-[10px] uppercase tracking-wide text-amber-600 font-medium">
