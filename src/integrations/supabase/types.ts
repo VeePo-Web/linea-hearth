@@ -998,6 +998,7 @@ export type Database = {
           description: string | null
           fabric_composition: string | null
           fit_type: string | null
+          flash_sale_ends_at: string | null
           id: string
           is_featured: boolean
           is_on_sale: boolean
@@ -1020,6 +1021,7 @@ export type Database = {
           description?: string | null
           fabric_composition?: string | null
           fit_type?: string | null
+          flash_sale_ends_at?: string | null
           id?: string
           is_featured?: boolean
           is_on_sale?: boolean
@@ -1042,6 +1044,7 @@ export type Database = {
           description?: string | null
           fabric_composition?: string | null
           fit_type?: string | null
+          flash_sale_ends_at?: string | null
           id?: string
           is_featured?: boolean
           is_on_sale?: boolean
