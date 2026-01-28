@@ -4,16 +4,14 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
-import { useSizeQuiz, HeightRange, FitPreference, PrimaryCategory } from "@/hooks/useSizeQuiz";
+import { useSizeQuizContext, HeightRange, FitPreference, PrimaryCategory } from "@/contexts/SizeQuizContext";
 import { cn } from "@/lib/utils";
 
-interface SizeQuizModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
+// ============= Quiz Option Component =============
 
 interface QuizOptionProps {
   value: string;
@@ -45,8 +43,61 @@ const QuizOption = ({ label, description, isSelected, onClick }: QuizOptionProps
   </button>
 );
 
-const SizeQuizModal = ({ isOpen, onClose }: SizeQuizModalProps) => {
+// ============= Step Configuration =============
+
+const heightOptions: { value: HeightRange; label: string; description: string }[] = [
+  { value: 'under-5-4', label: "Under 5'4\"", description: "162 cm and below" },
+  { value: '5-4-to-5-8', label: "5'4\" - 5'8\"", description: "163 - 173 cm" },
+  { value: '5-9-to-6-0', label: "5'9\" - 6'0\"", description: "174 - 183 cm" },
+  { value: 'over-6-0', label: "Over 6'0\"", description: "184 cm and above" },
+];
+
+const fitOptions: { value: FitPreference; label: string; description: string }[] = [
+  { value: 'fitted', label: "Fitted", description: "Close to body, tailored look" },
+  { value: 'relaxed', label: "Relaxed", description: "Comfortable, slightly loose" },
+  { value: 'oversized', label: "Oversized", description: "Extra roomy, streetwear vibe" },
+];
+
+const categoryOptions: { value: PrimaryCategory; label: string; description: string }[] = [
+  { value: 'tops', label: "Mostly Tops", description: "Tees, hoodies, crewnecks" },
+  { value: 'bottoms', label: "Mostly Bottoms", description: "Joggers, shorts, pants" },
+  { value: 'both', label: "Both Equally", description: "Full fits, head to toe" },
+];
+
+interface StepConfig {
+  title: string;
+  subtitle: string;
+  options: Array<{ value: string; label: string; description: string }>;
+  answerKey: 'heightRange' | 'fitPreference' | 'primaryCategory';
+}
+
+const steps: StepConfig[] = [
+  {
+    title: "What's your height?",
+    subtitle: "This helps us recommend the right length",
+    options: heightOptions,
+    answerKey: 'heightRange',
+  },
+  {
+    title: "How do you like your fit?",
+    subtitle: "Everyone has their preference",
+    options: fitOptions,
+    answerKey: 'fitPreference',
+  },
+  {
+    title: "What do you shop for most?",
+    subtitle: "We'll prioritize these sizes",
+    options: categoryOptions,
+    answerKey: 'primaryCategory',
+  },
+];
+
+// ============= Modal Component =============
+
+const SizeQuizModal = () => {
   const {
+    isOpen,
+    closeQuiz,
     currentStep,
     answers,
     setAnswer,
@@ -54,47 +105,7 @@ const SizeQuizModal = ({ isOpen, onClose }: SizeQuizModalProps) => {
     prevStep,
     submitQuiz,
     recommendedSizes,
-  } = useSizeQuiz();
-
-  const heightOptions: { value: HeightRange; label: string; description: string }[] = [
-    { value: 'under-5-4', label: "Under 5'4\"", description: "162 cm and below" },
-    { value: '5-4-to-5-8', label: "5'4\" - 5'8\"", description: "163 - 173 cm" },
-    { value: '5-9-to-6-0', label: "5'9\" - 6'0\"", description: "174 - 183 cm" },
-    { value: 'over-6-0', label: "Over 6'0\"", description: "184 cm and above" },
-  ];
-
-  const fitOptions: { value: FitPreference; label: string; description: string }[] = [
-    { value: 'fitted', label: "Fitted", description: "Close to body, tailored look" },
-    { value: 'relaxed', label: "Relaxed", description: "Comfortable, slightly loose" },
-    { value: 'oversized', label: "Oversized", description: "Extra roomy, streetwear vibe" },
-  ];
-
-  const categoryOptions: { value: PrimaryCategory; label: string; description: string }[] = [
-    { value: 'tops', label: "Mostly Tops", description: "Tees, hoodies, crewnecks" },
-    { value: 'bottoms', label: "Mostly Bottoms", description: "Joggers, shorts, pants" },
-    { value: 'both', label: "Both Equally", description: "Full fits, head to toe" },
-  ];
-
-  const steps = [
-    {
-      title: "What's your height?",
-      subtitle: "This helps us recommend the right length",
-      options: heightOptions,
-      answerKey: 'heightRange' as const,
-    },
-    {
-      title: "How do you like your fit?",
-      subtitle: "Everyone has their preference",
-      options: fitOptions,
-      answerKey: 'fitPreference' as const,
-    },
-    {
-      title: "What do you shop for most?",
-      subtitle: "We'll prioritize these sizes",
-      options: categoryOptions,
-      answerKey: 'primaryCategory' as const,
-    },
-  ];
+  } = useSizeQuizContext();
 
   const currentStepData = steps[currentStep];
   const canProceed = answers[currentStepData.answerKey] !== null;
@@ -108,8 +119,16 @@ const SizeQuizModal = ({ isOpen, onClose }: SizeQuizModalProps) => {
     }
   };
 
+  const handleBack = () => {
+    if (currentStep > 0) {
+      prevStep();
+    } else {
+      closeQuiz();
+    }
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && closeQuiz()}>
       <DialogContent className="max-w-md p-0 gap-0 overflow-hidden">
         {/* Progress indicator */}
         <div className="flex gap-1 p-4 pb-0">
@@ -128,9 +147,9 @@ const SizeQuizModal = ({ isOpen, onClose }: SizeQuizModalProps) => {
           <DialogTitle className="text-xl font-light">
             {currentStepData.title}
           </DialogTitle>
-          <p className="text-sm text-muted-foreground font-light">
+          <DialogDescription className="text-sm text-muted-foreground font-light">
             {currentStepData.subtitle}
-          </p>
+          </DialogDescription>
         </DialogHeader>
 
         <div className="px-6 pb-6">
@@ -150,7 +169,7 @@ const SizeQuizModal = ({ isOpen, onClose }: SizeQuizModalProps) => {
                   label={option.label}
                   description={option.description}
                   isSelected={answers[currentStepData.answerKey] === option.value}
-                  onClick={() => setAnswer(currentStepData.answerKey, option.value)}
+                  onClick={() => setAnswer(currentStepData.answerKey, option.value as any)}
                 />
               ))}
             </motion.div>
@@ -188,7 +207,7 @@ const SizeQuizModal = ({ isOpen, onClose }: SizeQuizModalProps) => {
           <Button
             variant="ghost"
             size="sm"
-            onClick={currentStep > 0 ? prevStep : onClose}
+            onClick={handleBack}
             className="text-sm font-light"
           >
             <ChevronLeft className="w-4 h-4 mr-1" />

@@ -350,6 +350,7 @@ export function useQuickAdd(
       hasPromptedQuizRef.current = true;
       sizeQuizContext.openQuizWithPending({
         productId: product.id,
+        categorySlug: categorySlug, // Pass category for correct size resolution
         callback: (size: string, color?: string) => {
           addToCart({ size, color });
         },
