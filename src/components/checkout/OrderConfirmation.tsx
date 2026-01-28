@@ -86,7 +86,7 @@ const OrderConfirmation = ({
         </div>
         <div className="flex justify-between text-sm">
           <span className="text-muted-foreground">Total</span>
-          <span className="text-foreground font-medium">€{subtotal.toLocaleString()}</span>
+          <span className="text-foreground font-medium">${subtotal.toLocaleString()}</span>
         </div>
         <div className="flex justify-between text-sm">
           <span className="text-muted-foreground">Shipping</span>

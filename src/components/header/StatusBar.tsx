@@ -12,7 +12,7 @@ const StatusBar = () => {
   const [isPaused, setIsPaused] = useState(false);
 
   const usps: USP[] = [
-    { text: "Free shipping over €50", icon: <Truck size={14} strokeWidth={1.5} /> },
+    { text: "Free shipping over $99", icon: <Truck size={14} strokeWidth={1.5} /> },
     { text: "365 days warranty", icon: <Shield size={14} strokeWidth={1.5} /> },
     { text: "+100,000 happy customers", icon: <Users size={14} strokeWidth={1.5} /> },
     { text: "Free returns within 30 days", icon: <RotateCcw size={14} strokeWidth={1.5} /> },

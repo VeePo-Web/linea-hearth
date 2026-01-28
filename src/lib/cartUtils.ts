@@ -2,6 +2,9 @@
  * Cart utility functions for consistent ID handling and haptic feedback
  */
 
+// Re-export formatPrice from the centralized currency module
+export { formatPrice, formatPriceCents, CURRENCY } from './currency';
+
 /**
  * Converts a product UUID to a stable numeric cart ID.
  * Uses the first 8 characters of the UUID as a hex value.
@@ -86,14 +89,4 @@ export function getColorHex(color: string): string {
   };
   
   return colorMap[color.toLowerCase()] || color;
-}
-
-/**
- * Formats a price as USD currency string.
- */
-export function formatPrice(price: number): string {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-  }).format(price);
 }

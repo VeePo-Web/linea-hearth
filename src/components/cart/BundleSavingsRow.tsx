@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useBundleDiscounts } from "@/hooks/useBundleDiscounts";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { cn } from "@/lib/utils";
+import { formatPrice } from "@/lib/currency";
 
 interface BundleSavingsRowProps {
   variant?: "drawer" | "checkout";
@@ -62,7 +63,7 @@ const BundleSavingsRow = ({ variant = "drawer" }: BundleSavingsRowProps) => {
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.2 }}
         >
-          -€{totalBundleSavings.toFixed(2)}
+          -{formatPrice(totalBundleSavings)}
         </motion.span>
       </motion.div>
     </AnimatePresence>

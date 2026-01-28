@@ -45,7 +45,7 @@ export const MobileTryOnBar = ({ onOpenSlot }: MobileTryOnBarProps) => {
           id: item.productId.charCodeAt(0) + Date.now() + Math.random(),
           name: item.name,
           price: Number(item.price),
-          priceFormatted: `€${Number(item.price).toLocaleString()}`,
+          priceFormatted: `$${Number(item.price).toLocaleString()}`,
           image: item.imageUrl || '/placeholder.svg',
           category: slot,
           size: item.size,
@@ -134,7 +134,7 @@ export const MobileTryOnBar = ({ onOpenSlot }: MobileTryOnBarProps) => {
                           <div className="text-sm font-light">{item.name}</div>
                           <div className="text-xs text-muted-foreground">Size {item.size}</div>
                         </div>
-                        <div className="text-sm font-medium">€{item.price.toLocaleString()}</div>
+                        <div className="text-sm font-medium">${item.price.toLocaleString()}</div>
                       </div>
                     );
                   })}
@@ -143,7 +143,7 @@ export const MobileTryOnBar = ({ onOpenSlot }: MobileTryOnBarProps) => {
                 {/* Total */}
                 <div className="flex items-center justify-between py-3 border-t border-border">
                   <span className="text-sm font-light">Total</span>
-                  <span className="text-lg font-medium">€{totalPrice.toLocaleString()}</span>
+                  <span className="text-lg font-medium">${totalPrice.toLocaleString()}</span>
                 </div>
 
                 {/* Action Buttons */}
@@ -186,7 +186,7 @@ export const MobileTryOnBar = ({ onOpenSlot }: MobileTryOnBarProps) => {
           </Sheet>
 
           <div className="flex items-center gap-4">
-            <span className="text-lg font-medium">€{totalPrice.toLocaleString()}</span>
+            <span className="text-lg font-medium">${totalPrice.toLocaleString()}</span>
             <Button 
               onClick={handleBuyThisLook}
               disabled={itemCount === 0}

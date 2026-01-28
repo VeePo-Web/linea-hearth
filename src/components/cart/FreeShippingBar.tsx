@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { DrawCheckIcon } from "@/components/ui/draw-check-icon";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { easing } from "@/lib/animations";
+import { formatPrice } from "@/lib/currency";
 
 type MilestoneType = 'halfway' | 'almost' | 'unlocked';
 
@@ -145,7 +146,7 @@ const FreeShippingBar = () => {
             <>
               <Truck className="h-4 w-4 text-amber-500" />
               <span className="text-muted-foreground">
-                Almost there—<span className="font-medium text-amber-600">€{amountToFreeShipping.toFixed(0)}</span> more
+                Almost there—<span className="font-medium text-amber-600">{formatPrice(amountToFreeShipping)}</span> more
               </span>
             </>
           ) : activeCelebration === 'halfway' ? (
@@ -156,7 +157,7 @@ const FreeShippingBar = () => {
             <>
               <Truck className="h-4 w-4 text-muted-foreground" />
               <span className="text-muted-foreground">
-                You're <span className="font-medium text-foreground">€{amountToFreeShipping.toFixed(0)}</span> away from FREE shipping
+                You're <span className="font-medium text-foreground">{formatPrice(amountToFreeShipping)}</span> away from FREE shipping
               </span>
             </>
           )}

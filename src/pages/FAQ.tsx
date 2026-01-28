@@ -28,7 +28,7 @@ const faqData: FAQItem[] = [
   {
     id: "ship-2",
     question: "Is shipping free?",
-    answer: "Yes! We offer free standard shipping on all orders over $75. Orders under $75 have a flat rate of $5.99 for standard shipping.",
+    answer: "Yes! We offer free standard shipping on all orders over $99. Orders under $99 have a flat rate of $9.99 for standard shipping.",
     category: "shipping",
     keywords: ["free", "cost", "price", "charge"]
   },

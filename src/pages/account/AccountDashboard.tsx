@@ -22,7 +22,7 @@ export default function AccountDashboard() {
     },
     {
       label: 'Total Spent',
-      value: `€${totalSpent.toFixed(2)}`,
+      value: `$${totalSpent.toFixed(2)}`,
       icon: Package,
     },
     {
@@ -164,7 +164,7 @@ export default function AccountDashboard() {
 
             <div className="flex items-center justify-between pt-4 border-t border-border">
               <p className="text-sm text-foreground">
-                €{(recentOrder.total_cents / 100).toFixed(2)}
+                ${(recentOrder.total_cents / 100).toFixed(2)}
               </p>
               {recentOrder.tracking_url ? (
                 <a
