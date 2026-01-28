@@ -91,7 +91,7 @@ const StoryJoinCTA = () => {
                 asChild
                 variant="outline"
                 size="lg"
-                className="border-white/30 text-white hover:bg-white/10 px-8"
+                className="border-white/30 text-white bg-transparent hover:bg-white/10 hover:text-white px-8"
               >
                 <Link to="/ambassador">Become an Ambassador</Link>
               </Button>

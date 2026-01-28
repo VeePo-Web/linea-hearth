@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import FooterEmailCapture from "./FooterEmailCapture";
 
 const Footer = () => {
@@ -37,10 +38,10 @@ const Footer = () => {
             <div>
               <h4 className="text-sm font-normal text-white mb-4">Shop</h4>
               <ul className="space-y-2">
-                <li><a href="/category/tees" className="text-sm font-light text-white/70 hover:text-amber-500 transition-colors">T-Shirts</a></li>
-                <li><a href="/category/hoodies" className="text-sm font-light text-white/70 hover:text-amber-500 transition-colors">Hoodies</a></li>
-                <li><a href="/category/accessories" className="text-sm font-light text-white/70 hover:text-amber-500 transition-colors">Accessories</a></li>
-                <li><a href="/category/sale" className="text-sm font-light text-white/70 hover:text-amber-500 transition-colors">Sale</a></li>
+                <li><Link to="/category/tees" className="text-sm font-light text-white/70 hover:text-amber-500 transition-colors">T-Shirts</Link></li>
+                <li><Link to="/category/hoodies" className="text-sm font-light text-white/70 hover:text-amber-500 transition-colors">Hoodies</Link></li>
+                <li><Link to="/category/accessories" className="text-sm font-light text-white/70 hover:text-amber-500 transition-colors">Accessories</Link></li>
+                <li><Link to="/category/sale" className="text-sm font-light text-white/70 hover:text-amber-500 transition-colors">Sale</Link></li>
               </ul>
             </div>
 
@@ -48,11 +49,11 @@ const Footer = () => {
             <div>
               <h4 className="text-sm font-normal text-white mb-4">Support</h4>
               <ul className="space-y-2">
-                <li><a href="/faq" className="text-sm font-light text-white/70 hover:text-amber-500 transition-colors">FAQ</a></li>
-                <li><a href="/shipping" className="text-sm font-light text-white/70 hover:text-amber-500 transition-colors">Shipping</a></li>
-                <li><a href="/returns" className="text-sm font-light text-white/70 hover:text-amber-500 transition-colors">Returns & Exchanges</a></li>
-                <li><a href="/about/size-guide" className="text-sm font-light text-white/70 hover:text-amber-500 transition-colors">Size Guide</a></li>
-                <li><a href="/accessibility" className="text-sm font-light text-white/70 hover:text-amber-500 transition-colors">Accessibility</a></li>
+                <li><Link to="/faq" className="text-sm font-light text-white/70 hover:text-amber-500 transition-colors">FAQ</Link></li>
+                <li><Link to="/shipping" className="text-sm font-light text-white/70 hover:text-amber-500 transition-colors">Shipping</Link></li>
+                <li><Link to="/returns" className="text-sm font-light text-white/70 hover:text-amber-500 transition-colors">Returns & Exchanges</Link></li>
+                <li><Link to="/about/size-guide" className="text-sm font-light text-white/70 hover:text-amber-500 transition-colors">Size Guide</Link></li>
+                <li><Link to="/accessibility" className="text-sm font-light text-white/70 hover:text-amber-500 transition-colors">Accessibility</Link></li>
               </ul>
             </div>
 
@@ -60,9 +61,9 @@ const Footer = () => {
             <div>
               <h4 className="text-sm font-normal text-white mb-4">About</h4>
               <ul className="space-y-2">
-                <li><a href="/about/our-story" className="text-sm font-light text-white/70 hover:text-amber-500 transition-colors">Our Mission</a></li>
-                <li><a href="/contact" className="text-sm font-light text-white/70 hover:text-amber-500 transition-colors">Contact Us</a></li>
-                <li><a href="/ambassador" className="text-sm font-light text-white/70 hover:text-amber-500 transition-colors">Become an Ambassador</a></li>
+                <li><Link to="/about/our-story" className="text-sm font-light text-white/70 hover:text-amber-500 transition-colors">Our Mission</Link></li>
+                <li><Link to="/contact" className="text-sm font-light text-white/70 hover:text-amber-500 transition-colors">Contact Us</Link></li>
+                <li><Link to="/ambassador" className="text-sm font-light text-white/70 hover:text-amber-500 transition-colors">Become an Ambassador</Link></li>
               </ul>
             </div>
           </div>
@@ -76,12 +77,12 @@ const Footer = () => {
             © 2024 Line of Judah. All rights reserved.
           </p>
           <div className="flex space-x-6">
-            <a href="/privacy-policy" className="text-sm font-light text-white/50 hover:text-amber-500 transition-colors">
+            <Link to="/privacy-policy" className="text-sm font-light text-white/50 hover:text-amber-500 transition-colors">
               Privacy Policy
-            </a>
-            <a href="/terms-of-service" className="text-sm font-light text-white/50 hover:text-amber-500 transition-colors">
+            </Link>
+            <Link to="/terms-of-service" className="text-sm font-light text-white/50 hover:text-amber-500 transition-colors">
               Terms of Service
-            </a>
+            </Link>
           </div>
         </div>
       </div>
