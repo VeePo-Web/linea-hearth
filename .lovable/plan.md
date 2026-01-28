@@ -1,330 +1,324 @@
 
-
-# TEMU-Tier Conversion Audit: Complete Gap Analysis
+# CAD Dollar Currency Conversion - Premium Implementation Blueprint
 
 ## Executive Summary
 
-This audit compares the current LINEA e-commerce implementation against TEMU's world-class conversion optimization techniques. The codebase already implements approximately **85-90%** of advanced conversion patterns. This analysis identifies the remaining gaps and prioritizes them by expected conversion lift.
+This implementation converts ALL pricing display across the LINEA e-commerce platform from the current mixed EUR/USD system to unified **CAD (Canadian Dollars)** with proper `$` symbol formatting. This affects **45+ files** across frontend components, hooks, edge functions, and copy/content.
 
 ---
 
-## Current Implementation Status
+## Current State Audit
 
-### Already Implemented (World-Class Level)
+### Identified Currency Inconsistencies
 
-| Category | Features | Quality |
-|----------|----------|---------|
-| **Size Memory System** | localStorage + DB sync, confidence scoring, size quiz onboarding, guest-to-auth migration | Excellent |
-| **One-Tap Add-to-Cart** | Universal `useQuickAdd` hook, works on PLP, search, favorites, recently viewed, lookbooks | Excellent |
-| **Bundle Discount Engine** | `useBundleDiscounts` with lookbook detection, tier-based discounts (10%/15%), missing product suggestions | Excellent |
-| **Cart Drawer Optimization** | Free shipping bar with celebrations, smart threshold upsells, save for later, email capture, express checkout | Excellent |
-| **Behavioral Tracking** | View count, dwell time, zoom tracking, high-intent prompts | Good |
-| **Return Customer Recognition** | Welcome back banner, size reminders, last order reference | Good |
-| **Quick Reorder** | One-tap reorder from order history with size preservation | Excellent |
-| **Post-Purchase Account Creation** | Guest-to-account conversion with discount incentive | Excellent |
-| **Lookbook Swipe Interface** | Tinder-style mobile shopping with running totals | Excellent |
-| **Free Shipping Gamification** | Milestone celebrations, haptic feedback, progress messaging | Excellent |
-| **Email Typo Detection** | Levenshtein-based detection on all 9 email inputs | Excellent |
+The codebase currently has a **critical inconsistency**:
 
----
+| Location | Current Currency | Symbol |
+|----------|------------------|--------|
+| `cartUtils.ts` formatPrice | USD | `$` |
+| `ProductCard.tsx` formatPrice | USD | `$` |
+| `ProductInfo.tsx` | USD | `$69.99` |
+| `FeaturedDrop.tsx` | USD | `$65` |
+| `ProductCarousel.tsx` | Hardcoded USD | `$65`, `$85` |
+| `CartDrawer.tsx` | EUR | `€` |
+| `FreeShippingBar.tsx` | EUR | `€` |
+| `Checkout.tsx` | EUR | `€` |
+| `OrderDetail/Dashboard` | EUR | `€` |
+| `Try-On components` | EUR | `€` |
+| `StatusBar.tsx` | EUR | `€50` |
+| Edge Functions | EUR | `currency: "eur"` |
+| Database `orders.currency` | EUR | `'eur'` default |
+| Shipping thresholds | Mixed | `€150`, `$75+` |
 
-## Gap Analysis: Remaining TEMU Features
-
-### GAP 1: Real-Time Social Proof (Live Data)
-
-**Current State**: `OrderStatsBadge` displays simulated data ("X orders today", "X viewing now")
-
-**TEMU Pattern**: Real-time, product-specific social proof:
-- "47 people bought this in the last 24 hours"
-- "12 viewing this product right now"
-- "Added to 8 carts in the last hour"
-
-**Technical Implementation**:
-- Query `user_behavior_signals` for real aggregate data
-- Use Supabase Realtime for live viewer counts
-- Add "X bought this today" from `order_items` table
-
-**Expected Lift**: +5-8% conversion on high-traffic products
+**This creates customer confusion and must be unified to CAD.**
 
 ---
 
-### GAP 2: Waitlist / Restock Notifications
+## Implementation Architecture
 
-**Current State**: No waitlist functionality exists
+```text
+                    CURRENCY SYSTEM REFACTOR
+ ──────────────────────────────────────────────────────────
 
-**TEMU Pattern**: When size/product is OOS:
-- "Notify me when back in stock" button
-- Email capture specific to product/size
-- Push notification when restocked
-
-**Technical Implementation**:
-- Create `restock_notifications` table (user_id, product_id, variant_id, email, notified_at)
-- Edge function to send restock emails
-- Show waitlist count as social proof ("32 people waiting for this")
-
-**Expected Lift**: +3-5% recovered sales on OOS items
-
----
-
-### GAP 3: Price Drop Alerts
-
-**Current State**: Sale badges exist but no proactive notifications
-
-**TEMU Pattern**:
-- "Track this price" button on non-sale items
-- Email when price drops
-- Browser push notifications for price drops
-
-**Technical Implementation**:
-- Create `price_alerts` table (user_id, product_id, original_price, target_price)
-- Trigger on price update or sale activation
-- Integrate with abandoned cart recovery
-
-**Expected Lift**: +2-4% conversion on watched items
-
----
-
-### GAP 4: Flash Sale / Limited-Time Deals
-
-**Current State**: `UrgencyTimer` exists but isn't product-specific
-
-**TEMU Pattern**:
-- Product-specific countdown timers
-- "Flash Sale ends in 02:34:17" on select items
-- Visual urgency indicators (pulsing, color changes)
-
-**Technical Implementation**:
-- Add `flash_sale_end` timestamp to products table
-- Create `FlashSaleBanner` component for PLP/PDP
-- Auto-remove sale when timer expires
-
-**Expected Lift**: +10-15% conversion during flash sale periods
+ ┌─────────────────────────────────────────────────────────┐
+ │              src/lib/currency.ts (NEW)                  │
+ │  ─────────────────────────────────────────────────────  │
+ │  export const CURRENCY = {                              │
+ │    code: 'CAD',                                         │
+ │    symbol: '$',                                         │
+ │    locale: 'en-CA',                                     │
+ │    freeShippingThreshold: 99,  // $99 CAD               │
+ │  };                                                     │
+ │                                                         │
+ │  export function formatPrice(price: number): string {   │
+ │    return new Intl.NumberFormat('en-CA', {              │
+ │      style: 'currency',                                 │
+ │      currency: 'CAD',                                   │
+ │    }).format(price);                                    │
+ │  }                                                      │
+ │  // Output: "$69.99" (proper CAD formatting)            │
+ └─────────────────────────────────────────────────────────┘
+                          │
+                          ▼
+ ┌─────────────────────────────────────────────────────────┐
+ │           All Components Import From Here               │
+ │  ─────────────────────────────────────────────────────  │
+ │  import { formatPrice, CURRENCY } from '@/lib/currency' │
+ └─────────────────────────────────────────────────────────┘
+```
 
 ---
 
-### GAP 5: Loyalty Points / Credit System
+## Files Requiring Changes
 
-**Current State**: `RewardsProgress` shows milestone unlocks, but no persistent points
+### TIER 1: Core Currency Infrastructure (Critical Path)
 
-**TEMU Pattern**:
-- Earn X coins per purchase
-- Spend coins on discounts
-- Daily check-in bonuses
-- Points expiration urgency
+| File | Change Type | Details |
+|------|-------------|---------|
+| `src/lib/currency.ts` | **NEW** | Central currency config + formatPrice function |
+| `src/lib/cartUtils.ts` | UPDATE | Replace formatPrice with import from currency.ts |
+| `src/hooks/useCart.tsx` | UPDATE | Change `FREE_SHIPPING_THRESHOLD = 99` (CAD), update comments |
 
-**Technical Implementation**:
-- Create `user_loyalty_points` table
-- Points earning rules (1 point per €1, bonus for reviews)
-- Points redemption in checkout
-- Points balance display in header/account
+### TIER 2: Cart & Checkout (High Visibility)
 
-**Expected Lift**: +15-25% repeat purchase rate
+| File | Lines | Current | Change To |
+|------|-------|---------|-----------|
+| `src/components/cart/CartDrawer.tsx` | 437-441 | `€{subtotal.toLocaleString('en-EU'...)}` | `${formatPrice(subtotal)}` |
+| `src/components/cart/FreeShippingBar.tsx` | 148, 159 | `€{amountToFreeShipping...}` | `${formatPrice(amountToFreeShipping)}` |
+| `src/components/cart/BundleSavingsRow.tsx` | 65 | `-€{totalBundleSavings...}` | `-${formatPrice(totalBundleSavings)}` |
+| `src/components/cart/ThresholdUpsellCard.tsx` | 61, 167 | `€{effectivePrice}` | `${formatPrice(effectivePrice)}` |
+| `src/pages/Checkout.tsx` | 870, 883, 895, 997-1066 | All `€` symbols | All `$` symbols with formatPrice() |
+| `src/components/checkout/MobileStickyCheckout.tsx` | 63 | `€{total...}` | `${formatPrice(total)}` |
+| `src/components/checkout/OrderConfirmation.tsx` | 89 | `€{subtotal...}` | `${formatPrice(subtotal)}` |
 
----
+### TIER 3: Product Display
 
-### GAP 6: Spin Wheel / Scratch Card Gamification
+| File | Lines | Change |
+|------|-------|--------|
+| `src/components/product/ProductInfo.tsx` | 230-234, 259 | Already uses `$` - verify consistency |
+| `src/components/product/MobileStickyATC.tsx` | 67-68, 108-109 | Already uses `$` - verify consistency |
+| `src/components/product/WearWithSection.tsx` | 122-127, 229-240 | Already uses `$` - verify consistency |
+| `src/components/category/ProductCard.tsx` | 112-116 | formatPrice uses USD - change to CAD |
+| `src/components/homepage/FeaturedDrop.tsx` | 65 | Hardcoded `$65` - keep symbol, adjust if needed |
+| `src/components/content/ProductCarousel.tsx` | 24-69 | Hardcoded `$65`, `$85` strings |
+| `src/components/homepage/RecentlyViewed.tsx` | 72-77 | `€{displayPrice...}` → `${formatPrice(...)}` |
 
-**Current State**: No gamification for discount acquisition
+### TIER 4: Try-On Room Components
 
-**TEMU Pattern**:
-- "Spin to win" for first-time visitors
-- Random discount reveals (5-20% off)
-- Scratch cards on repeat visits
+| File | Lines | Change |
+|------|-------|--------|
+| `src/components/try-on/SaveLookModal.tsx` | 144, 150 | `€{item?.price...}` → `${formatPrice(...)}` |
+| `src/components/try-on/ProductDrawer.tsx` | 174 | `€{product.price...}` → `${formatPrice(...)}` |
+| `src/components/try-on/ClothingSlot.tsx` | 54 | `€{equippedItem.price...}` → `${formatPrice(...)}` |
+| `src/components/try-on/MobileTryOnBar.tsx` | 48, 137, 146, 189 | `€` → `$` with formatPrice |
+| `src/components/try-on/OutfitSummary.tsx` | 27, 95, 105 | `€` → `$` with formatPrice |
 
-**Technical Implementation**:
-- Create `SpinWheelModal` with weighted outcomes
-- Store spin results in `user_spins` table
-- Auto-generate discount codes on win
-- Limit to 1 spin per session/day
+### TIER 5: Account & Orders
 
-**Expected Lift**: +8-12% first-time conversion, +5% email capture
+| File | Lines | Change |
+|------|-------|--------|
+| `src/pages/account/AccountOrderDetail.tsx` | 225, 284, 291, 297, 303, 308 | All `€` → `$` |
+| `src/pages/account/AccountDashboard.tsx` | 25, 167 | `€{totalSpent...}` → `${formatPrice(...)}` |
+| `src/pages/account/AccountFavorites.tsx` | 20-22, 28 | Already uses `$` - verify |
 
----
+### TIER 6: Header & Global UI
 
-### GAP 7: Coupon / Referral Sharing
+| File | Lines | Change |
+|------|-------|--------|
+| `src/components/header/StatusBar.tsx` | 15 | `"Free shipping over €50"` → `"Free shipping over $99"` |
+| `src/components/header/ShoppingBag.tsx` | 127 | `€{subtotal...}` → `${formatPrice(subtotal)}` |
+| `src/components/homepage/ValueStackBanner.tsx` | 33 | `"Free Shipping $75+"` → `"Free Shipping $99+"` |
+| `src/components/homepage/MobileStickyBar.tsx` | 63 | `"Free shipping on orders $75+"` → `"$99+"` |
 
-**Current State**: Ambassador program exists but no user-to-user sharing
+### TIER 7: Content & Copy Pages
 
-**TEMU Pattern**:
-- "Share and earn" referral codes
-- Both parties get discount
-- Easy share to WhatsApp/SMS/social
-- Track referral conversions
+| File | Lines | Change |
+|------|-------|--------|
+| `src/pages/FAQ.tsx` | 31 | `$75` threshold mentions → `$99` |
+| `src/pages/Contact.tsx` | 124 | Shipping threshold copy |
+| `src/pages/ShippingInfo.tsx` | 14, 53, 115 | All `$75` → `$99` |
+| `src/components/shipping/ShippingCalculator.tsx` | 49 | `"Free over $75"` → `"Free over $99"` |
+| `src/components/product/ShippingReturnsAccordion.tsx` | 32 | `"Orders over $75"` → `"Orders over $99"` |
+| `src/components/product/ProductInfo.tsx` | 186 | `"Free shipping $75+"` → `"Free shipping $99+"` |
+| `src/components/category/FilterSortBar.tsx` | 50 | Price range filters (keep as-is for now) |
 
-**Technical Implementation**:
-- Create `referral_codes` table linked to users
-- Create `referral_conversions` tracking
-- Deep link handling for referral attribution
-- Share sheet UI on mobile
+### TIER 8: Edge Functions (Backend)
 
-**Expected Lift**: +10-20% new customer acquisition cost reduction
-
----
-
-### GAP 8: Saved Address Auto-Fill in Checkout
-
-**Current State**: Addresses saved in account but not auto-applied at checkout
-
-**TEMU Pattern**:
-- "Use saved address" dropdown
-- One-click address selection
-- Default address auto-populated
-
-**Technical Implementation**:
-- Query `addresses` table on checkout load
-- Add address selector dropdown
-- Auto-populate form fields on selection
-
-**Expected Lift**: +3-5% checkout completion
-
----
-
-### GAP 9: Cart Quantity Badges on Product Cards
-
-**Current State**: Cart badge shows total count in header only
-
-**TEMU Pattern**:
-- If product is in cart, show quantity badge on product card
-- "In your bag" indicator
-- Quick quantity adjustment from PLP
-
-**Technical Implementation**:
-- Check `useCart().items` in ProductCard
-- Show quantity badge overlay
-- Add +/- controls on hover
-
-**Expected Lift**: +2-3% cart awareness
+| File | Lines | Change |
+|------|-------|--------|
+| `supabase/functions/create-checkout-session/index.ts` | 53-57, 174, 289, 340, 360, 410, 447 | `"eur"` → `"cad"`, `€` → `$` in comments |
+| `supabase/functions/create-payment-intent/index.ts` | 162, 282, 310 | `"eur"` → `"cad"` |
+| `supabase/functions/validate-discount-code/index.ts` | TBD | Check for currency mentions |
 
 ---
 
-### GAP 10: Recently Bought Together / Frequently Bought Together
+## New File: `src/lib/currency.ts`
 
-**Current State**: "Complete the Look" shows lookbook pairings only
-
-**TEMU Pattern**:
-- "Frequently Bought Together" bundle on PDP
-- Based on actual order data (collaborative filtering)
-- One-click add all with bundle discount preview
-
-**Technical Implementation**:
-- Create `product_purchase_pairs` materialized view
-- Query co-purchase patterns from order_items
-- Show on PDP with combined price
-
-**Expected Lift**: +8-12% average order value
-
----
-
-## Priority Matrix
-
-| Priority | Gap | Effort | Impact | ROI |
-|----------|-----|--------|--------|-----|
-| P1 | Saved Address Auto-Fill | Low | Medium | High |
-| P1 | Real-Time Social Proof | Medium | High | High |
-| P2 | Waitlist/Restock Notifications | Medium | Medium | Medium |
-| P2 | Flash Sale Countdown | Low | High | High |
-| P2 | Cart Quantity on Product Cards | Low | Low | Medium |
-| P3 | Frequently Bought Together | High | High | Medium |
-| P3 | Price Drop Alerts | Medium | Medium | Medium |
-| P3 | Referral Sharing System | High | High | Medium |
-| P4 | Loyalty Points System | High | Very High | Long-term |
-| P4 | Spin Wheel Gamification | Medium | Medium | Medium |
-
----
-
-## Implementation Sprints
-
-### Sprint 1: Quick Wins (1-2 days)
-1. Saved address auto-fill in checkout
-2. Cart quantity badges on product cards
-3. Flash sale countdown component
-
-### Sprint 2: Social Proof & Urgency (3-4 days)
-4. Real-time social proof from actual data
-5. Waitlist/restock notifications
-6. Price drop alerts infrastructure
-
-### Sprint 3: AOV Boosters (4-5 days)
-7. Frequently bought together engine
-8. Referral sharing system
-
-### Sprint 4: Gamification (5-7 days)
-9. Loyalty points system
-10. Spin wheel / scratch card
-
----
-
-## Technical Details for Top Priority Gaps
-
-### Gap 8: Saved Address Auto-Fill
-
-**Database**: Uses existing `addresses` table (already has `is_default_shipping`)
-
-**New Hook**: `src/hooks/useSavedAddresses.ts`
 ```typescript
-interface UseSavedAddressesReturn {
-  addresses: Address[];
-  defaultAddress: Address | null;
-  isLoading: boolean;
-  selectAddress: (id: string) => void;
+/**
+ * Centralized currency configuration for LINEA
+ * All pricing display must use these utilities for consistency
+ */
+
+export const CURRENCY = {
+  /** ISO 4217 currency code */
+  code: 'CAD' as const,
+  /** Display symbol */
+  symbol: '$',
+  /** Locale for formatting */
+  locale: 'en-CA',
+  /** Free shipping threshold in dollars */
+  freeShippingThreshold: 99,
+  /** Express shipping cost */
+  expressShippingCost: 15,
+  /** Overnight shipping cost */
+  overnightShippingCost: 35,
+  /** Standard shipping cost (under threshold) */
+  standardShippingCost: 10,
+};
+
+/**
+ * Formats a numeric price as a CAD currency string
+ * @param price - Price in dollars (not cents)
+ * @returns Formatted string like "$69.99"
+ */
+export function formatPrice(price: number): string {
+  return new Intl.NumberFormat(CURRENCY.locale, {
+    style: 'currency',
+    currency: CURRENCY.code,
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(price);
+}
+
+/**
+ * Formats a price from cents to CAD string
+ * @param cents - Price in cents
+ * @returns Formatted string like "$69.99"
+ */
+export function formatPriceCents(cents: number): string {
+  return formatPrice(cents / 100);
+}
+
+/**
+ * Formats a price without the currency symbol
+ * @param price - Price in dollars
+ * @returns Formatted string like "69.99"
+ */
+export function formatPriceNumeric(price: number): string {
+  return price.toFixed(2);
 }
 ```
 
-**Checkout Integration**:
-- Add `<Select>` component above shipping form
-- On selection, populate all fields via `setShippingAddress`
-- Show "Use saved address" only for authenticated users
+---
+
+## Shipping Threshold Alignment
+
+| Current | New (CAD) | Notes |
+|---------|-----------|-------|
+| €150 (edge functions) | $99 CAD | Standard market threshold |
+| €100 (checkout) | $99 CAD | Unified |
+| $75 (copy) | $99 CAD | Unified |
+| €50 (StatusBar) | $99 CAD | Unified |
+
+**Rationale**: $99 CAD is a common Canadian e-commerce free shipping threshold that balances conversion incentive with margin protection.
 
 ---
 
-### Gap 1: Real-Time Social Proof
+## Database Considerations
 
-**Database Queries**:
-```sql
--- People viewing now (last 5 minutes)
-SELECT COUNT(DISTINCT session_id) 
-FROM user_behavior_signals 
-WHERE product_id = $1 AND last_viewed_at > NOW() - INTERVAL '5 minutes'
+The `orders` table has `currency` column defaulting to `'eur'`. This stores the transaction currency, but since we're converting the entire store to CAD, new orders will use `'cad'`.
 
--- Bought in last 24 hours
-SELECT COUNT(*) FROM order_items 
-WHERE product_id = $1 
-AND created_at > NOW() - INTERVAL '24 hours'
-```
-
-**New Component**: `src/components/product/SocialProofBadge.tsx`
-- Shows on PDP below price
-- Updates every 30 seconds via polling or Realtime
-- Displays: "🔥 47 people viewing • 12 bought today"
+**No migration needed** - the column accepts any string. Edge functions will insert `'cad'` for new orders.
 
 ---
 
-### Gap 4: Flash Sale Countdown
+## Implementation Sequence
 
-**Database Change**: Add `flash_sale_ends_at` column to `products` table
+### Phase 1: Infrastructure (Must Do First)
+1. Create `src/lib/currency.ts` with centralized config
+2. Update `src/lib/cartUtils.ts` to re-export from currency.ts (backward compat)
+3. Update `src/hooks/useCart.tsx` threshold to 99
 
-**New Component**: `src/components/product/FlashSaleTimer.tsx`
-- Accepts `endsAt: Date` prop
-- Shows countdown with urgency styling
-- Auto-hides when expired
-- Pulses when < 1 hour remaining
+### Phase 2: Cart & Checkout Flow
+4. Update `CartDrawer.tsx`, `FreeShippingBar.tsx`, `BundleSavingsRow.tsx`
+5. Update `Checkout.tsx` (large file, many instances)
+6. Update `MobileStickyCheckout.tsx`, `OrderConfirmation.tsx`
 
-**Integration Points**:
-- ProductCard (badge overlay)
-- ProductInfo (prominent display)
-- CartDrawer (in line item)
+### Phase 3: Product Display
+7. Update `ProductCard.tsx`, `RecentlyViewed.tsx`
+8. Update Try-On components (5 files)
+9. Verify `ProductInfo.tsx` consistency
+
+### Phase 4: Account & History
+10. Update `AccountOrderDetail.tsx`, `AccountDashboard.tsx`
+
+### Phase 5: Global & Copy
+11. Update `StatusBar.tsx`, `ValueStackBanner.tsx`, `MobileStickyBar.tsx`
+12. Update content pages (FAQ, Contact, ShippingInfo)
+
+### Phase 6: Edge Functions (Deploy Required)
+13. Update `create-checkout-session/index.ts`
+14. Update `create-payment-intent/index.ts`
+15. Deploy edge functions
 
 ---
 
-## Summary
+## Copy Standardization
 
-The codebase is already at an impressive 85-90% TEMU-tier implementation. The remaining gaps focus on:
+All shipping/pricing copy will follow this pattern:
 
-1. **Real-time data** instead of simulated social proof
-2. **Notification systems** for restocks and price drops
-3. **Advanced gamification** (loyalty points, spin wheels)
-4. **Referral mechanics** for viral growth
-5. **Checkout friction reduction** via saved addresses
+| Element | Copy |
+|---------|------|
+| Free shipping threshold | "Free shipping on orders $99+" |
+| Short form | "Free over $99" |
+| Trust signal | "Free shipping $99+ • Easy 30-day returns" |
+| Checkout shipping option | "Standard Shipping — FREE over $99" |
 
-The P1 items (saved addresses, real social proof, flash sales) can be implemented in 1-2 sprints and will provide the highest immediate ROI. The loyalty points system is a larger investment but offers the highest long-term repeat purchase rate improvement.
+---
 
+## Quality Assurance Checklist
+
+### Visual Regression
+- [ ] Homepage hero shows correct currency
+- [ ] PLP product cards show `$XX.XX` format
+- [ ] PDP price displays correctly
+- [ ] Cart drawer shows CAD prices
+- [ ] Checkout totals display correctly
+- [ ] Order confirmation shows correct amounts
+- [ ] Account order history displays CAD
+
+### Functional Testing
+- [ ] Add to cart calculates correct totals
+- [ ] Free shipping unlocks at $99
+- [ ] Discount codes apply correctly
+- [ ] Stripe checkout uses CAD
+- [ ] Express Pay uses CAD
+- [ ] Order database stores 'cad' currency
+
+### Edge Cases
+- [ ] Bundle discounts calculate correctly
+- [ ] Sale prices display with proper formatting
+- [ ] Price filters work (if enabled)
+- [ ] Reorder from history uses correct pricing
+
+---
+
+## Risk Mitigation
+
+| Risk | Mitigation |
+|------|------------|
+| Stripe currency mismatch | Test checkout flow after deploy |
+| Existing EUR orders display | Orders store their transaction currency - historical orders show correctly |
+| Price filter breakage | Filters use numeric values, unaffected by display currency |
+| SEO impact | Product schema uses numeric prices with currency code |
+
+---
+
+## Success Metrics
+
+After implementation:
+- 100% of frontend price displays use `$` symbol
+- 100% of new transactions use `cad` currency code
+- Zero customer confusion reports about currency
+- Free shipping threshold unified across all touchpoints
