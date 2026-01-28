@@ -1,19 +1,12 @@
 import { createContext, useContext, useState, ReactNode, useCallback, useRef, useMemo } from 'react';
 import { useSizeMemory } from '@/hooks/useSizeMemory';
 import { useToast } from '@/hooks/use-toast';
-import SizeQuizModal from '@/components/size-guide/SizeQuizModal';
+import SizeQuizModal, { QuizAnswers, HeightRange, FitPreference, PrimaryCategory } from '@/components/size-guide/SizeQuizModal';
+
+// Re-export types for consumers
+export type { QuizAnswers, HeightRange, FitPreference, PrimaryCategory };
 
 // ============= Type Definitions =============
-
-export type HeightRange = 'under-5-4' | '5-4-to-5-8' | '5-9-to-6-0' | 'over-6-0';
-export type FitPreference = 'fitted' | 'relaxed' | 'oversized';
-export type PrimaryCategory = 'tops' | 'bottoms' | 'both';
-
-export interface QuizAnswers {
-  heightRange: HeightRange | null;
-  fitPreference: FitPreference | null;
-  primaryCategory: PrimaryCategory | null;
-}
 
 interface PendingAction {
   productId: string;
@@ -306,7 +299,18 @@ export const SizeQuizProvider = ({ children }: SizeQuizProviderProps) => {
   return (
     <SizeQuizContext.Provider value={value}>
       {children}
-      <SizeQuizModal />
+      {/* Modal receives props directly - no context hook needed inside */}
+      <SizeQuizModal
+        isOpen={isOpen}
+        onClose={closeQuiz}
+        currentStep={currentStep}
+        answers={answers}
+        recommendedSizes={recommendedSizes}
+        onSetAnswer={setAnswer}
+        onNextStep={nextStep}
+        onPrevStep={prevStep}
+        onSubmit={submitQuiz}
+      />
     </SizeQuizContext.Provider>
   );
 };

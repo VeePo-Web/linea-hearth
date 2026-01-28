@@ -8,8 +8,31 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
-import { useSizeQuizContext, HeightRange, FitPreference, PrimaryCategory } from "@/contexts/SizeQuizContext";
 import { cn } from "@/lib/utils";
+
+// ============= Type Definitions =============
+
+export type HeightRange = 'under-5-4' | '5-4-to-5-8' | '5-9-to-6-0' | 'over-6-0';
+export type FitPreference = 'fitted' | 'relaxed' | 'oversized';
+export type PrimaryCategory = 'tops' | 'bottoms' | 'both';
+
+export interface QuizAnswers {
+  heightRange: HeightRange | null;
+  fitPreference: FitPreference | null;
+  primaryCategory: PrimaryCategory | null;
+}
+
+export interface SizeQuizModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  currentStep: number;
+  answers: QuizAnswers;
+  recommendedSizes: { tops: string; bottoms: string; hats: string };
+  onSetAnswer: <K extends keyof QuizAnswers>(key: K, value: QuizAnswers[K]) => void;
+  onNextStep: () => void;
+  onPrevStep: () => void;
+  onSubmit: () => void;
+}
 
 // ============= Quiz Option Component =============
 
@@ -94,41 +117,39 @@ const steps: StepConfig[] = [
 
 // ============= Modal Component =============
 
-const SizeQuizModal = () => {
-  const {
-    isOpen,
-    closeQuiz,
-    currentStep,
-    answers,
-    setAnswer,
-    nextStep,
-    prevStep,
-    submitQuiz,
-    recommendedSizes,
-  } = useSizeQuizContext();
-
+const SizeQuizModal = ({
+  isOpen,
+  onClose,
+  currentStep,
+  answers,
+  recommendedSizes,
+  onSetAnswer,
+  onNextStep,
+  onPrevStep,
+  onSubmit,
+}: SizeQuizModalProps) => {
   const currentStepData = steps[currentStep];
   const canProceed = answers[currentStepData.answerKey] !== null;
   const isLastStep = currentStep === steps.length - 1;
 
   const handleNext = () => {
     if (isLastStep) {
-      submitQuiz();
+      onSubmit();
     } else {
-      nextStep();
+      onNextStep();
     }
   };
 
   const handleBack = () => {
     if (currentStep > 0) {
-      prevStep();
+      onPrevStep();
     } else {
-      closeQuiz();
+      onClose();
     }
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && closeQuiz()}>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-md p-0 gap-0 overflow-hidden">
         {/* Progress indicator */}
         <div className="flex gap-1 p-4 pb-0">
@@ -169,7 +190,7 @@ const SizeQuizModal = () => {
                   label={option.label}
                   description={option.description}
                   isSelected={answers[currentStepData.answerKey] === option.value}
-                  onClick={() => setAnswer(currentStepData.answerKey, option.value as any)}
+                  onClick={() => onSetAnswer(currentStepData.answerKey, option.value as any)}
                 />
               ))}
             </motion.div>
