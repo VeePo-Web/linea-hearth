@@ -20,7 +20,8 @@ interface SwipeCardProps {
   getStockForSize: (size: string) => number;
 }
 
-const SWIPE_THRESHOLD = typeof window !== 'undefined' ? window.innerWidth * 0.25 : 100;
+// Cap threshold at 100px for consistent feel across devices
+const SWIPE_THRESHOLD = typeof window !== 'undefined' ? Math.min(window.innerWidth * 0.25, 100) : 100;
 const THROW_VELOCITY = 500;
 const MAX_ROTATION = 15;
 
@@ -173,7 +174,7 @@ export default function SwipeCard({
       animate={isExiting ? exitVariants[isExiting === 'left' ? 'exitLeft' : 'exitRight'] : {}}
     >
       <motion.div
-        className="w-full h-full bg-stone-800 rounded-2xl overflow-hidden shadow-2xl touch-none"
+        className="w-full h-full bg-stone-800 rounded-3xl md:rounded-2xl overflow-hidden shadow-2xl touch-none will-change-transform"
         style={{ x, rotate: isTop && !prefersReducedMotion ? rotate : 0 }}
         drag={isTop && !prefersReducedMotion ? 'x' : false}
         dragConstraints={{ left: 0, right: 0 }}
@@ -201,7 +202,7 @@ export default function SwipeCard({
           
           {/* Position Badge */}
           {positionLabel && (
-            <span className="absolute top-4 left-4 text-[10px] uppercase tracking-wider bg-black/60 text-white/90 px-3 py-1.5 rounded-full font-light backdrop-blur-sm">
+            <span className="absolute top-4 left-4 text-xs md:text-[10px] uppercase tracking-wider bg-black/60 text-white/90 px-3 py-2 md:py-1.5 rounded-full font-light backdrop-blur-sm">
               {positionLabel}
             </span>
           )}
@@ -252,9 +253,9 @@ export default function SwipeCard({
           </AnimatePresence>
           
           {/* Product Info - Bottom */}
-          <div className="absolute bottom-0 left-0 right-0 p-5">
+          <div className="absolute bottom-0 left-0 right-0 p-5 pb-6">
             <Link to={`/product/${product.slug}`} className="block" onClick={(e) => e.stopPropagation()}>
-              <h3 className="text-white text-xl font-light mb-1 truncate">
+              <h3 className="text-white text-lg md:text-xl font-light mb-1 truncate">
                 {product.name}
               </h3>
             </Link>
@@ -273,12 +274,13 @@ export default function SwipeCard({
           {/* Inline Size Picker */}
           <AnimatePresence>
             {isPickerOpen && (
-              <div className="absolute inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6">
+              <div className="absolute inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 will-change-auto">
                 <motion.div
                   initial={{ scale: 0.9, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   exit={{ scale: 0.9, opacity: 0 }}
                   className="w-full max-w-xs"
+                  style={{ willChange: 'opacity, transform' }}
                 >
                   <p className="text-white text-center text-sm mb-4 font-light">
                     Select your size

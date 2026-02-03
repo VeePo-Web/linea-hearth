@@ -5,6 +5,7 @@ import Footer from "@/components/footer/Footer";
 import LookbookHero from "@/components/lookbook/LookbookHero";
 import LookSection from "@/components/lookbook/LookSection";
 import LookNavigation from "@/components/lookbook/LookNavigation";
+import LookNavigationMobile from "@/components/lookbook/LookNavigationMobile";
 import FitGuideSection from "@/components/lookbook/FitGuideSection";
 import WearTheMissionCTA from "@/components/about/WearTheMissionCTA";
 
@@ -156,7 +157,7 @@ const Lookbook = () => {
       
       {/* Main Scroll Container - offset by header height */}
       <main 
-        className="lookbook-scroll-container snap-y snap-mandatory overflow-y-auto scroll-smooth"
+        className="lookbook-scroll-container snap-y snap-mandatory overflow-y-auto scroll-smooth overscroll-y-contain"
         style={{ 
           height: 'calc(100vh - var(--header-height))',
           marginTop: 'var(--header-height)' 
@@ -192,8 +193,11 @@ const Lookbook = () => {
         </section>
       </main>
 
-      {/* Fixed Navigation */}
+      {/* Fixed Navigation - Desktop */}
       <LookNavigation looks={displayLooks} />
+      
+      {/* Fixed Navigation - Mobile */}
+      <LookNavigationMobile looks={displayLooks} />
     </div>
   );
 };

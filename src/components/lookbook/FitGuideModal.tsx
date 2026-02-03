@@ -4,6 +4,8 @@ import { motion, useReducedMotion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { easing, timing } from "@/lib/animations";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { Drawer, DrawerContent } from "@/components/ui/drawer";
 
 interface FitModel {
   id: string;
@@ -27,10 +29,13 @@ interface FitGuideModalProps {
 
 const FitGuideModal = ({ model, onClose }: FitGuideModalProps) => {
   const prefersReducedMotion = useReducedMotion();
+  const isMobile = useIsMobile();
 
-  // Lock body scroll and trap focus
+  // Lock body scroll and trap focus (only for desktop dialog)
   useEffect(() => {
-    document.body.style.overflow = 'hidden';
+    if (!isMobile) {
+      document.body.style.overflow = 'hidden';
+    }
     
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
@@ -39,10 +44,12 @@ const FitGuideModal = ({ model, onClose }: FitGuideModalProps) => {
     document.addEventListener('keydown', handleEscape);
     
     return () => {
-      document.body.style.overflow = '';
+      if (!isMobile) {
+        document.body.style.overflow = '';
+      }
       document.removeEventListener('keydown', handleEscape);
     };
-  }, [onClose]);
+  }, [onClose, isMobile]);
 
   const cmToInches = (cm: number) => (cm / 2.54).toFixed(1);
   const kgToLbs = (kg: number) => Math.round(kg * 2.205);
@@ -56,6 +63,108 @@ const FitGuideModal = ({ model, onClose }: FitGuideModalProps) => {
   ].filter(m => m.value);
 
   const springConfig = { type: "spring" as const, stiffness: 400, damping: 30 };
+
+  // Mobile: Use Drawer pattern
+  if (isMobile) {
+    return (
+      <Drawer open={!!model} onOpenChange={(open) => !open && onClose()}>
+        <DrawerContent className="max-h-[95vh] bg-stone-900 border-t-0 rounded-t-3xl">
+          <div className="overflow-y-auto max-h-[95vh]">
+            {/* Close Button */}
+            <button
+              onClick={onClose}
+              className="absolute top-4 right-4 z-10 w-12 h-12 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center text-white transition-colors"
+              aria-label="Close modal"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            {/* Image */}
+            <div className="w-full h-56 xs:h-64 overflow-hidden">
+              <img
+                src={model.photo_url}
+                alt={model.name}
+                className="w-full h-full object-cover"
+              />
+            </div>
+
+            {/* Info */}
+            <div className="p-4 pb-safe">
+              {/* Name & Size Badge */}
+              <div className="flex items-center gap-3 mb-6">
+                <h2 className="text-2xl font-extralight text-white">
+                  {model.name}
+                </h2>
+                <span className="text-[10px] uppercase tracking-wider bg-amber-600 text-white px-3 py-1.5 rounded-full">
+                  Size {model.size_worn}
+                </span>
+              </div>
+
+              {/* Measurements Table */}
+              <div className="mb-6">
+                <h3 className="text-[10px] uppercase tracking-[0.2em] text-white/40 mb-4 flex items-center gap-2">
+                  <Ruler className="w-3.5 h-3.5" />
+                  Measurements
+                </h3>
+                <div className="space-y-3">
+                  {measurements.map((m) => (
+                    <div 
+                      key={m.label}
+                      className="flex justify-between items-center py-2 border-b border-white/5"
+                    >
+                      <span className="text-white/50 font-light text-sm">{m.label}</span>
+                      <span className="text-white font-light text-sm">{m.value}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Size Worn */}
+              <div className="mb-6 p-4 bg-stone-800/50 rounded-lg border border-white/5">
+                <p className="text-[10px] uppercase tracking-[0.2em] text-amber-500 mb-2">
+                  Size Worn in Photo
+                </p>
+                <p className="text-2xl font-extralight text-white">
+                  {model.size_worn}
+                </p>
+              </div>
+
+              {/* Fit Notes */}
+              {model.fit_notes && (
+                <div className="mb-6">
+                  <h3 className="text-[10px] uppercase tracking-[0.2em] text-white/40 mb-3">
+                    Fit Notes
+                  </h3>
+                  <p className="text-white/70 font-light leading-relaxed text-sm">
+                    {model.fit_notes}
+                  </p>
+                </div>
+              )}
+
+              {/* Actions */}
+              <div className="space-y-3">
+                <Link to="/about/size-guide">
+                  <Button 
+                    variant="outline" 
+                    className="w-full border-white/10 text-white hover:bg-white/5 h-12"
+                  >
+                    View Full Size Chart
+                  </Button>
+                </Link>
+                <Link to={`/category/all?size=${model.size_worn}`}>
+                  <Button className="w-full bg-amber-600 hover:bg-amber-500 text-white h-12">
+                    Shop in Size {model.size_worn}
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </DrawerContent>
+      </Drawer>
+    );
+  }
+
+  // Desktop: Original dialog pattern
 
   return (
     <motion.div 
@@ -88,7 +197,7 @@ const FitGuideModal = ({ model, onClose }: FitGuideModalProps) => {
         {/* Close Button */}
         <motion.button
           onClick={onClose}
-          className="absolute top-4 right-4 z-10 w-10 h-10 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center text-white transition-colors"
+          className="absolute top-4 right-4 z-10 w-12 h-12 md:w-10 md:h-10 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center text-white transition-colors"
           aria-label="Close modal"
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
@@ -115,7 +224,7 @@ const FitGuideModal = ({ model, onClose }: FitGuideModalProps) => {
         </motion.div>
 
         {/* Info Side */}
-        <div className="w-full lg:w-1/2 p-6 lg:p-10 overflow-y-auto">
+        <div className="w-full lg:w-1/2 p-4 md:p-6 lg:p-10 pb-safe overflow-y-auto">
           {/* Name & Size Badge */}
           <motion.div 
             className="flex items-center gap-3 mb-8"
@@ -209,7 +318,7 @@ const FitGuideModal = ({ model, onClose }: FitGuideModalProps) => {
               >
                 <Button 
                   variant="outline" 
-                  className="w-full border-white/10 text-white hover:bg-white/5 h-11"
+                  className="w-full border-white/10 text-white hover:bg-white/5 h-12 md:h-11"
                 >
                   View Full Size Chart
                 </Button>
@@ -221,7 +330,7 @@ const FitGuideModal = ({ model, onClose }: FitGuideModalProps) => {
                 whileTap={prefersReducedMotion ? {} : { scale: 0.98 }}
                 transition={springConfig}
               >
-                <Button className="w-full bg-amber-600 hover:bg-amber-500 text-white h-11">
+                <Button className="w-full bg-amber-600 hover:bg-amber-500 text-white h-12 md:h-11">
                   Shop in Size {model.size_worn}
                 </Button>
               </motion.div>

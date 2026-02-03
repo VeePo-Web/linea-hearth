@@ -50,7 +50,7 @@ const LookbookHero = () => {
         <div className="mb-8">
           <div className="overflow-hidden">
             <motion.span
-              className="block text-6xl md:text-8xl lg:text-[10rem] font-extralight text-white/90 leading-[0.85] tracking-tight"
+              className="block text-5xl xs:text-6xl md:text-8xl lg:text-[10rem] font-extralight text-white/90 leading-[0.85] tracking-tight"
               initial={prefersReducedMotion ? {} : { y: "100%" }}
               animate={{ y: 0 }}
               transition={{ duration: timing.cinematic, ease: easing.editorial, delay: 0.4 }}
@@ -60,7 +60,7 @@ const LookbookHero = () => {
           </div>
           <div className="overflow-hidden mt-2">
             <motion.span
-              className="block text-6xl md:text-8xl lg:text-[10rem] font-extralight italic text-white leading-[0.85] tracking-tight"
+              className="block text-5xl xs:text-6xl md:text-8xl lg:text-[10rem] font-extralight italic text-white leading-[0.85] tracking-tight"
               initial={prefersReducedMotion ? {} : { y: "100%" }}
               animate={{ y: 0 }}
               transition={{ duration: timing.cinematic, ease: easing.editorial, delay: 0.55 }}
@@ -93,16 +93,16 @@ const LookbookHero = () => {
           Shop by design, not just category.
         </motion.p>
 
-        {/* Scroll Indicator - Minimal */}
+        {/* Scroll Indicator - Centered on mobile, left on desktop */}
         <motion.button 
           onClick={scrollToNext}
-          className="absolute bottom-16 left-6 flex flex-col items-start gap-4 text-white/40 hover:text-white/70 transition-colors cursor-pointer group"
+          className="absolute bottom-16 left-1/2 -translate-x-1/2 md:left-6 md:translate-x-0 flex flex-col items-center md:items-start gap-4 text-white/40 hover:text-white/70 transition-colors cursor-pointer group min-h-[48px] min-w-[48px] justify-center"
           initial={prefersReducedMotion ? {} : { opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: timing.slow, ease: easing.editorial, delay: 1.2 }}
           aria-label="Scroll to explore looks"
         >
-          <span className="text-[10px] uppercase tracking-[0.3em] font-light">
+          <span className="text-xs md:text-[10px] uppercase tracking-[0.3em] font-light">
             Scroll
           </span>
           <motion.div
@@ -118,9 +118,9 @@ const LookbookHero = () => {
         </motion.button>
       </div>
 
-      {/* Look count indicator - Right side */}
+      {/* Look count indicator - Right side, hidden on tiny mobile */}
       <motion.div
-        className="absolute right-6 bottom-16 text-right"
+        className="hidden xs:block absolute right-6 bottom-16 text-right"
         initial={prefersReducedMotion ? {} : { opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: timing.slow, ease: easing.editorial, delay: 1.3 }}

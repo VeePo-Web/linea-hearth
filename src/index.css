@@ -296,6 +296,18 @@
     }
   }
 
+  /* Lookbook scroll container optimizations */
+  .lookbook-scroll-container {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+  }
+  
+  @media (prefers-reduced-motion: reduce) {
+    .lookbook-scroll-container {
+      scroll-behavior: auto;
+    }
+  }
+
   /* ============================================
      MOBILE EXPERIENCE OPTIMIZATIONS
      Phase 1: Critical Fixes & Phase 2: Polish

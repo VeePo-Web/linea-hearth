@@ -42,7 +42,7 @@ export default function SwipeProgress({
         {Array.from({ length: totalProducts }).map((_, i) => (
           <motion.div
             key={i}
-            className={`w-2 h-2 rounded-full transition-colors ${
+            className={`w-2.5 h-2.5 md:w-2 md:h-2 rounded-full transition-colors ${
               i < currentIndex
                 ? 'bg-amber-500'
                 : i === currentIndex
@@ -67,7 +67,7 @@ export default function SwipeProgress({
               className="flex items-center gap-2"
             >
               <ShoppingBag className="w-4 h-4 text-amber-500" />
-              <span className="text-white font-medium">
+              <span className="text-white font-medium text-sm md:text-base">
                 {addedCount} {addedCount === 1 ? 'item' : 'items'}
               </span>
             </motion.div>
@@ -81,7 +81,7 @@ export default function SwipeProgress({
               key={totalValue}
               initial={prefersReducedMotion ? {} : { scale: 1.2 }}
               animate={{ scale: 1 }}
-              className="text-white font-medium"
+              className="text-white font-medium text-sm md:text-base"
             >
               {formatPrice(totalValue)}
             </motion.span>
@@ -110,7 +110,7 @@ export default function SwipeProgress({
               variant="ghost"
               size="sm"
               onClick={onViewBag}
-              className="text-amber-500 hover:text-amber-400 hover:bg-amber-500/10 h-8 px-3"
+              className="text-amber-500 hover:text-amber-400 hover:bg-amber-500/10 h-9 md:h-8 px-4 md:px-3 min-w-[44px]"
             >
               View Bag
               <ArrowRight className="w-4 h-4 ml-1" />
@@ -155,7 +155,7 @@ export default function SwipeProgress({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="text-[11px] text-white/50"
+              className="text-xs md:text-[11px] text-white/50"
             >
               {formatPrice(amountToFreeShipping)} away from free shipping
             </motion.p>
