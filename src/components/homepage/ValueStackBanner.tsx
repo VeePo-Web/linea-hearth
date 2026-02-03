@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { CURRENCY } from "@/lib/currency";
 
 const ValueStackBanner = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -30,7 +31,7 @@ const ValueStackBanner = () => {
     >
       <div className="max-w-7xl mx-auto px-6">
         <div className="flex items-center justify-center gap-4 md:gap-8 text-center">
-          <span className="text-caption text-muted-foreground uppercase">Free Shipping $99+</span>
+          <span className="text-caption text-muted-foreground uppercase">Free Shipping ${CURRENCY.freeShippingThreshold}+</span>
           <span className="text-muted-foreground/30">•</span>
           <span className="text-caption text-muted-foreground uppercase">30-Day Returns</span>
           <span className="text-muted-foreground/30 hidden md:inline">•</span>

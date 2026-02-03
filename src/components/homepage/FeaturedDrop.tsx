@@ -4,6 +4,7 @@ import { ArrowRight } from "lucide-react";
 import ScrollReveal from "@/components/motion/ScrollReveal";
 import TextReveal from "@/components/motion/TextReveal";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
+import { formatPrice } from "@/lib/currency";
 
 const FeaturedDrop = () => {
   const prefersReducedMotion = useReducedMotion();
@@ -62,7 +63,7 @@ const FeaturedDrop = () => {
             {/* Price & CTA */}
             <ScrollReveal variant="fadeUp" delay={0.6}>
               <div className="flex items-center gap-8">
-                <span className="text-2xl font-light text-background">$65</span>
+                <span className="text-2xl font-light text-background">{formatPrice(65)}</span>
                 <motion.div
                   whileHover={{ x: 4 }}
                   transition={{ type: "spring", stiffness: 400, damping: 20 }}

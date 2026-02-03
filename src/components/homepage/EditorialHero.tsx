@@ -6,6 +6,7 @@ import CharacterReveal from "@/components/motion/CharacterReveal";
 import DropBadgeCluster from "./DropBadgeCluster";
 import ScrollInvitation from "./ScrollInvitation";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
+import { formatPrice } from "@/lib/currency";
 
 const EditorialHero = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -218,7 +219,7 @@ const EditorialHero = () => {
           Featured
         </p>
         <p className="text-sm font-medium text-foreground">Stay Holy Hoodie</p>
-        <p className="text-sm font-light text-foreground/80">$79</p>
+        <p className="text-sm font-light text-foreground/80">{formatPrice(79)}</p>
       </motion.div>
 
       {/* Scroll Invitation */}
