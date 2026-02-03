@@ -57,17 +57,26 @@ const StatusBar = () => {
         </AnimatePresence>
         
         {/* Progress dots */}
-        <div className="absolute right-4 flex gap-1.5">
-          {usps.map((_, index) => (
-            <motion.div
+        <div 
+          className="absolute right-4 flex gap-1.5" 
+          role="tablist" 
+          aria-label="Value propositions"
+        >
+          {usps.map((usp, index) => (
+            <motion.button
               key={index}
-              className="w-1 h-1 rounded-full bg-status-bar-foreground"
+              className="w-1 h-1 rounded-full bg-status-bar-foreground p-0 border-0"
               initial={false}
               animate={{
                 opacity: index === currentIndex ? 1 : 0.3,
                 scale: index === currentIndex ? 1.2 : 1,
               }}
               transition={{ duration: 0.2 }}
+              role="tab"
+              aria-selected={index === currentIndex}
+              aria-label={usp.text}
+              onClick={() => setCurrentIndex(index)}
+              tabIndex={index === currentIndex ? 0 : -1}
             />
           ))}
         </div>

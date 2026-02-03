@@ -10,6 +10,7 @@ import CartQuantityBadge from "@/components/category/CartQuantityBadge";
 import { useQuickAdd, ProductForQuickAdd } from "@/hooks/useQuickAdd";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { useCart } from "@/hooks/useCart";
+import { formatPrice } from "@/lib/currency";
 interface ProductImage {
   image_url: string;
   is_primary: boolean;
@@ -108,12 +109,6 @@ const ProductCard = ({ product, onQuickView, index = 0, onAuthRequired }: Produc
     badges.push({ label: "ALMOST GONE", className: "bg-red-500 text-white" });
   }
 
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(price);
-  };
 
   const springConfig = { type: "spring" as const, stiffness: 400, damping: 25 };
 

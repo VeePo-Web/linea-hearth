@@ -24,7 +24,7 @@ const ColorSwatchSelector = ({ colors, selectedColor, onColorChange }: ColorSwat
         )}
       </div>
 
-      <div className="flex flex-wrap gap-3">
+      <div className="flex flex-wrap gap-3" role="radiogroup" aria-label="Color options">
         {colors.map(({ color, colorCode, available }) => {
           const isSelected = selectedColor === color;
 
@@ -43,7 +43,10 @@ const ColorSwatchSelector = ({ colors, selectedColor, onColorChange }: ColorSwat
                 }
               `}
               style={{ backgroundColor: colorCode }}
-              aria-label={`Color ${color}${!available ? " - Out of stock" : ""}`}
+              aria-label={`Select ${color} color${!available ? " - Out of stock" : ""}`}
+              aria-pressed={isSelected}
+              role="radio"
+              aria-checked={isSelected}
             >
               {!available && (
                 <span className="absolute inset-0 flex items-center justify-center">
