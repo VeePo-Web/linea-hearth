@@ -1,10 +1,11 @@
 import { motion, useInView, useReducedMotion } from "framer-motion";
 import { useRef } from "react";
 import ShopTheLook from "./ShopTheLook";
+import SwipeableLookCard from "./SwipeableLookCard";
 import TextReveal from "@/components/motion/TextReveal";
 import ScrollReveal from "@/components/motion/ScrollReveal";
 import { easing, timing } from "@/lib/animations";
-
+import { useCart } from "@/hooks/useCart";
 interface LookProduct {
   id: string;
   name: string;
@@ -40,6 +41,7 @@ const LookSection = ({ look, index }: LookSectionProps) => {
   const sectionRef = useRef<HTMLElement>(null);
   const isInView = useInView(sectionRef, { once: true, amount: 0.3 });
   const prefersReducedMotion = useReducedMotion();
+  const { openCart } = useCart();
 
   // Alternate layout for visual interest
   const isReversed = index % 2 === 1;
@@ -77,59 +79,66 @@ const LookSection = ({ look, index }: LookSectionProps) => {
         </span>
       </motion.div>
 
-      {/* Image Side */}
-      <div 
-        className={`w-full lg:w-3/5 lookbook-half-height lg:h-full relative overflow-hidden ${
-          isReversed ? 'lg:order-2' : ''
-        }`}
+      {/* Image Side - Wrapped with SwipeableLookCard for mobile swipe-to-add */}
+      <SwipeableLookCard
+        lookId={look.id}
+        lookName={look.name}
+        products={look.products}
+        onViewBag={openCart}
       >
-        {/* Image with mask reveal */}
-        <motion.div
-          className="w-full h-full"
-          initial={prefersReducedMotion ? {} : { clipPath: imageClipPath.hidden }}
-          animate={isInView ? { clipPath: imageClipPath.visible } : {}}
-          transition={{ duration: timing.cinematic, ease: easing.editorial }}
-        >
-          <motion.img
-            src={look.image_url}
-            alt={look.name}
-            className="w-full h-full object-cover"
-            initial={prefersReducedMotion ? {} : { scale: 1.15 }}
-            animate={isInView ? { scale: 1.02 } : {}}
-            transition={{ 
-              duration: timing.cinematic * 1.5, 
-              ease: easing.editorial 
-            }}
-            style={{
-              transformOrigin: isReversed ? 'right center' : 'left center'
-            }}
-          />
-        </motion.div>
-        
-        {/* Gradient overlay */}
         <div 
-          className={`absolute inset-0 ${
-            isReversed 
-              ? 'bg-gradient-to-l from-stone-900/80 via-stone-900/20 to-transparent' 
-              : 'bg-gradient-to-r from-transparent via-stone-900/20 to-stone-900/80'
+          className={`w-full lg:w-3/5 lookbook-half-height lg:h-full relative overflow-hidden ${
+            isReversed ? 'lg:order-2' : ''
           }`}
-        />
-
-        {/* Mobile gradient for content readability */}
-        <div className="absolute inset-0 bg-gradient-to-t from-stone-900 via-stone-900/50 to-transparent lg:hidden" />
-
-        {/* Look Index Badge - Mobile */}
-        <motion.div
-          className="absolute top-4 left-4 lg:hidden"
-          initial={prefersReducedMotion ? {} : { opacity: 0, y: -10 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: timing.slow, ease: easing.editorial, delay: 0.3 }}
         >
-          <span className="text-5xl md:text-4xl font-extralight text-white/25">
-            {lookIndex}
-          </span>
-        </motion.div>
-      </div>
+          {/* Image with mask reveal */}
+          <motion.div
+            className="w-full h-full"
+            initial={prefersReducedMotion ? {} : { clipPath: imageClipPath.hidden }}
+            animate={isInView ? { clipPath: imageClipPath.visible } : {}}
+            transition={{ duration: timing.cinematic, ease: easing.editorial }}
+          >
+            <motion.img
+              src={look.image_url}
+              alt={look.name}
+              className="w-full h-full object-cover"
+              initial={prefersReducedMotion ? {} : { scale: 1.15 }}
+              animate={isInView ? { scale: 1.02 } : {}}
+              transition={{ 
+                duration: timing.cinematic * 1.5, 
+                ease: easing.editorial 
+              }}
+              style={{
+                transformOrigin: isReversed ? 'right center' : 'left center'
+              }}
+            />
+          </motion.div>
+          
+          {/* Gradient overlay */}
+          <div 
+            className={`absolute inset-0 pointer-events-none ${
+              isReversed 
+                ? 'bg-gradient-to-l from-stone-900/80 via-stone-900/20 to-transparent' 
+                : 'bg-gradient-to-r from-transparent via-stone-900/20 to-stone-900/80'
+            }`}
+          />
+
+          {/* Mobile gradient for content readability */}
+          <div className="absolute inset-0 bg-gradient-to-t from-stone-900 via-stone-900/50 to-transparent lg:hidden pointer-events-none" />
+
+          {/* Look Index Badge - Mobile */}
+          <motion.div
+            className="absolute top-4 left-4 lg:hidden pointer-events-none"
+            initial={prefersReducedMotion ? {} : { opacity: 0, y: -10 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: timing.slow, ease: easing.editorial, delay: 0.3 }}
+          >
+            <span className="text-5xl md:text-4xl font-extralight text-white/25">
+              {lookIndex}
+            </span>
+          </motion.div>
+        </div>
+      </SwipeableLookCard>
 
       {/* Content Side */}
       <div 
