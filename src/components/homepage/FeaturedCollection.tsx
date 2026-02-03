@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import ScrollReveal from "@/components/motion/ScrollReveal";
 import StaggerContainer from "@/components/motion/StaggerContainer";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
+import { formatPrice } from "@/lib/currency";
 
 interface Product {
   id: string;
@@ -76,11 +77,11 @@ const FeaturedCollection = () => {
   const displayProducts = products.length > 0 ? products : placeholderProducts;
 
   return (
-    <section className="w-full py-16 md:py-24 bg-background">
-      <div className="max-w-7xl mx-auto px-6">
+    <section className="w-full py-12 md:py-16 lg:py-24 bg-background">
+      <div className="max-w-7xl mx-auto px-4 xs:px-6">
         {/* Section Header - Editorial minimal */}
         <ScrollReveal variant="fadeUp">
-          <div className="flex justify-between items-end mb-8">
+          <div className="flex justify-between items-end mb-6 md:mb-8">
             <div>
               <p className="text-eyebrow text-muted-foreground mb-2">Community picks</p>
               <h2 className="text-section text-foreground">Tribe Approved</h2>
@@ -91,7 +92,7 @@ const FeaturedCollection = () => {
             >
               <Link 
                 to="/category/shop"
-                className="text-foreground text-sm font-light flex items-center gap-2 hover:text-accent transition-colors group"
+                className="text-foreground text-sm font-light flex items-center gap-2 hover:text-accent transition-colors group touch-target py-2"
               >
                 Shop All
                 <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
@@ -100,9 +101,9 @@ const FeaturedCollection = () => {
           </div>
         </ScrollReveal>
 
-        {/* Product Grid - Clean, large images */}
-        <StaggerContainer className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4" staggerDelay={0.1}>
-          {displayProducts.slice(0, 4).map((product) => (
+        {/* Product Grid - Responsive columns */}
+        <StaggerContainer className="grid grid-cols-2 md:grid-cols-4 gap-2 xs:gap-3 md:gap-4" staggerDelay={0.1}>
+          {displayProducts.slice(0, 4).map((product, index) => (
             <motion.div
               key={product.id}
               whileHover={prefersReducedMotion ? {} : { y: -4 }}
@@ -110,10 +111,10 @@ const FeaturedCollection = () => {
             >
               <Link
                 to={`/product/${product.slug}`}
-                className="group block"
+                className="group block tap-feedback active:scale-[0.98] transition-transform duration-150"
               >
                 {/* Product Image */}
-                <div className="aspect-[3/4] bg-muted mb-4 overflow-hidden relative">
+                <div className="aspect-[3/4] bg-muted mb-3 md:mb-4 overflow-hidden relative">
                   {product.primary_image ? (
                     <motion.img 
                       src={product.primary_image}
@@ -121,6 +122,7 @@ const FeaturedCollection = () => {
                       className="w-full h-full object-cover"
                       whileHover={prefersReducedMotion ? {} : { scale: 1.03 }}
                       transition={{ duration: 0.5 }}
+                      loading="lazy"
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-muted to-secondary">
@@ -132,7 +134,7 @@ const FeaturedCollection = () => {
 
                   {/* Sale Badge */}
                   {product.is_on_sale && (
-                    <div className="absolute top-3 left-3 bg-destructive text-destructive-foreground text-[10px] font-bold tracking-wider uppercase px-2 py-1">
+                    <div className="absolute top-2 left-2 md:top-3 md:left-3 bg-destructive text-destructive-foreground text-[10px] font-bold tracking-wider uppercase px-2 py-1">
                       Sale
                     </div>
                   )}
@@ -143,22 +145,22 @@ const FeaturedCollection = () => {
                   <p className="text-caption text-muted-foreground uppercase mb-1">
                     {product.category_name}
                   </p>
-                  <h3 className="text-sm font-light text-foreground mb-1 group-hover:text-accent transition-colors">
+                  <h3 className="text-xs xs:text-sm font-light text-foreground mb-1 group-hover:text-accent transition-colors line-clamp-1">
                     {product.name}
                   </h3>
                   <div className="flex items-center gap-2">
                     {product.is_on_sale && product.sale_price ? (
                       <>
-                        <span className="text-sm font-light text-foreground">
-                          ${product.sale_price}
+                        <span className="text-xs xs:text-sm font-light text-foreground">
+                          {formatPrice(product.sale_price)}
                         </span>
-                        <span className="text-sm font-light text-muted-foreground line-through">
-                          ${product.price}
+                        <span className="text-xs xs:text-sm font-light text-muted-foreground line-through">
+                          {formatPrice(product.price)}
                         </span>
                       </>
                     ) : (
-                      <span className="text-sm font-light text-foreground">
-                        ${product.price}
+                      <span className="text-xs xs:text-sm font-light text-foreground">
+                        {formatPrice(product.price)}
                       </span>
                     )}
                   </div>

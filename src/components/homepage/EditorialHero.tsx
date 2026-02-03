@@ -6,26 +6,31 @@ import CharacterReveal from "@/components/motion/CharacterReveal";
 import DropBadgeCluster from "./DropBadgeCluster";
 import ScrollInvitation from "./ScrollInvitation";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { formatPrice } from "@/lib/currency";
 
 const EditorialHero = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const prefersReducedMotion = useReducedMotion();
+  const isMobile = useIsMobile();
   
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end start"],
   });
 
-  // Parallax transforms
+  // Parallax transforms - disabled on mobile for performance
   const mainImageY = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
   const secondaryImageY = useTransform(scrollYProgress, [0, 1], ["0%", "50%"]);
   const textOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
 
+  // Disable parallax on mobile to save GPU/battery
+  const shouldAnimate = !prefersReducedMotion && !isMobile;
+
   return (
     <section 
       ref={containerRef}
-      className="relative w-full min-h-screen bg-foreground overflow-hidden hero-noise group"
+      className="relative w-full min-h-dvh bg-foreground overflow-hidden hero-noise group"
       style={{ position: "relative" }}
     >
       {/* Index Number - 032c Editorial Watermark */}
@@ -41,7 +46,7 @@ const EditorialHero = () => {
       {/* Main Image Layer - Brave Crop */}
       <motion.div
         className="absolute inset-0 z-0"
-        style={{ y: prefersReducedMotion ? 0 : mainImageY }}
+        style={{ y: shouldAnimate ? mainImageY : 0 }}
       >
         <motion.div
           initial={{ clipPath: "inset(100% 0% 0% 0%)" }}
@@ -53,6 +58,8 @@ const EditorialHero = () => {
             src="/products/stay-holy-hoodie/male-model.png"
             alt="Stay Holy Hoodie - Male Model"
             className="w-full h-full object-cover object-top hero-image-grayscale"
+            loading="eager"
+            fetchPriority="high"
           />
           {/* Gradient overlays for text readability */}
           <div className="absolute inset-0 bg-gradient-to-r from-foreground via-foreground/70 to-transparent" />
@@ -63,7 +70,7 @@ const EditorialHero = () => {
       {/* Secondary Image - Offset Collage Layer */}
       <motion.div
         className="absolute bottom-[10%] right-[5%] w-[35vw] max-w-[400px] h-[45vh] z-[5] hidden lg:block"
-        style={{ y: prefersReducedMotion ? 0 : secondaryImageY }}
+        style={{ y: shouldAnimate ? secondaryImageY : 0 }}
       >
         <motion.div
           initial={{ clipPath: "inset(0% 100% 0% 0%)" }}
@@ -75,6 +82,7 @@ const EditorialHero = () => {
             src="/products/stay-holy-hoodie/female-model-1.png"
             alt="Stay Holy Hoodie - Female Model"
             className="w-full h-full object-cover object-center hero-image-grayscale"
+            loading="lazy"
           />
         </motion.div>
       </motion.div>
@@ -90,20 +98,21 @@ const EditorialHero = () => {
           src="/products/stay-holy-hoodie/flat-front.png"
           alt="Stay Holy Hoodie - Product"
           className="w-full h-auto drop-shadow-2xl"
+          loading="lazy"
         />
       </motion.div>
 
       {/* Content Container */}
       <motion.div
-        className="relative z-10 min-h-screen flex flex-col justify-between px-6 md:px-12 lg:px-16 pt-24 md:pt-28 lg:pt-32 pb-12 lg:pb-16"
-        style={{ opacity: prefersReducedMotion ? 1 : textOpacity }}
+        className="relative z-10 min-h-dvh flex flex-col justify-between px-4 xs:px-6 md:px-12 lg:px-16 pt-24 md:pt-28 lg:pt-32 pb-16 md:pb-12 lg:pb-16 safe-area-bottom"
+        style={{ opacity: shouldAnimate ? textOpacity : 1 }}
       >
 
         {/* Center Section - Massive Typography */}
         <div className="flex-1 flex flex-col justify-center">
-          {/* Mobile Typography */}
+          {/* Mobile Typography - Refined scaling */}
           <div className="block lg:hidden">
-            <h1 className="text-hero-massive-mobile text-background leading-[0.85]">
+            <h1 className="text-hero-massive-mobile-refined text-background leading-[0.85]">
               <CharacterReveal 
                 text="WEAR" 
                 className="block"
@@ -154,7 +163,7 @@ const EditorialHero = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1.6, duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }}
-            className="mt-8 lg:mt-12 max-w-md text-base md:text-lg font-light leading-relaxed text-muted-foreground"
+            className="mt-6 md:mt-8 lg:mt-12 max-w-md text-sm xs:text-base md:text-lg font-light leading-relaxed text-muted-foreground"
           >
             Some people wear crosses as accessories.<br />
             You wear yours as a declaration.<br />
@@ -163,17 +172,17 @@ const EditorialHero = () => {
         </div>
 
         {/* Bottom Section - CTA + Drop Badge */}
-        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-8 pb-8">
+        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 md:gap-8 pb-4 md:pb-8">
           {/* Left - CTA */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1.8, duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
-            className="flex flex-col gap-6"
+            className="flex flex-col gap-4 md:gap-6"
           >
             <Link
               to="/category/shop"
-              className="editorial-link text-background inline-flex items-center gap-3 group/cta"
+              className="editorial-link text-background inline-flex items-center gap-3 group/cta touch-target py-2"
             >
               Enter the Drop
               <motion.span
@@ -189,7 +198,7 @@ const EditorialHero = () => {
             {/* Secondary CTA */}
             <Link
               to="/about/our-story"
-              className="text-[10px] font-light tracking-[0.2em] uppercase text-muted-foreground hover:text-background transition-colors duration-300"
+              className="text-[10px] font-light tracking-[0.2em] uppercase text-muted-foreground hover:text-background transition-colors duration-300 touch-target-sm py-2"
             >
               Read Our Story
             </Link>
@@ -222,8 +231,10 @@ const EditorialHero = () => {
         <p className="text-sm font-light text-foreground/80">{formatPrice(79)}</p>
       </motion.div>
 
-      {/* Scroll Invitation */}
-      <ScrollInvitation delay={2.2} />
+      {/* Scroll Invitation - positioned above safe area on mobile */}
+      <div className="absolute bottom-20 md:bottom-8 left-1/2 -translate-x-1/2 z-20">
+        <ScrollInvitation delay={2.2} />
+      </div>
     </section>
   );
 };

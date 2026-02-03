@@ -10,7 +10,7 @@ const FeaturedDrop = () => {
   const prefersReducedMotion = useReducedMotion();
 
   return (
-    <section className="relative w-full min-h-[90vh] bg-foreground overflow-hidden">
+    <section className="relative w-full featured-drop-height bg-foreground overflow-hidden">
       {/* Full-bleed Background Image */}
       <motion.div
         className="absolute inset-0"
@@ -23,6 +23,7 @@ const FeaturedDrop = () => {
           src="/products/heavenly-crewneck/lifestyle.png"
           alt="Heavenly Crewneck"
           className="w-full h-full object-cover"
+          loading="lazy"
         />
         
         {/* Gradient overlay for text legibility */}
@@ -30,12 +31,12 @@ const FeaturedDrop = () => {
       </motion.div>
 
       {/* Content Overlay */}
-      <div className="relative z-10 h-full min-h-[90vh] flex items-center">
-        <div className="max-w-7xl mx-auto px-6 md:px-12 w-full">
+      <div className="relative z-10 h-full featured-drop-height flex items-center safe-area-bottom">
+        <div className="max-w-7xl mx-auto px-4 xs:px-6 md:px-12 w-full">
           <div className="max-w-xl">
             {/* Drop Badge */}
             <ScrollReveal variant="fadeUp" delay={0.1}>
-              <div className="inline-flex items-center gap-2 mb-8">
+              <div className="inline-flex items-center gap-2 mb-6 md:mb-8">
                 <span className="bg-destructive text-destructive-foreground text-[10px] font-bold tracking-wider uppercase px-3 py-1">
                   Drop 002
                 </span>
@@ -46,7 +47,7 @@ const FeaturedDrop = () => {
             </ScrollReveal>
 
             {/* Product Name - Editorial oversized */}
-            <h2 className="text-display-sm text-background mb-6">
+            <h2 className="text-display-sm text-background mb-4 md:mb-6">
               <TextReveal text="HEAVENLY" delay={0.2} />
               <br />
               <TextReveal text="CREWNECK" delay={0.4} />
@@ -54,7 +55,7 @@ const FeaturedDrop = () => {
 
             {/* Description */}
             <ScrollReveal variant="fadeUp" delay={0.5}>
-              <p className="text-editorial text-background/70 mb-8 max-w-md">
+              <p className="text-sm xs:text-base md:text-lg font-light text-background/70 mb-6 md:mb-8 max-w-md leading-relaxed">
                 You'll get asked about this.<br />
                 What you say next is up to you.
               </p>
@@ -62,15 +63,15 @@ const FeaturedDrop = () => {
 
             {/* Price & CTA */}
             <ScrollReveal variant="fadeUp" delay={0.6}>
-              <div className="flex items-center gap-8">
-                <span className="text-2xl font-light text-background">{formatPrice(65)}</span>
+              <div className="flex items-center gap-6 md:gap-8">
+                <span className="text-xl md:text-2xl font-light text-background">{formatPrice(65)}</span>
                 <motion.div
                   whileHover={{ x: 4 }}
                   transition={{ type: "spring", stiffness: 400, damping: 20 }}
                 >
                   <Link 
                     to="/product/heavenly-crewneck"
-                    className="inline-flex items-center gap-3 text-background text-sm font-medium tracking-wide hover:text-accent transition-colors group"
+                    className="inline-flex items-center gap-3 text-background text-sm font-medium tracking-wide hover:text-accent transition-colors group touch-target py-3"
                   >
                     Carry the Message
                     <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-2" />
@@ -82,9 +83,9 @@ const FeaturedDrop = () => {
         </div>
       </div>
 
-      {/* Product Index - 032c style */}
+      {/* Product Index - 032c style - scaled for mobile */}
       <ScrollReveal variant="fadeIn" delay={0.8}>
-        <div className="absolute bottom-8 right-8 text-background/30 text-[120px] md:text-[200px] font-light leading-none">
+        <div className="absolute bottom-4 right-4 md:bottom-8 md:right-8 text-background/30 text-[80px] md:text-[120px] lg:text-[200px] font-light leading-none select-none pointer-events-none">
           01
         </div>
       </ScrollReveal>

@@ -5,9 +5,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { DrawCheckIcon } from "@/components/ui/draw-check-icon";
 import { useEmailTypoDetection } from "@/hooks/useEmailTypoDetection";
 import EmailTypoSuggestion from "@/components/ui/EmailTypoSuggestion";
+import { Button } from "@/components/ui/button";
 
 const emailSchema = z.string().email("Please enter a valid email address");
 
@@ -25,6 +27,7 @@ const EmailOptIn = ({ variant = "default" }: EmailOptInProps) => {
   const ref = useRef<HTMLElement>(null);
   const isInView = useInView(ref, { once: true, amount: 0.3 });
   const prefersReducedMotion = useReducedMotion();
+  const isMobile = useIsMobile();
   
   // Email typo detection
   const emailTypo = useEmailTypoDetection({
@@ -102,7 +105,7 @@ const EmailOptIn = ({ variant = "default" }: EmailOptInProps) => {
   return (
     <section
       ref={ref}
-      className="relative bg-foreground text-background py-24 md:py-32 lg:py-40 overflow-hidden"
+      className="relative bg-foreground text-background py-16 md:py-24 lg:py-32 xl:py-40 overflow-hidden"
     >
       {/* Noise texture overlay */}
       <div
@@ -117,7 +120,7 @@ const EmailOptIn = ({ variant = "default" }: EmailOptInProps) => {
         initial={{ opacity: 0 }}
         animate={isInView ? { opacity: 0.04 } : { opacity: 0 }}
         transition={{ duration: 1, delay: 1.5 }}
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none select-none"
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none select-none hidden md:block"
       >
         <div className="relative w-[60vw] h-[60vw] max-w-[600px] max-h-[600px]">
           {/* Horizontal line */}
@@ -129,8 +132,8 @@ const EmailOptIn = ({ variant = "default" }: EmailOptInProps) => {
         </div>
       </motion.div>
 
-      <div className="container mx-auto px-4 md:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-12 lg:gap-16 items-end">
+      <div className="container mx-auto px-4 xs:px-6 md:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 md:gap-12 lg:gap-16 items-end">
           {/* Typography Zone - 60% */}
           <div className="lg:col-span-3">
             {/* Eyebrow */}
@@ -138,12 +141,12 @@ const EmailOptIn = ({ variant = "default" }: EmailOptInProps) => {
               initial={{ opacity: 0, y: 20 }}
               animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
               transition={getFadeUpTransition(0.2)}
-              className="text-[10px] uppercase tracking-[0.4em] text-background/50 mb-8"
+              className="text-[10px] uppercase tracking-[0.4em] text-background/50 mb-6 md:mb-8"
             >
               Intelligence Briefings • Drop Alerts • First Deployment
             </motion.p>
 
-            {/* Massive headline with character animation */}
+            {/* Massive headline with character animation - Responsive scaling */}
             <div className="space-y-0">
               {headlineWords.map((word, wordIndex) => (
                 <div
@@ -153,7 +156,7 @@ const EmailOptIn = ({ variant = "default" }: EmailOptInProps) => {
                   <motion.h2
                     initial="hidden"
                     animate={isInView ? "visible" : "hidden"}
-                    className={`text-[14vw] md:text-[10vw] lg:text-[7vw] font-extralight leading-[0.85] tracking-[-0.04em] ${
+                    className={`text-[12vw] xs:text-[11vw] sm:text-[10vw] md:text-[9vw] lg:text-[7vw] font-extralight leading-[0.85] tracking-[-0.04em] ${
                       word === "FRONT" ? "text-amber-400" : "text-background"
                     }`}
                   >
@@ -188,7 +191,7 @@ const EmailOptIn = ({ variant = "default" }: EmailOptInProps) => {
               initial="hidden"
               animate={isInView ? "visible" : "hidden"}
               variants={lineVariants}
-              className="w-full h-px bg-background/20 mb-8 origin-left"
+              className="w-full h-px bg-background/20 mb-6 md:mb-8 origin-left"
             />
 
             {isSuccess ? (
@@ -207,7 +210,7 @@ const EmailOptIn = ({ variant = "default" }: EmailOptInProps) => {
                   >
                     <DrawCheckIcon size="sm" className="text-foreground" delay={200} />
                   </motion.div>
-                  <span className="text-2xl md:text-3xl font-light tracking-tight">
+                  <span className="text-xl md:text-2xl lg:text-3xl font-light tracking-tight">
                     ENLISTED.
                   </span>
                 </div>
@@ -221,7 +224,7 @@ const EmailOptIn = ({ variant = "default" }: EmailOptInProps) => {
                 initial={{ opacity: 0 }}
                 animate={isInView ? { opacity: 1 } : { opacity: 0 }}
                 transition={{ duration: 0.6, delay: 1.0 }}
-                className="space-y-6"
+                className="space-y-4 md:space-y-6"
               >
                 {/* Floating label input */}
                 <motion.div
@@ -243,6 +246,8 @@ const EmailOptIn = ({ variant = "default" }: EmailOptInProps) => {
                   <input
                     id="newsletter-email"
                     type="email"
+                    inputMode="email"
+                    autoComplete="email"
                     value={email}
                     onChange={(e) => {
                       setEmail(e.target.value);
@@ -253,7 +258,7 @@ const EmailOptIn = ({ variant = "default" }: EmailOptInProps) => {
                       setIsFocused(false);
                       emailTypo.checkForTypos(email);
                     }}
-                    className={`w-full bg-transparent border-0 border-b-2 py-2 text-lg text-background placeholder-transparent focus:outline-none transition-colors duration-300 ${
+                    className={`w-full bg-transparent border-0 border-b-2 py-2 text-base md:text-lg text-background placeholder-transparent focus:outline-none transition-colors duration-300 ${
                       isFocused ? "border-amber-400" : "border-background/30"
                     }`}
                     placeholder="your@email.com"
@@ -277,22 +282,33 @@ const EmailOptIn = ({ variant = "default" }: EmailOptInProps) => {
                   )}
                 </motion.div>
 
-                {/* Text link CTA */}
+                {/* Mobile: Full-width button | Desktop: Text link CTA */}
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
                   transition={getFadeUpTransition(1.4)}
+                  className="pt-4 md:pt-0"
                 >
-                  <button
-                    type="submit"
-                    disabled={isLoading}
-                    className="group relative text-xs uppercase tracking-[0.2em] text-background/80 hover:text-background transition-colors duration-300 flex items-center gap-2 mt-8"
-                  >
-                    <span>{isLoading ? "ENLISTING..." : "ENLIST NOW"}</span>
-                    <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
-                    {/* Animated underline */}
-                    <span className="absolute -bottom-1 left-0 h-px bg-background origin-left transition-transform duration-300 scale-x-0 group-hover:scale-x-100 w-full" />
-                  </button>
+                  {isMobile ? (
+                    <Button
+                      type="submit"
+                      disabled={isLoading}
+                      className="w-full h-12 bg-amber-500 hover:bg-amber-400 text-foreground font-medium rounded-none"
+                    >
+                      {isLoading ? "ENLISTING..." : "ENLIST NOW"}
+                    </Button>
+                  ) : (
+                    <button
+                      type="submit"
+                      disabled={isLoading}
+                      className="group relative text-xs uppercase tracking-[0.2em] text-background/80 hover:text-background transition-colors duration-300 flex items-center gap-2 mt-8 touch-target py-3"
+                    >
+                      <span>{isLoading ? "ENLISTING..." : "ENLIST NOW"}</span>
+                      <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
+                      {/* Animated underline */}
+                      <span className="absolute -bottom-1 left-0 h-px bg-background origin-left transition-transform duration-300 scale-x-0 group-hover:scale-x-100 w-full" />
+                    </button>
+                  )}
                 </motion.div>
 
                 {/* Subtext */}
@@ -300,7 +316,7 @@ const EmailOptIn = ({ variant = "default" }: EmailOptInProps) => {
                   initial={{ opacity: 0, y: 20 }}
                   animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
                   transition={getFadeUpTransition(1.6)}
-                  className="text-xs text-background/40 uppercase tracking-[0.15em] pt-4"
+                  className="text-xs text-background/40 uppercase tracking-[0.15em] pt-2 md:pt-4"
                 >
                   First access to drops. Field reports. 15% off first deployment.
                 </motion.p>
