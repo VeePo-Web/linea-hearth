@@ -125,7 +125,7 @@ const LookSection = ({ look, index }: LookSectionProps) => {
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: timing.slow, ease: easing.editorial, delay: 0.3 }}
         >
-          <span className="text-4xl font-extralight text-white/20">
+          <span className="text-5xl md:text-4xl font-extralight text-white/25">
             {lookIndex}
           </span>
         </motion.div>
@@ -133,7 +133,7 @@ const LookSection = ({ look, index }: LookSectionProps) => {
 
       {/* Content Side */}
       <div 
-        className={`w-full lg:w-2/5 lookbook-half-height lg:h-full flex items-center justify-center bg-stone-900 px-6 lg:px-12 py-8 relative z-10 ${
+        className={`w-full lg:w-2/5 lookbook-half-height lg:h-full flex items-center justify-center bg-stone-900 px-4 md:px-6 lg:px-12 py-6 md:py-8 pb-safe relative z-10 ${
           isReversed ? 'lg:order-1' : ''
         }`}
       >
@@ -153,7 +153,7 @@ const LookSection = ({ look, index }: LookSectionProps) => {
           {/* Scripture Reference */}
           {look.scripture_reference && (
             <motion.p 
-              className="text-xs uppercase tracking-[0.25em] text-amber-500 mb-4 font-light"
+              className="text-sm md:text-xs uppercase tracking-[0.25em] text-amber-500 mb-4 font-light"
               initial={prefersReducedMotion ? {} : { opacity: 0, y: 10 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: timing.slow, ease: easing.editorial, delay: 0.5 }}
@@ -167,7 +167,7 @@ const LookSection = ({ look, index }: LookSectionProps) => {
             <TextReveal 
               text={`"${look.headline}"`}
               as="h2"
-              className="text-2xl md:text-3xl lg:text-4xl font-extralight italic text-white leading-tight"
+              className="text-xl xs:text-2xl md:text-3xl lg:text-4xl font-extralight italic text-white leading-tight"
               delay={0.6}
             />
           </div>
@@ -185,7 +185,7 @@ const LookSection = ({ look, index }: LookSectionProps) => {
           {/* Description */}
           {look.description && (
             <motion.p 
-              className="text-sm text-white/60 font-light leading-relaxed mb-8"
+              className="text-sm text-white/60 font-light leading-relaxed mb-6 md:mb-8 line-clamp-3 md:line-clamp-none"
               initial={prefersReducedMotion ? {} : { opacity: 0, y: 15 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: timing.slow, ease: easing.editorial, delay: 0.9 }}

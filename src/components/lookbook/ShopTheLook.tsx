@@ -122,19 +122,25 @@ function LookProductCard({
             </div>
           )}
 
-          {/* Quick Add Button */}
+          {/* Quick Add Button - Always visible on mobile */}
           {!isInCart && !quickAdd.isAdded && (
             <motion.button
-              onClick={quickAdd.handleQuickAdd}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                quickAdd.handleQuickAdd(e as any);
+              }}
               disabled={quickAdd.isAdding}
               className={`
-                absolute bottom-2 right-2 w-9 h-9 rounded-full 
+                absolute bottom-2 right-2 w-10 h-10 md:w-9 md:h-9 rounded-full 
                 flex items-center justify-center transition-colors
+                opacity-90 md:opacity-100
                 ${quickAdd.canOneTap 
                   ? 'bg-amber-500 hover:bg-amber-400' 
                   : 'bg-white/95 hover:bg-white'
                 }
               `}
+              style={{ boxShadow: '0 4px 20px -5px rgba(0,0,0,0.3)' }}
               whileHover={prefersReducedMotion ? {} : { scale: 1.1 }}
               whileTap={prefersReducedMotion ? {} : { scale: 0.9 }}
               aria-label={quickAdd.canOneTap 
@@ -173,7 +179,7 @@ function LookProductCard({
           {product.name}
         </p>
         <div className="flex items-center gap-2 mt-0.5">
-          <p className="text-xs text-white/50 font-light">
+          <p className="text-sm md:text-xs text-white/50 font-light">
             {product.is_on_sale && product.sale_price ? (
               <>
                 <span className="text-amber-500">${product.sale_price}</span>
@@ -185,7 +191,7 @@ function LookProductCard({
           </p>
           {/* Show remembered size hint */}
           {quickAdd.rememberedSize && !isInCart && (
-            <span className="text-[9px] uppercase tracking-wide text-amber-500/70">
+            <span className="text-[10px] md:text-[9px] uppercase tracking-wide text-amber-500/70">
               {quickAdd.rememberedSize}
             </span>
           )}
@@ -287,14 +293,14 @@ const ShopTheLook = ({ products, lookName, lookId }: ShopTheLookProps) => {
     <div className="space-y-6">
       {/* Section Label with Progress */}
       <div className="flex items-center justify-between">
-        <p className="text-[10px] uppercase tracking-[0.25em] text-white/40 font-light">
+        <p className="text-xs md:text-[10px] uppercase tracking-[0.25em] text-white/40 font-light">
           Shop the Look
         </p>
         {addedCount > 0 && (
           <motion.p 
             initial={{ opacity: 0, x: 10 }}
             animate={{ opacity: 1, x: 0 }}
-            className="text-[10px] uppercase tracking-wide text-amber-500 font-medium"
+            className="text-xs md:text-[10px] uppercase tracking-wide text-amber-500 font-medium"
           >
             {addedCount} of {products.length} in bag
           </motion.p>
@@ -319,9 +325,9 @@ const ShopTheLook = ({ products, lookName, lookId }: ShopTheLookProps) => {
         </motion.div>
       )}
 
-      {/* Products Grid */}
+      {/* Products Grid - Show 2 on mobile, 4 on desktop */}
       <StaggerContainer className="grid grid-cols-2 gap-3" staggerDelay={0.1} delayChildren={0}>
-        {products.slice(0, 4).map((product) => (
+        {products.slice(0, isMobile ? 2 : 4).map((product) => (
           <LookProductCard
             key={product.id}
             product={product}
@@ -372,7 +378,7 @@ const ShopTheLook = ({ products, lookName, lookId }: ShopTheLookProps) => {
 
       {/* Size memory hint */}
       {products.length > 0 && (
-        <p className="text-[10px] text-center text-white/30 font-light">
+        <p className="text-xs md:text-[10px] text-center text-white/30 font-light">
           Tap + to instantly add in your size
         </p>
       )}

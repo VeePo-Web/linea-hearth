@@ -168,7 +168,7 @@ const FitGuideSection = () => {
     <>
       <section 
         data-section="fit-guide"
-        className="lookbook-section-height w-full snap-start bg-stone-900 py-16 lg:py-24 px-6 overflow-y-auto"
+        className="lookbook-section-height w-full snap-start bg-stone-900 py-12 md:py-16 lg:py-24 px-4 md:px-6 overflow-y-auto"
       >
         <div className="max-w-6xl mx-auto">
           {/* Section Header */}
@@ -198,7 +198,7 @@ const FitGuideSection = () => {
             <div className="inline-flex bg-stone-800/50 rounded-full p-1 backdrop-blur-sm border border-white/5">
               <motion.button
                 onClick={() => setSelectedGender('male')}
-                className={`relative px-8 py-2.5 rounded-full text-sm font-light transition-colors ${
+                className={`relative px-6 py-3 md:px-8 md:py-2.5 min-h-[44px] rounded-full text-sm font-light transition-colors ${
                   selectedGender === 'male'
                     ? 'text-white'
                     : 'text-white/50 hover:text-white/70'
@@ -218,7 +218,7 @@ const FitGuideSection = () => {
               </motion.button>
               <motion.button
                 onClick={() => setSelectedGender('female')}
-                className={`relative px-8 py-2.5 rounded-full text-sm font-light transition-colors ${
+                className={`relative px-6 py-3 md:px-8 md:py-2.5 min-h-[44px] rounded-full text-sm font-light transition-colors ${
                   selectedGender === 'female'
                     ? 'text-white'
                     : 'text-white/50 hover:text-white/70'
@@ -241,7 +241,7 @@ const FitGuideSection = () => {
 
           {/* Models Grid */}
           {isLoading ? (
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 lg:gap-6">
               {[1, 2, 3, 4].map((i) => (
                 <div key={i} className="aspect-[3/4] bg-stone-800 rounded-lg animate-pulse" />
               ))}
@@ -256,7 +256,7 @@ const FitGuideSection = () => {
                 transition={{ duration: 0.3 }}
               >
                 <StaggerContainer 
-                  className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6"
+                  className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 lg:gap-6"
                   staggerDelay={0.08}
                   delayChildren={0.1}
                 >
@@ -264,7 +264,7 @@ const FitGuideSection = () => {
                     <motion.button
                       key={model.id}
                       onClick={() => setSelectedModel(model)}
-                      className="group relative aspect-[3/4] overflow-hidden rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:ring-offset-stone-900"
+                      className="group relative aspect-[3/4] overflow-hidden rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:ring-offset-stone-900 active:scale-[0.98] transition-transform"
                       whileHover={prefersReducedMotion ? {} : { y: -6 }}
                       whileTap={prefersReducedMotion ? {} : { scale: 0.98 }}
                       transition={springConfig}
@@ -283,7 +283,7 @@ const FitGuideSection = () => {
                       {/* Info */}
                       <div className="absolute bottom-0 left-0 right-0 p-4 text-left">
                         <motion.p 
-                          className="text-white font-light text-lg mb-1"
+                          className="text-white font-light text-base md:text-lg mb-1"
                           initial={{ y: 0 }}
                           whileHover={{ y: -4 }}
                           transition={springConfig}
@@ -295,17 +295,16 @@ const FitGuideSection = () => {
                         </p>
                       </div>
 
-                      {/* Hover indicator */}
+                      {/* Hover/Tap indicator - Always visible on mobile */}
                       <motion.div 
-                        className="absolute inset-0 flex items-center justify-center"
-                        initial={{ opacity: 0 }}
-                        whileHover={{ opacity: 1 }}
+                        className="absolute inset-0 flex items-center justify-center opacity-100 md:opacity-0 md:group-hover:opacity-100"
                         transition={{ duration: 0.2 }}
                       >
                         <motion.span 
                           className="text-[10px] uppercase tracking-wider text-white bg-amber-600 px-4 py-2 rounded-full"
                           initial={{ scale: 0.8, opacity: 0 }}
-                          whileHover={{ scale: 1, opacity: 1 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          whileHover={{ scale: 1.05 }}
                           transition={springConfig}
                         >
                           View Details

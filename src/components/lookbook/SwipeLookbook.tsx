@@ -75,7 +75,7 @@ export default function SwipeLookbook({
               variant="ghost"
               size="icon"
               onClick={onClose}
-              className="text-white/70 hover:text-white hover:bg-white/10"
+              className="text-white/70 hover:text-white hover:bg-white/10 min-w-[48px] min-h-[48px]"
             >
               <X className="w-5 h-5" />
             </Button>
@@ -87,7 +87,7 @@ export default function SwipeLookbook({
             <Button
               variant="ghost"
               size="icon"
-              className="text-white/70 hover:text-white hover:bg-white/10"
+              className="text-white/70 hover:text-white hover:bg-white/10 min-w-[48px] min-h-[48px]"
               aria-label="Share look"
             >
               <Share2 className="w-5 h-5" />
@@ -96,7 +96,7 @@ export default function SwipeLookbook({
           
           {/* Swipe Instructions */}
           {!session.isComplete && (
-            <p className="text-center text-white/40 text-xs mt-2">
+            <p className="text-center text-white/40 text-sm md:text-xs mt-2">
               Swipe right to add • Left to skip
             </p>
           )}

@@ -27,7 +27,7 @@ export default function SwipeActions({
   const springConfig = { type: "spring" as const, stiffness: 400, damping: 25 };
   
   return (
-    <div className="flex items-center justify-center gap-6 py-4">
+    <div className="flex items-center justify-center gap-4 xs:gap-6 py-3 md:py-4 pb-safe">
       {/* Undo Button */}
       <motion.div
         initial={{ opacity: 0, scale: 0.8 }}
@@ -87,7 +87,7 @@ export default function SwipeActions({
         >
           <ShoppingBag className="w-6 h-6" />
           {canOneTap && rememberedSize && (
-            <span className="text-[9px] font-medium uppercase">{rememberedSize}</span>
+            <span className="text-[10px] md:text-[9px] font-medium uppercase">{rememberedSize}</span>
           )}
         </Button>
       </motion.div>
