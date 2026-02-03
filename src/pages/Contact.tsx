@@ -121,7 +121,7 @@ const quickFAQs = [
   {
     id: "shipping",
     question: "What are your shipping options and timeframes?",
-    answer: "Standard (5-9 business days, FREE over $75), Express (2-3 business days, $12.99), Overnight (next business day, $24.99). We ship to 50+ countries worldwide. All orders include tracking and insurance.",
+    answer: "Standard (5-9 business days, FREE over $99), Express (2-3 business days, $15), Overnight (next business day, $35). We ship to 50+ countries worldwide. All orders include tracking and insurance.",
   },
   {
     id: "returns",

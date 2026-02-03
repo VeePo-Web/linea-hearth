@@ -124,7 +124,7 @@ const WearTheMissionCTA = () => {
               className="mt-10 pt-8 border-t border-stone-950/20"
             >
               <p className="text-sm text-stone-950/60 font-light">
-                Free shipping on orders over $100 • Easy returns • Made with conviction
+                Free shipping on orders over $99 • Easy returns • Made with conviction
               </p>
             </motion.div>
           </div>

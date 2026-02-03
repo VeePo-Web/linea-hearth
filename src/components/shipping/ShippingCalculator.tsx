@@ -54,7 +54,7 @@ const ShippingCalculator = () => {
         method: "Express Shipping",
         minDays: productionMin + expressShipping.min,
         maxDays: productionMax + expressShipping.max,
-        price: "$12.99",
+        price: "$15",
         carrier: "FedEx 2-Day",
         includesProduction: true
       },
@@ -62,7 +62,7 @@ const ShippingCalculator = () => {
         method: "Overnight",
         minDays: productionMin + 1,
         maxDays: productionMax + 2,
-        price: "$24.99",
+        price: "$35",
         carrier: "FedEx Overnight",
         includesProduction: true
       }
