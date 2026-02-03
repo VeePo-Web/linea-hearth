@@ -1,4 +1,5 @@
-import { Search, LucideIcon } from "lucide-react";
+import { useState, useRef } from "react";
+import { Search, LucideIcon, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
@@ -34,6 +35,8 @@ const ServiceHero = ({
 }: ServiceHeroProps) => {
   const prefersReducedMotion = useReducedMotion();
   const isCenter = alignment === 'center';
+  const [isFocused, setIsFocused] = useState(false);
+  const searchRef = useRef<HTMLInputElement>(null);
   
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -53,9 +56,25 @@ const ServiceHero = ({
       transition: { duration: 0.4, ease: "easeOut" as const }
     }
   };
+
+  const handleSearchFocus = () => {
+    setIsFocused(true);
+    // Scroll search into view on mobile when keyboard appears
+    setTimeout(() => {
+      searchRef.current?.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'center' 
+      });
+    }, 300);
+  };
+
+  const handleClearSearch = () => {
+    onSearchChange?.('');
+    searchRef.current?.focus();
+  };
   
   return (
-    <section className="bg-stone-900 text-white pt-[calc(var(--header-height)+2rem)] pb-16 px-6">
+    <section className="bg-stone-900 text-white pt-[calc(var(--header-height)+2rem)] pb-12 md:pb-16 px-6">
       <motion.div 
         className={cn(
           "max-w-7xl mx-auto",
@@ -76,10 +95,10 @@ const ServiceHero = ({
             </motion.span>
           )}
           
-          {/* Title */}
+          {/* Title - Refined mobile typography */}
           <motion.h1 
             variants={itemVariants}
-            className="text-4xl md:text-5xl lg:text-6xl font-light tracking-tight uppercase mb-4"
+            className="text-3xl xs:text-4xl md:text-5xl lg:text-6xl font-light tracking-tight uppercase mb-4"
           >
             {title}
           </motion.h1>
@@ -89,7 +108,7 @@ const ServiceHero = ({
             <motion.p 
               variants={itemVariants}
               className={cn(
-                "text-lg text-white/70 font-light leading-relaxed",
+                "text-base md:text-lg text-white/70 font-light leading-relaxed",
                 isCenter && "max-w-xl mx-auto"
               )}
             >
@@ -102,7 +121,7 @@ const ServiceHero = ({
             <motion.div 
               variants={itemVariants}
               className={cn(
-                "flex flex-wrap items-center gap-6 mt-8 text-sm text-white/80",
+                "flex flex-wrap items-center gap-4 md:gap-6 mt-6 md:mt-8 text-sm text-white/80",
                 isCenter && "justify-center"
               )}
             >
@@ -116,20 +135,42 @@ const ServiceHero = ({
           )}
         </div>
         
-        {/* Search Bar */}
+        {/* Search Bar with clear button and mobile optimization */}
         {showSearch && onSearchChange && (
           <motion.div 
             variants={itemVariants}
-            className="relative max-w-xl mx-auto mt-10"
+            className={cn(
+              "relative max-w-xl mx-auto mt-8 md:mt-10 transition-transform",
+              isFocused && "scale-[1.02]"
+            )}
           >
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-stone-400" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-stone-400 pointer-events-none" />
             <Input
-              type="text"
+              ref={searchRef}
+              type="search"
+              inputMode="search"
+              enterKeyHint="search"
+              autoComplete="off"
+              autoCorrect="off"
+              spellCheck={false}
               placeholder={searchPlaceholder}
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
-              className="w-full h-14 pl-12 pr-4 bg-white text-stone-900 border-0 placeholder:text-stone-400 text-base focus-visible:ring-amber-500 rounded-none"
+              onFocus={handleSearchFocus}
+              onBlur={() => setIsFocused(false)}
+              className="w-full h-14 pl-12 pr-12 bg-white text-stone-900 border-0 placeholder:text-stone-400 text-base focus-visible:ring-amber-500 rounded-none"
             />
+            {/* Clear search button */}
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={handleClearSearch}
+                className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center text-stone-400 hover:text-stone-600 transition-colors touch-target"
+                aria-label="Clear search"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            )}
           </motion.div>
         )}
       </motion.div>

@@ -202,17 +202,17 @@ const NoResultsState = ({
   searchQuery: string; 
   onAskClick: () => void;
 }) => (
-  <div className="text-center py-16">
+  <div className="text-center py-12 md:py-16">
     <div className="w-16 h-16 bg-stone-100 dark:bg-stone-800 rounded-full flex items-center justify-center mx-auto mb-6">
       <Search className="w-6 h-6 text-muted-foreground" />
     </div>
-    <h3 className="text-xl font-light mb-2 uppercase tracking-wide">INTEL NOT FOUND.</h3>
-    <p className="text-muted-foreground font-light mb-8 max-w-md mx-auto">
-      Your search for "{searchQuery}" returned no active briefings. Our command center is standing by.
+    <h3 className="text-lg md:text-xl font-light mb-2 uppercase tracking-wide">INTEL NOT FOUND.</h3>
+    <p className="text-muted-foreground font-light mb-8 max-w-md mx-auto px-4">
+      Your search for "<span className="font-medium truncate max-w-[200px] inline-block align-bottom">{searchQuery}</span>" returned no active briefings. Our command center is standing by.
     </p>
     <Button 
       onClick={onAskClick}
-      className="bg-amber-500 hover:bg-amber-600 text-white"
+      className="bg-amber-500 hover:bg-amber-600 text-white min-h-[48px]"
     >
       <MessageCircle className="w-4 h-4 mr-2" />
       CONTACT COMMAND

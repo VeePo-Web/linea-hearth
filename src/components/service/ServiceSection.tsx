@@ -29,8 +29,8 @@ const ServiceSection = ({
     <motion.section
       id={id}
       className={cn(
-        "scroll-mt-24",
-        size === 'default' ? "mb-16" : "mb-10",
+        "scroll-mt-28 md:scroll-mt-24",
+        size === 'default' ? "mb-12 md:mb-16" : "mb-8 md:mb-10",
         className
       )}
       initial={prefersReducedMotion ? "visible" : "hidden"}
