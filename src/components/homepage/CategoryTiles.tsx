@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import TextReveal from "@/components/motion/TextReveal";
 import StaggerContainer from "@/components/motion/StaggerContainer";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { staggerItem } from "@/lib/animations";
 
 interface Category {
@@ -16,6 +17,7 @@ interface Category {
 
 const CategoryTiles = () => {
   const prefersReducedMotion = useReducedMotion();
+  const isMobile = useIsMobile();
 
   const categories: Category[] = [
     {
@@ -57,7 +59,7 @@ const CategoryTiles = () => {
   const wideCategory = categories.find(c => c.layout === "wide")!;
 
   return (
-    <section className="w-full py-24 md:py-40 bg-background relative overflow-hidden">
+    <section className="w-full py-16 md:py-24 lg:py-40 bg-background relative overflow-hidden">
       {/* Noise Texture Overlay */}
       <div 
         className="absolute inset-0 opacity-[0.02] pointer-events-none mix-blend-overlay"
@@ -66,9 +68,9 @@ const CategoryTiles = () => {
         }}
       />
 
-      <div className="max-w-7xl mx-auto px-6 relative z-10">
+      <div className="max-w-7xl mx-auto px-4 xs:px-6 relative z-10">
         {/* Editorial Section Header - 032c Style */}
-        <div className="mb-16 md:mb-24">
+        <div className="mb-12 md:mb-16 lg:mb-24">
           <motion.span
             className="text-xs uppercase tracking-[0.3em] text-muted-foreground block mb-3"
             initial={{ opacity: 0, y: 10 }}
@@ -82,12 +84,12 @@ const CategoryTiles = () => {
             <TextReveal 
               text="COLLECTION" 
               as="h2"
-              className="text-[12vw] md:text-[8vw] lg:text-[6vw] font-extralight tracking-[-0.04em] text-foreground leading-[0.85]"
+              className="text-[10vw] sm:text-[8vw] md:text-[6vw] lg:text-[5vw] font-extralight tracking-[-0.04em] text-foreground leading-[0.85]"
             />
           </div>
           {/* Editorial Divider */}
           <motion.div 
-            className="w-24 h-px bg-foreground mt-8"
+            className="w-16 md:w-24 h-px bg-foreground mt-6 md:mt-8"
             initial={{ scaleX: 0, originX: 0 }}
             whileInView={{ scaleX: 1 }}
             viewport={{ once: true }}
@@ -97,7 +99,7 @@ const CategoryTiles = () => {
 
         {/* Asymmetric Bento Grid - Desktop */}
         <StaggerContainer 
-          className="hidden md:grid grid-cols-2 gap-3" 
+          className="hidden md:grid grid-cols-2 gap-2 md:gap-3" 
           staggerDelay={0.15}
         >
           {/* Hero Tile - Hoodies (spans 2 rows) */}
@@ -105,7 +107,7 @@ const CategoryTiles = () => {
             variants={staggerItem}
             className="row-span-2"
           >
-            <CategoryTile category={heroCategory} prefersReducedMotion={prefersReducedMotion} />
+            <CategoryTile category={heroCategory} prefersReducedMotion={prefersReducedMotion} isMobile={false} />
           </motion.div>
 
           {/* Standard Tiles - Tops & Tees */}
@@ -114,37 +116,37 @@ const CategoryTiles = () => {
               key={category.slug}
               variants={staggerItem}
             >
-              <CategoryTile category={category} prefersReducedMotion={prefersReducedMotion} />
+              <CategoryTile category={category} prefersReducedMotion={prefersReducedMotion} isMobile={false} />
             </motion.div>
           ))}
         </StaggerContainer>
 
         {/* Wide Tile - Accessories (full width) */}
         <motion.div
-          className="hidden md:block mt-3"
+          className="hidden md:block mt-2 md:mt-3"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.6 }}
         >
-          <CategoryTile category={wideCategory} prefersReducedMotion={prefersReducedMotion} isWide />
+          <CategoryTile category={wideCategory} prefersReducedMotion={prefersReducedMotion} isWide isMobile={false} />
         </motion.div>
 
-        {/* Mobile Stacked Layout */}
+        {/* Mobile Stacked Layout - Using aspect ratios instead of vh */}
         <StaggerContainer 
-          className="md:hidden flex flex-col gap-3" 
+          className="md:hidden flex flex-col gap-2" 
           staggerDelay={0.1}
         >
           {categories.map((category) => (
             <motion.div
               key={category.slug}
               variants={staggerItem}
-              style={{ 
-                height: category.layout === "hero" ? "70vh" : 
-                        category.layout === "wide" ? "40vh" : "50vh" 
-              }}
             >
-              <CategoryTile category={category} prefersReducedMotion={prefersReducedMotion} />
+              <CategoryTile 
+                category={category} 
+                prefersReducedMotion={prefersReducedMotion} 
+                isMobile={true}
+              />
             </motion.div>
           ))}
         </StaggerContainer>
@@ -157,31 +159,45 @@ interface CategoryTileProps {
   category: Category;
   prefersReducedMotion: boolean;
   isWide?: boolean;
+  isMobile?: boolean;
 }
 
-const CategoryTile = ({ category, prefersReducedMotion, isWide = false }: CategoryTileProps) => {
-  const aspectClass = isWide 
-    ? "aspect-[21/9]" 
-    : category.layout === "hero" 
-      ? "h-full min-h-[600px]" 
-      : "aspect-[4/5]";
+const CategoryTile = ({ category, prefersReducedMotion, isWide = false, isMobile = false }: CategoryTileProps) => {
+  // Mobile: use consistent aspect ratios instead of vh units
+  const getMobileAspect = () => {
+    if (category.layout === "hero") return "aspect-[3/4]";
+    if (category.layout === "wide") return "aspect-[16/9]";
+    return "aspect-[4/5]";
+  };
 
-  const titleSize = isWide 
-    ? "text-[10vw] md:text-[4vw]" 
-    : category.layout === "hero" 
-      ? "text-[18vw] md:text-[8vw]" 
-      : "text-[15vw] md:text-[5vw]";
+  const aspectClass = isMobile 
+    ? getMobileAspect()
+    : isWide 
+      ? "aspect-[21/9]" 
+      : category.layout === "hero" 
+        ? "h-full min-h-[600px]" 
+        : "aspect-[4/5]";
 
-  const indexSize = isWide
-    ? "text-[40px] md:text-[80px]"
-    : category.layout === "hero"
-      ? "text-[60px] md:text-[120px]"
-      : "text-[50px] md:text-[100px]";
+  const titleSize = isMobile
+    ? "text-[14vw] xs:text-[12vw]"
+    : isWide 
+      ? "text-[10vw] md:text-[4vw]" 
+      : category.layout === "hero" 
+        ? "text-[18vw] md:text-[8vw]" 
+        : "text-[15vw] md:text-[5vw]";
+
+  const indexSize = isMobile
+    ? "text-[40px] xs:text-[50px]"
+    : isWide
+      ? "text-[40px] md:text-[80px]"
+      : category.layout === "hero"
+        ? "text-[60px] md:text-[120px]"
+        : "text-[50px] md:text-[100px]";
 
   return (
     <Link
       to={`/category/${category.slug}`}
-      className={`group block relative ${aspectClass} overflow-hidden bg-muted`}
+      className={`group block relative ${aspectClass} overflow-hidden bg-muted tap-feedback active:scale-[0.99] transition-transform duration-150`}
     >
       {/* Image with Grayscale → Color Transition */}
       <motion.div
@@ -192,7 +208,8 @@ const CategoryTile = ({ category, prefersReducedMotion, isWide = false }: Catego
         <img 
           src={category.image}
           alt={category.name}
-          className="w-full h-full object-cover grayscale contrast-110 group-hover:grayscale-0 group-hover:contrast-100 transition-all duration-700"
+          className="w-full h-full object-cover grayscale contrast-110 group-hover:grayscale-0 group-hover:contrast-100 group-active:grayscale-0 group-active:contrast-100 transition-all duration-700"
+          loading="lazy"
         />
       </motion.div>
       
@@ -200,15 +217,15 @@ const CategoryTile = ({ category, prefersReducedMotion, isWide = false }: Catego
       <div className="absolute inset-0 bg-gradient-to-t from-foreground/60 via-foreground/20 to-transparent group-hover:from-foreground/40 group-hover:via-foreground/10 transition-all duration-500" />
 
       {/* Hover Border Frame */}
-      <div className="absolute inset-3 border border-background/0 group-hover:border-background/30 transition-all duration-500 pointer-events-none" />
+      <div className="absolute inset-2 md:inset-3 border border-background/0 group-hover:border-background/30 transition-all duration-500 pointer-events-none" />
       
       {/* Index Number - 032c Style */}
-      <div className="absolute bottom-6 right-6 md:bottom-8 md:right-8 flex flex-col items-end">
+      <div className="absolute bottom-4 right-4 md:bottom-6 md:right-6 lg:bottom-8 lg:right-8 flex flex-col items-end">
         <span className={`${indexSize} font-extralight text-background/15 group-hover:text-background/25 transition-all duration-500 leading-none`}>
           {category.index}
         </span>
         <motion.div 
-          className="w-6 md:w-8 h-px bg-background/20 group-hover:bg-background/40 mt-2 transition-all duration-500"
+          className="w-4 md:w-6 lg:w-8 h-px bg-background/20 group-hover:bg-background/40 mt-2 transition-all duration-500"
           initial={{ scaleX: 0 }}
           whileInView={{ scaleX: 1 }}
           viewport={{ once: true }}
@@ -217,22 +234,22 @@ const CategoryTile = ({ category, prefersReducedMotion, isWide = false }: Catego
       </div>
 
       {/* Content Overlay */}
-      <div className="absolute bottom-0 left-0 right-0 p-6 md:p-10">
+      <div className="absolute bottom-0 left-0 right-0 p-4 xs:p-6 md:p-10">
         {/* Category Name - Massive Typography */}
         <h3 className={`${titleSize} font-extralight text-background uppercase tracking-[-0.04em] leading-[0.85] group-hover:tracking-[-0.02em] transition-all duration-500`}>
           {category.name}
         </h3>
         
-        {/* Subtitle - Appears on Hover */}
-        <div className="overflow-hidden h-0 group-hover:h-6 transition-all duration-500 mt-2">
-          <p className="text-[10px] md:text-xs uppercase tracking-[0.2em] text-background/70 transform translate-y-full group-hover:translate-y-0 transition-transform duration-500 delay-100">
+        {/* Subtitle - Visible by default on mobile, appears on hover for desktop */}
+        <div className={`overflow-hidden mt-2 ${isMobile ? 'h-6' : 'h-0 group-hover:h-6'} transition-all duration-500`}>
+          <p className={`text-[10px] md:text-xs uppercase tracking-[0.2em] text-background/70 ${isMobile ? '' : 'transform translate-y-full group-hover:translate-y-0'} transition-transform duration-500 delay-100`}>
             {category.subtitle}
           </p>
         </div>
 
-        {/* CTA - Editorial Underline Style */}
-        <div className="mt-4 md:mt-6 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-200">
-          <span className="text-[10px] md:text-xs uppercase tracking-[0.2em] text-background inline-flex items-center gap-2">
+        {/* CTA - Editorial Underline Style - Always visible on mobile */}
+        <div className={`mt-3 md:mt-4 lg:mt-6 ${isMobile ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'} transition-opacity duration-500 delay-200`}>
+          <span className="text-[10px] md:text-xs uppercase tracking-[0.2em] text-background inline-flex items-center gap-2 touch-target-sm">
             Shop {category.name}
             <motion.span
               className="inline-block"
@@ -244,7 +261,7 @@ const CategoryTile = ({ category, prefersReducedMotion, isWide = false }: Catego
           </span>
           <motion.div 
             className="h-px bg-background/60 mt-1 origin-left"
-            initial={{ scaleX: 0 }}
+            initial={{ scaleX: isMobile ? 1 : 0 }}
             whileHover={{ scaleX: 1 }}
             transition={{ duration: 0.3 }}
           />

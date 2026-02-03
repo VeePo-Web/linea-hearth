@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import { useReducedMotion } from "@/hooks/useReducedMotion";
 
 interface ScrollInvitationProps {
   delay?: number;
@@ -7,6 +8,7 @@ interface ScrollInvitationProps {
 
 const ScrollInvitation = ({ delay = 2.2 }: ScrollInvitationProps) => {
   const [isVisible, setIsVisible] = useState(true);
+  const prefersReducedMotion = useReducedMotion();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -23,7 +25,7 @@ const ScrollInvitation = ({ delay = 2.2 }: ScrollInvitationProps) => {
       initial={{ opacity: 0 }}
       animate={{ opacity: isVisible ? 1 : 0 }}
       transition={{ delay, duration: 0.6 }}
-      className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3 pointer-events-none z-20"
+      className="flex flex-col items-center gap-3 pointer-events-none"
     >
       {/* Text */}
       <span className="text-[10px] font-light tracking-[0.3em] uppercase text-background/60">
@@ -31,20 +33,22 @@ const ScrollInvitation = ({ delay = 2.2 }: ScrollInvitationProps) => {
       </span>
 
       {/* Animated Line */}
-      <div className="relative h-12 w-px">
+      <div className="relative h-8 md:h-12 w-px">
         <div className="absolute inset-0 bg-background/20" />
-        <motion.div
-          className="absolute top-0 left-0 w-full bg-background/60"
-          initial={{ height: 0 }}
-          animate={{ height: "100%" }}
-          transition={{
-            delay: delay + 0.3,
-            duration: 1.5,
-            repeat: Infinity,
-            repeatType: "loop",
-            ease: "easeInOut",
-          }}
-        />
+        {!prefersReducedMotion && (
+          <motion.div
+            className="absolute top-0 left-0 w-full bg-background/60"
+            initial={{ height: 0 }}
+            animate={{ height: "100%" }}
+            transition={{
+              delay: delay + 0.3,
+              duration: 1.5,
+              repeat: Infinity,
+              repeatType: "loop",
+              ease: "easeInOut",
+            }}
+          />
+        )}
       </div>
 
       {/* Arrow */}
@@ -54,7 +58,7 @@ const ScrollInvitation = ({ delay = 2.2 }: ScrollInvitationProps) => {
         viewBox="0 0 10 10"
         fill="none"
         className="text-background/60"
-        animate={{ y: [0, 4, 0] }}
+        animate={prefersReducedMotion ? {} : { y: [0, 4, 0] }}
         transition={{
           duration: 1.5,
           repeat: Infinity,

@@ -24,15 +24,22 @@ const MobileStickyBar = () => {
       }
     };
 
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Haptic feedback on tap
+  const handleTap = () => {
+    if (navigator.vibrate) {
+      navigator.vibrate(10);
+    }
+  };
 
   const shouldShow = isVisible && !isFooterVisible;
 
   return (
     <div 
-      className={`fixed bottom-0 left-0 right-0 z-40 md:hidden transition-all duration-300 ${
+      className={`fixed bottom-0 left-0 right-0 z-40 md:hidden transition-all duration-300 safe-area-bottom ${
         shouldShow 
           ? 'translate-y-0 opacity-100' 
           : 'translate-y-full opacity-0'
@@ -42,13 +49,14 @@ const MobileStickyBar = () => {
       <div className="h-6 bg-gradient-to-t from-stone-900 to-transparent" />
       
       {/* Main Bar */}
-      <div className="bg-stone-900 px-4 py-3 safe-area-inset-bottom">
+      <div className="bg-stone-900 px-4 py-3">
         <div className="flex items-center gap-3">
-          {/* Shop Button - Full Width */}
+          {/* Shop Button - Full Width with touch target */}
           <Button 
             asChild
             size="lg"
-            className="flex-1 bg-amber-500 hover:bg-amber-400 text-black font-medium h-12 rounded-none group"
+            className="flex-1 bg-amber-500 hover:bg-amber-400 active:bg-amber-400 text-black font-medium h-12 rounded-none group touch-target"
+            onClick={handleTap}
           >
             <Link to="/category/shop">
               <ShoppingBag className="w-4 h-4 mr-2" />
