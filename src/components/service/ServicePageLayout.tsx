@@ -53,7 +53,7 @@ const ServicePageLayout = ({
         searchPlaceholder={searchPlaceholder}
       />
       
-      <main className="max-w-7xl mx-auto px-6 py-16">
+      <main className="max-w-7xl mx-auto px-6 py-10 md:py-16 pb-safe">
         {showSidebar ? (
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-12">
             <aside className="lg:col-span-1">

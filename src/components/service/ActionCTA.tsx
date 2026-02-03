@@ -64,8 +64,8 @@ const ActionCTA = ({
       variants={fadeIn}
     >
       <div className={cn(isCenter && "text-center")}>
-        {/* Title */}
-        <h2 className="text-2xl md:text-3xl font-light mb-4">
+        {/* Title - Mobile typography refinement */}
+        <h2 className="text-xl xs:text-2xl md:text-3xl font-light mb-4">
           {title}
         </h2>
         
@@ -103,7 +103,7 @@ const ActionCTA = ({
             )}
             <Button 
               type="submit"
-              className="bg-amber-500 hover:bg-amber-600 text-white px-8 h-auto py-3 rounded-none"
+              className="bg-amber-500 hover:bg-amber-600 text-white px-8 min-h-[48px] py-3 md:h-auto rounded-none"
             >
               {buttonText}
               <ArrowRight className="w-4 h-4 ml-2" />
@@ -121,7 +121,7 @@ const ActionCTA = ({
                 {link.isExternal ? (
                   <a 
                     href={link.href}
-                    className="text-amber-400 hover:underline"
+                    className="text-amber-400 hover:underline inline-flex items-center min-h-[44px] px-1"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -130,7 +130,7 @@ const ActionCTA = ({
                 ) : (
                   <Link 
                     to={link.href}
-                    className="text-amber-400 hover:underline"
+                    className="text-amber-400 hover:underline inline-flex items-center min-h-[44px] px-1"
                   >
                     {link.text}
                   </Link>

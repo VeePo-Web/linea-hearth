@@ -30,19 +30,20 @@ const highlightText = (text: string, query: string) => {
 
 const FAQAccordionGroup = ({ items, searchQuery = "" }: FAQAccordionGroupProps) => {
   return (
-    <Accordion type="single" collapsible className="space-y-2">
+    <Accordion type="single" collapsible className="space-y-3 md:space-y-2">
       {items.map((item) => (
         <AccordionItem 
-          key={item.id} 
+          key={item.id}
+          id={item.id}
           value={item.id}
-          className="border border-border px-6 data-[state=open]:bg-stone-50 dark:data-[state=open]:bg-stone-900/50"
+          className="border border-border px-6 data-[state=open]:bg-stone-50 dark:data-[state=open]:bg-stone-900/50 active:bg-stone-50 dark:active:bg-stone-900/30"
         >
-          <AccordionTrigger className="text-left font-light py-5 hover:no-underline">
-            <span className="pr-4">
+          <AccordionTrigger className="text-left font-light py-6 md:py-5 hover:no-underline gap-4">
+            <span className="pr-6 md:pr-4">
               {highlightText(item.question, searchQuery)}
             </span>
           </AccordionTrigger>
-          <AccordionContent className="text-muted-foreground font-light leading-relaxed pb-6">
+          <AccordionContent className="text-base md:text-sm text-muted-foreground font-light leading-relaxed pb-6">
             {highlightText(item.answer, searchQuery)}
           </AccordionContent>
         </AccordionItem>
