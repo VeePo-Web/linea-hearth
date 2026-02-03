@@ -1,13 +1,13 @@
 
 
 # World-Class Mobile Experience Optimization Plan
-## Shop/Category Pages — Section-by-Section Engineering
+## Lookbook Page — Section-by-Section Engineering
 
 ---
 
 ## Executive Summary
 
-This plan transforms the Shop/Category pages into a world-class mobile e-commerce experience while **preserving the desktop design exactly as-is**. These pages are critical conversion surfaces where users browse, filter, and add products to cart. Mobile optimization focuses on: thumb-reachable filter controls, generous touch targets on product cards, optimized quick-add flows for one-handed shopping, and a sticky filter bar that stays accessible without obscuring products.
+This plan transforms the Lookbook into a **world-class immersive mobile experience** while **preserving the desktop design exactly as-is**. The Lookbook is a premium editorial feature that showcases curated outfits with full-screen imagery, cinematic animations, and an innovative "Swipe to Shop" mechanic already in place. Our mobile optimization focuses on: perfecting scroll-snap behavior across all iOS devices, enhancing thumb-reachable shopping interactions, optimizing the swipe card physics for buttery 60fps performance, and creating seamless transitions between looks that feel native to mobile.
 
 ---
 
@@ -15,696 +15,713 @@ This plan transforms the Shop/Category pages into a world-class mobile e-commerc
 
 ### Page Architecture
 ```text
-Category.tsx
-├── Layout (wrapper)
-│   ├── CollectionHero
-│   │   ├── Pattern overlay
-│   │   ├── Tagline + Title
-│   │   └── Product count
-│   ├── FilterSortBar
-│   │   ├── Active filter chips
-│   │   ├── Item count
-│   │   ├── Filter button → Sheet
-│   │   └── Sort dropdown
-│   ├── ProductGrid
-│   │   ├── ProductCard[] (2-col mobile, 4-col desktop)
-│   │   │   ├── Image with hover swap
-│   │   │   ├── Quick View / Quick Add buttons
-│   │   │   ├── InlineQuickSizePicker
-│   │   │   ├── CartQuantityBadge
-│   │   │   └── Product info (name, price, colors)
-│   │   ├── PLPTestimonialStrip
-│   │   └── Pagination
-│   └── QuickViewModal
+Lookbook.tsx
+├── Header (fixed)
+├── Main Scroll Container (snap-y snap-mandatory)
+│   ├── LookbookHero
+│   │   ├── Noise texture overlay
+│   │   ├── Title animation ("THE LOOKBOOK")
+│   │   ├── Season tag (SS25)
+│   │   ├── Scroll indicator (left)
+│   │   └── Look count (right)
+│   ├── LookSection[] (for each look)
+│   │   ├── Image Side (3/5 width desktop, full on mobile)
+│   │   │   ├── Masked image reveal
+│   │   │   ├── Gradient overlay
+│   │   │   └── Look index badge
+│   │   ├── Content Side (2/5 width desktop, full on mobile)
+│   │   │   ├── Gender badge
+│   │   │   ├── Scripture reference
+│   │   │   ├── Headline (TextReveal)
+│   │   │   ├── Look name
+│   │   │   ├── Description
+│   │   │   └── ShopTheLook
+│   │   │       ├── "Swipe to Shop" CTA (mobile)
+│   │   │       ├── Product grid (2-col)
+│   │   │       └── "Add Complete Look" button
+│   │   └── SwipeLookbook (Drawer)
+│   │       ├── SwipeCard stack
+│   │       ├── SwipeActions (skip/add/undo)
+│   │       └── SwipeProgress (footer)
+│   ├── FitGuideSection
+│   │   ├── Gender toggle
+│   │   ├── Model grid
+│   │   └── FitGuideModal
+│   ├── WearTheMissionCTA
+│   └── Footer
+└── LookNavigation (fixed, desktop only)
 ```
 
-### Current Mobile Observations
-1. **CollectionHero**: Height `h-[40vh]` is good on mobile; typography could be refined
-2. **FilterSortBar**: Sheet slides from right which is acceptable; filter chips need larger touch targets
-3. **ProductGrid**: 2-column grid (`grid-cols-2`) works; gap could be tighter on mobile
-4. **ProductCard**: Hover-based quick actions don't work on mobile; needs tap alternatives
-5. **QuickViewModal**: Dialog layout needs mobile-first consideration; image/info split is problematic
-6. **Pagination**: Touch targets at `min-w-8 h-8` (32px) are below 48px minimum
-7. **InlineQuickSizePicker**: Button sizes at `min-w-[36px] h-9` could be larger for mobile
+### Current Mobile Implementation Status
+- **Excellent**: SwipeLookbook Drawer pattern is already mobile-first
+- **Good**: LookSection uses `lookbook-half-height` for mobile split layout
+- **Good**: Dynamic viewport height support exists for iOS
+- **Needs Work**: Hero scroll indicator touch target too small
+- **Needs Work**: LookNavigation hidden on mobile with no alternative
+- **Needs Work**: FitGuideSection model cards need larger touch targets
+- **Needs Work**: SwipeCard drag physics could be more responsive
+- **Needs Work**: Product cards in ShopTheLook need mobile touch optimization
+- **Needs Work**: FitGuideModal needs mobile drawer pattern
 
 ---
 
 ## Section-by-Section Implementation
 
-### 1. Collection Hero (`CollectionHero.tsx`)
+### 1. Lookbook Hero (`LookbookHero.tsx`)
 
 #### Current Issues on Mobile
-- Height `h-[40vh]` is reasonable but could be reduced to show products faster
-- Title at `text-4xl` (36px) on mobile is good ✓
-- Tagline text is very small (`text-xs`) on mobile
+- Title at `text-6xl` (60px) on mobile is good but could scale better on tiny phones
+- Scroll indicator button (`bottom-16 left-6`) may be hard to reach on large phones
+- Look count indicator on right side competes with scroll indicator
+- "Scroll" text at `text-[10px]` is very small
 
 #### Mobile Optimizations
 
-**a) Hero Height Reduction on Mobile**
+**a) Title Typography Scaling for Tiny Phones**
 ```text
-Current: h-[40vh] md:h-[50vh] lg:h-[60vh]
-Proposed: h-[35vh] md:h-[50vh] lg:h-[60vh]
+Current: text-6xl md:text-8xl lg:text-[10rem]
+Proposed: text-5xl xs:text-6xl md:text-8xl lg:text-[10rem]
 ```
-- Shows product grid faster on mobile
-- Users come to browse, not admire hero banners
+- Prevents "LOOKBOOK" from being cramped on 320px screens
 
-**b) Use Dynamic Viewport Height**
+**b) Scroll Indicator Touch Target Enhancement**
 ```text
-Current: h-[40vh]
-Proposed: h-[35dvh] md:h-[50vh] lg:h-[60vh]
+Current: button at bottom-16 left-6
+Proposed: Add min-h-[48px] min-w-[48px] touch area
 ```
-- Prevents iOS Safari address bar issues
+- Wrap indicator in larger touch target with invisible hit area
 
-**c) Tagline Typography Enhancement**
+**c) Center-Position Scroll Indicator on Mobile**
 ```text
-Current: text-xs md:text-sm
-Proposed: text-sm md:text-sm
+Current: absolute bottom-16 left-6
+Proposed on Mobile: absolute bottom-16 left-1/2 -translate-x-1/2
 ```
-- 14px minimum for readability on mobile
+- Center position is more thumb-reachable and creates visual balance
 
-**d) Product Count Touch-Friendly**
+**d) Hide Look Count on Small Mobile**
 ```text
-Current: text-sm md:text-base
-This is acceptable ✓
+Current: absolute right-6 bottom-16
+Proposed: hidden xs:block absolute right-6 bottom-16
 ```
+- Declutters the hero on smallest screens, info is redundant
 
-**e) Bottom Gradient Safe Area**
-- Current gradient `h-24` is good ✓
-- Ensures smooth transition to content
+**e) Scroll Text Size Increase**
+```text
+Current: text-[10px]
+Proposed: text-xs md:text-[10px]
+```
+- 12px minimum for mobile readability
 
-**Files Modified:** `CollectionHero.tsx`
+**Files Modified:** `LookbookHero.tsx`
 
 ---
 
-### 2. Filter/Sort Bar (`FilterSortBar.tsx`)
+### 2. Look Section (`LookSection.tsx`)
 
 #### Current Issues on Mobile
-- Filter chips at `px-3 py-1.5` (~28px height) are small touch targets
-- "Clear all" link needs larger touch target
-- Sort dropdown trigger may be hard to tap
-- Filter Sheet needs mobile-specific enhancements
-- Checkbox touch targets in filter sheet are small
-- "Apply Filters" and "Clear All" buttons in sheet need touch optimization
+- Two-part layout (image half + content half) works but feels cramped
+- Content side padding `px-6` is good but `py-8` may be insufficient
+- Scripture reference at `text-xs` is very small
+- Gender badge touch target unclear (it's display-only but could link)
+- ShopTheLook component gets compressed at bottom
 
 #### Mobile Optimizations
 
-**a) Active Filter Chips Touch Enhancement**
+**a) Mobile Half-Height Validation**
+- Current `lookbook-half-height` = `calc((100dvh - var(--header-height)) / 2)`
+- This is approximately 45% of screen for each half — good balance
+- No change needed, but ensure safe areas are respected
+
+**b) Content Side Vertical Padding Enhancement**
 ```text
-Current: px-3 py-1.5 text-xs → ~28px height
-Proposed: px-3 py-2 md:py-1.5 text-xs → 36px on mobile
+Current: py-8
+Proposed: py-6 md:py-8 pb-safe
 ```
-- Add `min-h-[44px]` to badge wrapper
-- Increase X icon area
+- Slightly reduce top/bottom to fit more content
+- Add safe-area-bottom for iOS home indicator
 
-**b) Clear All Link Touch Target**
+**c) Scripture Reference Size Increase**
 ```text
-Current: text-xs text-muted-foreground hover:text-foreground hover:underline ml-2
-Proposed: text-xs ... px-2 py-2 -mx-2 min-h-[44px] inline-flex items-center
+Current: text-xs uppercase tracking-[0.25em]
+Proposed: text-sm md:text-xs uppercase tracking-[0.25em]
 ```
+- 14px on mobile for better readability of important spiritual content
 
-**c) Filter Button Touch Enhancement**
+**d) Headline Typography Scaling**
 ```text
-Current: variant="ghost" size="sm"
-Proposed: Add min-h-[44px] and larger icon on mobile
+Current: text-2xl md:text-3xl lg:text-4xl
+Proposed: text-xl xs:text-2xl md:text-3xl lg:text-4xl
 ```
+- Slightly smaller on tiny phones to prevent overflow
 
-**d) Sort Dropdown Mobile Optimization**
+**e) Description Line Clamp on Mobile**
 ```text
-Current: w-auto border-none bg-transparent
-Proposed: Add min-h-[44px] touch target
+Current: text-sm text-white/60 font-light leading-relaxed mb-8
+Proposed: text-sm ... leading-relaxed mb-6 md:mb-8 line-clamp-3 md:line-clamp-none
 ```
-- SelectTrigger needs `py-3 md:py-2`
+- Limit to 3 lines on mobile to ensure ShopTheLook is visible
 
-**e) Filter Sheet Mobile Enhancements**
-- Current width `w-80` is good ✓
-- Add safe area bottom padding: `pb-safe`
-- Increase checkbox touch targets
-
-**f) Checkbox Touch Target Expansion**
+**f) Mobile Index Badge Size Increase**
 ```text
-Current: space-y-3 per item → ~24px per row
-Proposed: space-y-4 md:space-y-3 → 32px+ per row
-Add py-1 to label for larger hit area
+Current: text-4xl font-extralight text-white/20
+Proposed: text-5xl md:text-4xl font-extralight text-white/25
 ```
+- Larger index number creates stronger visual identity
 
-**g) Apply/Clear Buttons in Sheet**
-```text
-Current: size="sm"
-Proposed: size="sm" className="min-h-[48px] md:min-h-auto"
-```
+**g) Add Scroll Hint for Mobile Content**
+- If ShopTheLook products are cut off, add subtle fade indicator
+- Or add "Scroll for products" micro-text
 
-**h) Sticky Filter Bar on Mobile**
-- Consider making FilterSortBar sticky on scroll
-- Use `sticky top-[var(--header-height)] z-30`
-- Add background blur: `backdrop-blur-sm bg-background/95`
-
-**Files Modified:** `FilterSortBar.tsx`
+**Files Modified:** `LookSection.tsx`
 
 ---
 
-### 3. Product Grid (`ProductGrid.tsx`)
+### 3. Shop The Look (`ShopTheLook.tsx`)
 
 #### Current Issues on Mobile
-- Grid gap `gap-4 md:gap-6` is good ✓
-- Skeleton loading aspect ratio matches products ✓
-- Empty state padding could be reduced
-- No loading indication beyond skeletons
+- "Swipe to Shop" CTA is already implemented — excellent ✓
+- Product grid shows 4 items in 2x2 which can overflow on short viewports
+- Product card quick add buttons at `w-9 h-9` (36px) are borderline
+- "Add Complete Look" button is good at `h-12` ✓
+- Size memory hint at `text-[10px]` is very small
 
 #### Mobile Optimizations
 
-**a) Grid Gap Mobile Optimization**
+**a) Product Grid Mobile Limit**
 ```text
-Current: gap-4 md:gap-6
-Proposed: gap-3 md:gap-6
+Current: products.slice(0, 4)
+Proposed: products.slice(0, isMobile ? 2 : 4)
 ```
-- Tighter gap shows more product on mobile screens
-- More products above fold = higher engagement
+- Show only 2 products on mobile to prevent overflow
+- Users can see all via Swipe mode
 
-**b) Empty State Mobile Padding**
+**b) Quick Add Button Touch Enhancement**
 ```text
-Current: py-16
-Proposed: py-12 md:py-16
-```
-
-**c) Loading Skeleton Enhancement**
-- Add subtle pulse animation (already using Skeleton ✓)
-- Consider reducing skeleton count on mobile
-```text
-Current: [...Array(8)].map
-Proposed: [...Array(isMobile ? 4 : 8)].map
+Current: w-9 h-9 rounded-full (36px)
+Proposed: w-10 h-10 md:w-9 md:h-9 rounded-full (40px on mobile)
 ```
 
-**d) Grid Section Padding**
+**c) Product Card Aspect Ratio Consistency**
 ```text
-Current: px-6 mb-8
-Proposed: px-4 md:px-6 mb-6 md:mb-8
+Current: aspect-[3/4]
+This is correct for fashion imagery ✓
 ```
-- Slightly more content area on mobile
 
-**Files Modified:** `ProductGrid.tsx`
+**d) "Swipe to Shop" CTA Priority**
+- Move CTA above product grid on mobile
+- Currently below section label, above grid ✓
+- Consider making it sticky at bottom of content area
+
+**e) Section Label Touch-Friendly**
+```text
+Current: text-[10px] uppercase
+Proposed: text-xs md:text-[10px] uppercase
+```
+
+**f) Price Display Enhancement**
+```text
+Current: text-xs text-white/50
+Proposed: text-sm md:text-xs text-white/50
+```
+- Price should be clearly readable
+
+**Files Modified:** `ShopTheLook.tsx`
 
 ---
 
-### 4. Product Card (`ProductCard.tsx`)
+### 4. Look Product Card (in `ShopTheLook.tsx`)
 
 #### Current Issues on Mobile
-- **Critical**: Hover-based quick actions (Quick View, Quick Add) don't work on touch
-- Image swap on hover doesn't translate to mobile
-- Quick Add button at `h-9` (36px) is acceptable but could be larger
-- Size picker buttons at `min-w-[36px] h-9` are borderline
-- Color swatches at `w-3.5 h-3.5` (14px) are very small
-- Favorite button only shows on hover
+- Position tag at `text-[9px]` is tiny
+- Product name truncation is good ✓
+- Quick add button positioning and size needs enhancement
+- Hover-based interactions don't work on mobile
 
 #### Mobile Optimizations
 
-**a) Always-Visible Mobile Actions**
-- Show Quick View and Quick Add buttons permanently on mobile
-- Position at bottom of image, semi-transparent
-```tsx
-// Desktop: opacity-0 group-hover:opacity-100
-// Mobile: opacity-100 always
-className={`absolute bottom-3 left-3 right-3 flex gap-2 transition-all duration-300 ${
-  isHovered && !quickAdd.isPickerOpen && !quickAdd.isAdded 
-    ? "opacity-100 translate-y-0" 
-    : isMobile 
-      ? "opacity-90" 
-      : "opacity-0 translate-y-2"
-}`}
-```
-
-**b) Favorite Button Always Visible on Mobile**
+**a) Position Tag Size Increase**
 ```text
-Current: opacity-0 md:opacity-0 md:group-hover:opacity-100
-Proposed: opacity-100 md:opacity-0 md:group-hover:opacity-100
+Current: text-[9px] uppercase tracking-wider
+Proposed: text-[10px] md:text-[9px] uppercase tracking-wider
 ```
-- Mobile users can't hover, so always show favorite button
 
-**c) Quick Add Button Touch Enhancement**
+**b) Quick Add Button Always Visible on Mobile**
 ```text
-Current: h-9 px-3
-Proposed: h-10 md:h-9 px-4 md:px-3
+Current: Shows on hover/tap
+Proposed: Always visible with opacity-80 on mobile
 ```
-- 40px height on mobile for easier tapping
+- Mobile users need to see the action affordance immediately
 
-**d) Quick View Button Touch Enhancement**
+**c) Success Overlay Animation**
+- Already using DrawCheckIcon with animation ✓
+- Consider adding haptic feedback on success (already in useQuickAdd ✓)
+
+**d) Card Shadow on Mobile**
 ```text
-Current: flex-1 ... text-xs h-9
-Proposed: flex-1 ... text-xs h-10 md:h-9
+Current: boxShadow on whileHover
+Proposed: Add subtle default shadow on mobile
+box-shadow: 0 4px 20px -5px rgba(0,0,0,0.3)
 ```
 
-**e) Color Swatch Size Increase**
-```text
-Current: w-3.5 h-3.5 (14px)
-Proposed: w-4 h-4 md:w-3.5 md:h-3.5 (16px on mobile)
-```
-
-**f) Product Name Truncation**
-- Add line clamp for long names on mobile
-```text
-Current: leading-tight
-Proposed: leading-tight line-clamp-2
-```
-
-**g) Badge Positioning for Small Screens**
-- Current positioning is good ✓
-- Ensure badges don't overlap on narrow cards
-
-**h) Haptic Feedback on Quick Add**
-```tsx
-// In handleQuickAdd
-if (navigator.vibrate) navigator.vibrate(10);
-```
-- Already implemented in useQuickAdd ✓
-
-**Files Modified:** `ProductCard.tsx`
+**Files Modified:** `ShopTheLook.tsx`
 
 ---
 
-### 5. Inline Quick Size Picker (`InlineQuickSizePicker.tsx`)
+### 5. Swipe Lookbook Drawer (`SwipeLookbook.tsx`)
 
-#### Current Issues on Mobile
-- Button sizes at `min-w-[36px] h-9` (36px) are borderline
-- "Select Size" label is very small (`text-[9px]`)
-- Remembered size badge at `text-[7px]` is tiny
-- Low stock indicator dot is very small
+#### Current Implementation — Already Excellent
+- Uses Drawer component (bottom sheet pattern) ✓
+- Height `95vh` is good for immersive experience ✓
+- Header has close/share buttons ✓
+- Card stack with physics-based swiping ✓
+- Completion screen with celebration haptics ✓
 
 #### Mobile Optimizations
 
-**a) Size Button Touch Enhancement**
+**a) Safe Area Bottom for Progress Bar**
 ```text
-Current: min-w-[36px] h-9 px-2
-Proposed: min-w-[40px] md:min-w-[36px] h-10 md:h-9 px-2.5 md:px-2
+Current: SwipeProgress has safe-area-pb class ✓
+Verify this is working correctly on notched devices
 ```
-- 40px height on mobile for WCAG compliance
 
-**b) Label Size Increase**
+**b) Header Close Button Touch Target**
+```text
+Current: Button size="icon" (default 40x40)
+Proposed: Ensure min-w-[48px] min-h-[48px]
+```
+
+**c) Share Button Touch Target**
+Same as close button — ensure 48px minimum
+
+**d) Swipe Instructions Typography**
+```text
+Current: text-xs (12px)
+Proposed: text-sm md:text-xs (14px on mobile)
+```
+
+**e) Completion Screen Button Enhancement**
+```text
+Current: h-12 rounded-xl (48px) ✓
+This is perfect, no change needed
+```
+
+**Files Modified:** `SwipeLookbook.tsx`
+
+---
+
+### 6. Swipe Card (`SwipeCard.tsx`)
+
+#### Current Implementation — Highly Optimized
+- Physics-based drag with velocity detection ✓
+- Haptic feedback at 50% threshold ✓
+- Direction indicators (Skip/Add badges) ✓
+- Size picker integration ✓
+- Keyboard accessibility ✓
+
+#### Mobile Optimizations
+
+**a) Swipe Threshold Responsiveness**
+```text
+Current: SWIPE_THRESHOLD = window.innerWidth * 0.25
+Proposed: SWIPE_THRESHOLD = Math.min(window.innerWidth * 0.25, 100)
+```
+- Cap threshold at 100px for consistent feel across devices
+
+**b) Card Border Radius Mobile Enhancement**
+```text
+Current: rounded-2xl (16px)
+Proposed: rounded-3xl md:rounded-2xl (24px on mobile)
+```
+- Larger radius feels more "card-like" on mobile
+
+**c) Position Badge Touch Target**
+```text
+Current: text-[10px] px-3 py-1.5 rounded-full
+Proposed: text-xs md:text-[10px] px-3 py-2 md:py-1.5
+```
+
+**d) Product Name Font Size**
+```text
+Current: text-xl (20px)
+Proposed: text-lg md:text-xl (18px on mobile to prevent truncation)
+```
+
+**e) Size Picker Overlay Enhancement**
+- Current implementation is good ✓
+- Ensure backdrop-blur performs well on older devices
+- Add `will-change: opacity` for smoother transitions
+
+**Files Modified:** `SwipeCard.tsx`
+
+---
+
+### 7. Swipe Actions (`SwipeActions.tsx`)
+
+#### Current Implementation — Good Touch Targets
+- Undo button: `w-12 h-12` (48px) ✓
+- Skip button: `w-16 h-16` (64px) ✓
+- Add button: `w-16 h-16` (64px) ✓
+
+#### Mobile Optimizations
+
+**a) Action Button Spacing**
+```text
+Current: gap-6
+Proposed: gap-4 xs:gap-6
+```
+- Tighter gap on tiny phones to fit all buttons
+
+**b) Container Padding**
+```text
+Current: py-4
+Proposed: py-3 md:py-4 pb-safe
+```
+- Reduce slightly but ensure safe area
+
+**c) Size Badge in Add Button**
 ```text
 Current: text-[9px]
 Proposed: text-[10px] md:text-[9px]
 ```
 
-**c) "Yours" Badge Enhancement**
-```text
-Current: text-[7px]
-Proposed: text-[8px] md:text-[7px]
-```
-
-**d) Low Stock Indicator Enhancement**
-```text
-Current: w-1 h-1 rounded-full
-Proposed: w-1.5 h-1.5 md:w-1 md:h-1 rounded-full
-```
-
-**e) Container Padding**
-```text
-Current: p-2.5
-Proposed: p-3 md:p-2.5
-```
-
-**Files Modified:** `InlineQuickSizePicker.tsx`
+**Files Modified:** `SwipeActions.tsx`
 
 ---
 
-### 6. Quick View Modal (`QuickViewModal.tsx`)
+### 8. Swipe Progress (`SwipeProgress.tsx`)
+
+#### Current Implementation — Well Designed
+- Card progress dots ✓
+- Stats row with item count and total ✓
+- Bundle discount badge ✓
+- Free shipping progress bar ✓
+
+#### Mobile Optimizations
+
+**a) Progress Dots Size Enhancement**
+```text
+Current: w-2 h-2 rounded-full
+Proposed: w-2.5 h-2.5 md:w-2 md:h-2
+```
+- Slightly larger for better visibility
+
+**b) Stats Row Typography**
+```text
+Current: text-white font-medium
+Proposed: text-white font-medium text-sm md:text-base
+```
+- Slightly smaller on mobile to fit all elements
+
+**c) View Bag CTA Touch Target**
+```text
+Current: h-8 px-3
+Proposed: h-9 md:h-8 px-4 md:px-3 min-w-[44px]
+```
+
+**d) Free Shipping Text Size**
+```text
+Current: text-[11px]
+Proposed: text-xs md:text-[11px]
+```
+
+**Files Modified:** `SwipeProgress.tsx`
+
+---
+
+### 9. Fit Guide Section (`FitGuideSection.tsx`)
 
 #### Current Issues on Mobile
-- **Critical**: Two-column grid doesn't work well on narrow screens
-- Image at `aspect-square md:aspect-auto md:h-[500px]` clips content
-- Close button at top-right may be hard to reach on large phones
-- Size selector buttons don't have adequate spacing
-- Quantity controls at `p-2` are small touch targets
-- "View Full Details" link needs larger touch area
+- Section title at `text-3xl` (30px) on mobile is good ✓
+- Gender toggle buttons need touch target verification
+- Model grid is 2-column on mobile ✓
+- Model cards need larger touch targets
+- "View Details" hover indicator doesn't work on mobile
+
+#### Mobile Optimizations
+
+**a) Gender Toggle Touch Enhancement**
+```text
+Current: px-8 py-2.5 rounded-full
+Proposed: px-6 py-3 md:px-8 md:py-2.5 min-h-[44px]
+```
+- Increase vertical padding on mobile for easier tapping
+
+**b) Model Card Touch Target**
+```text
+Current: aspect-[3/4] rounded-lg focus:ring-2
+Proposed: Add active:scale-[0.98] for tap feedback
+```
+
+**c) Always-Visible Info on Mobile**
+- "View Details" hover indicator should be visible on mobile
+- Or tap anywhere on card to open modal
+
+**d) Model Info Typography**
+```text
+Current: text-lg mb-1, text-sm
+Proposed: text-base md:text-lg mb-1, text-sm
+```
+- Slightly smaller name on mobile
+
+**e) Section Padding Mobile Optimization**
+```text
+Current: py-16 lg:py-24 px-6
+Proposed: py-12 md:py-16 lg:py-24 px-4 md:px-6
+```
+
+**f) Grid Gap Mobile**
+```text
+Current: gap-4 lg:gap-6
+Proposed: gap-3 md:gap-4 lg:gap-6
+```
+- Tighter gap shows more models on mobile
+
+**Files Modified:** `FitGuideSection.tsx`
+
+---
+
+### 10. Fit Guide Modal (`FitGuideModal.tsx`)
+
+#### Current Issues on Mobile
+- Dialog pattern may clip on small screens with fixed height
+- Image at `h-64 lg:h-auto` is good on mobile ✓
+- Close button at `w-10 h-10` is below 48px minimum
+- Measurement rows need adequate touch targets (they're display-only ✓)
+- Action buttons at `h-11` (44px) are acceptable
 
 #### Mobile Optimizations
 
 **a) Convert to Bottom Sheet on Mobile**
-Consider using Drawer pattern for mobile:
 ```tsx
 const isMobile = useIsMobile();
 
+// Use full-screen drawer on mobile for better ergonomics
 {isMobile ? (
-  <Drawer open={open} onOpenChange={onClose}>
-    <DrawerContent className="max-h-[90vh]">
-      {/* Scrollable content */}
+  <Drawer open={!!model} onOpenChange={() => onClose()}>
+    <DrawerContent className="max-h-[95vh]">
+      {/* Modal content */}
     </DrawerContent>
   </Drawer>
 ) : (
-  <Dialog open={open} onOpenChange={onClose}>
-    <DialogContent>
-      {/* Current layout */}
-    </DialogContent>
-  </Dialog>
+  // Current Dialog pattern for desktop
 )}
 ```
 
-**b) If Keeping Dialog, Stack Layout on Mobile**
+**b) Close Button Touch Enhancement**
 ```text
-Current: grid md:grid-cols-2 gap-0
-Proposed: flex flex-col md:grid md:grid-cols-2 gap-0
-```
-- Full-width image on top, info below on mobile
-- Add max-height and scroll to content area
-
-**c) Image Height Mobile Constraint**
-```text
-Current: aspect-square md:aspect-auto md:h-[500px]
-Proposed: aspect-square md:aspect-auto md:h-[500px] max-h-[40vh] md:max-h-none
-```
-- Prevents image from dominating mobile viewport
-
-**d) Close Button Position/Size Enhancement**
-```text
-Current: right-4 top-4 ... rounded-full
-Proposed: right-3 top-3 md:right-4 md:top-4 w-10 h-10 md:w-auto md:h-auto
-```
-- Larger touch target on mobile
-
-**e) Size Button Touch Enhancement**
-```text
-Current: px-4 py-2
-Proposed: px-4 py-3 md:py-2 min-h-[44px] md:min-h-auto
+Current: w-10 h-10
+Proposed: w-12 h-12 md:w-10 md:h-10
 ```
 
-**f) Color Swatch Touch Enhancement**
+**c) Mobile Image Height**
 ```text
-Current: w-8 h-8 rounded-full
-Proposed: w-10 h-10 md:w-8 md:h-8 rounded-full
+Current: h-64 lg:h-auto
+Proposed: h-56 xs:h-64 lg:h-auto
 ```
-- 40px on mobile for easier tapping
+- Slightly smaller on tiny phones to show more info
 
-**g) Quantity Control Touch Enhancement**
+**d) Info Side Padding Mobile**
 ```text
-Current: p-2 hover:bg-muted/50
-Proposed: p-3 md:p-2 min-w-[44px] min-h-[44px] md:min-w-auto md:min-h-auto
-```
-
-**h) Add to Cart Button (Already 48px ✓)**
-- Current `h-12` is perfect
-
-**i) View Full Details Link Enhancement**
-```text
-Current: text-sm text-muted-foreground hover:text-foreground hover:underline
-Proposed: text-sm ... inline-flex items-center min-h-[44px] py-2
+Current: p-6 lg:p-10
+Proposed: p-4 md:p-6 lg:p-10 pb-safe
 ```
 
-**j) Favorite Button Enhancement**
-- Current using FavoriteButton component
-- Ensure touch target is adequate
-
-**k) Safe Area for Scrollable Content**
+**e) Action Buttons Touch Enhancement**
 ```text
-Add: pb-safe at bottom of scrollable content
+Current: h-11 (44px)
+Proposed: h-12 md:h-11 (48px on mobile)
 ```
 
-**l) Image Navigation Arrows Enhancement**
-```text
-Current: h-8 w-8
-Proposed: h-10 w-10 md:h-8 md:w-8
-```
-
-**m) Thumbnail Dots Enhancement**
-```text
-Current: w-2 h-2 rounded-full
-Proposed: w-3 h-3 md:w-2 md:h-2 rounded-full
-```
-
-**Files Modified:** `QuickViewModal.tsx`
+**Files Modified:** `FitGuideModal.tsx`
 
 ---
 
-### 7. Cart Quantity Badge (`CartQuantityBadge.tsx`)
+### 11. Mobile Look Navigation (NEW COMPONENT)
 
-#### Current Issues on Mobile
-- Badge variant is good ✓
-- Controls variant buttons at `h-7 w-7` (28px) are small
-- Text in controls is small
+#### Current State
+- `LookNavigation` is `hidden lg:flex` — no mobile navigation exists
+- Users rely on scroll snapping to navigate between looks
+- No way to jump to a specific look on mobile
 
-#### Mobile Optimizations
+#### Mobile Navigation Implementation
 
-**a) Control Buttons Touch Enhancement**
-```text
-Current: h-7 w-7 p-0
-Proposed: h-9 w-9 md:h-7 md:w-7 p-0
-```
-- 36px on mobile is borderline but acceptable given context
+**Create `LookNavigationMobile.tsx`**
 
-**b) Container Padding**
-```text
-Current: p-1
-Proposed: p-1.5 md:p-1
-```
-
-**Files Modified:** `CartQuantityBadge.tsx`
-
----
-
-### 8. Pagination (`Pagination.tsx`)
-
-#### Current Issues on Mobile
-- Page buttons at `min-w-8 h-8` (32px) are below 48px minimum
-- Navigation arrows at `p-2` with small icon are small targets
-- Spacing between elements is tight
-
-#### Mobile Optimizations
-
-**a) Page Button Touch Enhancement**
-```text
-Current: min-w-8 h-8
-Proposed: min-w-10 h-10 md:min-w-8 md:h-8
-```
-- 40px on mobile for better tapping
-
-**b) Navigation Arrow Touch Enhancement**
-```text
-Current: p-2 ... ChevronLeft className="h-4 w-4"
-Proposed: p-3 md:p-2 ... ChevronLeft className="h-5 w-5 md:h-4 md:w-4"
+**Option A: Progress Dots (Minimal)**
+```tsx
+// Fixed at bottom of viewport, shows current look
+<div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 lg:hidden">
+  <div className="flex gap-2 bg-black/60 backdrop-blur-sm px-3 py-2 rounded-full">
+    {looks.map((_, index) => (
+      <button
+        key={index}
+        onClick={() => scrollToLook(index)}
+        className={`w-2.5 h-2.5 rounded-full transition-all ${
+          activeIndex === index 
+            ? 'bg-amber-500 scale-125' 
+            : 'bg-white/40'
+        }`}
+        aria-label={`Go to look ${index + 1}`}
+      />
+    ))}
+  </div>
+</div>
 ```
 
-**c) Gap Between Elements**
-```text
-Current: gap-2 for outer, gap-1 for pages
-Proposed: gap-3 md:gap-2 for outer, gap-1.5 md:gap-1 for pages
+**Option B: Bottom Tab Bar (More Discoverable)**
+```tsx
+// Fixed at bottom with look names
+<nav className="fixed bottom-0 left-0 right-0 z-40 lg:hidden bg-stone-900/95 backdrop-blur-md border-t border-white/10 safe-area-pb">
+  <div className="flex overflow-x-auto scroll-snap-x scrollbar-hide px-4 py-2 gap-3">
+    {looks.map((look, index) => (
+      <button
+        key={look.id}
+        onClick={() => scrollToLook(index)}
+        className={`flex-shrink-0 px-4 py-2 rounded-full text-xs uppercase tracking-wide transition-all ${
+          activeIndex === index 
+            ? 'bg-amber-500 text-white' 
+            : 'bg-white/10 text-white/60'
+        }`}
+      >
+        {look.name}
+      </button>
+    ))}
+  </div>
+</nav>
 ```
 
-**d) Ellipsis Spacing**
-```text
-Current: mx-2
-This is acceptable ✓
-```
+**Recommendation:** Use Option A (Progress Dots) for minimal intrusion on the immersive experience. The dots are familiar from Instagram Stories and communicate progress.
 
-**e) Container Padding**
-```text
-Current: px-6 py-8
-Proposed: px-4 md:px-6 py-8
-```
-
-**Files Modified:** `Pagination.tsx`
-
----
-
-### 9. PLP Testimonial Strip (`PLPTestimonialStrip.tsx`)
-
-#### Current Issues on Mobile
-- Quote at `text-lg md:text-xl` is good ✓
-- Star icons at `w-4 h-4` are acceptable ✓
-- CTA link needs larger touch target
-
-#### Mobile Optimizations
-
-**a) CTA Link Touch Enhancement**
-```text
-Current: inline-block mt-6 text-sm text-muted-foreground hover:text-foreground hover:underline
-Proposed: inline-flex items-center min-h-[44px] px-2 py-2 -mx-2 mt-4 md:mt-6 text-sm ...
-```
-
-**b) Section Padding Mobile Optimization**
-```text
-Current: px-6 py-12 my-8
-Proposed: px-4 md:px-6 py-10 md:py-12 my-6 md:my-8
-```
-
-**Files Modified:** `PLPTestimonialStrip.tsx`
-
----
-
-### 10. Category Header (`CategoryHeader.tsx`)
-
-#### Current Issues on Mobile
-- Breadcrumb links need adequate touch targets
-- Title at `text-3xl` on mobile is good ✓
-
-#### Mobile Optimizations
-
-**a) Breadcrumb Touch Enhancement**
-```text
-Current: Default shadcn breadcrumb
-Proposed: Add py-2 to BreadcrumbLink for larger hit area
-```
-
-**b) Section Padding**
-```text
-Current: px-6 mb-8
-Proposed: px-4 md:px-6 mb-6 md:mb-8
-```
-
-**Files Modified:** `CategoryHeader.tsx`
+**Files Created:** `LookNavigationMobile.tsx`
+**Files Modified:** `Lookbook.tsx` (import and render)
 
 ---
 
 ## Cross-Cutting Technical Optimizations
 
-### A. Sticky Filter Bar Implementation
+### A. Scroll Snap Optimization
 
-**Sticky Filter on Scroll (Mobile)**
-```tsx
-// In Category.tsx or FilterSortBar.tsx
-const [isSticky, setIsSticky] = useState(false);
+**Scroll Snap Behavior Enhancement**
+```css
+/* Enhanced lookbook scroll snap */
+.lookbook-scroll-container {
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain; /* Prevent pull-to-refresh */
+}
 
-useEffect(() => {
-  const handleScroll = () => {
-    const heroHeight = document.querySelector('.collection-hero')?.getBoundingClientRect().bottom || 0;
-    setIsSticky(heroHeight < 0);
-  };
-  
-  window.addEventListener('scroll', handleScroll, { passive: true });
-  return () => window.removeEventListener('scroll', handleScroll);
-}, []);
-
-// Apply to FilterSortBar container
-<div className={cn(
-  "transition-all duration-200",
-  isSticky && "sticky top-[var(--header-height)] z-30 bg-background/95 backdrop-blur-sm shadow-sm"
-)}>
-  <FilterSortBar ... />
-</div>
+@media (prefers-reduced-motion: reduce) {
+  .lookbook-scroll-container {
+    scroll-behavior: auto;
+  }
+}
 ```
 
-### B. Product Card Image Optimization
+**Prevent Overscroll Bounce**
+```css
+.lookbook-scroll-container {
+  overscroll-behavior: none;
+}
+```
 
-**Lazy Loading for Below-Fold Products**
+### B. Performance Optimizations
+
+**Image Preloading for Next Look**
 ```tsx
-// Add loading="lazy" to ProductCard images after first 4
-<img
-  loading={index < 4 ? "eager" : "lazy"}
-  fetchPriority={index < 2 ? "high" : "auto"}
-  src={primaryImage.image_url}
-  alt={product.name}
-  ...
+// In LookSection, preload next image
+useEffect(() => {
+  if (index < looks.length - 1) {
+    const nextImage = new Image();
+    nextImage.src = looks[index + 1].image_url;
+  }
+}, [index, looks]);
+```
+
+**Lazy Load Below-Fold Looks**
+```tsx
+// In Lookbook.tsx, use intersection observer
+<LookSection
+  loading={index > 1 ? 'lazy' : 'eager'}
 />
 ```
 
-### C. Scroll Restoration
+### C. Animation Performance
 
-**Preserve Scroll on Filter Changes**
-```tsx
-// In Category.tsx
-useEffect(() => {
-  // Save scroll position before filter
-  const savedPosition = sessionStorage.getItem(`scroll-${categorySlug}`);
-  if (savedPosition) {
-    window.scrollTo(0, parseInt(savedPosition, 10));
-    sessionStorage.removeItem(`scroll-${categorySlug}`);
-  }
-}, []);
-
-// Before filter change
-sessionStorage.setItem(`scroll-${categorySlug}`, window.scrollY.toString());
+**GPU-Accelerated Transforms**
+```css
+.swipe-card {
+  will-change: transform;
+  transform: translateZ(0);
+}
 ```
 
-### D. Touch Feedback Consistency
-
-**Tap Feedback on Product Cards**
+**Disable Complex Animations on Low-Power Mode**
 ```tsx
-<Card
-  className="... active:scale-[0.98] transition-transform duration-75"
->
+// Check for low-power mode
+const isLowPowerMode = navigator.getBattery?.()?.then(b => b.charging === false && b.level < 0.2);
 ```
 
-### E. Mobile-Specific Empty State
+### D. Haptic Feedback Refinement
 
-**Condensed Empty State**
+**Distinct Haptic Patterns**
 ```tsx
-{products.length === 0 ? (
-  <div className={cn(
-    "text-center py-12 md:py-16",
-    "flex flex-col items-center gap-4"
-  )}>
-    <div className="w-12 h-12 md:w-16 md:h-16 bg-muted rounded-full flex items-center justify-center">
-      <Search className="w-5 h-5 md:w-6 md:h-6 text-muted-foreground" />
-    </div>
-    <div>
-      <p className="text-base md:text-lg text-muted-foreground mb-1 md:mb-2">No products found</p>
-      <p className="text-sm text-muted-foreground">
-        Try adjusting your filters
-      </p>
-    </div>
-    <Button 
-      variant="outline" 
-      size="sm"
-      className="min-h-[44px] mt-2"
-      onClick={clearFilters}
-    >
-      Clear Filters
-    </Button>
-  </div>
-) : (
-  // Product grid
-)}
+// Light tap for navigation
+const lightHaptic = () => navigator.vibrate?.(10);
+
+// Medium for adding to cart
+const mediumHaptic = () => navigator.vibrate?.(20);
+
+// Celebration pattern for completion
+const celebrationHaptic = () => navigator.vibrate?.([10, 50, 10, 50, 10]);
+
+// Error/skip pattern
+const skipHaptic = () => navigator.vibrate?.(5);
 ```
 
----
+### E. Accessibility Enhancements
 
-## Accessibility Enhancements
-
-### A. Filter State Announcements
+**Screen Reader Announcements**
 ```tsx
+// Announce current look
 <div aria-live="polite" className="sr-only">
-  {`Showing ${itemCount} products${activeFilterCount > 0 ? ` with ${activeFilterCount} filters applied` : ''}`}
+  {`Viewing look ${currentIndex + 1} of ${looks.length}: ${currentLook.name}`}
 </div>
 ```
 
-### B. Product Card Focus States
-- Ensure focus ring is visible on keyboard navigation
-- Add `focus-visible:ring-2 focus-visible:ring-offset-2` to card links
-
-### C. Size Picker Accessibility
-- Already has aria-label ✓
-- Ensure disabled state is announced
-
-### D. Modal Focus Management
-- Already using Radix Dialog ✓
-- Ensure focus is trapped and returned on close
+**Focus Management in Swipe Drawer**
+```tsx
+// Return focus to trigger when drawer closes
+useEffect(() => {
+  if (!isOpen && triggerRef.current) {
+    triggerRef.current.focus();
+  }
+}, [isOpen]);
+```
 
 ---
 
 ## Implementation Priority
 
-### Phase 1: Critical Touch Targets (Immediate)
-1. ProductCard always-visible mobile actions
-2. Favorite button always visible on mobile
-3. Quick Add/View button height increase
-4. Pagination touch targets
-5. QuickViewModal mobile layout
+### Phase 1: Critical Touch & Navigation (Immediate)
+1. Create mobile look navigation (progress dots)
+2. Hero scroll indicator enhancement
+3. Gender toggle touch targets
+4. FitGuideModal drawer pattern for mobile
+5. SwipeLookbook header button sizing
 
-### Phase 2: Filter Experience (Week 1)
-6. Filter chip touch targets
-7. Filter sheet checkbox spacing
-8. Sort dropdown touch target
-9. Sticky filter bar on scroll
-10. Clear filters button enhancement
+### Phase 2: Product Interaction (Day 2)
+6. ShopTheLook product grid mobile limit
+7. Product card quick add visibility
+8. LookSection content padding and safe areas
+9. SwipeCard threshold optimization
 
-### Phase 3: Quick View Optimization (Week 1)
-11. Consider Drawer pattern for mobile
-12. Size/color selector touch targets
-13. Quantity controls enhancement
-14. Navigation arrows/dots sizing
-
-### Phase 4: Polish & Performance (Week 2)
-15. Image lazy loading optimization
-16. Scroll restoration on filter
-17. Color swatch size increase
-18. InlineQuickSizePicker button sizing
-19. Empty state mobile optimization
+### Phase 3: Polish & Performance (Day 3)
+10. Image preloading for next look
+11. Scroll snap overscroll behavior
+12. Typography scaling refinements
+13. Haptic feedback patterns
+14. Animation performance optimization
 
 ---
 
@@ -712,41 +729,42 @@ sessionStorage.setItem(`scroll-${categorySlug}`, window.scrollY.toString());
 
 | File | Changes |
 |------|---------|
-| `src/pages/Category.tsx` | Sticky filter logic, scroll restoration |
-| `src/components/category/CollectionHero.tsx` | Height reduction, dvh units, tagline size |
-| `src/components/category/FilterSortBar.tsx` | Touch targets, sticky positioning, checkbox spacing |
-| `src/components/category/ProductGrid.tsx` | Grid gap, padding, skeleton count |
-| `src/components/category/ProductCard.tsx` | Always-visible actions, button sizes, color swatches |
-| `src/components/category/QuickViewModal.tsx` | Mobile layout, touch targets, Drawer pattern |
-| `src/components/category/Pagination.tsx` | Touch targets, arrow sizing, gap adjustment |
-| `src/components/category/PLPTestimonialStrip.tsx` | CTA touch target, padding |
-| `src/components/category/CategoryHeader.tsx` | Breadcrumb touch targets, padding |
-| `src/components/category/CartQuantityBadge.tsx` | Control button sizing |
-| `src/components/ui/InlineQuickSizePicker.tsx` | Button sizing, label sizing |
+| `src/pages/Lookbook.tsx` | Import mobile nav, safe areas, preloading |
+| `src/components/lookbook/LookbookHero.tsx` | Scroll indicator, typography, look count |
+| `src/components/lookbook/LookSection.tsx` | Padding, typography, description clamp |
+| `src/components/lookbook/ShopTheLook.tsx` | Product limit, touch targets |
+| `src/components/lookbook/SwipeLookbook.tsx` | Button sizing, safe areas |
+| `src/components/lookbook/SwipeCard.tsx` | Threshold, border radius, sizing |
+| `src/components/lookbook/SwipeActions.tsx` | Spacing, safe areas |
+| `src/components/lookbook/SwipeProgress.tsx` | Dot sizing, typography |
+| `src/components/lookbook/FitGuideSection.tsx` | Touch targets, padding, grid gap |
+| `src/components/lookbook/FitGuideModal.tsx` | Drawer pattern, touch targets |
+| `src/components/lookbook/LookNavigationMobile.tsx` | **NEW** - Mobile progress dots |
+| `src/index.css` | Scroll behavior, overscroll prevention |
 
 ---
 
 ## Testing Matrix
 
 ### Device Coverage
-- iPhone SE (375×667) - Smallest supported, 2-col grid stress test
-- iPhone 14 (390×844) - Standard modern phone
-- iPhone 14 Pro Max (430×932) - Large phone, reach considerations
-- iPad Mini (768×1024) - Tablet grid transition
+- iPhone SE (375x667) - Smallest supported, scroll snap stress test
+- iPhone 14 (390x844) - Standard modern phone
+- iPhone 14 Pro Max (430x932) - Large phone, safe area validation
+- iPad Mini (768x1024) - Tablet transition
 
 ### Interaction Testing
-- Quick Add one-tap flow on mobile
-- Size picker appearance and selection
-- Filter sheet open/close with keyboard
-- QuickView modal scroll behavior
-- Pagination navigation
-- Cart quantity adjustment from grid
+- Scroll snap between looks (vertical)
+- Swipe card physics and haptics
+- Size picker in swipe drawer
+- FitGuide modal/drawer behavior
+- Mobile navigation dots
+- Product quick add from cards
 
 ### Performance Testing
-- Grid render time with 12+ products
-- Image lazy loading effectiveness
-- Filter application response time
-- Scroll performance with sticky filter
+- 60fps swipe card animation
+- Image loading between looks
+- Memory usage with all looks loaded
+- Battery impact of animations
 
 ---
 
@@ -754,12 +772,12 @@ sessionStorage.setItem(`scroll-${categorySlug}`, window.scrollY.toString());
 
 | Metric | Target |
 |--------|--------|
-| Product Card Touch Target (Quick Add) | ≥40px height |
-| Filter Chip Touch Target | ≥36px height |
-| Pagination Button Touch Target | ≥40px |
-| Quick View Load Time | <200ms |
-| Add to Cart Response | <100ms perceived |
-| Products Visible Above Fold (Mobile) | ≥2 full cards |
+| Look Navigation Touch Target | ≥44px |
+| Swipe Card FPS | 60fps |
+| Look Transition Time | <200ms snap |
+| Image Load (Next Look) | <100ms (preloaded) |
+| Swipe Completion Rate | >70% of started sessions |
+| Add-to-Cart via Swipe | >30% of swipe sessions |
 
 ---
 
@@ -767,12 +785,11 @@ sessionStorage.setItem(`scroll-${categorySlug}`, window.scrollY.toString());
 
 The following will NOT be modified:
 - Any layout at `lg:` breakpoint and above
+- Desktop LookNavigation dots on right side
+- Desktop FitGuideModal dialog pattern
 - Desktop typography sizes
-- Desktop product grid columns
-- Desktop hover interactions (image swap, button reveal)
-- Desktop modal layout
-- Desktop filter sheet width
-- Desktop pagination spacing
+- Desktop scroll behavior
+- Desktop hover interactions
 
 All changes are scoped to screens under 1024px width, with mobile-first priority for screens under 768px.
 
