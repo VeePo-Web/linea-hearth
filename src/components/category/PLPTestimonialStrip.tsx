@@ -23,7 +23,7 @@ const PLPTestimonialStrip = () => {
   if (!review) return null;
 
   return (
-    <section className="w-full px-6 py-12 my-8 bg-muted/30 border-y border-border">
+    <section className="w-full px-4 md:px-6 py-10 md:py-12 my-6 md:my-8 bg-muted/30 border-y border-border">
       <div className="max-w-2xl mx-auto text-center">
         {/* Stars */}
         <div className="flex justify-center gap-1 mb-4">
@@ -60,7 +60,7 @@ const PLPTestimonialStrip = () => {
         {/* CTA */}
         <Link
           to="/about/customer-care"
-          className="inline-block mt-6 text-sm text-muted-foreground hover:text-foreground hover:underline transition-colors"
+          className="inline-flex items-center min-h-[44px] px-2 py-2 -mx-2 mt-4 md:mt-6 text-sm text-muted-foreground hover:text-foreground hover:underline transition-colors"
         >
           Read More Reviews →
         </Link>

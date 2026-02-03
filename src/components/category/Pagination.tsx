@@ -50,19 +50,19 @@ const Pagination = ({ currentPage, totalPages, onPageChange }: PaginationProps) 
   const pages = getPageNumbers();
 
   return (
-    <section className="w-full px-6 py-8">
-      <div className="flex justify-center items-center gap-2">
+    <section className="w-full px-4 md:px-6 py-8">
+      <div className="flex justify-center items-center gap-3 md:gap-2">
         <Button
           variant="ghost"
           size="sm"
-          className="p-2 hover:bg-transparent hover:opacity-50 disabled:opacity-30"
+          className="p-3 md:p-2 hover:bg-transparent hover:opacity-50 disabled:opacity-30 min-w-[44px] min-h-[44px] md:min-w-0 md:min-h-0"
           disabled={currentPage === 1}
           onClick={() => onPageChange(currentPage - 1)}
         >
-          <ChevronLeft className="h-4 w-4" />
+          <ChevronLeft className="h-5 w-5 md:h-4 md:w-4" />
         </Button>
 
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1.5 md:gap-1">
           {pages.map((page, index) =>
             page === "ellipsis" ? (
               <span
@@ -76,7 +76,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange }: PaginationProps) 
                 key={page}
                 variant="ghost"
                 size="sm"
-                className={`min-w-8 h-8 hover:bg-transparent font-light text-sm ${
+                className={`min-w-10 h-10 md:min-w-8 md:h-8 hover:bg-transparent font-light text-sm ${
                   currentPage === page
                     ? "underline font-normal"
                     : "hover:underline"
@@ -92,11 +92,11 @@ const Pagination = ({ currentPage, totalPages, onPageChange }: PaginationProps) 
         <Button
           variant="ghost"
           size="sm"
-          className="p-2 hover:bg-transparent hover:opacity-50 disabled:opacity-30"
+          className="p-3 md:p-2 hover:bg-transparent hover:opacity-50 disabled:opacity-30 min-w-[44px] min-h-[44px] md:min-w-0 md:min-h-0"
           disabled={currentPage === totalPages}
           onClick={() => onPageChange(currentPage + 1)}
         >
-          <ChevronRight className="h-4 w-4" />
+          <ChevronRight className="h-5 w-5 md:h-4 md:w-4" />
         </Button>
       </div>
     </section>
