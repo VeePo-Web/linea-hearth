@@ -147,10 +147,10 @@ const CartDrawer = ({ onViewFavorites }: CartDrawerProps) => {
   return (
     <AnimatePresence>
       {isCartOpen && (
-        <div className="fixed inset-0 z-50 h-screen">
+        <div className="fixed inset-0 z-50 min-h-screen h-[100dvh]">
           {/* Backdrop */}
           <motion.div
-            className="absolute inset-0 bg-black/50 h-screen"
+            className="absolute inset-0 bg-black/50 min-h-screen h-[100dvh]"
             variants={backdropVariants}
             initial="hidden"
             animate="visible"
@@ -165,7 +165,7 @@ const CartDrawer = ({ onViewFavorites }: CartDrawerProps) => {
             role="dialog"
             aria-modal="true"
             aria-labelledby="cart-title"
-            className="absolute right-0 top-0 h-screen w-full max-w-md bg-background border-l border-border flex flex-col shadow-2xl"
+            className="absolute right-0 top-0 min-h-screen h-[100dvh] w-full max-w-md bg-background border-l border-border flex flex-col shadow-2xl"
             variants={drawerVariants}
             initial="hidden"
             animate="visible"

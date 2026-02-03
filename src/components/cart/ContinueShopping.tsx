@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useCart } from "@/hooks/useCart";
+import { formatPrice } from "@/lib/currency";
 
 interface MiniProductCardProps {
   product: ProductForQuickAdd & { image_url: string };
@@ -55,7 +56,7 @@ const MiniProductCard = ({ product, onAdd }: MiniProductCardProps) => {
         </Link>
         <div className="flex items-center gap-2 mt-0.5">
           <span className="text-xs font-medium text-foreground">
-            €{displayPrice.toLocaleString()}
+            {formatPrice(displayPrice)}
           </span>
           {quickAdd.canOneTap && (
             <span className="text-[10px] text-amber-600 font-medium">
