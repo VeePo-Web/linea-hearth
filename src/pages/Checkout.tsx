@@ -535,6 +535,7 @@ const Checkout = () => {
                         <Input
                           id="email"
                           type="email"
+                          autoComplete="email"
                           value={customerDetails.email}
                           onChange={(e) => handleCustomerDetailsChange("email", e.target.value)}
                           onBlur={() => customerEmailTypo.checkForTypos(customerDetails.email)}
@@ -563,6 +564,7 @@ const Checkout = () => {
                           <Input
                             id="firstName"
                             type="text"
+                            autoComplete="given-name"
                             value={customerDetails.firstName}
                             onChange={(e) => handleCustomerDetailsChange("firstName", e.target.value)}
                             className="mt-2 rounded-none"
@@ -576,6 +578,7 @@ const Checkout = () => {
                           <Input
                             id="lastName"
                             type="text"
+                            autoComplete="family-name"
                             value={customerDetails.lastName}
                             onChange={(e) => handleCustomerDetailsChange("lastName", e.target.value)}
                             className="mt-2 rounded-none"
@@ -591,6 +594,7 @@ const Checkout = () => {
                         <Input
                           id="phone"
                           type="tel"
+                          autoComplete="tel"
                           value={customerDetails.phone}
                           onChange={(e) => handleCustomerDetailsChange("phone", e.target.value)}
                           className="mt-2 rounded-none"
@@ -635,6 +639,7 @@ const Checkout = () => {
                             <Input
                               id="shippingAddress"
                               type="text"
+                              autoComplete="shipping street-address"
                               value={shippingAddress.address}
                               onChange={(e) => {
                                 handleShippingAddressChange("address", e.target.value);
@@ -653,6 +658,7 @@ const Checkout = () => {
                               <Input
                                 id="shippingCity"
                                 type="text"
+                                autoComplete="shipping address-level2"
                                 value={shippingAddress.city}
                                 onChange={(e) => {
                                   handleShippingAddressChange("city", e.target.value);
@@ -669,6 +675,7 @@ const Checkout = () => {
                               <Input
                                 id="shippingPostalCode"
                                 type="text"
+                                autoComplete="shipping postal-code"
                                 value={shippingAddress.postalCode}
                                 onChange={(e) => {
                                   handleShippingAddressChange("postalCode", e.target.value);
@@ -687,6 +694,7 @@ const Checkout = () => {
                             <Input
                               id="shippingCountry"
                               type="text"
+                              autoComplete="shipping country-name"
                               value={shippingAddress.country}
                               onChange={(e) => {
                                 handleShippingAddressChange("country", e.target.value);
@@ -728,6 +736,7 @@ const Checkout = () => {
                             <Input
                               id="billingEmail"
                               type="email"
+                              autoComplete="billing email"
                               value={billingDetails.email}
                               onChange={(e) => handleBillingDetailsChange("email", e.target.value)}
                               onBlur={() => billingEmailTypo.checkForTypos(billingDetails.email)}
@@ -751,6 +760,7 @@ const Checkout = () => {
                               <Input
                                 id="billingFirstName"
                                 type="text"
+                                autoComplete="billing given-name"
                                 value={billingDetails.firstName}
                                 onChange={(e) => handleBillingDetailsChange("firstName", e.target.value)}
                                 className="mt-2 rounded-none"
@@ -764,6 +774,7 @@ const Checkout = () => {
                               <Input
                                 id="billingLastName"
                                 type="text"
+                                autoComplete="billing family-name"
                                 value={billingDetails.lastName}
                                 onChange={(e) => handleBillingDetailsChange("lastName", e.target.value)}
                                 className="mt-2 rounded-none"
@@ -779,6 +790,7 @@ const Checkout = () => {
                             <Input
                               id="billingPhone"
                               type="tel"
+                              autoComplete="billing tel"
                               value={billingDetails.phone}
                               onChange={(e) => handleBillingDetailsChange("phone", e.target.value)}
                               className="mt-2 rounded-none"
@@ -793,6 +805,7 @@ const Checkout = () => {
                             <Input
                               id="billingAddress"
                               type="text"
+                              autoComplete="billing street-address"
                               value={billingDetails.address}
                               onChange={(e) => handleBillingDetailsChange("address", e.target.value)}
                               className="mt-2 rounded-none"
@@ -808,6 +821,7 @@ const Checkout = () => {
                               <Input
                                 id="billingCity"
                                 type="text"
+                                autoComplete="billing address-level2"
                                 value={billingDetails.city}
                                 onChange={(e) => handleBillingDetailsChange("city", e.target.value)}
                                 className="mt-2 rounded-none"
@@ -821,6 +835,7 @@ const Checkout = () => {
                               <Input
                                 id="billingPostalCode"
                                 type="text"
+                                autoComplete="billing postal-code"
                                 value={billingDetails.postalCode}
                                 onChange={(e) => handleBillingDetailsChange("postalCode", e.target.value)}
                                 className="mt-2 rounded-none"
@@ -836,6 +851,7 @@ const Checkout = () => {
                             <Input
                               id="billingCountry"
                               type="text"
+                              autoComplete="billing country-name"
                               value={billingDetails.country}
                               onChange={(e) => handleBillingDetailsChange("country", e.target.value)}
                               className="mt-2 rounded-none"
