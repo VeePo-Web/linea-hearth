@@ -110,7 +110,7 @@ const CartQuantityBadge = ({
           "absolute bottom-3 left-3 right-3 z-10",
           "flex items-center justify-between",
           "bg-foreground/95 backdrop-blur-sm",
-          "p-1",
+          "p-1.5 md:p-1",
           className
         )}
         onClick={(e) => e.preventDefault()}
@@ -119,9 +119,9 @@ const CartQuantityBadge = ({
           variant="ghost"
           size="sm"
           onClick={handleDecrement}
-          className="h-7 w-7 p-0 text-background hover:bg-background/20"
+          className="h-9 w-9 md:h-7 md:w-7 p-0 text-background hover:bg-background/20"
         >
-          <Minus className="h-3 w-3" />
+          <Minus className="h-4 w-4 md:h-3 md:w-3" />
         </Button>
         
         <span className="text-background text-xs font-medium">
@@ -132,9 +132,9 @@ const CartQuantityBadge = ({
           variant="ghost"
           size="sm"
           onClick={handleIncrement}
-          className="h-7 w-7 p-0 text-background hover:bg-background/20"
+          className="h-9 w-9 md:h-7 md:w-7 p-0 text-background hover:bg-background/20"
         >
-          <Plus className="h-3 w-3" />
+          <Plus className="h-4 w-4 md:h-3 md:w-3" />
         </Button>
       </motion.div>
     </AnimatePresence>

@@ -178,7 +178,7 @@ const CollectionHero = ({ category, productCount }: CollectionHeroProps) => {
   }, [category]);
 
   return (
-    <section className={`relative w-full h-[40vh] md:h-[50vh] lg:h-[60vh] ${content.bgClass} overflow-hidden`}>
+    <section className={`collection-hero relative w-full h-[35dvh] md:h-[50vh] lg:h-[60vh] ${content.bgClass} overflow-hidden`}>
       {/* Subtle pattern overlay */}
       <div className="absolute inset-0 opacity-10">
         <div 
@@ -190,15 +190,15 @@ const CollectionHero = ({ category, productCount }: CollectionHeroProps) => {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 h-full flex flex-col justify-center items-center text-center px-6">
-        <p className="text-white/70 text-xs md:text-sm uppercase tracking-[0.3em] mb-4 animate-fade-in">
+      <div className="relative z-10 h-full flex flex-col justify-center items-center text-center px-4 md:px-6">
+        <p className="text-white/70 text-sm md:text-sm uppercase tracking-[0.3em] mb-3 md:mb-4 animate-fade-in">
           {content.tagline}
         </p>
-        <h1 className="text-4xl md:text-5xl lg:text-6xl font-light text-white tracking-wide animate-fade-in">
+        <h1 className="text-3xl xs:text-4xl md:text-5xl lg:text-6xl font-light text-white tracking-wide animate-fade-in">
           {content.title}
         </h1>
         {productCount !== undefined && productCount > 0 && (
-          <p className="text-white/60 text-sm md:text-base font-light mt-6 animate-fade-in">
+          <p className="text-white/60 text-sm md:text-base font-light mt-4 md:mt-6 animate-fade-in">
             {productCount} {productCount === 1 ? "product" : "products"}
           </p>
         )}

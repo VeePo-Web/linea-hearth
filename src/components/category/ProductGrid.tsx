@@ -7,6 +7,9 @@ import QuickViewModal from "./QuickViewModal";
 import PLPTestimonialStrip from "./PLPTestimonialStrip";
 import Pagination from "./Pagination";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import { Search } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 import type { FilterState, SortOption } from "./FilterSortBar";
 
 interface ProductGridProps {
@@ -16,6 +19,7 @@ interface ProductGridProps {
   page: number;
   pageSize?: number;
   onTotalCountChange?: (count: number) => void;
+  onClearFilters?: () => void;
 }
 
 const ProductGrid = ({
@@ -25,9 +29,11 @@ const ProductGrid = ({
   page,
   pageSize = 12,
   onTotalCountChange,
+  onClearFilters,
 }: ProductGridProps) => {
   const [quickViewProduct, setQuickViewProduct] = useState<ProductCardData | null>(null);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const isMobile = useIsMobile();
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["products", categorySlug, filters, sortBy, page, pageSize],
@@ -167,9 +173,12 @@ const ProductGrid = ({
   const totalCount = data?.totalCount || 0;
   const totalPages = Math.ceil(totalCount / pageSize);
 
+  // Skeleton count based on device
+  const skeletonCount = isMobile ? 4 : 8;
+
   if (error) {
     return (
-      <section className="w-full px-6 mb-16">
+      <section className="w-full px-4 md:px-6 mb-16">
         <div className="text-center py-12">
           <p className="text-muted-foreground">Failed to load products</p>
         </div>
@@ -179,10 +188,10 @@ const ProductGrid = ({
 
   return (
     <>
-      <section className="w-full px-6 mb-8">
+      <section className="w-full px-4 md:px-6 mb-6 md:mb-8">
         {isLoading ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-            {[...Array(8)].map((_, i) => (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6">
+            {[...Array(skeletonCount)].map((_, i) => (
               <div key={i} className="space-y-3">
                 <Skeleton className="aspect-[3/4] w-full" />
                 <Skeleton className="h-3 w-16" />
@@ -191,14 +200,29 @@ const ProductGrid = ({
             ))}
           </div>
         ) : products.length === 0 ? (
-          <div className="text-center py-16">
-            <p className="text-lg text-muted-foreground mb-2">No products found</p>
-            <p className="text-sm text-muted-foreground">
-              Try adjusting your filters or browse all products
-            </p>
+          <div className="text-center py-12 md:py-16 flex flex-col items-center gap-4">
+            <div className="w-12 h-12 md:w-16 md:h-16 bg-muted rounded-full flex items-center justify-center">
+              <Search className="w-5 h-5 md:w-6 md:h-6 text-muted-foreground" />
+            </div>
+            <div>
+              <p className="text-base md:text-lg text-muted-foreground mb-1 md:mb-2">No products found</p>
+              <p className="text-sm text-muted-foreground">
+                Try adjusting your filters or browse all products
+              </p>
+            </div>
+            {onClearFilters && (
+              <Button 
+                variant="outline" 
+                size="sm"
+                className="min-h-[44px] mt-2"
+                onClick={onClearFilters}
+              >
+                Clear Filters
+              </Button>
+            )}
           </div>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6">
             {products.map((product, index) => (
               <ProductCard
                 key={product.id}

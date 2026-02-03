@@ -9,8 +9,10 @@ import InlineQuickSizePicker from "@/components/ui/InlineQuickSizePicker";
 import CartQuantityBadge from "@/components/category/CartQuantityBadge";
 import { useQuickAdd, ProductForQuickAdd } from "@/hooks/useQuickAdd";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { useCart } from "@/hooks/useCart";
 import { formatPrice } from "@/lib/currency";
+
 interface ProductImage {
   image_url: string;
   is_primary: boolean;
@@ -51,6 +53,7 @@ interface ProductCardProps {
 const ProductCard = ({ product, onQuickView, index = 0, onAuthRequired }: ProductCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
   const prefersReducedMotion = useReducedMotion();
+  const isMobile = useIsMobile();
   const { items } = useCart();
 
   // Check if product is in cart
@@ -109,12 +112,14 @@ const ProductCard = ({ product, onQuickView, index = 0, onAuthRequired }: Produc
     badges.push({ label: "ALMOST GONE", className: "bg-red-500 text-white" });
   }
 
-
   const springConfig = { type: "spring" as const, stiffness: 400, damping: 25 };
+  
+  // Show actions on mobile always, on desktop only on hover
+  const showActions = isMobile || (isHovered && !quickAdd.isPickerOpen && !quickAdd.isAdded);
 
   return (
     <Card
-      className="border-none shadow-none bg-transparent group cursor-pointer animate-fade-in"
+      className="border-none shadow-none bg-transparent group cursor-pointer animate-fade-in active:scale-[0.98] transition-transform duration-75"
       style={{ animationDelay: `${index * 50}ms` }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => {
@@ -130,6 +135,7 @@ const ProductCard = ({ product, onQuickView, index = 0, onAuthRequired }: Produc
               <img
                 src={primaryImage.image_url}
                 alt={product.name}
+                loading={index < 4 ? "eager" : "lazy"}
                 className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${
                   isHovered && secondaryImage ? "opacity-0" : "opacity-100"
                 }`}
@@ -141,6 +147,7 @@ const ProductCard = ({ product, onQuickView, index = 0, onAuthRequired }: Produc
               <img
                 src={secondaryImage.image_url}
                 alt={`${product.name} lifestyle`}
+                loading="lazy"
                 className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${
                   isHovered ? "opacity-100" : "opacity-0"
                 }`}
@@ -193,9 +200,9 @@ const ProductCard = ({ product, onQuickView, index = 0, onAuthRequired }: Produc
               </div>
             )}
 
-            {/* Favorite Button */}
+            {/* Favorite Button - Always visible on mobile */}
             <div className={`absolute top-3 right-3 transition-opacity duration-200 ${
-              isHovered ? "opacity-100" : "opacity-0 md:opacity-0"
+              isMobile ? "opacity-100" : isHovered ? "opacity-100" : "opacity-0"
             } md:group-hover:opacity-100`}>
               <FavoriteButton
                 productId={product.id}
@@ -228,23 +235,23 @@ const ProductCard = ({ product, onQuickView, index = 0, onAuthRequired }: Produc
               )}
             </AnimatePresence>
 
-            {/* Quick Actions (hover) */}
+            {/* Quick Actions - Always visible on mobile, hover on desktop */}
             <div
               className={`absolute bottom-3 left-3 right-3 flex gap-2 transition-all duration-300 ${
-                isHovered && !quickAdd.isPickerOpen && !quickAdd.isAdded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
+                showActions ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
               }`}
             >
               <Button
                 variant="secondary"
                 size="sm"
-                className="flex-1 bg-white/95 hover:bg-white text-foreground text-xs h-9"
+                className="flex-1 bg-white/95 hover:bg-white text-foreground text-xs h-10 md:h-9"
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
                   onQuickView?.(product);
                 }}
               >
-                <Eye className="w-3.5 h-3.5 mr-1.5" />
+                <Eye className="w-4 h-4 md:w-3.5 md:h-3.5 mr-1.5" />
                 Quick View
               </Button>
               {quickAdd.totalStock > 0 && (
@@ -256,7 +263,7 @@ const ProductCard = ({ product, onQuickView, index = 0, onAuthRequired }: Produc
                   <Button
                     variant="default"
                     size="sm"
-                    className={`text-xs h-9 px-3 ${
+                    className={`text-xs h-10 md:h-9 px-4 md:px-3 ${
                       quickAdd.canOneTap 
                         ? 'bg-amber-500 hover:bg-amber-400 text-white' 
                         : 'bg-foreground/95 hover:bg-foreground text-background'
@@ -267,7 +274,7 @@ const ProductCard = ({ product, onQuickView, index = 0, onAuthRequired }: Produc
                     {quickAdd.isAdding ? (
                       <span className="animate-pulse">...</span>
                     ) : (
-                      <Plus className="w-3.5 h-3.5" />
+                      <Plus className="w-4 h-4 md:w-3.5 md:h-3.5" />
                     )}
                   </Button>
                 </motion.div>
@@ -300,7 +307,7 @@ const ProductCard = ({ product, onQuickView, index = 0, onAuthRequired }: Produc
           {/* Name & Price Row */}
           <div className="flex justify-between items-start gap-2">
             <Link to={`/product/${product.slug}`}>
-              <h3 className="text-sm font-medium text-foreground hover:underline leading-tight">
+              <h3 className="text-sm font-medium text-foreground hover:underline leading-tight line-clamp-2">
                 {product.name}
               </h3>
             </Link>
@@ -329,7 +336,7 @@ const ProductCard = ({ product, onQuickView, index = 0, onAuthRequired }: Produc
                 {uniqueColors.slice(0, 4).map((color) => (
                   <span
                     key={color}
-                    className="w-3.5 h-3.5 rounded-full border border-border"
+                    className="w-4 h-4 md:w-3.5 md:h-3.5 rounded-full border border-border"
                     style={{
                       backgroundColor:
                         color.toLowerCase() === "black"

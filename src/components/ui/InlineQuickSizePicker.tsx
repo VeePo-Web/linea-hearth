@@ -64,11 +64,11 @@ const InlineQuickSizePicker = ({
           ? 'bg-stone-900/95 border-t border-white/10' 
           : 'bg-background/95 border-t border-border'
         }
-        backdrop-blur-sm p-2.5 rounded-b-lg
+        backdrop-blur-sm p-3 md:p-2.5 rounded-b-lg
         ${className}
       `}
     >
-      <p className={`text-[9px] uppercase tracking-wider mb-2 text-center ${
+      <p className={`text-[10px] md:text-[9px] uppercase tracking-wider mb-2 text-center ${
         isDark ? 'text-white/50' : 'text-muted-foreground'
       }`}>
         Select Size
@@ -89,7 +89,7 @@ const InlineQuickSizePicker = ({
               onClick={(e) => !isOutOfStock && handleSizeClick(size, e)}
               disabled={isOutOfStock}
               className={`
-                relative min-w-[36px] h-9 px-2 text-xs rounded transition-colors
+                relative min-w-[40px] md:min-w-[36px] h-10 md:h-9 px-2.5 md:px-2 text-xs rounded transition-colors
                 ${isOutOfStock 
                   ? isDark
                     ? 'bg-white/5 text-white/30 cursor-not-allowed line-through' 
@@ -108,7 +108,7 @@ const InlineQuickSizePicker = ({
               {size}
               {isRemembered && !isOutOfStock && (
                 <span className={`absolute -top-1.5 left-1/2 -translate-x-1/2 
-                                  text-[7px] uppercase tracking-wide 
+                                  text-[8px] md:text-[7px] uppercase tracking-wide 
                                   px-1 rounded whitespace-nowrap
                                   ${isDark 
                                     ? 'text-amber-500 bg-stone-900' 
@@ -119,7 +119,7 @@ const InlineQuickSizePicker = ({
               )}
               {isLowStock && !isRemembered && (
                 <span className={`absolute -bottom-0.5 left-1/2 -translate-x-1/2 
-                                  w-1 h-1 rounded-full bg-amber-500`} />
+                                  w-1.5 h-1.5 md:w-1 md:h-1 rounded-full bg-amber-500`} />
               )}
             </motion.button>
           );

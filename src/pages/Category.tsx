@@ -1,15 +1,17 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import CollectionHero from "../components/category/CollectionHero";
 import FilterSortBar, { FilterState, SortOption } from "../components/category/FilterSortBar";
 import ProductGrid from "../components/category/ProductGrid";
+import { cn } from "@/lib/utils";
 
 const Category = () => {
   const { category } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
+  const [isFilterSticky, setIsFilterSticky] = useState(false);
 
   // Initialize state from URL params
   const [filters, setFilters] = useState<FilterState>(() => ({
@@ -28,6 +30,20 @@ const Category = () => {
   const [page, setPage] = useState(
     parseInt(searchParams.get("page") || "1", 10)
   );
+
+  // Sticky filter bar on scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      const hero = document.querySelector('.collection-hero');
+      if (hero) {
+        const heroBottom = hero.getBoundingClientRect().bottom;
+        setIsFilterSticky(heroBottom < 0);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // Update URL when filters change
   const handleFilterChange = useCallback((newFilters: FilterState) => {
@@ -77,6 +93,18 @@ const Category = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [searchParams, setSearchParams]);
 
+  const handleClearFilters = useCallback(() => {
+    const emptyFilters: FilterState = {
+      sizes: [],
+      colors: [],
+      fits: [],
+      messageTypes: [],
+      priceRanges: [],
+      categories: [],
+    };
+    handleFilterChange(emptyFilters);
+  }, [handleFilterChange]);
+
   return (
     <Layout>
       <CollectionHero 
@@ -84,7 +112,7 @@ const Category = () => {
         productCount={totalCount}
       />
       
-      <div className="pt-8">
+      <div className="pt-6 md:pt-8 pb-safe">
         <FilterSortBar 
           filtersOpen={filtersOpen}
           setFiltersOpen={setFiltersOpen}
@@ -93,6 +121,7 @@ const Category = () => {
           onFilterChange={handleFilterChange}
           sortBy={sortBy}
           onSortChange={handleSortChange}
+          isSticky={isFilterSticky}
         />
         
         <ProductGrid 
@@ -102,6 +131,7 @@ const Category = () => {
           page={page}
           pageSize={12}
           onTotalCountChange={setTotalCount}
+          onClearFilters={handleClearFilters}
         />
       </div>
     </Layout>
