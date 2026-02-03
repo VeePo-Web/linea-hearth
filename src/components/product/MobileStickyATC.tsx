@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
+import { formatPrice } from "@/lib/currency";
 
 interface MobileStickyATCProps {
   price: number;
@@ -60,11 +61,11 @@ const MobileStickyATC = ({ price, salePrice, quantity, onAddToBag, disabled }: M
           <div className="flex flex-col">
             {salePrice && (
               <span className="text-xs font-light text-muted-foreground line-through">
-                ${(price * quantity).toFixed(2)}
+                {formatPrice(price * quantity)}
               </span>
             )}
             <span className="text-lg font-light text-foreground">
-              ${totalPrice.toFixed(2)}
+              {formatPrice(totalPrice)}
             </span>
           </div>
           <Button
@@ -102,11 +103,11 @@ const MobileStickyATC = ({ price, salePrice, quantity, onAddToBag, disabled }: M
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.2 }}
                 >
-                  ${(price * quantity).toFixed(2)}
+                  {formatPrice(price * quantity)}
                 </motion.span>
               )}
               <span className="text-lg font-light text-foreground">
-                ${totalPrice.toFixed(2)}
+                {formatPrice(totalPrice)}
               </span>
             </div>
             <motion.div

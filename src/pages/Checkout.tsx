@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
 import { Minus, Plus, CreditCard, Check, ExternalLink, AlertCircle, X, Loader2 } from "lucide-react";
+import { formatPrice, CURRENCY } from "@/lib/currency";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import CheckoutHeader from "../components/header/CheckoutHeader";
 import Footer from "../components/footer/Footer";
@@ -883,7 +884,7 @@ const Checkout = () => {
                           {hasFreeShipping ? (
                             <span className="text-emerald-600 dark:text-emerald-400 font-medium">FREE ✓</span>
                           ) : (
-                            <span className="text-muted-foreground">$10 • 3-5 business days</span>
+                            <span className="text-muted-foreground">{formatPrice(CURRENCY.standardShippingCost)} • 3-5 business days</span>
                           )}
                         </div>
                       </div>
@@ -896,7 +897,7 @@ const Checkout = () => {
                           </Label>
                         </div>
                         <div className="text-sm text-muted-foreground">
-                          $15 • 1-2 business days
+                          {formatPrice(CURRENCY.expressShippingCost)} • 1-2 business days
                         </div>
                       </div>
 
@@ -908,7 +909,7 @@ const Checkout = () => {
                           </Label>
                         </div>
                         <div className="text-sm text-muted-foreground">
-                          $35 • Next business day
+                          {formatPrice(CURRENCY.overnightShippingCost)} • Next business day
                         </div>
                       </div>
                     </RadioGroup>
