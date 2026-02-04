@@ -22,7 +22,7 @@ const CheckoutHeader = () => {
             {/* Center - Logo - Absolutely positioned to ensure perfect centering */}
             <Link to="/" className="absolute left-1/2 transform -translate-x-1/2">
               <img
-                src="/LINEA-1.svg"
+                src="/logo.svg"
                 alt="Line of Judah"
                 className="h-6 w-auto"
               />

@@ -84,7 +84,7 @@ export const SaveLookModal = ({ open, onOpenChange }: SaveLookModalProps) => {
   };
 
   const handleShare = (platform: 'twitter' | 'facebook' | 'whatsapp') => {
-    const text = `Check out my outfit from LINEA!`;
+    const text = `Check out my outfit from Line of Judah!`;
     const urls = {
       twitter: `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(shareUrl)}`,
       facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`,

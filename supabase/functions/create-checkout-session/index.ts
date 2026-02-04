@@ -83,7 +83,7 @@ Deno.serve(async (req) => {
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const siteUrl = Deno.env.get("SITE_URL") || "https://linea-hearth.lovable.app";
+    const siteUrl = Deno.env.get("SITE_URL") || "https://lineofjudah.com";
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 

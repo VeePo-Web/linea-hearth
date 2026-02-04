@@ -1,5 +1,5 @@
 /**
- * Centralized currency configuration for LINEA
+ * Centralized currency configuration for Line of Judah
  * All pricing display must use these utilities for consistency
  */
 
