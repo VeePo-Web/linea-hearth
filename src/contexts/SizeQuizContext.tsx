@@ -44,8 +44,8 @@ const SizeQuizContext = createContext<SizeQuizContextType | null>(null);
 
 // ============= Constants =============
 
-const QUIZ_COMPLETED_KEY = 'linea-size-quiz-completed';
-const SIZE_MEMORY_KEY = 'linea-size-memory';
+const QUIZ_COMPLETED_KEY = 'loj-size-quiz-completed';
+const SIZE_MEMORY_KEY = 'loj-size-memory';
 
 const DEFAULT_ANSWERS: QuizAnswers = {
   heightRange: null,

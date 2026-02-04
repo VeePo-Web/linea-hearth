@@ -1,8 +1,8 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
-const SESSION_ID_KEY = 'linea-session-id';
-const BEHAVIOR_CACHE_KEY = 'linea-behavior-cache';
+const SESSION_ID_KEY = 'loj-session-id';
+const BEHAVIOR_CACHE_KEY = 'loj-behavior-cache';
 const SYNC_INTERVAL = 30000; // Sync every 30 seconds
 const MIN_TIME_THRESHOLD = 5000; // 5 seconds minimum before tracking
 

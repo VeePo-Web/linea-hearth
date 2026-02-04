@@ -2,8 +2,8 @@ import { useState, useCallback, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { CartItem } from "./useCart";
 
-const ABANDONED_CART_EMAIL_KEY = 'linea-abandoned-cart-email';
-const ABANDONED_CART_ID_KEY = 'linea-abandoned-cart-id';
+const ABANDONED_CART_EMAIL_KEY = 'loj-abandoned-cart-email';
+const ABANDONED_CART_ID_KEY = 'loj-abandoned-cart-id';
 
 interface AbandonedCartState {
   email: string | null;

@@ -30,7 +30,7 @@ interface ReturnCustomerData {
   hasSeenGreeting: boolean;
 }
 
-const GREETING_DISMISSED_KEY = 'linea-greeting-dismissed';
+const GREETING_DISMISSED_KEY = 'loj-greeting-dismissed';
 const GREETING_DISMISS_DURATION = 24 * 60 * 60 * 1000; // 24 hours
 
 // Check if greeting was recently dismissed

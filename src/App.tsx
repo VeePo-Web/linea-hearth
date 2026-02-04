@@ -9,6 +9,10 @@ import { CartProvider } from "@/hooks/useCart";
 import { SizeQuizProvider } from "@/contexts/SizeQuizContext";
 import { RecentlyViewedProvider } from "@/contexts/RecentlyViewedContext";
 import { StripeProvider } from "@/components/checkout/StripeProvider";
+import { migrateLocalStorage } from "@/lib/storageMigration";
+
+// Run localStorage migration on app load (before React renders)
+migrateLocalStorage();
 import ScrollToTop from "./components/ScrollToTop";
 import PageTransition from "./components/motion/PageTransition";
 import Index from "./pages/Index";
