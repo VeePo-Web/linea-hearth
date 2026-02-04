@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
@@ -110,6 +111,9 @@ export const SaveLookModal = ({ open, onOpenChange }: SaveLookModalProps) => {
           <DialogTitle className="text-sm uppercase tracking-wider font-light">
             Save Your Look
           </DialogTitle>
+          <DialogDescription className="sr-only">
+            Save your current outfit configuration to share with others
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6 py-4">

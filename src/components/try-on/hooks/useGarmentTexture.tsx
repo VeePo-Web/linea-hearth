@@ -1,5 +1,4 @@
-import { useLoader } from '@react-three/fiber';
-import { useMemo, useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import * as THREE from 'three';
 
 interface TextureConfig {
@@ -9,6 +8,16 @@ interface TextureConfig {
   wrapS: THREE.Wrapping;
   wrapT: THREE.Wrapping;
 }
+
+// Global texture cache with reference counting
+interface CachedTexture {
+  texture: THREE.Texture;
+  refCount: number;
+}
+
+const textureCache = new Map<string, CachedTexture>();
+
+const getCacheKey = (url: string, garmentType: string) => `${url}::${garmentType}`;
 
 // Garment-specific UV configurations for optimal texture display
 const garmentTextureConfigs: Record<string, TextureConfig> = {
@@ -73,29 +82,21 @@ const defaultConfig: TextureConfig = {
 
 /**
  * Custom hook for loading and configuring garment textures
- * Uses THREE.TextureLoader directly with error handling
+ * Uses THREE.TextureLoader with global caching and reference counting
  */
 export const useGarmentTexture = (
   imageUrl: string | undefined,
   garmentType: string = 'hoodie'
 ): THREE.Texture | null => {
   const [texture, setTexture] = useState<THREE.Texture | null>(null);
-  const [error, setError] = useState<boolean>(false);
-
+  const cacheKeyRef = useRef<string | null>(null);
   const config = garmentTextureConfigs[garmentType] || defaultConfig;
 
   useEffect(() => {
     if (!imageUrl) {
-      console.log('[Texture] ===== NO URL PROVIDED =====');
-      console.log('[Texture] Garment type:', garmentType);
       setTexture(null);
       return;
     }
-
-    console.log('[Texture] ===== LOADING TEXTURE =====');
-    console.log('[Texture] URL:', imageUrl);
-    console.log('[Texture] Garment type:', garmentType);
-    console.log('[Texture] Config:', JSON.stringify(config, null, 2));
     
     // Resolve URL - handle both absolute and relative paths
     const resolvedUrl = imageUrl.startsWith('http') 
@@ -104,17 +105,23 @@ export const useGarmentTexture = (
         ? imageUrl 
         : `/${imageUrl}`;
     
-    console.log('[Texture] Resolved URL:', resolvedUrl);
+    const cacheKey = getCacheKey(resolvedUrl, garmentType);
+    cacheKeyRef.current = cacheKey;
     
-    setError(false);
+    // Check cache first
+    const cached = textureCache.get(cacheKey);
+    if (cached) {
+      cached.refCount++;
+      setTexture(cached.texture);
+      return;
+    }
+    
+    // Load new texture
     const loader = new THREE.TextureLoader();
 
     loader.load(
       resolvedUrl,
       (loadedTexture) => {
-        console.log('[Texture] ✅ LOADED SUCCESSFULLY:', resolvedUrl);
-        console.log('[Texture] Image dimensions:', loadedTexture.image?.width, 'x', loadedTexture.image?.height);
-        
         // Configure texture properties
         loadedTexture.wrapS = config.wrapS;
         loadedTexture.wrapT = config.wrapT;
@@ -132,29 +139,34 @@ export const useGarmentTexture = (
         loadedTexture.colorSpace = THREE.SRGBColorSpace;
         
         loadedTexture.needsUpdate = true;
+        
+        // Add to cache
+        textureCache.set(cacheKey, { texture: loadedTexture, refCount: 1 });
+        
         setTexture(loadedTexture);
       },
-      (progress) => {
-        if (progress.total) {
-          console.log('[Texture] Loading progress:', Math.round((progress.loaded / progress.total) * 100) + '%');
-        }
-      },
+      undefined,
       (err) => {
-        console.error('[Texture] ❌ FAILED TO LOAD:', resolvedUrl);
-        console.error('[Texture] Error:', err);
-        setError(true);
+        console.error('[Texture] Failed to load:', resolvedUrl, err);
         setTexture(null);
       }
     );
 
     return () => {
-      // Cleanup on unmount or URL change
-      if (texture) {
-        console.log('[Texture] Disposing texture:', imageUrl);
-        texture.dispose();
+      // Decrement reference count on cleanup
+      const key = cacheKeyRef.current;
+      if (key) {
+        const cached = textureCache.get(key);
+        if (cached) {
+          cached.refCount--;
+          if (cached.refCount <= 0) {
+            cached.texture.dispose();
+            textureCache.delete(key);
+          }
+        }
       }
     };
-  }, [imageUrl, config]);
+  }, [imageUrl, garmentType, config]);
 
   return texture;
 };

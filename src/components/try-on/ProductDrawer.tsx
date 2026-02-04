@@ -30,14 +30,30 @@ export const ProductDrawer = ({ isOpen, onClose, slot }: ProductDrawerProps) => 
     queryFn: async () => {
       if (!slot) return [];
       
-      // Fetch all products for now - in production, filter by category
-      const { data, error } = await supabase
+      // Get categories for this slot
+      const categoryMatches = slotToCategoryMap[slot] || [];
+      
+      // First, get matching category IDs
+      const { data: categories, error: catError } = await supabase
+        .from('categories')
+        .select('id, slug')
+        .or(categoryMatches.map(c => `slug.ilike.%${c}%`).join(','));
+      
+      if (catError) {
+        console.error('Error fetching categories:', catError);
+      }
+      
+      const categoryIds = categories?.map(c => c.id) || [];
+      
+      // If we have matching categories, filter by them; otherwise get all active products
+      let query = supabase
         .from('products')
         .select(`
           id,
           name,
           price,
           slug,
+          category_id,
           product_images (
             image_url,
             is_primary
@@ -49,8 +65,14 @@ export const ProductDrawer = ({ isOpen, onClose, slot }: ProductDrawerProps) => 
             stock_quantity
           )
         `)
-        .eq('status', 'active')
-        .limit(12);
+        .eq('status', 'active');
+      
+      // Filter by category if we have matches
+      if (categoryIds.length > 0) {
+        query = query.in('category_id', categoryIds);
+      }
+      
+      const { data, error } = await query.limit(12);
 
       if (error) throw error;
       return data || [];
