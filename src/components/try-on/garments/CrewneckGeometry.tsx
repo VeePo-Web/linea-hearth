@@ -81,7 +81,7 @@ export const CrewneckGeometry = ({
   }, [bodyScale, imageUrl]);
 
   return (
-    <group position={[0, 1.22, 0]}>
+    <group position={[0, 1.20, 0]}>
       {/* Main body */}
       <mesh geometry={bodyGeometry}>
         {material}
