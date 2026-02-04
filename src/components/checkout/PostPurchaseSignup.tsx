@@ -180,7 +180,7 @@ export function PostPurchaseSignup({
 
         <h3 className="text-xl font-medium mb-2">Account Created!</h3>
         <p className="text-muted-foreground mb-6">
-          Welcome to LINEA{orderFirstName ? `, ${orderFirstName}` : ""}!
+          Welcome to Line of Judah{orderFirstName ? `, ${orderFirstName}` : ""}!
         </p>
 
         {discountCode && (

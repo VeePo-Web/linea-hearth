@@ -66,7 +66,7 @@ export default function CreateAccountForm({ onSuccess, onSwitchToSignIn }: Creat
         return;
       }
 
-      toast.success('Welcome to LINEA!', {
+      toast.success('Welcome to Line of Judah!', {
         description: 'Your account has been created successfully.',
       });
       onSuccess();

@@ -20,7 +20,7 @@ const tocSections = [
 
 const TermsOfService = () => {
   useEffect(() => {
-    document.title = "Terms of Service - Linea Jewelry";
+    document.title = "Terms of Service - Line of Judah";
   }, []);
 
   return (
@@ -33,7 +33,7 @@ const TermsOfService = () => {
 
       <LegalSection id="agreement" title="Agreement to Terms">
         <p>
-          By accessing and using the Linea Jewelry Inc. website and services, you accept 
+          By accessing and using the Line of Judah LLC website and services, you accept 
           and agree to be bound by the terms and provision of this agreement. These Terms 
           of Service govern your use of our website, products, and services.
         </p>
@@ -41,8 +41,8 @@ const TermsOfService = () => {
 
       <LegalSection id="license" title="Use License">
         <p>
-          Permission is granted to temporarily download one copy of the materials on Linea 
-          Jewelry Inc.'s website for personal, non-commercial transitory viewing only. This 
+          Permission is granted to temporarily download one copy of the materials on Line of Judah 
+          LLC's website for personal, non-commercial transitory viewing only. This 
           is the grant of a license, not a transfer of title, and under this license you may not:
         </p>
         <ul className="mt-4 space-y-1">
@@ -97,7 +97,7 @@ const TermsOfService = () => {
           are accepted within 30 days of delivery, subject to the following conditions:
         </p>
         <ul className="mt-4 space-y-1">
-          <li>Items must be in original condition and packaging</li>
+          <li>Items must be in original condition with tags attached</li>
           <li>Custom or personalized items are final sale</li>
           <li>Return shipping costs are the responsibility of the customer</li>
           <li>Refunds will be processed to the original payment method</li>
@@ -106,7 +106,7 @@ const TermsOfService = () => {
 
       <LegalSection id="warranty" title="Warranty and Care">
         <p>
-          Our jewelry comes with a limited warranty against manufacturing defects. This 
+          Our apparel comes with a limited warranty against manufacturing defects. This 
           warranty does not cover damage from normal wear, improper care, or accidents. 
           Proper care instructions are provided with each purchase and on our website.
         </p>
@@ -115,7 +115,7 @@ const TermsOfService = () => {
       <LegalSection id="intellectual" title="Intellectual Property">
         <p>
           All content on this website, including but not limited to text, graphics, logos, 
-          images, and software, is the property of Linea Jewelry Inc. and is protected by 
+          images, and software, is the property of Line of Judah LLC and is protected by 
           copyright, trademark, and other intellectual property laws. Unauthorized use is 
           prohibited.
         </p>
@@ -123,7 +123,7 @@ const TermsOfService = () => {
 
       <LegalSection id="liability" title="Limitation of Liability">
         <ImportantCallout>
-          In no event shall Linea Jewelry Inc. or its suppliers be liable for any damages 
+          In no event shall Line of Judah LLC or its suppliers be liable for any damages 
           arising out of the use or inability to use the materials on our website or 
           products, even if we have been notified of the possibility of such damage.
         </ImportantCallout>
@@ -149,8 +149,8 @@ const TermsOfService = () => {
       <LegalSection id="governing" title="Governing Law">
         <p>
           These terms and conditions are governed by and construed in accordance with the 
-          laws of New York State, and you irrevocably submit to the exclusive jurisdiction 
-          of the courts in that state or location.
+          laws of Alberta, Canada, and you irrevocably submit to the exclusive jurisdiction 
+          of the courts in that province or location.
         </p>
       </LegalSection>
 
@@ -167,9 +167,8 @@ const TermsOfService = () => {
           If you have any questions about these Terms of Service, please contact us at:
         </p>
         <div className="mt-4 space-y-1">
-          <p className="text-foreground">Email: legal@lineajewelry.com</p>
-          <p className="text-foreground">Phone: +1 (212) 555-0123</p>
-          <p className="text-foreground">Address: 123 Madison Avenue, New York, NY 10016</p>
+          <p className="text-foreground">Email: legal@lineofjudah.com</p>
+          <p className="text-foreground">Website: lineofjudah.com</p>
         </div>
       </LegalSection>
     </LegalPageLayout>
