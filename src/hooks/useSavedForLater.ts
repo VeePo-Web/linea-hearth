@@ -5,7 +5,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useCart, CartItem } from '@/hooks/useCart';
 import { useToast } from '@/hooks/use-toast';
 
-const STORAGE_KEY = 'linea-saved-for-later';
+const STORAGE_KEY = 'loj-saved-for-later';
 const MAX_SAVED_ITEMS = 20;
 
 export interface SavedItem {

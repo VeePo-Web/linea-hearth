@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { BodyMeasurements, defaultMeasurements } from '../utils/measurementToProportions';
 
-const STORAGE_KEY = 'linea_body_profiles';
+const STORAGE_KEY = 'loj_body_profiles';
 const MAX_PROFILES = 5;
 
 export interface SavedProfile {

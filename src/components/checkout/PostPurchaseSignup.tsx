@@ -65,7 +65,7 @@ export function PostPurchaseSignup({
 
   const migratePreferences = async (userId: string) => {
     // Migrate size preferences
-    const sizePrefsRaw = localStorage.getItem("linea-size-memory");
+    const sizePrefsRaw = localStorage.getItem("loj-size-memory");
     if (sizePrefsRaw) {
       try {
         const sizePrefs = JSON.parse(sizePrefsRaw);

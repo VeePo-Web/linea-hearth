@@ -23,7 +23,7 @@ interface RecentlyViewedContextType {
 
 const RecentlyViewedContext = createContext<RecentlyViewedContextType | null>(null);
 
-const STORAGE_KEY = 'linea-recently-viewed';
+const STORAGE_KEY = 'loj-recently-viewed';
 const MAX_PRODUCTS = 20;
 const HIGH_INTENT_THRESHOLD = 3; // 3+ views = high intent
 

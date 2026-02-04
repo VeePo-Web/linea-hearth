@@ -39,7 +39,7 @@ interface CartContextType {
   lastAddedItem: CartItem | null;
 }
 
-const CART_STORAGE_KEY = 'linea-cart';
+const CART_STORAGE_KEY = 'loj-cart';
 const FREE_SHIPPING_THRESHOLD = 99; // $99 CAD for free shipping
 
 const CartContext = createContext<CartContextType | undefined>(undefined);

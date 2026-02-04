@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
-const SIZE_MEMORY_KEY = 'linea-size-memory';
+const SIZE_MEMORY_KEY = 'loj-size-memory';
 
 interface SizeMemory {
   tops: string | null;
