@@ -24,10 +24,18 @@ const Layout = ({
 }: LayoutProps) => {
   return (
     <div className={`min-h-screen bg-background ${className}`}>
+      {/* Skip to main content - Accessibility */}
+      <a 
+        href="#main-content" 
+        className="skip-link"
+      >
+        Skip to main content
+      </a>
+      
       <Header />
       
       {/* Main content with header offset */}
-      <main className="pt-[var(--header-height)]">
+      <main id="main-content" className="pt-[var(--header-height)] scroll-mt-[var(--header-height)]">
         {/* Return customer greeting */}
         {showWelcomeBanner && <WelcomeBackBanner />}
         

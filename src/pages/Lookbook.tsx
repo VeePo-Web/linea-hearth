@@ -159,7 +159,7 @@ const Lookbook = () => {
       <main 
         className="lookbook-scroll-container snap-y snap-mandatory overflow-y-auto scroll-smooth overscroll-y-contain"
         style={{ 
-          height: 'calc(100vh - var(--header-height))',
+          height: 'calc(100dvh - var(--header-height))',
           marginTop: 'var(--header-height)' 
         }}
       >

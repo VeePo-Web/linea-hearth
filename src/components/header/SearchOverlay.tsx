@@ -192,40 +192,126 @@ const SearchOverlay = ({ isOpen, onClose }: SearchOverlayProps) => {
   return (
     <AnimatePresence>
       {isOpen && (
-        <motion.div
-          className="absolute top-full left-0 right-0 bg-background border-b border-border z-50 shadow-lg"
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-          exit="exit"
-        >
-          <div className="px-8 py-10">
-            <div className="max-w-4xl mx-auto">
-              {/* Search input */}
-              <motion.div className="relative mb-10" variants={itemVariants}>
-                <div className="flex items-center border-b-2 border-border pb-3 group focus-within:border-foreground transition-colors">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth="1.5"
-                    stroke="currentColor"
-                    className="w-6 h-6 text-muted-foreground mr-4"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
+        <>
+          {/* Mobile: Full-screen overlay */}
+          <motion.div
+            className="fixed inset-0 bg-background z-50 md:hidden flex flex-col"
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+          >
+            {/* Mobile search header */}
+            <div className="flex items-center gap-3 px-4 py-4 border-b border-border">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth="1.5"
+                stroke="currentColor"
+                className="w-5 h-5 text-muted-foreground flex-shrink-0"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
+                />
+              </svg>
+              <input
+                ref={inputRef}
+                type="search"
+                inputMode="search"
+                value={searchValue}
+                onChange={(e) => setSearchValue(e.target.value)}
+                placeholder="Search for apparel..."
+                className="flex-1 bg-transparent text-foreground placeholder:text-muted-foreground outline-none text-lg font-light"
+              />
+              <motion.button
+                onClick={onClose}
+                className="p-2 -mr-2 text-muted-foreground hover:text-foreground transition-colors touch-target"
+                whileTap={{ scale: 0.95 }}
+                aria-label="Close search"
+              >
+                <X size={24} />
+              </motion.button>
+            </div>
+            
+            {/* Mobile content - scrollable */}
+            <div className="flex-1 overflow-y-auto px-4 py-6">
+              {/* Popular searches */}
+              <motion.div variants={itemVariants} className="mb-8">
+                <h3 className="flex items-center gap-2 text-foreground text-xs uppercase tracking-[0.15em] font-medium mb-4">
+                  <Clock size={14} />
+                  Popular Searches
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  {popularSearches.map((search, index) => (
+                    <motion.button
+                      key={index}
+                      className="text-muted-foreground hover:text-foreground text-sm font-light py-2.5 px-4 border border-border hover:border-foreground transition-all duration-200"
+                      variants={itemVariants}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => setSearchValue(search)}
+                    >
+                      {search}
+                    </motion.button>
+                  ))}
+                </div>
+              </motion.div>
+
+              {/* Trending products */}
+              <motion.div variants={itemVariants}>
+                <h3 className="flex items-center gap-2 text-foreground text-xs uppercase tracking-[0.15em] font-medium mb-4">
+                  <TrendingUp size={14} />
+                  Trending Now
+                </h3>
+                <div className="space-y-4">
+                  {productsForDisplay.map((product) => (
+                    <TrendingProduct 
+                      key={product.id} 
+                      product={product} 
+                      onClose={onClose} 
                     />
-                  </svg>
-                  <input
-                    ref={inputRef}
-                    type="text"
-                    value={searchValue}
-                    onChange={(e) => setSearchValue(e.target.value)}
-                    placeholder="Search for apparel..."
-                    className="flex-1 bg-transparent text-foreground placeholder:text-muted-foreground outline-none text-2xl md:text-3xl font-light"
-                  />
+                  ))}
+                </div>
+              </motion.div>
+            </div>
+          </motion.div>
+
+          {/* Desktop: Dropdown overlay (unchanged) */}
+          <motion.div
+            className="hidden md:block absolute top-full left-0 right-0 bg-background border-b border-border z-50 shadow-lg"
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+          >
+            <div className="px-8 py-10">
+              <div className="max-w-4xl mx-auto">
+                {/* Search input */}
+                <motion.div className="relative mb-10" variants={itemVariants}>
+                  <div className="flex items-center border-b-2 border-border pb-3 group focus-within:border-foreground transition-colors">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth="1.5"
+                      stroke="currentColor"
+                      className="w-6 h-6 text-muted-foreground mr-4"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
+                      />
+                    </svg>
+                    <input
+                      type="text"
+                      value={searchValue}
+                      onChange={(e) => setSearchValue(e.target.value)}
+                      placeholder="Search for apparel..."
+                      className="flex-1 bg-transparent text-foreground placeholder:text-muted-foreground outline-none text-2xl md:text-3xl font-light"
+                    />
                   {searchValue && (
                     <motion.button
                       initial={{ opacity: 0, scale: 0.8 }}
@@ -284,9 +370,10 @@ const SearchOverlay = ({ isOpen, onClose }: SearchOverlayProps) => {
                   </div>
                 </motion.div>
               </div>
+              </div>
             </div>
-          </div>
-        </motion.div>
+          </motion.div>
+        </>
       )}
     </AnimatePresence>
   );

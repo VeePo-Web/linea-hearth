@@ -308,13 +308,15 @@ const CartDrawer = ({ onViewFavorites }: CartDrawerProps) => {
                               <div className="flex-1 relative">
                                 <Input
                                   type="email"
+                                  inputMode="email"
+                                  autoComplete="email"
                                   placeholder="Email"
                                   value={emailInput}
                                   onChange={(e) => {
                                     setEmailInput(e.target.value);
                                     setEmailError("");
                                   }}
-                                  className="rounded-none text-sm h-10 border-muted-foreground/30 focus:border-foreground transition-colors"
+                                  className="rounded-none text-sm h-12 border-muted-foreground/30 focus:border-foreground transition-colors"
                                   onKeyDown={(e) => e.key === 'Enter' && handleSaveCart()}
                                   disabled={savingState !== 'idle'}
                                 />
@@ -324,7 +326,7 @@ const CartDrawer = ({ onViewFavorites }: CartDrawerProps) => {
                                 disabled={savingState !== 'idle'}
                                 size="sm"
                                 variant="outline"
-                                className="rounded-none h-10 px-5 text-xs uppercase tracking-[0.15em] border-foreground hover:bg-foreground hover:text-background transition-all"
+                                className="rounded-none h-12 px-5 text-xs uppercase tracking-[0.15em] border-foreground hover:bg-foreground hover:text-background transition-all"
                               >
                                 {savingState === 'saving' ? (
                                   <span className="flex items-center gap-1">

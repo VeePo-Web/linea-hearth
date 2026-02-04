@@ -68,7 +68,7 @@ export default function AuthModal({ isOpen, onClose, defaultTab = 'signup' }: Au
             {/* Header */}
             <div className="flex items-center justify-between px-6 py-5 border-b border-border">
               <h2 className="text-lg font-light tracking-wide text-foreground">
-                {activeTab === 'signin' ? 'Welcome Back' : 'Join LINEA'}
+                {activeTab === 'signin' ? 'Welcome Back' : 'Join Line of Judah'}
               </h2>
               <motion.button
                 className="p-2 text-foreground hover:text-muted-foreground transition-colors relative group"

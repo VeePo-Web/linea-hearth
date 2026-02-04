@@ -33,23 +33,30 @@ export default function AccountLayout() {
     <Layout>
       <div className="min-h-[80vh] bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          {/* Mobile tabs */}
-          <div className="lg:hidden mb-8 overflow-x-auto">
-            <div className="flex gap-1 min-w-max pb-2 border-b border-border">
-              {sidebarLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  to={link.href}
-                  className={cn(
-                    'px-4 py-2 text-sm whitespace-nowrap transition-colors rounded-sm',
-                    isActive(link.href)
-                      ? 'bg-foreground text-background'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
-                  )}
-                >
-                  {link.label}
-                </Link>
-              ))}
+          {/* Mobile tabs with scroll indicators */}
+          <div className="lg:hidden mb-8 relative">
+            {/* Scroll fade indicators */}
+            <div className="absolute left-0 top-0 bottom-2 w-4 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none opacity-0" />
+            <div className="absolute right-0 top-0 bottom-2 w-6 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
+            
+            <div className="overflow-x-auto scrollbar-hide -mx-4 px-4">
+              <div className="flex gap-2 min-w-max pb-3 border-b border-border">
+                {sidebarLinks.map((link) => (
+                  <Link
+                    key={link.href}
+                    to={link.href}
+                    className={cn(
+                      'px-4 py-2.5 text-sm whitespace-nowrap transition-colors rounded-sm flex items-center gap-2',
+                      isActive(link.href)
+                        ? 'bg-foreground text-background'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                    )}
+                  >
+                    <link.icon size={16} strokeWidth={1.5} />
+                    {link.label}
+                  </Link>
+                ))}
+              </div>
             </div>
           </div>
 

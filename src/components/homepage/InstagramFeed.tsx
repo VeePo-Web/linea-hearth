@@ -70,14 +70,14 @@ const InstagramFeed = () => {
           ))}
         </StaggerContainer>
 
-        {/* Desktop Grid - Collage style with row spanning */}
-        <StaggerContainer className="hidden md:grid grid-cols-12 gap-2" staggerDelay={0.08}>
+        {/* Tablet & Desktop Grid - Collage style with row spanning */}
+        <StaggerContainer className="hidden md:grid md:grid-cols-6 lg:grid-cols-12 gap-2" staggerDelay={0.08}>
           {/* Large left image - spans 2 rows */}
           <motion.a
             href="https://instagram.com/lineofjudahwear"
             target="_blank"
             rel="noopener noreferrer"
-            className="col-span-4 row-span-2 relative aspect-[3/4] overflow-hidden group"
+            className="md:col-span-2 lg:col-span-4 row-span-2 relative aspect-[3/4] overflow-hidden group"
             whileHover={prefersReducedMotion ? {} : { scale: 1.02 }}
             transition={{ type: "spring", stiffness: 300, damping: 20 }}
           >
@@ -101,7 +101,7 @@ const InstagramFeed = () => {
               href="https://instagram.com/lineofjudahwear"
               target="_blank"
               rel="noopener noreferrer"
-              className="col-span-4 relative aspect-square overflow-hidden group"
+              className="md:col-span-2 lg:col-span-4 relative aspect-square overflow-hidden group"
               whileHover={prefersReducedMotion ? {} : { scale: 1.02 }}
               transition={{ type: "spring", stiffness: 300, damping: 20 }}
             >
@@ -126,7 +126,7 @@ const InstagramFeed = () => {
               href="https://instagram.com/lineofjudahwear"
               target="_blank"
               rel="noopener noreferrer"
-              className="col-span-4 relative aspect-square overflow-hidden group"
+              className="md:col-span-2 lg:col-span-4 relative aspect-square overflow-hidden group"
               whileHover={prefersReducedMotion ? {} : { scale: 1.02 }}
               transition={{ type: "spring", stiffness: 300, damping: 20 }}
             >
