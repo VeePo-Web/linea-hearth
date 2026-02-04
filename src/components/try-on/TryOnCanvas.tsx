@@ -3,9 +3,13 @@ import { Canvas } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera, ContactShadows } from '@react-three/drei';
 import { Avatar3D } from './Avatar3D';
 import { SceneControls } from './SceneControls';
+import { CameraPresets, CameraPreset } from './CameraPresets';
+import { CanvasOverlays } from './CanvasOverlays';
 import { StudioLighting } from './lighting/StudioLighting';
 import { useTryOnState } from '@/hooks/useTryOnState';
+import { useCameraPresets } from '@/hooks/useCameraPresets';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { Loader2, AlertTriangle, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -86,10 +90,13 @@ const Scene = ({
 export const TryOnCanvas = ({ className }: TryOnCanvasProps) => {
   const { isLoading } = useTryOnState();
   const isMobile = useIsMobile();
+  const prefersReducedMotion = useReducedMotion();
+  const { animateToPreset } = useCameraPresets();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const cameraRef = useRef<any>(null);
   const controlsRef = useRef<any>(null);
   const [lightingMode, setLightingMode] = useState<'studio' | 'natural' | 'dramatic'>('studio');
+  const [cameraPreset, setCameraPreset] = useState<CameraPreset>('full');
   const [contextLost, setContextLost] = useState(false);
 
   // Handle WebGL context loss/restore
@@ -160,8 +167,29 @@ export const TryOnCanvas = ({ className }: TryOnCanvasProps) => {
     });
   }, []);
 
+  const handleCameraPreset = useCallback((preset: CameraPreset) => {
+    setCameraPreset(preset);
+    if (!prefersReducedMotion) {
+      animateToPreset(cameraRef, controlsRef, preset);
+    } else {
+      // Instant transition for reduced motion
+      const config = {
+        full: { pos: [0, 1.2, 2.8], target: [0, 1.1, 0] },
+        upper: { pos: [0, 1.5, 1.6], target: [0, 1.4, 0] },
+        detail: { pos: [0, 1.3, 1.0], target: [0, 1.3, 0] },
+        'three-quarter': { pos: [1.2, 1.3, 2.2], target: [0, 1.1, 0] },
+      }[preset];
+      if (cameraRef.current && controlsRef.current && config) {
+        cameraRef.current.position.set(...config.pos);
+        controlsRef.current.target.set(...config.target);
+      }
+    }
+  }, [animateToPreset, prefersReducedMotion]);
+
   return (
     <div className={`relative ${className}`}>
+      {/* Editorial overlays - grain + vignette */}
+      <CanvasOverlays showGrain={!isMobile} showVignette />
       {/* Loading Overlay */}
       {isLoading && !contextLost && (
         <div className="absolute inset-0 bg-background/80 backdrop-blur-sm z-10 flex items-center justify-center">
@@ -217,6 +245,14 @@ export const TryOnCanvas = ({ className }: TryOnCanvasProps) => {
       {/* Drag hint - premium styling */}
       <div className="absolute top-4 left-1/2 -translate-x-1/2 text-[11px] uppercase tracking-[0.15em] text-muted-foreground/70 bg-background/60 backdrop-blur-sm px-4 py-2 rounded-full border border-border/30">
         Drag to rotate • Scroll to zoom
+      </div>
+
+      {/* Camera Presets - Desktop only */}
+      <div className="hidden sm:block absolute top-4 right-4">
+        <CameraPresets 
+          activePreset={cameraPreset}
+          onSelectPreset={handleCameraPreset}
+        />
       </div>
 
       {/* Scene Controls */}

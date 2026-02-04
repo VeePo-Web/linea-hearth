@@ -3,9 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { useTryOnState } from '@/hooks/useTryOnState';
 import { useCart } from '@/hooks/useCart';
 import { Button } from '@/components/ui/button';
+import { AnimatedPrice } from './AnimatedPrice';
 import { ShoppingBag, CreditCard, Bookmark, Share2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { SaveLookModal } from './SaveLookModal';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export const OutfitSummary = () => {
   const navigate = useNavigate();
@@ -74,35 +76,44 @@ export const OutfitSummary = () => {
 
         {/* Items List */}
         <div className="divide-y divide-border">
-          {items.map(([slot, item]) => (
-            <div key={slot} className="p-3 flex items-center gap-3">
-              {item?.imageUrl && (
-                <div className="w-12 h-12 bg-muted overflow-hidden flex-shrink-0">
-                  <img 
-                    src={item.imageUrl} 
-                    alt={item.name}
-                    className="w-full h-full object-cover"
-                  />
+          <AnimatePresence mode="popLayout">
+            {items.map(([slot, item]) => (
+              <motion.div 
+                key={slot}
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 10, scale: 0.95 }}
+                transition={{ duration: 0.2 }}
+                className="p-3 flex items-center gap-3"
+              >
+                {item?.imageUrl && (
+                  <div className="w-12 h-12 bg-muted overflow-hidden flex-shrink-0">
+                    <img 
+                      src={item.imageUrl} 
+                      alt={item.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                )}
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm font-light truncate">{item?.name}</div>
+                  <div className="text-xs text-muted-foreground">
+                    Size {item?.size}
+                  </div>
                 </div>
-              )}
-              <div className="flex-1 min-w-0">
-                <div className="text-sm font-light truncate">{item?.name}</div>
-                <div className="text-xs text-muted-foreground">
-                  Size {item?.size}
+                <div className="text-sm font-medium">
+                  ${item?.price.toLocaleString()}
                 </div>
-              </div>
-              <div className="text-sm font-medium">
-                ${item?.price.toLocaleString()}
-              </div>
-            </div>
-          ))}
+              </motion.div>
+            ))}
+          </AnimatePresence>
         </div>
 
         {/* Total + CTAs */}
         <div className="p-4 bg-muted/30 space-y-3">
           <div className="flex items-center justify-between">
             <span className="text-sm font-light">Total</span>
-            <span className="text-lg font-medium">${totalPrice.toLocaleString()}</span>
+            <AnimatedPrice value={totalPrice} className="text-lg font-medium" />
           </div>
           
           {/* Primary CTAs */}

@@ -4,10 +4,12 @@ import { useTryOnState } from '@/hooks/useTryOnState';
 import { useCart } from '@/hooks/useCart';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { AnimatedPrice } from './AnimatedPrice';
 import { ShoppingBag, ChevronUp, Crown, Shirt, Footprints, CreditCard, Bookmark } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { SaveLookModal } from './SaveLookModal';
+import { motion, AnimatePresence } from 'framer-motion';
 
 // Custom pants icon
 const PantsIcon = () => (
@@ -71,36 +73,46 @@ export const MobileTryOnBar = ({ onOpenSlot }: MobileTryOnBarProps) => {
 
   return (
     <>
-      <div className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border md:hidden">
+      <div className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border md:hidden pb-safe">
         {/* Slot Quick Access */}
-        <div className="flex items-center justify-around py-2 px-4 border-b border-border">
+        <div className="flex items-center justify-around py-3 px-4 border-b border-border">
           {slots.map(({ id, icon }) => {
             const isEquipped = !!equippedItems[id];
             return (
-              <button
+              <motion.button
                 key={id}
                 onClick={() => onOpenSlot(id)}
                 className={cn(
-                  "w-12 h-12 flex items-center justify-center rounded-full border-2 transition-all",
+                  "w-12 h-12 min-w-[48px] min-h-[48px] flex items-center justify-center rounded-full border-2 transition-all",
                   isEquipped
                     ? "border-foreground bg-foreground text-background"
-                    : "border-border text-muted-foreground hover:border-foreground"
+                    : "border-border border-dashed text-muted-foreground hover:border-foreground"
                 )}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                animate={isEquipped ? { scale: [1, 1.1, 1] } : {}}
+                transition={{ duration: 0.2 }}
+                aria-label={`${id} slot${isEquipped ? ` - ${equippedItems[id]?.name}` : ' - empty'}`}
               >
                 {icon}
-              </button>
+              </motion.button>
             );
           })}
         </div>
 
         {/* Summary Bar */}
-        <div className="flex items-center justify-between p-4">
+        <div className="flex items-center justify-between p-4 min-h-[64px]">
           <Sheet open={showSummary} onOpenChange={setShowSummary}>
             <SheetTrigger asChild>
-              <button className="flex items-center gap-2 text-sm">
+              <button className="flex items-center gap-2 text-sm min-h-[44px] px-2">
                 <ShoppingBag className="w-4 h-4" />
                 <span>{itemCount} items</span>
-                <ChevronUp className={cn("w-4 h-4 transition-transform", showSummary && "rotate-180")} />
+                <motion.div
+                  animate={{ rotate: showSummary ? 180 : 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <ChevronUp className="w-4 h-4" />
+                </motion.div>
               </button>
             </SheetTrigger>
             <SheetContent side="bottom" className="h-[70vh]">
@@ -143,7 +155,7 @@ export const MobileTryOnBar = ({ onOpenSlot }: MobileTryOnBarProps) => {
                 {/* Total */}
                 <div className="flex items-center justify-between py-3 border-t border-border">
                   <span className="text-sm font-light">Total</span>
-                  <span className="text-lg font-medium">${totalPrice.toLocaleString()}</span>
+                  <AnimatedPrice value={totalPrice} className="text-lg font-medium" />
                 </div>
 
                 {/* Action Buttons */}
@@ -186,12 +198,12 @@ export const MobileTryOnBar = ({ onOpenSlot }: MobileTryOnBarProps) => {
           </Sheet>
 
           <div className="flex items-center gap-4">
-            <span className="text-lg font-medium">${totalPrice.toLocaleString()}</span>
+            <AnimatedPrice value={totalPrice} className="text-lg font-medium" />
             <Button 
               onClick={handleBuyThisLook}
               disabled={itemCount === 0}
-              size="sm"
-              className="gap-2"
+              size="default"
+              className="gap-2 min-h-[44px] min-w-[100px]"
             >
               <CreditCard className="w-4 h-4" />
               Buy Now
