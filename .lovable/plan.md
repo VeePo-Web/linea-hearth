@@ -1,243 +1,211 @@
 
 
-# Line of Judah: Strategic Next Steps Plan
-## Premium Editorial Streetwear E-Commerce Elevation
+# localStorage Migration Utility: 'linea-' → 'loj-' Prefix
+
+## Executive Summary
+
+This plan creates a robust localStorage migration utility that renames all `linea-` prefixed keys to `loj-` while preserving 100% of existing user data. The migration runs automatically on app initialization, is idempotent (safe to run multiple times), and includes comprehensive error handling.
 
 ---
 
-## Current State Audit Summary
+## Complete Key Inventory
 
-After an exhaustive code audit, the Line of Judah storefront is already at a **strong foundation level** for a premium faith-based streetwear brand. The existing implementation reflects:
+| Old Key | New Key | Data Type | Used In | Critical |
+|---------|---------|-----------|---------|----------|
+| `linea-cart` | `loj-cart` | `CartItem[]` | `useCart.tsx` | ⚠️ HIGH |
+| `linea-size-memory` | `loj-size-memory` | `SizeMemory` | `useSizeMemory.ts`, `SizeQuizContext.tsx`, `PostPurchaseSignup.tsx` | ⚠️ HIGH |
+| `linea-size-quiz-completed` | `loj-size-quiz-completed` | `"true"` | `SizeQuizContext.tsx` | MEDIUM |
+| `linea-recently-viewed` | `loj-recently-viewed` | `RecentlyViewedProduct[]` | `RecentlyViewedContext.tsx` | MEDIUM |
+| `linea-saved-for-later` | `loj-saved-for-later` | `LocalStorageSavedItem[]` | `useSavedForLater.ts` | MEDIUM |
+| `linea-abandoned-cart-email` | `loj-abandoned-cart-email` | `string` | `useAbandonedCart.ts` | MEDIUM |
+| `linea-abandoned-cart-id` | `loj-abandoned-cart-id` | `string` (UUID) | `useAbandonedCart.ts` | MEDIUM |
+| `linea-behavior-cache` | `loj-behavior-cache` | `BehaviorCache` | `useBehaviorTracking.ts` | LOW |
+| `linea-greeting-dismissed` | `loj-greeting-dismissed` | `string` (timestamp) | `useReturnCustomer.ts` | LOW |
+| `linea_body_profiles` | `loj_body_profiles` | `ProfilesData` | `useBodyProfiles.ts` | MEDIUM |
 
-**What's Already Working Well:**
-- Swedish design discipline: `--radius: 0rem` enforcing sharp edges site-wide
-- 032c-inspired typography scale with `text-display`, `text-hero-massive`, `text-eyebrow` classes
-- DAZED editorial animations: clip-path reveals, Ken Burns effects, stagger children
-- Premium color palette: deep blacks, warm off-whites, gold accent (#D4AF37)
-- Mobile-first responsive architecture with `100dvh`, safe-area handling, touch-target sizing
-- Framer Motion animation library with reduced-motion support
-- Behavioral tracking for high-intent signals
-- Comprehensive cart drawer with bundle discounts and abandoned cart recovery
-
----
-
-## Strategic Priority Matrix: What's Next
-
-After the brand name correction (LINEA → Line of Judah), the following areas require attention to achieve world-class streetwear e-commerce status:
-
-### TIER 1: Critical Brand Completion (Immediate)
-
-| Task | Impact | Effort |
-|------|--------|--------|
-| **1. Update Tailwind comment** | Low | 5 min |
-| **2. Create placeholder logo component** | Medium | 30 min |
-| **3. Fix remaining brand assets in StatusBar** | Medium | 15 min |
-| **4. Update social media handles** | Medium | 20 min |
-| **5. Fix copyright year to 2025** | Low | 5 min |
+**Note:** `linea-session-id` uses `sessionStorage` not `localStorage`, so it doesn't need migration (it resets per session anyway).
 
 ---
 
-### TIER 2: Content Authenticity Upgrade
+## Technical Architecture
 
-The site currently uses placeholder stats and testimonials that need real data:
+### Phase 1: Create Migration Utility
 
-#### StatusBar.tsx Placeholder Data
-```
-Current: "+100,000 happy customers"
-Action: Replace with actual customer count or remove until verified
-```
+Create a new file `src/lib/storageMigration.ts` that:
 
-#### MarqueeStrip.tsx Fake Testimonials
-| Name | Quote | Status |
-|------|-------|--------|
-| Marcus T. | "Finally, a brand that gets it." | PLACEHOLDER |
-| Sarah M. | "The quality is insane." | PLACEHOLDER |
-| David K. | "Premium quality, meaningful designs." | PLACEHOLDER |
-| Michelle R. | "My whole youth group loves them." | PLACEHOLDER |
-| James L. | "Worth every penny." | PLACEHOLDER |
-| Priscilla W. | "This isn't just clothing, it's armor." | PLACEHOLDER |
+1. Defines the complete key mapping
+2. Implements safe migration with data validation
+3. Tracks migration completion to avoid re-running
+4. Logs migration activity for debugging
 
-**Recommendation:** Create a `src/config/brand.ts` centralized content configuration file to store all brand copy, stats, and contact info in one location.
-
----
-
-### TIER 3: Editorial Content Gaps
-
-#### Homepage EditorialHero.tsx
-| Element | Current | Needs Owner Input |
-|---------|---------|-------------------|
-| Drop Number | "001" | Confirm if this is Drop 001 |
-| Collection Name | "Stay Holy Collection" | Confirm collection naming |
-| Limited Pieces | "250" | Actual production quantity |
-| Product Price | "$79" | Confirm pricing |
-
-#### TestimonySpotlight.tsx
-| Element | Current | Status |
-|---------|---------|--------|
-| Customer Name | "Marcus T." | PLACEHOLDER |
-| Title | "Youth Pastor" | PLACEHOLDER |
-| Location | "Atlanta, GA" | PLACEHOLDER |
-| Quote | Full quote | PLACEHOLDER |
-
----
-
-### TIER 4: Performance & CRO Enhancements
-
-Based on the audit, these high-impact improvements align with premium streetwear standards:
-
-#### 4.1 Image Optimization Audit
 ```text
-Files Found: 10 product images in /public/products/
-Current Format: PNG
-Recommended: Convert to WebP with AVIF fallback
-Expected LCP Improvement: 200-400ms
+src/lib/storageMigration.ts (NEW FILE)
+├── MIGRATION_COMPLETE_KEY = 'loj-migration-v1'
+├── KEY_MAPPINGS: Record<string, string>
+├── migrateLocalStorage(): MigrationResult
+├── rollbackMigration(): void (for emergencies)
+└── getMigrationStatus(): MigrationStatus
 ```
 
-#### 4.2 Missing SEO Metadata
-- `index.html` OG image contains old "Linea" branding
-- No product-specific meta descriptions
-- No JSON-LD structured data for products
+### Phase 2: Update All Consuming Hooks/Contexts
 
-#### 4.3 Accessibility Gaps Identified
-- Color contrast ratio on muted text needs WCAG AA verification
-- Missing `aria-label` on some icon-only buttons
-- No skip-to-content link implemented (class exists but not used)
+Each file using `linea-` keys must be updated to use `loj-` constants:
 
----
+| File | Lines to Change | Change Summary |
+|------|-----------------|----------------|
+| `src/hooks/useCart.tsx` | Line 42 | `'linea-cart'` → `'loj-cart'` |
+| `src/hooks/useSizeMemory.ts` | Line 5 | `'linea-size-memory'` → `'loj-size-memory'` |
+| `src/hooks/useSavedForLater.ts` | Line 8 | `'linea-saved-for-later'` → `'loj-saved-for-later'` |
+| `src/hooks/useAbandonedCart.ts` | Lines 5-6 | Both keys renamed |
+| `src/hooks/useBehaviorTracking.ts` | Line 5 | `'linea-behavior-cache'` → `'loj-behavior-cache'` |
+| `src/hooks/useReturnCustomer.ts` | Line 33 | `'linea-greeting-dismissed'` → `'loj-greeting-dismissed'` |
+| `src/contexts/SizeQuizContext.tsx` | Lines 47-48 | Both keys renamed |
+| `src/contexts/RecentlyViewedContext.tsx` | Line 26 | `'linea-recently-viewed'` → `'loj-recently-viewed'` |
+| `src/components/try-on/hooks/useBodyProfiles.ts` | Line 4 | `'linea_body_profiles'` → `'loj_body_profiles'` |
+| `src/components/checkout/PostPurchaseSignup.tsx` | Line 68 | `"linea-size-memory"` → `"loj-size-memory"` |
 
-### TIER 5: Trust & Conversion Engineering
+### Phase 3: Integrate Migration into App Initialization
 
-#### Missing Trust Elements for Premium Perception
-1. **Real Review Integration** - ProductReviews component exists but needs data source
-2. **Payment Badges** - No Visa/MC/AMEX/Apple Pay badges visible
-3. **Security Seals** - No SSL/secure checkout indicators prominent
-4. **Guarantee Badge** - Component exists but content is placeholder
-
-#### Price Display Consistency
-- Some components use `formatPrice()`, others use `$${price.toFixed(2)}`
-- Recommendation: Audit all price displays for consistency
+Update `src/App.tsx` or create an initialization hook to run migration on first load.
 
 ---
 
-## Recommended Implementation Order
+## Migration Algorithm
 
-### Phase 1: Brand Consistency (1-2 hours)
-1. Create centralized brand config file
-2. Update copyright year in Footer
-3. Add placeholder preparation for new logo
-4. Update Tailwind comment from "Linea" to "Line of Judah"
+```text
+1. Check if migration already complete (MIGRATION_COMPLETE_KEY exists)
+   → If yes: exit early (idempotent)
 
-### Phase 2: Content Authenticity (Owner Required)
-1. Gather real customer testimonials
-2. Confirm actual product pricing
-3. Get verified customer counts
-4. Collect real social proof data
+2. For each OLD_KEY → NEW_KEY mapping:
+   a. Check if OLD_KEY exists in localStorage
+   b. If OLD_KEY exists AND NEW_KEY does NOT exist:
+      - Copy data from OLD_KEY to NEW_KEY
+      - Delete OLD_KEY
+      - Log success
+   c. If both exist (edge case):
+      - Compare timestamps if available
+      - Keep most recent, log conflict
+   d. If only NEW_KEY exists:
+      - Already migrated, skip
 
-### Phase 3: Technical Polish (4-6 hours)
-1. Convert images to WebP format
-2. Implement skip-to-content link
-3. Add JSON-LD structured data
-4. Audit and fix accessibility issues
+3. Set MIGRATION_COMPLETE_KEY = timestamp
 
-### Phase 4: Trust Layer Enhancement (2-3 hours)
-1. Add payment method badges to checkout
-2. Integrate real review data source
-3. Polish guarantee badge content
-4. Add security indicators
+4. Return migration summary
+```
 
 ---
 
-## Centralized Brand Configuration Proposal
+## Implementation Details
 
-Create `src/config/brand.ts`:
+### File 1: `src/lib/storageMigration.ts` (NEW)
 
 ```typescript
-export const BRAND = {
-  // Core Identity
-  name: "Line of Judah",
-  tagline: "For those who walk different",
-  legalEntity: "Line of Judah LLC",
-  
-  // Contact
-  email: {
-    support: "hello@lineofjudah.com",
-    legal: "legal@lineofjudah.com",
-  },
-  
-  // Social
-  social: {
-    instagram: "@lineofjudahwear",
-    tiktok: "@lineofjudah",
-    youtube: "@lineofjudah",
-  },
-  
-  // Stats (replace with real numbers)
-  stats: {
-    customers: "10,000+", // or null to hide
-    countries: 5,
-    cities: 45,
-  },
-  
-  // Trust Signals
-  trust: {
-    freeShippingThreshold: 99,
-    returnDays: 30,
-    warrantyDays: 365,
-  },
-  
-  // Discount Prefix
-  discountPrefix: "LOJ",
-} as const;
+// Migration version - increment if adding new keys
+const MIGRATION_VERSION = 'v1';
+const MIGRATION_COMPLETE_KEY = `loj-migration-${MIGRATION_VERSION}`;
+
+// Complete mapping of old keys to new keys
+const KEY_MAPPINGS: Record<string, string> = {
+  'linea-cart': 'loj-cart',
+  'linea-size-memory': 'loj-size-memory',
+  'linea-size-quiz-completed': 'loj-size-quiz-completed',
+  'linea-recently-viewed': 'loj-recently-viewed',
+  'linea-saved-for-later': 'loj-saved-for-later',
+  'linea-abandoned-cart-email': 'loj-abandoned-cart-email',
+  'linea-abandoned-cart-id': 'loj-abandoned-cart-id',
+  'linea-behavior-cache': 'loj-behavior-cache',
+  'linea-greeting-dismissed': 'loj-greeting-dismissed',
+  'linea_body_profiles': 'loj_body_profiles',
+};
+
+interface MigrationResult {
+  success: boolean;
+  migrated: string[];
+  skipped: string[];
+  errors: string[];
+}
+
+export function migrateLocalStorage(): MigrationResult {
+  // Check if already migrated
+  // Loop through mappings
+  // Copy and delete safely
+  // Return result
+}
 ```
 
-This centralization enables:
-- Single source of truth for all brand data
-- Easy updates without hunting through components
-- Type-safety for brand references
+### File Updates Summary
+
+**10 files** require constant updates from `linea-` to `loj-`:
+- All changes are single-line constant renames
+- No logic changes required
+- Type safety preserved
 
 ---
 
-## Files to Modify (Summary)
+## Safety Mechanisms
 
-### Immediate Updates
-| File | Change |
-|------|--------|
-| `tailwind.config.ts` | Line 62: Comment "Linea" → "Line of Judah" |
-| `src/components/footer/Footer.tsx` | Line 146: "2024" → "2025" |
-| `src/components/header/StatusBar.tsx` | Verify/update customer count stat |
-
-### New Files to Create
-| File | Purpose |
-|------|---------|
-| `src/config/brand.ts` | Centralized brand configuration |
-| `public/line-of-judah-logo.svg` | Official logo (owner to provide) |
-| `public/og-line-of-judah.png` | Social sharing image (owner to provide) |
-
-### Assets Pending from Owner
-1. Official SVG logo for header/footer
-2. OG/Social sharing image (1200x630px)
-3. Real testimonials and customer data
-4. Confirmed pricing and product details
+1. **Idempotency**: Migration checks for completion flag before running
+2. **Data Preservation**: Copy-then-delete pattern (never lose data)
+3. **Conflict Resolution**: If both old and new keys exist, prefer newest data
+4. **Error Isolation**: Try-catch around each key migration
+5. **Rollback Function**: Emergency utility to reverse migration if needed
+6. **Console Logging**: Development mode logs all migration activity
+7. **No Breaking Changes**: Old keys are removed only after successful copy
 
 ---
 
-## Questions Before Implementation
+## Testing Checklist
 
-1. **Logo:** Can you provide the official Line of Judah logo in SVG format?
+After implementation:
 
-2. **Social Image:** Do you have a branded social sharing image (1200x630px) for Facebook/Twitter previews?
+| Test Case | Expected Result |
+|-----------|-----------------|
+| Fresh user (no localStorage) | No migration runs, no errors |
+| User with old `linea-cart` | Cart items appear under new key |
+| User with old `linea-size-memory` | Sizes remembered correctly |
+| Migration already complete | Skips without errors |
+| Both old and new keys exist | Keeps newest data |
+| Corrupted JSON in old key | Logs error, continues with other keys |
+| Clear localStorage manually | Next visit is treated as fresh |
 
-3. **Customer Stats:** What are the real numbers for:
-   - Happy customers
-   - Countries shipped to
-   - Cities reached
+---
 
-4. **Testimonials:** Do you have verified customer testimonials to replace the placeholder quotes?
+## Implementation Order
 
-5. **Copyright Year:** Should the footer say "2024" or "2025"?
+1. **Create** `src/lib/storageMigration.ts` with migration utility
+2. **Update** all 10 files to use new `loj-` key constants
+3. **Integrate** migration call in `src/App.tsx` (runs before providers)
+4. **Test** with existing user data in browser
+5. **Verify** no data loss across all storage types
 
-6. **Priority:** Would you like me to:
-   - **A)** Create the centralized brand config file now
-   - **B)** Focus on performance/image optimization
-   - **C)** Wait for real content before proceeding
+---
+
+## Rollback Plan
+
+If issues discovered post-deployment:
+
+1. The migration utility includes a `rollbackMigration()` function
+2. Can be called from browser console: `window.__LOJ_ROLLBACK_MIGRATION()`
+3. Reverses all key renames back to `linea-` prefix
+4. Clears migration completion flag
+
+---
+
+## Files Created/Modified
+
+**New File:**
+- `src/lib/storageMigration.ts`
+
+**Modified Files (10):**
+- `src/hooks/useCart.tsx`
+- `src/hooks/useSizeMemory.ts`
+- `src/hooks/useSavedForLater.ts`
+- `src/hooks/useAbandonedCart.ts`
+- `src/hooks/useBehaviorTracking.ts`
+- `src/hooks/useReturnCustomer.ts`
+- `src/contexts/SizeQuizContext.tsx`
+- `src/contexts/RecentlyViewedContext.tsx`
+- `src/components/try-on/hooks/useBodyProfiles.ts`
+- `src/components/checkout/PostPurchaseSignup.tsx`
+- `src/App.tsx` (add migration call)
 
