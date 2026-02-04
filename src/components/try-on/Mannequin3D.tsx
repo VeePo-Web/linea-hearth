@@ -1,166 +1,104 @@
 import { useRef, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-import { useTryOnState, BodyMeasurements } from '@/hooks/useTryOnState';
+import { useTryOnState } from '@/hooks/useTryOnState';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
+import { 
+  getBodyProportions, 
+  MannequinProportions,
+  EIGHT_HEAD_SCALE,
+  getScaledBodyPositions,
+} from './utils/measurementToProportions';
 
 /**
  * MANNEQUIN 3D - Anatomically Correct Human Form
  * 
- * Y-Coordinate Reference (ground at Y=0):
- * ─────────────────────────────────────────
- * Ground:     0.00
- * Feet:       0.00 → 0.05
- * Ankles:     0.05 → 0.08
- * Calves:     0.08 → 0.45
- * Knees:      0.45 (joint)
- * Thighs:     0.45 → 0.85
- * Hips:       0.85 (pelvis joint)
- * Pelvis:     0.85 → 0.95
- * Torso:      0.95 → 1.45
- * Shoulders:  1.45 (arm attachment)
- * Neck:       1.45 → 1.55
- * Head:       1.55 → 1.75
- * ─────────────────────────────────────────
- * TOTAL HEIGHT: ~1.75m (normalized male average)
+ * Uses 8-HEAD FASHION SCALE for industry-standard proportions:
+ * - Legs = 50% of total height (4 heads)
+ * - Torso = 37.5% of height (3 heads)
+ * - Head = 12.5% of height (1 head)
+ * 
+ * All proportions imported from centralized measurementToProportions.ts
  */
 
 interface MannequinProps {
   position?: [number, number, number];
 }
 
-// Body proportion presets by body type and gender
-const getPresetProportions = (
-  bodyType: 'slim' | 'athletic' | 'average' | 'curvy',
-  gender: 'male' | 'female'
-) => {
-  const baseProportions = {
-    slim: { shoulderWidth: 0.38, chestDepth: 0.18, waistWidth: 0.28, hipWidth: 0.34, armThickness: 0.045, legThickness: 0.07 },
-    athletic: { shoulderWidth: 0.44, chestDepth: 0.22, waistWidth: 0.30, hipWidth: 0.36, armThickness: 0.055, legThickness: 0.085 },
-    average: { shoulderWidth: 0.40, chestDepth: 0.20, waistWidth: 0.32, hipWidth: 0.38, armThickness: 0.05, legThickness: 0.08 },
-    curvy: { shoulderWidth: 0.38, chestDepth: 0.22, waistWidth: 0.34, hipWidth: 0.44, armThickness: 0.055, legThickness: 0.09 },
-  };
+// Default ceramic skin tone for mannequin aesthetic
+const DEFAULT_CERAMIC_TONE = '#D4D4D4';
 
-  const genderModifiers = gender === 'female' 
-    ? { shoulderMod: 0.9, hipMod: 1.1, chestMod: 1.1 }
-    : { shoulderMod: 1.1, hipMod: 0.9, chestMod: 1.0 };
+// ============================================
+// SKIN MATERIAL COMPONENT
+// ============================================
+// Uses meshPhysicalMaterial for realistic skin with subsurface scattering
 
-  const base = baseProportions[bodyType];
+const SkinMaterial = ({ skinTone }: { skinTone: string }) => {
+  const isDefaultCeramic = skinTone === DEFAULT_CERAMIC_TONE || skinTone === '#D4A574';
   
-  return {
-    shoulderWidth: base.shoulderWidth * genderModifiers.shoulderMod,
-    chestDepth: base.chestDepth * genderModifiers.chestMod,
-    waistWidth: base.waistWidth,
-    hipWidth: base.hipWidth * genderModifiers.hipMod,
-    armThickness: base.armThickness,
-    legThickness: base.legThickness,
-    height: gender === 'female' ? 1.65 : 1.75,
-    armLength: 0.55,
-    legLength: 0.80,
-  };
-};
-
-// Helper to map value from one range to another
-const mapRange = (value: number, inMin: number, inMax: number, outMin: number, outMax: number): number => {
-  const clamped = Math.max(inMin, Math.min(inMax, value));
-  return outMin + ((clamped - inMin) / (inMax - inMin)) * (outMax - outMin);
-};
-
-// Convert real measurements to 3D proportions
-const getMeasurementBasedProportions = (
-  measurements: BodyMeasurements,
-  gender: 'male' | 'female'
-) => {
-  const { heightCm, weightKg, chestCm, waistCm, hipsCm, inseamCm } = measurements;
-  
-  const heightM = heightCm / 100;
-  const bmi = weightKg / (heightM * heightM);
-  const bmiThicknessFactor = mapRange(bmi, 18.5, 32, 0.85, 1.25);
-  
-  const heightScale = heightCm / 170;
-  const height = 1.75 * heightScale;
-  
-  const shoulderWidth = mapRange(chestCm, 80, 130, 0.36, 0.52) * (gender === 'male' ? 1.08 : 0.95);
-  const chestDepth = mapRange(chestCm, 80, 130, 0.16, 0.26) * bmiThicknessFactor;
-  const waistWidth = mapRange(waistCm, 60, 120, 0.24, 0.42);
-  let hipWidth = mapRange(hipsCm, 80, 130, 0.32, 0.50);
-  if (gender === 'female') hipWidth *= 1.06;
-  
-  const armThickness = 0.048 * bmiThicknessFactor * (gender === 'male' ? 1.1 : 0.9);
-  const legThickness = 0.075 * bmiThicknessFactor * (gender === 'male' ? 1.05 : 1.0);
-  
-  const armLength = 0.55 * heightScale;
-  const legLength = (inseamCm / 76) * 0.80 * heightScale;
-  
-  return {
-    shoulderWidth,
-    chestDepth,
-    waistWidth,
-    hipWidth,
-    armThickness,
-    legThickness,
-    height,
-    armLength,
-    legLength,
-  };
-};
-
-// Unified function to get proportions based on mode
-const getBodyProportions = (
-  bodyType: 'slim' | 'athletic' | 'average' | 'curvy',
-  gender: 'male' | 'female',
-  measurements: BodyMeasurements,
-  useDetailedMeasurements: boolean
-) => {
-  if (useDetailedMeasurements) {
-    return getMeasurementBasedProportions(measurements, gender);
+  if (isDefaultCeramic) {
+    // Matte ceramic/plaster museum-quality finish
+    return (
+      <meshStandardMaterial
+        color={skinTone}
+        roughness={0.75}
+        metalness={0.0}
+        envMapIntensity={0.2}
+      />
+    );
   }
-  return getPresetProportions(bodyType, gender);
-};
-
-// Premium matte ceramic/plaster material for museum-quality mannequin
-const MannequinMaterial = ({ skinTone }: { skinTone: string }) => {
+  
+  // Realistic skin with subtle subsurface scattering effect
   return (
-    <meshStandardMaterial
+    <meshPhysicalMaterial
       color={skinTone}
-      roughness={0.75}
+      roughness={0.6}
       metalness={0.0}
-      envMapIntensity={0.2}
+      transmission={0.05}        // Subtle transparency for SSS effect
+      thickness={0.2}            // Depth for transmission
+      ior={1.4}                  // Skin's index of refraction
+      clearcoat={0.08}           // Very subtle sheen
+      clearcoatRoughness={0.5}
     />
   );
 };
 
-// Create anatomically correct torso geometry
-// Torso spans from Y=0 (hips) to Y=0.50 (shoulders) in local space
-// Positioned at Y=0.95 so actual range is 0.95 → 1.45
-const createTorsoGeometry = (props: ReturnType<typeof getBodyProportions>) => {
+// ============================================
+// TORSO GEOMETRY
+// ============================================
+// Creates anatomically correct torso from hips to shoulders
+
+const createTorsoGeometry = (props: MannequinProportions, positions: ReturnType<typeof getScaledBodyPositions>) => {
   const points: THREE.Vector2[] = [];
   const segments = 32;
-  const torsoHeight = 0.50; // 50cm torso
+  
+  // Torso spans from crotch line to shoulder line
+  const torsoHeight = positions.shoulderLine - positions.crotchLine;
   
   for (let i = 0; i <= segments; i++) {
     const t = i / segments;
     let radius: number;
     
-    if (t < 0.12) {
+    if (t < 0.15) {
       // Hips to waist (narrowing) - bottom of torso
-      const localT = t / 0.12;
+      const localT = t / 0.15;
       radius = THREE.MathUtils.lerp(props.hipWidth / 2, props.waistWidth / 2, localT);
-    } else if (t < 0.45) {
+    } else if (t < 0.50) {
       // Waist to chest (expanding)
-      const localT = (t - 0.12) / 0.33;
+      const localT = (t - 0.15) / 0.35;
       radius = THREE.MathUtils.lerp(props.waistWidth / 2, props.chestDepth, localT);
-    } else if (t < 0.75) {
-      // Chest region (widest)
-      const localT = (t - 0.45) / 0.30;
-      radius = THREE.MathUtils.lerp(props.chestDepth, props.shoulderWidth / 2, localT * 0.6);
+    } else if (t < 0.80) {
+      // Chest region (widest point)
+      const localT = (t - 0.50) / 0.30;
+      const chestMax = Math.max(props.chestDepth, props.shoulderWidth / 2 * 0.8);
+      radius = THREE.MathUtils.lerp(props.chestDepth, chestMax, localT * 0.5);
     } else {
       // Chest to shoulders (tapering to neck)
-      const localT = (t - 0.75) / 0.25;
-      radius = THREE.MathUtils.lerp(props.shoulderWidth / 2 * 0.6 + props.chestDepth * 0.4, props.shoulderWidth / 2 * 0.35, localT);
+      const localT = (t - 0.80) / 0.20;
+      const neckRadius = props.shoulderWidth * 0.15;
+      radius = THREE.MathUtils.lerp(props.shoulderWidth / 2 * 0.5, neckRadius, localT);
     }
     
-    // Y goes from 0 (hips) to torsoHeight (shoulders)
     const y = t * torsoHeight;
     points.push(new THREE.Vector2(radius, y));
   }
@@ -168,10 +106,12 @@ const createTorsoGeometry = (props: ReturnType<typeof getBodyProportions>) => {
   return new THREE.LatheGeometry(points, 40);
 };
 
-// Create pelvis geometry that connects torso to legs
-// Spans from Y=0 to Y=0.10 in local space
-// Positioned at Y=0.85 so actual range is 0.85 → 0.95
-const createPelvisGeometry = (props: ReturnType<typeof getBodyProportions>) => {
+// ============================================
+// PELVIS GEOMETRY
+// ============================================
+// Smooth transition from legs to torso
+
+const createPelvisGeometry = (props: MannequinProportions) => {
   const points: THREE.Vector2[] = [];
   const segments = 12;
   
@@ -179,199 +119,272 @@ const createPelvisGeometry = (props: ReturnType<typeof getBodyProportions>) => {
     const t = i / segments;
     // Pelvis is wider at bottom (leg attachment) and tapers to torso
     const radius = THREE.MathUtils.lerp(
-      props.hipWidth / 2 + 0.02, // Bottom - wider for leg joints
-      props.hipWidth / 2,         // Top - matches torso bottom
+      props.hipWidth / 2 + 0.015, // Bottom - slightly wider for leg joints
+      props.hipWidth / 2,          // Top - matches torso bottom
       t
     );
-    const y = t * 0.10;
+    const y = t * 0.08; // Small pelvis region
     points.push(new THREE.Vector2(radius, y));
   }
   
   return new THREE.LatheGeometry(points, 32);
 };
 
-// Head component - positioned so bottom is at Y=1.55
-const Head = ({ skinTone }: { skinTone: string }) => {
-  // Head radius 0.095, positioned at Y=1.65 (center)
-  // Bottom of head: 1.65 - 0.095 = 1.555
-  // Top of head: 1.65 + 0.095 = 1.745
+// ============================================
+// HEAD COMPONENT
+// ============================================
+
+const Head = ({ skinTone, positions }: { skinTone: string; positions: ReturnType<typeof getScaledBodyPositions> }) => {
+  // Head size = 1/8 of total height
+  const headHeight = positions.headTop - positions.headBottom;
+  const headRadius = headHeight / 2;
+  const headCenterY = positions.headBottom + headRadius;
+  
   return (
-    <group position={[0, 1.65, 0]}>
-      {/* Main skull */}
-      <mesh>
-        <sphereGeometry args={[0.095, 32, 24]} />
-        <MannequinMaterial skinTone={skinTone} />
+    <group position={[0, headCenterY, 0]}>
+      {/* Main skull - slightly oval */}
+      <mesh scale={[1, 1.1, 0.95]}>
+        <sphereGeometry args={[headRadius * 0.9, 32, 24]} />
+        <SkinMaterial skinTone={skinTone} />
       </mesh>
       {/* Subtle jaw shape */}
-      <mesh position={[0, -0.04, 0.02]} scale={[0.85, 0.7, 0.9]}>
-        <sphereGeometry args={[0.065, 16, 12]} />
-        <MannequinMaterial skinTone={skinTone} />
+      <mesh position={[0, -headRadius * 0.4, headRadius * 0.15]} scale={[0.8, 0.6, 0.85]}>
+        <sphereGeometry args={[headRadius * 0.6, 16, 12]} />
+        <SkinMaterial skinTone={skinTone} />
       </mesh>
     </group>
   );
 };
 
-// Neck component - spans from Y=1.45 to Y=1.55
-const Neck = ({ skinTone, proportions }: { skinTone: string; proportions: ReturnType<typeof getBodyProportions> }) => {
-  const neckRadius = proportions.shoulderWidth * 0.12;
-  return (
-    <mesh position={[0, 1.50, 0]}>
-      <cylinderGeometry args={[neckRadius * 0.9, neckRadius, 0.10, 20]} />
-      <MannequinMaterial skinTone={skinTone} />
-    </mesh>
-  );
-};
+// ============================================
+// NECK COMPONENT
+// ============================================
 
-// Torso component - positioned at Y=0.95 (hips level)
-const Torso = ({ skinTone, proportions }: { skinTone: string; proportions: ReturnType<typeof getBodyProportions> }) => {
-  const geometry = useMemo(() => createTorsoGeometry(proportions), [proportions]);
+const Neck = ({ skinTone, proportions, positions }: { 
+  skinTone: string; 
+  proportions: MannequinProportions;
+  positions: ReturnType<typeof getScaledBodyPositions>;
+}) => {
+  const neckLength = positions.headBottom - positions.neckBase;
+  const neckRadius = proportions.shoulderWidth * 0.11;
+  const neckY = positions.neckBase + neckLength / 2;
   
   return (
-    <mesh position={[0, 0.95, 0]} geometry={geometry}>
-      <MannequinMaterial skinTone={skinTone} />
+    <mesh position={[0, neckY, 0]}>
+      <cylinderGeometry args={[neckRadius * 0.85, neckRadius, neckLength, 20]} />
+      <SkinMaterial skinTone={skinTone} />
     </mesh>
   );
 };
 
-// Pelvis component - positioned at Y=0.85
-const Pelvis = ({ skinTone, proportions }: { skinTone: string; proportions: ReturnType<typeof getBodyProportions> }) => {
+// ============================================
+// TORSO COMPONENT
+// ============================================
+
+const Torso = ({ skinTone, proportions, positions }: { 
+  skinTone: string; 
+  proportions: MannequinProportions;
+  positions: ReturnType<typeof getScaledBodyPositions>;
+}) => {
+  const geometry = useMemo(
+    () => createTorsoGeometry(proportions, positions), 
+    [proportions, positions]
+  );
+  
+  return (
+    <mesh position={[0, positions.crotchLine, 0]} geometry={geometry}>
+      <SkinMaterial skinTone={skinTone} />
+    </mesh>
+  );
+};
+
+// ============================================
+// PELVIS COMPONENT
+// ============================================
+
+const Pelvis = ({ skinTone, proportions, positions }: { 
+  skinTone: string; 
+  proportions: MannequinProportions;
+  positions: ReturnType<typeof getScaledBodyPositions>;
+}) => {
   const geometry = useMemo(() => createPelvisGeometry(proportions), [proportions]);
+  const pelvisY = positions.crotchLine - 0.08; // Just below crotch line
   
   return (
-    <mesh position={[0, 0.85, 0]} geometry={geometry}>
-      <MannequinMaterial skinTone={skinTone} />
+    <mesh position={[0, pelvisY, 0]} geometry={geometry}>
+      <SkinMaterial skinTone={skinTone} />
     </mesh>
   );
 };
 
-// Arm component with proper shoulder attachment at Y=1.45
+// ============================================
+// ARM COMPONENT
+// ============================================
+// Arms attach at shoulder line, using bezier-like transitions
+
 const Arm = ({ 
   side, 
   skinTone, 
-  proportions 
+  proportions,
+  positions,
 }: { 
   side: 'left' | 'right'; 
   skinTone: string; 
-  proportions: ReturnType<typeof getBodyProportions>;
+  proportions: MannequinProportions;
+  positions: ReturnType<typeof getScaledBodyPositions>;
 }) => {
-  const xPos = side === 'left' 
-    ? -proportions.shoulderWidth / 2 - proportions.armThickness * 0.5
-    : proportions.shoulderWidth / 2 + proportions.armThickness * 0.5;
-  const rotation = side === 'left' ? 0.12 : -0.12;
+  const sign = side === 'left' ? -1 : 1;
+  const xPos = sign * (proportions.shoulderWidth / 2 + proportions.armThickness * 0.3);
+  const rotation = sign * 0.1; // Slight natural arm angle
   
-  // Calculate arm segment lengths
-  const upperArmLength = proportions.armLength * 0.50;
-  const forearmLength = proportions.armLength * 0.45;
+  // Calculate arm segment lengths (8-head proportions)
+  const upperArmLength = proportions.armLength * 0.48;
+  const forearmLength = proportions.armLength * 0.44;
+  const handLength = proportions.armLength * 0.08;
+  
+  // Joint radii - natural proportions without bulging
+  const shoulderRadius = proportions.armThickness * 1.0;
+  const elbowRadius = proportions.armThickness * 0.85;
+  const wristRadius = proportions.armThickness * 0.55;
   
   return (
-    <group position={[xPos, 1.45, 0]} rotation={[0, 0, rotation]}>
-      {/* Shoulder joint sphere */}
+    <group position={[xPos, positions.shoulderLine, 0]} rotation={[0, 0, rotation]}>
+      {/* Shoulder joint - smooth blend */}
       <mesh position={[0, 0, 0]}>
-        <sphereGeometry args={[proportions.armThickness * 1.15, 16, 16]} />
-        <MannequinMaterial skinTone={skinTone} />
+        <sphereGeometry args={[shoulderRadius, 16, 16]} />
+        <SkinMaterial skinTone={skinTone} />
       </mesh>
       
       {/* Upper arm */}
       <mesh position={[0, -upperArmLength / 2, 0]}>
-        <cylinderGeometry args={[proportions.armThickness, proportions.armThickness * 0.88, upperArmLength, 20]} />
-        <MannequinMaterial skinTone={skinTone} />
+        <cylinderGeometry args={[proportions.armThickness, proportions.armThickness * 0.9, upperArmLength, 20]} />
+        <SkinMaterial skinTone={skinTone} />
       </mesh>
       
-      {/* Elbow joint sphere */}
+      {/* Elbow joint */}
       <mesh position={[0, -upperArmLength, 0]}>
-        <sphereGeometry args={[proportions.armThickness * 0.9, 12, 12]} />
-        <MannequinMaterial skinTone={skinTone} />
+        <sphereGeometry args={[elbowRadius, 12, 12]} />
+        <SkinMaterial skinTone={skinTone} />
       </mesh>
       
-      {/* Forearm */}
+      {/* Forearm - tapers to wrist */}
       <mesh position={[0, -upperArmLength - forearmLength / 2, 0]}>
-        <cylinderGeometry args={[proportions.armThickness * 0.85, proportions.armThickness * 0.65, forearmLength, 20]} />
-        <MannequinMaterial skinTone={skinTone} />
+        <cylinderGeometry args={[proportions.armThickness * 0.85, wristRadius, forearmLength, 20]} />
+        <SkinMaterial skinTone={skinTone} />
       </mesh>
       
-      {/* Hand (simplified) */}
-      <mesh position={[0, -upperArmLength - forearmLength - 0.02, 0]}>
-        <sphereGeometry args={[proportions.armThickness * 0.75, 12, 12]} />
-        <MannequinMaterial skinTone={skinTone} />
+      {/* Wrist/Hand - simplified */}
+      <mesh position={[0, -upperArmLength - forearmLength - handLength / 2, 0]}>
+        <capsuleGeometry args={[wristRadius * 0.9, handLength, 8, 12]} />
+        <SkinMaterial skinTone={skinTone} />
       </mesh>
     </group>
   );
 };
 
-// Leg component with proper hip attachment at Y=0.85
+// ============================================
+// LEG COMPONENT
+// ============================================
+// Legs = 50% of total height (4 head units)
+
 const Leg = ({ 
   side, 
   skinTone, 
-  proportions 
+  proportions,
+  positions,
 }: { 
   side: 'left' | 'right'; 
   skinTone: string; 
-  proportions: ReturnType<typeof getBodyProportions>;
+  proportions: MannequinProportions;
+  positions: ReturnType<typeof getScaledBodyPositions>;
 }) => {
-  const xPos = side === 'left' ? -0.09 : 0.09;
+  const sign = side === 'left' ? -1 : 1;
+  const xPos = sign * 0.085; // Leg spread
   
   // Calculate leg segment lengths
-  const thighLength = proportions.legLength * 0.50; // ~0.40
-  const calfLength = proportions.legLength * 0.45;  // ~0.36
+  const thighLength = proportions.legLength * 0.52; // Upper leg
+  const calfLength = proportions.legLength * 0.43;  // Lower leg
+  const footHeight = 0.06;
   
-  // Leg attaches at hip level (Y=0.85)
-  // Thigh goes from 0.85 down to ~0.45 (knee)
-  // Calf goes from 0.45 down to ~0.08 (ankle)
+  // Joint radii - anatomically proportioned
+  const hipRadius = proportions.legThickness * 1.0;
+  const kneeRadius = proportions.legThickness * 0.82;
+  const ankleRadius = proportions.legThickness * 0.45;
+  
+  // Leg starts at crotch line
+  const legTopY = positions.crotchLine;
   
   return (
-    <group position={[xPos, 0.85, 0]}>
+    <group position={[xPos, legTopY, 0]}>
       {/* Hip joint sphere */}
       <mesh position={[0, 0, 0]}>
-        <sphereGeometry args={[proportions.legThickness * 1.15, 16, 16]} />
-        <MannequinMaterial skinTone={skinTone} />
+        <sphereGeometry args={[hipRadius, 16, 16]} />
+        <SkinMaterial skinTone={skinTone} />
       </mesh>
       
-      {/* Thigh */}
+      {/* Thigh - tapers toward knee */}
       <mesh position={[0, -thighLength / 2, 0]}>
-        <cylinderGeometry args={[proportions.legThickness, proportions.legThickness * 0.85, thighLength, 24]} />
-        <MannequinMaterial skinTone={skinTone} />
+        <cylinderGeometry args={[proportions.legThickness, proportions.legThickness * 0.82, thighLength, 24]} />
+        <SkinMaterial skinTone={skinTone} />
       </mesh>
       
-      {/* Knee joint sphere */}
+      {/* Knee joint */}
       <mesh position={[0, -thighLength, 0]}>
-        <sphereGeometry args={[proportions.legThickness * 0.88, 12, 12]} />
-        <MannequinMaterial skinTone={skinTone} />
+        <sphereGeometry args={[kneeRadius, 12, 12]} />
+        <SkinMaterial skinTone={skinTone} />
       </mesh>
       
-      {/* Calf */}
+      {/* Calf - tapers toward ankle */}
       <mesh position={[0, -thighLength - calfLength / 2, 0]}>
-        <cylinderGeometry args={[proportions.legThickness * 0.78, proportions.legThickness * 0.50, calfLength, 24]} />
-        <MannequinMaterial skinTone={skinTone} />
+        <cylinderGeometry args={[proportions.legThickness * 0.75, ankleRadius, calfLength, 24]} />
+        <SkinMaterial skinTone={skinTone} />
       </mesh>
       
       {/* Ankle joint */}
       <mesh position={[0, -thighLength - calfLength, 0]}>
-        <sphereGeometry args={[proportions.legThickness * 0.45, 10, 10]} />
-        <MannequinMaterial skinTone={skinTone} />
+        <sphereGeometry args={[ankleRadius, 10, 10]} />
+        <SkinMaterial skinTone={skinTone} />
       </mesh>
       
-      {/* Foot */}
-      <mesh position={[0, -thighLength - calfLength - 0.02, 0.04]} rotation={[Math.PI / 2.2, 0, 0]}>
-        <capsuleGeometry args={[proportions.legThickness * 0.42, 0.12, 8, 16]} />
-        <MannequinMaterial skinTone={skinTone} />
+      {/* Foot - capsule shape */}
+      <mesh position={[0, -thighLength - calfLength - footHeight / 2, 0.035]} rotation={[Math.PI / 2.5, 0, 0]}>
+        <capsuleGeometry args={[proportions.legThickness * 0.4, 0.10, 8, 16]} />
+        <SkinMaterial skinTone={skinTone} />
       </mesh>
     </group>
   );
 };
 
+// ============================================
+// MAIN MANNEQUIN COMPONENT
+// ============================================
+
 export const Mannequin3D = ({ position = [0, 0, 0] }: MannequinProps) => {
   const groupRef = useRef<THREE.Group>(null);
-  const { avatarGender, avatarBodyType, avatarSkinTone, measurements, useDetailedMeasurements } = useTryOnState();
+  const { 
+    avatarGender, 
+    avatarBodyType, 
+    avatarSkinTone, 
+    measurements, 
+    useDetailedMeasurements 
+  } = useTryOnState();
   const reducedMotion = useReducedMotion();
   
+  // Get proportions from unified source
   const proportions = useMemo(
     () => getBodyProportions(avatarBodyType, avatarGender, measurements, useDetailedMeasurements),
     [avatarBodyType, avatarGender, measurements, useDetailedMeasurements]
   );
+  
+  // Get scaled body positions based on calculated height
+  const positions = useMemo(
+    () => getScaledBodyPositions(proportions.height),
+    [proportions.height]
+  );
 
-  // Calculate height scale (base height is 1.75m)
+  // Calculate height scale for uniform scaling
   const heightScale = useMemo(() => {
-    return proportions.height / 1.75;
+    return proportions.height / EIGHT_HEAD_SCALE.referenceHeight;
   }, [proportions.height]);
 
   // Subtle breathing animation (disabled for reduced motion)
@@ -382,36 +395,36 @@ export const Mannequin3D = ({ position = [0, 0, 0] }: MannequinProps) => {
     }
   });
 
-  // Y offset to keep feet on ground when scaled
+  // Position offset to keep feet on ground during scaling
   const yOffset = useMemo(() => {
-    return (heightScale - 1) * 0.85;
+    return (heightScale - 1) * EIGHT_HEAD_SCALE.crotchLine;
   }, [heightScale]);
 
   return (
     <group 
       ref={groupRef} 
       position={[position[0], position[1] + yOffset, position[2]]} 
-      scale={[1, heightScale, 1]}
+      scale={[heightScale * 0.97, heightScale, heightScale * 0.97]} // Proportional width scaling
     >
       {/* Head - top of figure */}
-      <Head skinTone={avatarSkinTone} />
+      <Head skinTone={avatarSkinTone} positions={positions} />
       
       {/* Neck - connects head to torso */}
-      <Neck skinTone={avatarSkinTone} proportions={proportions} />
+      <Neck skinTone={avatarSkinTone} proportions={proportions} positions={positions} />
       
-      {/* Torso - main body from shoulders to hips */}
-      <Torso skinTone={avatarSkinTone} proportions={proportions} />
+      {/* Torso - main body from hips to shoulders */}
+      <Torso skinTone={avatarSkinTone} proportions={proportions} positions={positions} />
       
       {/* Pelvis - hip region connecting torso to legs */}
-      <Pelvis skinTone={avatarSkinTone} proportions={proportions} />
+      <Pelvis skinTone={avatarSkinTone} proportions={proportions} positions={positions} />
       
       {/* Arms - attach at shoulder level */}
-      <Arm side="left" skinTone={avatarSkinTone} proportions={proportions} />
-      <Arm side="right" skinTone={avatarSkinTone} proportions={proportions} />
+      <Arm side="left" skinTone={avatarSkinTone} proportions={proportions} positions={positions} />
+      <Arm side="right" skinTone={avatarSkinTone} proportions={proportions} positions={positions} />
       
-      {/* Legs - attach at hip level */}
-      <Leg side="left" skinTone={avatarSkinTone} proportions={proportions} />
-      <Leg side="right" skinTone={avatarSkinTone} proportions={proportions} />
+      {/* Legs - attach at hip level, 50% of body height */}
+      <Leg side="left" skinTone={avatarSkinTone} proportions={proportions} positions={positions} />
+      <Leg side="right" skinTone={avatarSkinTone} proportions={proportions} positions={positions} />
     </group>
   );
 };

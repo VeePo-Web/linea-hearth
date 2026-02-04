@@ -107,7 +107,7 @@ export const TshirtGeometry = ({
   const sleeveLength = 0.13 * fitScale.sleeve;
 
   return (
-    <group position={[0, 1.22, 0]}>
+    <group position={[0, 1.15, 0]}>
       {/* Main body */}
       <mesh geometry={bodyGeometry}>
         {material}

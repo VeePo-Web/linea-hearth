@@ -34,6 +34,7 @@ export const BodyMeasurementsPanel = ({ className }: BodyMeasurementsPanelProps)
     setMeasurements,
     unitSystem,
     setUnitSystem,
+    setUseDetailedMeasurements,
   } = useTryOnState();
 
   const {
@@ -70,9 +71,10 @@ export const BodyMeasurementsPanel = ({ className }: BodyMeasurementsPanelProps)
     }
   }, [isLoaded, defaultProfile, activeProfile, setMeasurements, setAvatarGender, setActiveProfile]);
 
-  // Handle preset selection
+  // Handle preset selection - enables measurement mode
   const handlePresetSelect = (presetMeasurements: BodyMeasurements) => {
     setMeasurements(presetMeasurements);
+    setUseDetailedMeasurements(true); // Enable measurement-based proportions
     const presetId = Object.entries(quickPresets).find(
       ([_, preset]) => preset.measurements === presetMeasurements
     )?.[0];
@@ -80,10 +82,11 @@ export const BodyMeasurementsPanel = ({ className }: BodyMeasurementsPanelProps)
     setActiveProfile(null); // Clear active saved profile when using preset
   };
 
-  // Handle individual measurement change
+  // Handle individual measurement change - enables measurement mode
   const handleMeasurementChange = (key: keyof BodyMeasurements, value: number) => {
     if (!measurements) return;
     setMeasurements({ ...measurements, [key]: value });
+    setUseDetailedMeasurements(true); // Enable measurement-based proportions
     setSelectedPresetId(undefined); // Clear preset when manually adjusting
     setActiveProfile(null); // Clear active profile when manually adjusting
   };
@@ -99,12 +102,13 @@ export const BodyMeasurementsPanel = ({ className }: BodyMeasurementsPanelProps)
     }
   };
 
-  // Handle apply profile
+  // Handle apply profile - enables measurement mode
   const handleApplyProfile = (profileId: string) => {
     const profile = profiles.find(p => p.id === profileId);
     if (profile) {
       setMeasurements(profile.measurements);
       setAvatarGender(profile.gender);
+      setUseDetailedMeasurements(true); // Enable measurement-based proportions
       setActiveProfile(profileId);
       setSelectedPresetId(undefined);
       toast.success(`Applied "${profile.name}"`);
