@@ -48,7 +48,7 @@ export const ShortsGeometry = ({
   const { legLength, inseam } = lengthConfig;
 
   return (
-    <group position={[0, 0.85, 0]}>
+    <group position={[0, 0.875, 0]}>
       {/* Waistband */}
       <mesh position={[0, 0.02, 0]}>
         <cylinderGeometry args={[

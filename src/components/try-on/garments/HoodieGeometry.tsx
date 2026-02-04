@@ -104,7 +104,7 @@ export const HoodieGeometry = ({
   }, []);
 
   return (
-    <group position={[0, 1.20, 0]}>
+    <group position={[0, 1.15, 0]}>
       {/* Main body */}
       <mesh geometry={bodyGeometry}>
         {material}
