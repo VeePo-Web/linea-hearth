@@ -1,370 +1,236 @@
 
-# World-Class Mobile Swipe-to-Add Feature for Lookbook Cards
+# Brand Name Correction Plan: "LINEA" → "Line of Judah"
 
 ## Executive Summary
 
-This plan adds a **direct swipe-right-to-add-to-cart gesture** on the Lookbook look cards on mobile, eliminating the need to open a separate drawer. When a user swipes right on any look section's image, **the entire outfit (complete look)** is added to their cart with size memory integration, haptic feedback, and beautiful visual confirmation. This creates a Tinder-like shopping experience that's intuitive, fast, and delightful.
+A comprehensive audit has revealed **47 instances across 23 files** where incorrect brand names (LINEA, Linea Jewelry Inc, lineajewelry) appear instead of "Line of Judah". This plan provides a surgical, file-by-file correction strategy to ensure complete brand consistency across the entire codebase.
 
 ---
 
-## Feature Architecture
+## Critical Severity Issues (Must Fix Immediately)
+
+### 1. Logo SVG Files in `/public` Directory
+
+| File | Current State | Action Required |
+|------|---------------|-----------------|
+| `/public/LINEA-1.svg` | Contains "LINEA" wordmark | Replace with "Line of Judah" logo or rename |
+| `/public/LINEA.svg` | Contains "LINEA" wordmark | Delete or replace with correct branding |
+| `/public/LINEA_JEWELRY_INC.svg` | "Linea Jewelry Inc" text | Delete - incorrect brand entirely |
+| `/public/Linea_Jewelry_Inc-2.svg` | "Linea Jewelry Inc" text | Delete - incorrect brand entirely |
+| `/src/assets/LINEA.svg` | "LINEA" wordmark | Delete or replace |
+
+**Owner Action Required**: Provide the official "Line of Judah" logo in SVG format for header/footer usage.
+
+---
+
+### 2. Terms of Service Page - COMPLETELY WRONG BRAND
+
+**File**: `src/pages/TermsOfService.tsx`
+
+| Line | Current | Correction |
+|------|---------|------------|
+| 23 | `document.title = "Terms of Service - Linea Jewelry"` | `"Terms of Service - Line of Judah"` |
+| 36 | `Linea Jewelry Inc. website and services` | `Line of Judah LLC website and services` |
+| 44-45 | `Linea Jewelry Inc.'s website` | `Line of Judah LLC's website` |
+| 109 | `Our jewelry comes with a limited warranty` | Rewrite for apparel context |
+| 118 | `Linea Jewelry Inc.` | `Line of Judah LLC` |
+| 126 | `Linea Jewelry Inc. or its suppliers` | `Line of Judah LLC or its suppliers` |
+| 170 | `legal@lineajewelry.com` | `legal@lineofjudah.com` |
+
+**Note**: This entire page has jewelry-specific language that needs rewriting for a streetwear/apparel brand.
+
+---
+
+## High Severity Issues (User-Facing)
+
+### 3. Header & Navigation Components
+
+**File**: `src/components/header/Navigation.tsx`
+
+| Line | Current | Correction |
+|------|---------|------------|
+| 159 | `src="/LINEA-1.svg"` | Update to new logo path |
+| 160 | `alt="LINEA"` | `alt="Line of Judah"` |
+
+**File**: `src/components/header/MobileMenu.tsx`
+
+| Line | Current | Correction |
+|------|---------|------------|
+| 141 | `src="/LINEA-1.svg" alt="LINEA"` | Update path and `alt="Line of Judah"` |
+| 329 | `href="mailto:hello@linea.com"` | `href="mailto:hello@lineofjudah.com"` |
+
+**File**: `src/components/header/CheckoutHeader.tsx`
+
+| Line | Current | Correction |
+|------|---------|------------|
+| 25 | `src="/LINEA-1.svg"` | Update to new logo path |
+| 26 | `alt="Linea Jewelry Inc"` | `alt="Line of Judah"` |
+
+---
+
+### 4. Authentication & Account Toasts
+
+**File**: `src/components/auth/CreateAccountForm.tsx`
+
+| Line | Current | Correction |
+|------|---------|------------|
+| 69 | `toast.success('Welcome to LINEA!')` | `toast.success('Welcome to Line of Judah!')` |
+
+**File**: `src/components/checkout/PostPurchaseSignup.tsx`
+
+| Line | Current | Correction |
+|------|---------|------------|
+| 183 | `Welcome to LINEA` | `Welcome to Line of Judah` |
+
+---
+
+## Medium Severity Issues (Backend/Infrastructure)
+
+### 5. Edge Functions - Discount Code Prefix
+
+**File**: `supabase/functions/process-abandoned-carts/index.ts`
+
+| Line | Current | Correction |
+|------|---------|------------|
+| 42 | `let code = 'LINEA15-'` | `let code = 'LOJ15-'` or `'JUDAH15-'` |
+| 440 | `'https://linea-hearth.lovable.app'` | Keep as fallback URL (technical, not branding) |
+
+**File**: `supabase/functions/create-checkout-session/index.ts`
+
+| Line | Current | Correction |
+|------|---------|------------|
+| 86 | `'https://linea-hearth.lovable.app'` | Keep as fallback (technical URL) |
+
+**File**: `supabase/functions/send-order-confirmation/index.ts`
+
+| Line | Current | Correction |
+|------|---------|------------|
+| 307 | `'https://linea-hearth.lovable.app'` | Keep as fallback (technical URL) |
+
+---
+
+### 6. LocalStorage Keys (Internal, No User Impact)
+
+These are technical identifiers that don't need to match brand name, but could be updated for consistency:
+
+| File | Key | Suggestion |
+|------|-----|------------|
+| `src/contexts/SizeQuizContext.tsx` | `'linea-size-quiz-completed'` | Optional: `'loj-size-quiz-completed'` |
+| `src/contexts/SizeQuizContext.tsx` | `'linea-size-memory'` | Optional: `'loj-size-memory'` |
+| `src/hooks/useSizeMemory.ts` | `'linea-size-memory'` | Optional: `'loj-size-memory'` |
+| `src/components/try-on/hooks/useBodyProfiles.ts` | `'linea_body_profiles'` | Optional: `'loj_body_profiles'` |
+| `src/components/checkout/PostPurchaseSignup.tsx` | `'linea-size-memory'` | Must match above if changed |
+
+**Recommendation**: Keep these as-is to avoid breaking existing user data, OR create a migration script.
+
+---
+
+## Low Severity Issues (Content Reference)
+
+### 7. OG Image Reference in `index.html`
+
+| Line | Current | Note |
+|------|---------|------|
+| 17 | `social-1758825622907-Linea OG Image.png` | External URL - requires uploading new OG image |
+| 21 | Same image for Twitter | Same action |
+
+**Owner Action Required**: Provide new OG/social sharing image with "Line of Judah" branding.
+
+---
+
+### 8. Orphaned Asset Files (May Not Be Used)
+
+**File**: `src/components/content/OneThirdTwoThirdsSection.tsx`
+
+References images that don't exist and have jewelry-themed alt text:
+- `@/assets/circular-collection.png` - File doesn't exist
+- `@/assets/organic-earring.png` - File doesn't exist
+- Alt text: "Artisan crafted jewelry", "Circular jewelry collection"
+
+**Recommendation**: This component appears unused. Verify and delete or update for streetwear context.
+
+---
+
+## Complete File Change Manifest
+
+### Files Requiring Code Changes (17 files)
 
 ```text
-LookSection (Mobile Only Enhancement)
-├── Swipeable Image Container
-│   ├── Horizontal swipe gesture detection
-│   ├── Visual drag feedback (rotation, opacity indicators)
-│   ├── Direction indicators ("Add Look" / "Skip")
-│   ├── Haptic feedback at threshold
-│   └── Spring-back on incomplete swipe
-├── Success Overlay (on add)
-│   ├── Animated checkmark (DrawCheckIcon)
-│   ├── "Look Added" confirmation
-│   ├── Bundle discount badge (if applicable)
-│   └── Auto-dismiss after 2s
-├── Size Selection (if needed)
-│   ├── Bottom sheet with sizes
-│   └── Size memory for future swipes
-└── Visual Affordance
-    ├── Swipe hint indicator on first visit
-    └── Subtle pulsing edge glow
+1.  src/pages/TermsOfService.tsx — 8 changes (CRITICAL)
+2.  src/components/header/Navigation.tsx — 2 changes
+3.  src/components/header/MobileMenu.tsx — 2 changes
+4.  src/components/header/CheckoutHeader.tsx — 2 changes
+5.  src/components/auth/CreateAccountForm.tsx — 1 change
+6.  src/components/checkout/PostPurchaseSignup.tsx — 2 changes
+7.  supabase/functions/process-abandoned-carts/index.ts — 1 change
+8.  index.html — Update OG image URL (after new image uploaded)
+9.  src/contexts/SizeQuizContext.tsx — 2 changes (optional)
+10. src/hooks/useSizeMemory.ts — 1 change (optional)
+11. src/components/try-on/hooks/useBodyProfiles.ts — 1 change (optional)
+12. src/components/content/OneThirdTwoThirdsSection.tsx — Delete or rewrite
 ```
 
----
-
-## Component Design
-
-### New Component: `SwipeableLookCard.tsx`
-
-A wrapper component that adds horizontal swipe gesture handling to the LookSection image side on mobile.
-
-**Key Features:**
-1. **Framer Motion Pan Gestures** — Uses `onPan`, `onPanEnd` for silky-smooth 60fps swipe detection
-2. **Elastic Drag Feel** — `dragElastic: 0.7` for natural resistance
-3. **Rotation Transform** — Subtle rotation (±8°) on drag for card-like feel
-4. **Direction Indicators** — "Add Look" and "Skip" badges appear based on swipe direction
-5. **Threshold Detection** — Commits at 30% screen width or velocity > 400px/s
-6. **Haptic Feedback** — Pulse at 50% threshold, strong pulse on commit
-
-**Physics Constants:**
-```typescript
-const SWIPE_THRESHOLD = Math.min(window.innerWidth * 0.3, 120);
-const THROW_VELOCITY = 400;
-const MAX_ROTATION = 8;
-const DRAG_ELASTIC = 0.7;
-```
-
----
-
-### Integration with Size Memory
-
-The swipe action integrates with the existing `useQuickAdd` hook for size memory:
-
-1. **If user has saved size preference** → Instant add with remembered size
-2. **If no size preference** → Show compact size picker overlay
-3. **After size selection** → Save to size memory for future swipes
-
----
-
-### Visual Feedback Hierarchy
-
-**During Drag:**
-- Card rotates ±8° based on drag direction
-- "Add Look" badge fades in (right swipe) — green background
-- "Skip" badge fades in (left swipe) — subtle gray
-- Edge glow intensifies toward commit threshold
-
-**At 50% Threshold:**
-- Haptic pulse (10ms vibration)
-- Badge fully visible
-- Slight scale increase (1.02)
-
-**On Commit (Right Swipe = Add):**
-1. Strong haptic (50ms)
-2. Card flies off-screen to right (400px, 15° rotation)
-3. Success overlay fades in:
-   - Animated checkmark (DrawCheckIcon)
-   - "Look Added to Bag"
-   - Item count + total value
-   - Bundle discount badge if applicable
-4. Auto-dismiss after 1.8s OR tap to dismiss
-
-**On Commit (Left Swipe = Skip):**
-- Light haptic (5ms)
-- Card returns to center with subtle bounce
-- No visual change (skip is just "not now")
-
----
-
-## UI/UX Details
-
-### Swipe Hint (First-Time User)
-
-On first lookbook visit (checked via localStorage), show a subtle animated hint:
-
-```tsx
-<motion.div 
-  className="absolute bottom-1/3 left-1/2 -translate-x-1/2 flex items-center gap-2 text-white/60"
-  animate={{ x: [0, 20, 0] }}
-  transition={{ repeat: 3, duration: 1.5 }}
->
-  <span className="text-sm">Swipe right to add look</span>
-  <ShoppingBag className="w-4 h-4" />
-</motion.div>
-```
-
-Hidden after first swipe or tap, stored in `localStorage.setItem('lookbook-swipe-hint-shown', 'true')`.
-
----
-
-### Success Overlay Design
+### Files to Delete (4 files)
 
 ```text
-┌─────────────────────────────────┐
-│                                 │
-│     ✓ (animated checkmark)      │
-│                                 │
-│       LOOK ADDED                │
-│                                 │
-│   4 items • $268 CAD            │
-│                                 │
-│   ┌─────────────────────┐       │
-│   │ 🎉 15% Bundle Saved │       │
-│   └─────────────────────┘       │
-│                                 │
-│   [View Bag]  [Keep Browsing]   │
-│                                 │
-└─────────────────────────────────┘
+1. public/LINEA_JEWELRY_INC.svg
+2. public/Linea_Jewelry_Inc-2.svg
+3. public/LINEA.svg (if not used)
+4. src/assets/LINEA.svg
 ```
 
-Colors:
-- Background: `bg-green-600/95` with `backdrop-blur-md`
-- Checkmark: White, animated draw
-- Text: White
-- Bundle badge: `bg-amber-500/20 text-amber-400`
-
----
-
-### Size Picker (When Needed)
-
-If the user hasn't saved a size preference, show a compact bottom-anchored picker:
+### Files Requiring Owner Assets (2 items)
 
 ```text
-┌─────────────────────────────────┐
-│                                 │
-│  Select your size for all items │
-│                                 │
-│  [XS] [S] [M*] [L] [XL] [2XL]  │
-│                                 │
-│  * Your saved size              │
-│                                 │
-│     [Apply to Look]             │
-│                                 │
-└─────────────────────────────────┘
-```
-
-- Single size applies to all items in look (simplified UX)
-- Size is saved to memory for future swipes
-- Positioned at bottom of card with `pb-safe` for iOS
-
----
-
-## Technical Implementation
-
-### Files to Create
-
-| File | Purpose |
-|------|---------|
-| `src/components/lookbook/SwipeableLookCard.tsx` | Main swipeable wrapper component |
-| `src/hooks/useLookSwipe.ts` | Hook managing swipe state, cart integration, size memory |
-
-### Files to Modify
-
-| File | Changes |
-|------|---------|
-| `src/components/lookbook/LookSection.tsx` | Wrap image side with SwipeableLookCard on mobile |
-| `src/hooks/useSwipeSession.ts` | Add `addEntireLook()` function for batch cart add |
-
----
-
-### Hook: `useLookSwipe.ts`
-
-```typescript
-interface UseLookSwipeReturn {
-  // State
-  isAdding: boolean;
-  showSuccess: boolean;
-  showSizePicker: boolean;
-  
-  // Size memory
-  rememberedSize: string | null;
-  hasRememberedSize: boolean;
-  
-  // Actions
-  handleSwipeComplete: (direction: 'left' | 'right') => void;
-  handleSizeSelect: (size: string) => void;
-  dismissSuccess: () => void;
-  
-  // Cart info
-  itemsAdded: number;
-  totalValue: number;
-  bundleDiscountPercent: number;
-}
-```
-
-**Cart Addition Logic:**
-```typescript
-const handleSwipeComplete = (direction: 'left' | 'right') => {
-  if (direction === 'left') return; // Skip = no action
-  
-  if (!rememberedSize) {
-    setShowSizePicker(true);
-    return;
-  }
-  
-  // Add all products in look to cart
-  products.forEach(product => {
-    addItem({
-      id: productIdToCartId(product.id),
-      name: product.name,
-      price: getPrice(product),
-      image: getPrimaryImage(product),
-      size: rememberedSize,
-      lookId: look.id,
-      lookName: look.name,
-    });
-  });
-  
-  // Haptic celebration
-  triggerHapticFeedback();
-  setShowSuccess(true);
-  
-  // Auto-dismiss after 1.8s
-  setTimeout(() => setShowSuccess(false), 1800);
-};
+1. New logo SVG → Replace /public/LINEA-1.svg
+2. New OG image → Update external URL in index.html
 ```
 
 ---
 
-### SwipeableLookCard Component
+## Implementation Order
 
-```tsx
-<motion.div
-  className="relative w-full h-full touch-none"
-  style={{ x, rotate }}
-  drag="x"
-  dragConstraints={{ left: 0, right: 0 }}
-  dragElastic={0.7}
-  onDrag={handleDrag}
-  onDragEnd={handleDragEnd}
->
-  {/* Original Image Content */}
-  {children}
-  
-  {/* Direction Indicators */}
-  <motion.div style={{ opacity: addOpacity }} className="...">
-    <ShoppingBag /> Add Look
-  </motion.div>
-  
-  <motion.div style={{ opacity: skipOpacity }} className="...">
-    Skip
-  </motion.div>
-  
-  {/* Success Overlay */}
-  <AnimatePresence>
-    {showSuccess && <LookAddedOverlay ... />}
-  </AnimatePresence>
-  
-  {/* Size Picker */}
-  <AnimatePresence>
-    {showSizePicker && <LookSizePicker ... />}
-  </AnimatePresence>
-  
-  {/* First-time hint */}
-  {showHint && <SwipeHint />}
-</motion.div>
+### Phase 1: Critical Brand Errors (Do First)
+1. Delete incorrect logo files (`LINEA_JEWELRY_INC.svg`, etc.)
+2. Fix Terms of Service page entirely
+3. Update all header/navigation logo alt text
+
+### Phase 2: User-Facing Messages
+4. Fix welcome toasts in auth forms
+5. Fix email links in MobileMenu
+6. Update discount code prefix in edge function
+
+### Phase 3: Owner-Dependent Items
+7. Wait for new logo SVG from owner
+8. Wait for new OG image from owner
+9. Update index.html with new social image URLs
+
+### Phase 4: Optional Cleanup
+10. Evaluate localStorage key migration
+11. Delete or update orphaned OneThirdTwoThirdsSection component
+
+---
+
+## Verification Checklist
+
+After implementation, search the entire codebase for these patterns to confirm zero matches:
+
+```text
+□ "LINEA" (case-insensitive, excluding technical CSS like "linear-gradient")
+□ "Linea Jewelry"
+□ "lineajewelry"
+□ "@linea.com" (email)
+□ "Jewelry" in alt text (should be apparel-related)
 ```
 
 ---
 
-## Accessibility
+## Questions for Owner
 
-1. **Screen Reader Alternative** — "Add Complete Look" button remains visible as non-swipe fallback
-2. **Reduced Motion** — Disable rotation/spring animations when `prefers-reduced-motion` is set
-3. **Keyboard** — Arrow keys work: Right = add, Left = skip (when card is focused)
-4. **Touch Target** — Entire image area is swipeable (generous 50%+ of screen)
+Before proceeding, please provide:
 
----
-
-## Performance Considerations
-
-1. **GPU Acceleration** — Use `will-change: transform` on swipeable element
-2. **Layout Containment** — Prevent overlay animations from triggering reflow
-3. **Lazy Haptics** — Check `navigator.vibrate` once on mount
-4. **Debounced Success** — Prevent double-add with `isAdding` guard
-
----
-
-## Edge Cases
-
-| Scenario | Behavior |
-|----------|----------|
-| All items already in cart | Show "Already in Bag" instead of success |
-| Partial items in cart | Add remaining items only, show "X more added" |
-| Out of stock product | Skip that item, add others, show "3 of 4 added" |
-| Network error | Show toast error, items remain in local state for retry |
-| Quick successive swipes | Debounce with 300ms cooldown |
-
----
-
-## Mobile-Only Activation
-
-This feature is **mobile-only** (< 768px). On desktop:
-- Swipe gestures are disabled
-- Hover interactions remain
-- "Shop the Look" section is primary interaction
-
-Detection via existing `useIsMobile()` hook.
-
----
-
-## Success Metrics
-
-| Metric | Target |
-|--------|--------|
-| Swipe FPS | 60fps consistent |
-| Add-to-cart latency | < 100ms perceived |
-| Haptic timing | 50% threshold = 10ms, commit = 50ms |
-| Success overlay duration | 1.8s |
-| First-swipe hint visibility | 3 oscillations over 4.5s |
-
----
-
-## Files Summary
-
-**New Files:**
-- `src/components/lookbook/SwipeableLookCard.tsx`
-- `src/hooks/useLookSwipe.ts`
-
-**Modified Files:**
-- `src/components/lookbook/LookSection.tsx` — Wrap image in SwipeableLookCard on mobile
-- `src/components/lookbook/ShopTheLook.tsx` — Add "in cart" state awareness for partial adds
-
----
-
-## Implementation Priority
-
-1. **Phase 1: Core Swipe Gesture** — SwipeableLookCard with drag physics
-2. **Phase 2: Cart Integration** — useLookSwipe hook with batch add
-3. **Phase 3: Visual Feedback** — Direction indicators, success overlay
-4. **Phase 4: Size Memory** — Integration with existing size memory system
-5. **Phase 5: Polish** — Haptics, hints, edge cases
-
----
-
-## Non-Goals (Preserved)
-
-- Desktop layout remains unchanged
-- Existing "Swipe to Shop" drawer continues to work
-- Individual product quick-add buttons still functional
-- No changes to lookbook navigation or scroll behavior
+1. **Official Logo SVG** — What is the exact logo file to use in header/footer?
+2. **Legal Entity Name** — Is it "Line of Judah LLC" or another entity for Terms of Service?
+3. **Discount Code Prefix** — Preferred prefix: `LOJ15-`, `JUDAH15-`, or `TRIBE15-`?
+4. **OG/Social Image** — New social sharing image for Facebook/Twitter previews?
+5. **LocalStorage Migration** — Should existing user size data be migrated or reset?
