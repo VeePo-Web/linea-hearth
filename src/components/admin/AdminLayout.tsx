@@ -36,7 +36,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
       <header className="h-14 border-b border-border bg-card px-6 flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Link to="/" className="text-sm font-medium tracking-wider text-foreground">
-            LINEA
+            LOJ
           </Link>
           <ChevronRight className="h-4 w-4 text-muted-foreground" />
           <span className="text-sm text-muted-foreground">Admin</span>

@@ -156,8 +156,8 @@ const Navigation = () => {
         <div className="absolute left-1/2 transform -translate-x-1/2">
           <Link to="/" className="block">
             <motion.img 
-              src="/LINEA-1.svg" 
-              alt="Line of Judah" 
+              src="/logo.svg" 
+              alt="Line of Judah"
               className="h-6 w-auto"
               whileHover={{ scale: 1.02 }}
               transition={{ type: "spring" as const, stiffness: 400, damping: 25 }}
