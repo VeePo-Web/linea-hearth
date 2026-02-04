@@ -10,7 +10,7 @@ const FeaturedDrop = () => {
   const prefersReducedMotion = useReducedMotion();
 
   return (
-    <section className="relative w-full featured-drop-height bg-foreground overflow-hidden">
+    <section className="relative w-full featured-drop-height max-h-[90dvh] md:max-h-none bg-foreground overflow-hidden">
       {/* Full-bleed Background Image */}
       <motion.div
         className="absolute inset-0"

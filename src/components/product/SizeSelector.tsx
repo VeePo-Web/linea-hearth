@@ -161,7 +161,7 @@ const SizeSelector = ({
         </Dialog>
       </div>
 
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-3 md:gap-2">
         {sizes.map(({ size, stock }) => {
           const state = getSizeState(stock);
           const isSelected = selectedSize === size;

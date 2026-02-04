@@ -265,18 +265,24 @@ const ProductImageGallery = ({ images, selectedColor }: ProductImageGalleryProps
             </AnimatePresence>
           </div>
           
-          {/* Tap to zoom hint */}
+          {/* Tap to zoom hint - auto-fade after 3 seconds */}
           <motion.div 
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.8, duration: 0.4 }}
-            className="absolute bottom-4 left-1/2 -translate-x-1/2 text-xs font-light text-muted-foreground/80 bg-background/80 backdrop-blur-sm px-3 py-1"
+            className="absolute top-4 left-1/2 -translate-x-1/2 text-xs font-light text-muted-foreground/80 bg-background/80 backdrop-blur-sm px-3 py-1.5"
           >
-            Tap to zoom
+            <motion.span
+              initial={{ opacity: 1 }}
+              animate={{ opacity: 0 }}
+              transition={{ delay: 3, duration: 0.5 }}
+            >
+              Tap to zoom
+            </motion.span>
           </motion.div>
           
-          {/* Dots indicator with spring animation */}
-          <div className="flex justify-center mt-4 gap-2">
+          {/* Dots indicator with touch-friendly targets */}
+          <div className="flex justify-center mt-4 gap-3">
             {sortedImages.map((_, index) => (
               <motion.button
                 key={index}
@@ -284,11 +290,9 @@ const ProductImageGallery = ({ images, selectedColor }: ProductImageGalleryProps
                   setSwipeDirection(index > currentImageIndex ? 1 : -1);
                   setCurrentImageIndex(index);
                 }}
-                className={`w-2 h-2 rounded-full ${
-                  index === currentImageIndex ? 'bg-foreground' : 'bg-muted-foreground/30'
-                }`}
+                className="w-8 h-8 flex items-center justify-center p-0"
                 animate={{
-                  scale: index === currentImageIndex ? 1.3 : 1,
+                  scale: index === currentImageIndex ? 1.1 : 1,
                 }}
                 transition={{
                   type: "spring",
@@ -296,7 +300,11 @@ const ProductImageGallery = ({ images, selectedColor }: ProductImageGalleryProps
                   damping: 20,
                 }}
                 aria-label={`View image ${index + 1}`}
-              />
+              >
+                <span className={`w-2 h-2 rounded-full transition-colors ${
+                  index === currentImageIndex ? 'bg-foreground' : 'bg-muted-foreground/30'
+                }`} />
+              </motion.button>
             ))}
           </div>
         </div>

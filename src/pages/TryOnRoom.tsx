@@ -169,7 +169,7 @@ const TryOnRoomContent = () => {
       {/* Main Content */}
       <div className="flex-1 flex flex-col md:flex-row">
         {/* 3D Canvas - Full width on mobile, 60% on desktop */}
-        <div className="flex-1 h-[50vh] md:h-[calc(100vh-200px)] relative bg-gradient-to-b from-muted/30 to-muted/10">
+        <div className="flex-1 h-[50dvh] md:h-[calc(100dvh-200px)] relative bg-gradient-to-b from-muted/30 to-muted/10">
           <TryOnCanvas className="w-full h-full" />
         </div>
 

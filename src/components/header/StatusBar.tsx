@@ -56,20 +56,19 @@ const StatusBar = () => {
           </motion.div>
         </AnimatePresence>
         
-        {/* Progress dots */}
+        {/* Progress dots - Hidden on mobile (too small for touch), visible on desktop */}
         <div 
-          className="absolute right-4 flex gap-1.5" 
+          className="absolute right-4 hidden md:flex gap-1.5" 
           role="tablist" 
           aria-label="Value propositions"
         >
           {usps.map((usp, index) => (
             <motion.button
               key={index}
-              className="w-1 h-1 rounded-full bg-status-bar-foreground p-0 border-0"
+              className="w-6 h-6 flex items-center justify-center p-0 border-0"
               initial={false}
               animate={{
-                opacity: index === currentIndex ? 1 : 0.3,
-                scale: index === currentIndex ? 1.2 : 1,
+                opacity: index === currentIndex ? 1 : 0.5,
               }}
               transition={{ duration: 0.2 }}
               role="tab"
@@ -77,7 +76,13 @@ const StatusBar = () => {
               aria-label={usp.text}
               onClick={() => setCurrentIndex(index)}
               tabIndex={index === currentIndex ? 0 : -1}
-            />
+            >
+              <span 
+                className={`w-1.5 h-1.5 rounded-full bg-status-bar-foreground transition-transform ${
+                  index === currentIndex ? 'scale-125' : 'scale-100'
+                }`}
+              />
+            </motion.button>
           ))}
         </div>
       </div>

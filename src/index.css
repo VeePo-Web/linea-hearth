@@ -472,6 +472,12 @@
     outline-offset: 2px;
   }
 
+  /* Scroll margin for focused elements under fixed header */
+  *:focus {
+    scroll-margin-top: calc(var(--header-height) + 1rem);
+    scroll-margin-bottom: 5rem;
+  }
+
   /* Skip Link for Accessibility */
   .skip-link {
     position: absolute;
@@ -481,6 +487,7 @@
     background: hsl(var(--background));
     color: hsl(var(--foreground));
     text-decoration: none;
+    border: 2px solid hsl(var(--foreground));
   }
 
   .skip-link:focus {
