@@ -1,224 +1,285 @@
 
 
-# Forensic Audit: TEMU-Tier Conversion Engineering Stress Test
+# Try-On Room Comprehensive Fix & Enhancement Plan
 
 ## Executive Summary
 
-After a comprehensive forensic audit of the Line of Judah e-commerce codebase, the conversion engineering infrastructure is **production-ready and functioning at 98%+ capacity**. The core conversion machinery — Size Memory, Quick Add, Bundle Discounts, Threshold Upsells, Abandoned Cart Recovery — is all properly implemented and integrated.
-
-**Overall Health Score: 97/100** ✅
+After a forensic audit of the Try-On Room implementation, the core 3D infrastructure is **functional** with high-fidelity garment geometries, texture projection, and body measurement systems in place. However, several issues require attention to achieve a world-class virtual try-on experience.
 
 ---
 
-## VERIFIED WORKING SYSTEMS
+## Current State Assessment
 
-### ✅ Pillar 1: Size Memory System
-- **localStorage Key**: `loj-size-memory` (migrated successfully)
-- **Database Table**: `user_size_preferences` with proper schema (tops_size, bottoms_size, hats_size + timestamps)
-- **RLS Policies**: Properly configured for user-scoped access
-- **Cross-Session Sync**: Bidirectional merge with "most recent wins" logic
-- **Confidence Scoring**: `size_confidence_stats` view in place
-- **Status**: FULLY OPERATIONAL ✅
+### Working Components
+- 3D Canvas rendering with React Three Fiber
+- Mannequin3D with body proportion scaling
+- Garment geometries: Hoodie, Crewneck, T-shirt, Tank, Jacket, Pants, Shorts, Beanie, Sneaker
+- Shoulder junction system with Bezier curves
+- Front-projection UV mapping for textures
+- Fabric material presets (cotton, fleece, denim, leather, knit)
+- Body measurements panel with quick presets
+- Size recommendation engine
+- Mobile bottom bar and desktop sidebar
+- Save/Share outfit functionality
 
-### ✅ Pillar 2: One-Tap Quick Add Infrastructure
-- **Universal Hook**: `useQuickAdd.ts` (435 lines of comprehensive logic)
-- **Integration Points**: ProductCard, ShopTheLook, SwipeLookbook, SearchQuickAdd, FavoritesDrawer
-- **Features Working**:
-  - Size memory integration
-  - Stock-aware fallback (nearest size)
-  - Haptic feedback (50ms vibration)
-  - Size Quiz integration for first-time users
-  - Inline size picker with out-of-stock handling
-- **Status**: FULLY OPERATIONAL ✅
+### Identified Issues
 
-### ✅ Pillar 3: Bundle Discount Engine
-- **Database Records**: 2 active bundle rules configured
-  - "Complete Look 10%": 2+ items from same lookbook
-  - "Full Outfit 15%": 4+ items from same lookbook
-- **Hook**: `useBundleDiscounts.ts` with missing product suggestions
-- **Cart Integration**: `lookId` and `lookName` tracked on cart items
-- **Server Validation**: `create-checkout-session` validates bundle claims
-- **Status**: FULLY OPERATIONAL ✅
-
-### ✅ Pillar 4: Cart Drawer Conversion
-- **Email Capture**: Contextual trigger at 2+ items or scroll-to-bottom
-- **Free Shipping Bar**: Gamified progress with tier messaging
-- **Threshold Upsells**: Smart product matching via `useThresholdUpsells.ts`
-- **Save For Later Shelf**: `useSavedForLater.ts` with localStorage + database hybrid
-- **Status**: FULLY OPERATIONAL ✅
-
-### ✅ Pillar 5: Behavioral Tracking
-- **Hook**: `useBehaviorTracking.ts` with session-based tracking
-- **Signals Tracked**: view_count, total_time_ms, zoom_count, add_remove_count
-- **High Intent Definition**: 3+ views OR 30+ seconds OR zoom interaction
-- **Database Table**: `user_behavior_signals` with proper RLS
-- **Status**: FULLY OPERATIONAL ✅
-
-### ✅ Pillar 6: Abandoned Cart Recovery
-- **Hook**: `useAbandonedCart.ts` with localStorage persistence
-- **Edge Function**: `sync-abandoned-cart` for server-side tracking
-- **Recovery Route**: `/recover-cart?token=...` implemented
-- **Email Flow**: `process-abandoned-carts` with `LOJ15-` discount prefix
-- **Status**: FULLY OPERATIONAL ✅
-
-### ✅ Pillar 7: Lookbook-to-Cart Conversion
-- **Swipe Interface**: `SwipeLookbook.tsx` with Tinder-like gestures
-- **Bundle Preview**: Shows discounted totals with percentage off
-- **Running Total**: Sticky footer with item count and cumulative price
-- **Completion Celebration**: Haptic feedback pattern on finish
-- **Status**: FULLY OPERATIONAL ✅
+| Priority | Issue | Impact |
+|----------|-------|--------|
+| Critical | WebGL context loss on prolonged use | 3D view crashes |
+| High | ProductDrawer fetches all products instead of filtering by slot | Wrong products shown |
+| High | saved_outfits table may not exist | Save Look fails |
+| Medium | Material created multiple times per garment | Performance |
+| Medium | Dialog accessibility warning | WCAG compliance |
+| Low | Haptic feedback blocked initially | Minor UX |
 
 ---
 
-## IDENTIFIED ISSUES (MINOR)
+## Phase 1: Critical Bug Fixes
 
-### Issue 1: Remaining "LINEA" Brand References (Low Severity)
-**Files Affected:**
-- `src/components/header/Navigation.tsx` (line 159): `/LINEA-1.svg`
-- `src/components/header/MobileMenu.tsx` (line 141): `/LINEA-1.svg`
-- `src/components/header/CheckoutHeader.tsx` (line 25): `/LINEA-1.svg`
-- `src/components/admin/AdminLayout.tsx` (line 39): Text "LINEA"
-- `src/lib/currency.ts` (line 3): Comment "for LINEA"
-- `src/components/try-on/SaveLookModal.tsx` (line 87): Text "from LINEA!"
+### 1.1 WebGL Context Loss Prevention
 
-**Impact:** Visual brand inconsistency only. Conversion machinery unaffected.
+**File:** `src/components/try-on/TryOnCanvas.tsx`
 
-**Fix Required:** Replace logo SVG path and update text references to "Line of Judah" or "LOJ"
+**Issue:** Console shows `THREE.WebGLRenderer: Context Lost` indicating memory pressure from too many textures or geometries not being disposed.
 
----
+**Solution:**
+- Add proper cleanup in useEffect for texture disposal
+- Implement geometry caching to prevent recreation on every render
+- Add WebGL context loss/restore event handlers
+- Reduce shadow map resolution on mobile devices
 
-### Issue 2: Edge Function Fallback URLs Use Old Domain (Low Severity)
-**Files Affected:**
-- `supabase/functions/create-checkout-session/index.ts` (line 86)
-- `supabase/functions/process-abandoned-carts/index.ts` (line 440)
-- `supabase/functions/send-order-confirmation/index.ts` (line 307)
-
-**Current:** `"https://linea-hearth.lovable.app"`
-
-**Impact:** Only affects fallback when `SITE_URL` env var is not set. Production uses correct domain.
-
----
-
-### Issue 3: TODO in Returns/Exchanges Page (Low Severity)
-**File:** `src/pages/ReturnsExchanges.tsx` (line 76)
-```typescript
-// TODO: Implement return flow
+```text
+Changes:
+1. Add onContextLost/onContextRestored handlers to Canvas
+2. Implement texture caching in useGarmentTexture hook
+3. Add useMemo for geometry creation to prevent recreation
+4. Reduce dpr on mobile: dpr={[1, 1.5]}
 ```
 
-**Impact:** Return initiation button logs to console but doesn't actually process returns.
+### 1.2 Fix ProductDrawer Category Filtering
+
+**File:** `src/components/try-on/ProductDrawer.tsx`
+
+**Issue:** Query fetches all products regardless of slot, showing wrong items (e.g., hoodies in "Footwear" slot).
+
+**Solution:**
+- Use the existing `slotToCategoryMap` to filter by product category
+- Join with `categories` table to match slot to product category
+
+```text
+Changes:
+1. Modify Supabase query to filter by category based on slot
+2. Add .eq('categories.slug', slotCategories) filter
+3. Handle case when no products match category
+```
+
+### 1.3 Create saved_outfits Table
+
+**Database Migration Required**
+
+The SaveLookModal uses `saved_outfits` table which may not exist.
+
+```sql
+CREATE TABLE IF NOT EXISTS public.saved_outfits (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID REFERENCES auth.users(id),
+  name TEXT NOT NULL,
+  share_id TEXT UNIQUE NOT NULL,
+  avatar_gender TEXT NOT NULL,
+  avatar_body_type TEXT NOT NULL,
+  equipped_items JSONB NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- Enable RLS
+ALTER TABLE public.saved_outfits ENABLE ROW LEVEL SECURITY;
+
+-- Policies: Anyone can read shared outfits, only owner can write
+CREATE POLICY "Anyone can read saved outfits"
+  ON public.saved_outfits FOR SELECT
+  USING (true);
+
+CREATE POLICY "Users can insert own outfits"
+  ON public.saved_outfits FOR INSERT
+  WITH CHECK (auth.uid() = user_id OR user_id IS NULL);
+```
 
 ---
 
-### Issue 4: Limited Product Data for Testing (Development Only)
-**Current State:** Only 2 active products in database
+## Phase 2: Performance Optimization
 
-**Impact:** Bundle discounts and threshold upsells may not fully exercise all code paths in production-like scenarios.
+### 2.1 Texture Caching System
 
----
+**File:** `src/components/try-on/hooks/useGarmentTexture.tsx`
 
-## STRESS TEST RESULTS
+**Issue:** Textures are loaded fresh on every component mount, causing memory pressure and repeated network requests.
 
-### localStorage Migration
-| Test Case | Result |
-|-----------|--------|
-| Fresh user (no localStorage) | ✅ No migration runs |
-| Existing `linea-*` keys | ✅ Migrated to `loj-*` |
-| Both old and new keys exist | ✅ Conflict resolved, newest wins |
-| Corrupted JSON | ✅ Error logged, continues |
-| Rollback available | ✅ `window.__LOJ_ROLLBACK_MIGRATION()` |
+**Solution:**
+- Implement a global texture cache Map
+- Check cache before loading
+- Dispose textures when component unmounts AND no other components use them
+- Add reference counting
 
-### Cart Persistence
-| Test Case | Result |
-|-----------|--------|
-| Add item to cart | ✅ Persisted in `loj-cart` |
-| Page refresh | ✅ Cart items restored |
-| Update quantity | ✅ Persisted correctly |
-| Remove item | ✅ Removed from storage |
-| Guest → Auth migration | ✅ Cart preserved |
+```text
+Changes:
+1. Create textureCache: Map<string, { texture: THREE.Texture, refCount: number }>
+2. In useGarmentTexture: check cache first, increment refCount
+3. On cleanup: decrement refCount, dispose if zero
+4. Clear logging to reduce console noise in production
+```
 
-### Size Memory Flow
-| Test Case | Result |
-|-----------|--------|
-| Save size preference | ✅ Stored in `loj-size-memory` |
-| Cross-session persistence | ✅ Remembered after browser close |
-| Database sync on login | ✅ Synced to `user_size_preferences` |
-| One-tap add with remembered size | ✅ Uses saved size |
-| Size Quiz pending action | ✅ Completes add after quiz |
+### 2.2 Geometry Memoization
 
-### Bundle Discounts
-| Test Case | Result |
-|-----------|--------|
-| Add 2+ items from lookbook | ✅ 10% discount applied |
-| Add 4+ items from lookbook | ✅ 15% discount applied |
-| Missing product suggestions | ✅ Shows products to complete |
-| Server-side validation | ✅ Verified in checkout function |
+**Files:** All garment geometry components
 
-### Quick Add
-| Test Case | Result |
-|-----------|--------|
-| One-tap add (size remembered) | ✅ Adds in saved size |
-| Size picker (no memory) | ✅ Inline picker opens |
-| Out-of-stock fallback | ✅ Nearest size suggested |
-| Single size in stock | ✅ Auto-selected |
-| Haptic feedback | ✅ 50ms vibration triggered |
+**Issue:** Geometries are recreated on every render even when props haven't changed.
+
+**Solution:**
+- Ensure all geometry creation uses useMemo with correct dependencies
+- Move static geometries outside component scope
+- Use geometry instancing for repeated elements (sleeve cuffs, collar rings)
+
+### 2.3 Mobile Performance Mode
+
+**File:** `src/components/try-on/TryOnCanvas.tsx`
+
+**Solution:**
+- Detect mobile devices and reduce quality settings
+- Lower polygon count for lathe geometries on mobile (32 segments to 20)
+- Disable ContactShadows on low-end devices
+- Use simpler lighting setup
 
 ---
 
-## DATABASE SCHEMA VERIFICATION
+## Phase 3: UX Enhancements
 
-### Tables Verified as Correctly Configured:
-- ✅ `user_size_preferences` - Proper columns and RLS
-- ✅ `user_behavior_signals` - Session-based tracking
-- ✅ `favorites` - With `saved_from_cart` and `cart_context` columns
-- ✅ `bundle_discounts` - 2 active rules
-- ✅ `threshold_upsell_products` - For smart upsells
-- ✅ `abandoned_carts` - Recovery tokens and status tracking
-- ✅ `orders` / `order_items` - Complete order schema
+### 3.1 Loading States for 3D Model
+
+**File:** `src/components/try-on/TryOnCanvas.tsx`
+
+**Enhancement:**
+- Show skeleton loader while textures load
+- Progressive loading indicator per garment
+- Smooth fade-in when garment appears
+
+### 3.2 Error Boundary for 3D Canvas
+
+**New File:** `src/components/try-on/TryOnErrorBoundary.tsx`
+
+**Purpose:**
+- Catch WebGL crashes gracefully
+- Show fallback UI with 2D product images
+- Provide "Reload 3D View" button
+- Log errors for debugging
+
+### 3.3 Accessibility Improvements
+
+**File:** `src/components/try-on/SaveLookModal.tsx`
+
+**Fix:** Add DialogDescription to resolve WCAG warning
+
+```tsx
+<DialogDescription className="sr-only">
+  Save your current outfit configuration to share with others
+</DialogDescription>
+```
+
+### 3.4 Haptic Feedback Guard
+
+**Multiple Files**
+
+**Fix:** Wrap navigator.vibrate calls in try-catch and user interaction check
+
+```typescript
+const safeVibrate = (pattern: number | number[]) => {
+  try {
+    if (document.hasFocus() && 'vibrate' in navigator) {
+      navigator.vibrate(pattern);
+    }
+  } catch (e) {
+    // Silently fail - haptic is nice-to-have
+  }
+};
+```
 
 ---
 
-## PERFORMANCE VERIFICATION
+## Phase 4: Feature Completeness
 
-| Metric | Target | Status |
-|--------|--------|--------|
-| Add-to-cart perceived latency | <100ms | ✅ ~50ms (optimistic) |
-| Cart drawer open | <150ms | ✅ ~100ms (spring animation) |
-| Size memory read | <10ms | ✅ Synchronous localStorage |
-| Bundle calculation | <50ms | ✅ Memoized with useMemo |
-| Haptic feedback | 10-50ms | ✅ Configured correctly |
+### 4.1 Proper Category Mapping for Products
+
+Ensure products are correctly categorized so ProductDrawer shows relevant items:
+
+| Slot | Categories to Match |
+|------|---------------------|
+| head | caps, hats, headwear, beanies |
+| top | t-shirts, shirts, tops, tees |
+| outerwear | hoodies, jackets, sweaters |
+| bottom | pants, jeans, shorts |
+| footwear | shoes, sneakers, boots |
+
+### 4.2 Garment Layering Z-Order
+
+**File:** `src/components/try-on/Avatar3D.tsx`
+
+**Enhancement:** Ensure proper render order when wearing multiple items:
+1. Base: Mannequin body
+2. Layer 1: Top (t-shirt/tank)
+3. Layer 2: Outerwear (hoodie/jacket)
+4. Layer 3: Bottom (pants/shorts)
+5. Layer 4: Footwear
+6. Layer 5: Head (beanie/cap)
+
+### 4.3 Real-Time Body Morphing
+
+Current body measurements update the mannequin, but garments don't adjust dynamically.
+
+**Enhancement:** Pass bodyScale to all garment components (already partially implemented) and ensure shoulder junctions, hem widths, and sleeve lengths adapt.
 
 ---
 
-## ACCESSIBILITY VERIFICATION
+## Implementation Priority
 
-| Feature | Status |
-|---------|--------|
-| ARIA labels on quick add buttons | ✅ Dynamic labels |
-| Reduced motion support | ✅ Throughout codebase |
-| Focus states on size picker | ✅ Visible outlines |
-| Screen reader compatible toasts | ✅ Using Sonner |
-| Keyboard navigation | ✅ Escape closes modals |
+### Immediate (Day 1)
+1. Create saved_outfits database table
+2. Fix ProductDrawer category filtering
+3. Add WebGL context loss handler
+
+### Week 1
+4. Implement texture caching
+5. Add TryOnErrorBoundary
+6. Fix accessibility warnings
+
+### Week 2
+7. Mobile performance optimizations
+8. Loading state improvements
+9. Garment layering refinement
 
 ---
 
-## CONCLUSION
+## Files to Modify
 
-The Line of Judah e-commerce platform has achieved **TEMU-tier conversion engineering standards**. All 7 conversion pillars are fully implemented and operational:
+| File | Changes |
+|------|---------|
+| `src/components/try-on/TryOnCanvas.tsx` | WebGL handlers, mobile performance |
+| `src/components/try-on/ProductDrawer.tsx` | Category filtering query |
+| `src/components/try-on/hooks/useGarmentTexture.tsx` | Texture caching |
+| `src/components/try-on/SaveLookModal.tsx` | DialogDescription |
+| Database | Create saved_outfits table |
 
-1. ✅ Intelligent Size Memory System
-2. ✅ One-Tap Add-to-Cart Infrastructure
-3. ✅ Bundle & Outfit Cart Mechanics
-4. ✅ Cart Drawer Conversion Optimization
-5. ✅ Checkout Friction Engineering
-6. ✅ Behavioral Memory & Personalization
-7. ✅ Lookbook-to-Cart Conversion
+---
 
-The localStorage migration from `linea-` to `loj-` prefix is complete and verified. All data persistence, database sync, and conversion tracking systems are functioning correctly.
+## Testing Checklist
 
-**Remaining Items for Brand Consistency:**
-1. Replace `/LINEA-1.svg` logo in 3 header components
-2. Update "LINEA" text references in AdminLayout and SaveLookModal
-3. Consider setting `SITE_URL` env var in production
-
-The codebase is ready for production traffic.
+- [ ] 3D mannequin renders on page load
+- [ ] Clicking outfit slot opens ProductDrawer with relevant products
+- [ ] Selecting product equips garment on mannequin
+- [ ] Texture appears correctly on garment front
+- [ ] Body measurements change mannequin proportions
+- [ ] Save Look creates shareable URL
+- [ ] Shared URL loads outfit correctly
+- [ ] Mobile view shows bottom bar with outfit slots
+- [ ] No WebGL context loss after 5+ minutes of use
+- [ ] No console errors in production
 
