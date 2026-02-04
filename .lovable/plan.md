@@ -1,236 +1,243 @@
 
-# Brand Name Correction Plan: "LINEA" → "Line of Judah"
 
-## Executive Summary
-
-A comprehensive audit has revealed **47 instances across 23 files** where incorrect brand names (LINEA, Linea Jewelry Inc, lineajewelry) appear instead of "Line of Judah". This plan provides a surgical, file-by-file correction strategy to ensure complete brand consistency across the entire codebase.
+# Line of Judah: Strategic Next Steps Plan
+## Premium Editorial Streetwear E-Commerce Elevation
 
 ---
 
-## Critical Severity Issues (Must Fix Immediately)
+## Current State Audit Summary
 
-### 1. Logo SVG Files in `/public` Directory
+After an exhaustive code audit, the Line of Judah storefront is already at a **strong foundation level** for a premium faith-based streetwear brand. The existing implementation reflects:
 
-| File | Current State | Action Required |
-|------|---------------|-----------------|
-| `/public/LINEA-1.svg` | Contains "LINEA" wordmark | Replace with "Line of Judah" logo or rename |
-| `/public/LINEA.svg` | Contains "LINEA" wordmark | Delete or replace with correct branding |
-| `/public/LINEA_JEWELRY_INC.svg` | "Linea Jewelry Inc" text | Delete - incorrect brand entirely |
-| `/public/Linea_Jewelry_Inc-2.svg` | "Linea Jewelry Inc" text | Delete - incorrect brand entirely |
-| `/src/assets/LINEA.svg` | "LINEA" wordmark | Delete or replace |
-
-**Owner Action Required**: Provide the official "Line of Judah" logo in SVG format for header/footer usage.
-
----
-
-### 2. Terms of Service Page - COMPLETELY WRONG BRAND
-
-**File**: `src/pages/TermsOfService.tsx`
-
-| Line | Current | Correction |
-|------|---------|------------|
-| 23 | `document.title = "Terms of Service - Linea Jewelry"` | `"Terms of Service - Line of Judah"` |
-| 36 | `Linea Jewelry Inc. website and services` | `Line of Judah LLC website and services` |
-| 44-45 | `Linea Jewelry Inc.'s website` | `Line of Judah LLC's website` |
-| 109 | `Our jewelry comes with a limited warranty` | Rewrite for apparel context |
-| 118 | `Linea Jewelry Inc.` | `Line of Judah LLC` |
-| 126 | `Linea Jewelry Inc. or its suppliers` | `Line of Judah LLC or its suppliers` |
-| 170 | `legal@lineajewelry.com` | `legal@lineofjudah.com` |
-
-**Note**: This entire page has jewelry-specific language that needs rewriting for a streetwear/apparel brand.
+**What's Already Working Well:**
+- Swedish design discipline: `--radius: 0rem` enforcing sharp edges site-wide
+- 032c-inspired typography scale with `text-display`, `text-hero-massive`, `text-eyebrow` classes
+- DAZED editorial animations: clip-path reveals, Ken Burns effects, stagger children
+- Premium color palette: deep blacks, warm off-whites, gold accent (#D4AF37)
+- Mobile-first responsive architecture with `100dvh`, safe-area handling, touch-target sizing
+- Framer Motion animation library with reduced-motion support
+- Behavioral tracking for high-intent signals
+- Comprehensive cart drawer with bundle discounts and abandoned cart recovery
 
 ---
 
-## High Severity Issues (User-Facing)
+## Strategic Priority Matrix: What's Next
 
-### 3. Header & Navigation Components
+After the brand name correction (LINEA → Line of Judah), the following areas require attention to achieve world-class streetwear e-commerce status:
 
-**File**: `src/components/header/Navigation.tsx`
+### TIER 1: Critical Brand Completion (Immediate)
 
-| Line | Current | Correction |
-|------|---------|------------|
-| 159 | `src="/LINEA-1.svg"` | Update to new logo path |
-| 160 | `alt="LINEA"` | `alt="Line of Judah"` |
-
-**File**: `src/components/header/MobileMenu.tsx`
-
-| Line | Current | Correction |
-|------|---------|------------|
-| 141 | `src="/LINEA-1.svg" alt="LINEA"` | Update path and `alt="Line of Judah"` |
-| 329 | `href="mailto:hello@linea.com"` | `href="mailto:hello@lineofjudah.com"` |
-
-**File**: `src/components/header/CheckoutHeader.tsx`
-
-| Line | Current | Correction |
-|------|---------|------------|
-| 25 | `src="/LINEA-1.svg"` | Update to new logo path |
-| 26 | `alt="Linea Jewelry Inc"` | `alt="Line of Judah"` |
+| Task | Impact | Effort |
+|------|--------|--------|
+| **1. Update Tailwind comment** | Low | 5 min |
+| **2. Create placeholder logo component** | Medium | 30 min |
+| **3. Fix remaining brand assets in StatusBar** | Medium | 15 min |
+| **4. Update social media handles** | Medium | 20 min |
+| **5. Fix copyright year to 2025** | Low | 5 min |
 
 ---
 
-### 4. Authentication & Account Toasts
+### TIER 2: Content Authenticity Upgrade
 
-**File**: `src/components/auth/CreateAccountForm.tsx`
+The site currently uses placeholder stats and testimonials that need real data:
 
-| Line | Current | Correction |
-|------|---------|------------|
-| 69 | `toast.success('Welcome to LINEA!')` | `toast.success('Welcome to Line of Judah!')` |
-
-**File**: `src/components/checkout/PostPurchaseSignup.tsx`
-
-| Line | Current | Correction |
-|------|---------|------------|
-| 183 | `Welcome to LINEA` | `Welcome to Line of Judah` |
-
----
-
-## Medium Severity Issues (Backend/Infrastructure)
-
-### 5. Edge Functions - Discount Code Prefix
-
-**File**: `supabase/functions/process-abandoned-carts/index.ts`
-
-| Line | Current | Correction |
-|------|---------|------------|
-| 42 | `let code = 'LINEA15-'` | `let code = 'LOJ15-'` or `'JUDAH15-'` |
-| 440 | `'https://linea-hearth.lovable.app'` | Keep as fallback URL (technical, not branding) |
-
-**File**: `supabase/functions/create-checkout-session/index.ts`
-
-| Line | Current | Correction |
-|------|---------|------------|
-| 86 | `'https://linea-hearth.lovable.app'` | Keep as fallback (technical URL) |
-
-**File**: `supabase/functions/send-order-confirmation/index.ts`
-
-| Line | Current | Correction |
-|------|---------|------------|
-| 307 | `'https://linea-hearth.lovable.app'` | Keep as fallback (technical URL) |
-
----
-
-### 6. LocalStorage Keys (Internal, No User Impact)
-
-These are technical identifiers that don't need to match brand name, but could be updated for consistency:
-
-| File | Key | Suggestion |
-|------|-----|------------|
-| `src/contexts/SizeQuizContext.tsx` | `'linea-size-quiz-completed'` | Optional: `'loj-size-quiz-completed'` |
-| `src/contexts/SizeQuizContext.tsx` | `'linea-size-memory'` | Optional: `'loj-size-memory'` |
-| `src/hooks/useSizeMemory.ts` | `'linea-size-memory'` | Optional: `'loj-size-memory'` |
-| `src/components/try-on/hooks/useBodyProfiles.ts` | `'linea_body_profiles'` | Optional: `'loj_body_profiles'` |
-| `src/components/checkout/PostPurchaseSignup.tsx` | `'linea-size-memory'` | Must match above if changed |
-
-**Recommendation**: Keep these as-is to avoid breaking existing user data, OR create a migration script.
-
----
-
-## Low Severity Issues (Content Reference)
-
-### 7. OG Image Reference in `index.html`
-
-| Line | Current | Note |
-|------|---------|------|
-| 17 | `social-1758825622907-Linea OG Image.png` | External URL - requires uploading new OG image |
-| 21 | Same image for Twitter | Same action |
-
-**Owner Action Required**: Provide new OG/social sharing image with "Line of Judah" branding.
-
----
-
-### 8. Orphaned Asset Files (May Not Be Used)
-
-**File**: `src/components/content/OneThirdTwoThirdsSection.tsx`
-
-References images that don't exist and have jewelry-themed alt text:
-- `@/assets/circular-collection.png` - File doesn't exist
-- `@/assets/organic-earring.png` - File doesn't exist
-- Alt text: "Artisan crafted jewelry", "Circular jewelry collection"
-
-**Recommendation**: This component appears unused. Verify and delete or update for streetwear context.
-
----
-
-## Complete File Change Manifest
-
-### Files Requiring Code Changes (17 files)
-
-```text
-1.  src/pages/TermsOfService.tsx — 8 changes (CRITICAL)
-2.  src/components/header/Navigation.tsx — 2 changes
-3.  src/components/header/MobileMenu.tsx — 2 changes
-4.  src/components/header/CheckoutHeader.tsx — 2 changes
-5.  src/components/auth/CreateAccountForm.tsx — 1 change
-6.  src/components/checkout/PostPurchaseSignup.tsx — 2 changes
-7.  supabase/functions/process-abandoned-carts/index.ts — 1 change
-8.  index.html — Update OG image URL (after new image uploaded)
-9.  src/contexts/SizeQuizContext.tsx — 2 changes (optional)
-10. src/hooks/useSizeMemory.ts — 1 change (optional)
-11. src/components/try-on/hooks/useBodyProfiles.ts — 1 change (optional)
-12. src/components/content/OneThirdTwoThirdsSection.tsx — Delete or rewrite
+#### StatusBar.tsx Placeholder Data
+```
+Current: "+100,000 happy customers"
+Action: Replace with actual customer count or remove until verified
 ```
 
-### Files to Delete (4 files)
+#### MarqueeStrip.tsx Fake Testimonials
+| Name | Quote | Status |
+|------|-------|--------|
+| Marcus T. | "Finally, a brand that gets it." | PLACEHOLDER |
+| Sarah M. | "The quality is insane." | PLACEHOLDER |
+| David K. | "Premium quality, meaningful designs." | PLACEHOLDER |
+| Michelle R. | "My whole youth group loves them." | PLACEHOLDER |
+| James L. | "Worth every penny." | PLACEHOLDER |
+| Priscilla W. | "This isn't just clothing, it's armor." | PLACEHOLDER |
 
-```text
-1. public/LINEA_JEWELRY_INC.svg
-2. public/Linea_Jewelry_Inc-2.svg
-3. public/LINEA.svg (if not used)
-4. src/assets/LINEA.svg
-```
-
-### Files Requiring Owner Assets (2 items)
-
-```text
-1. New logo SVG → Replace /public/LINEA-1.svg
-2. New OG image → Update external URL in index.html
-```
+**Recommendation:** Create a `src/config/brand.ts` centralized content configuration file to store all brand copy, stats, and contact info in one location.
 
 ---
 
-## Implementation Order
+### TIER 3: Editorial Content Gaps
 
-### Phase 1: Critical Brand Errors (Do First)
-1. Delete incorrect logo files (`LINEA_JEWELRY_INC.svg`, etc.)
-2. Fix Terms of Service page entirely
-3. Update all header/navigation logo alt text
+#### Homepage EditorialHero.tsx
+| Element | Current | Needs Owner Input |
+|---------|---------|-------------------|
+| Drop Number | "001" | Confirm if this is Drop 001 |
+| Collection Name | "Stay Holy Collection" | Confirm collection naming |
+| Limited Pieces | "250" | Actual production quantity |
+| Product Price | "$79" | Confirm pricing |
 
-### Phase 2: User-Facing Messages
-4. Fix welcome toasts in auth forms
-5. Fix email links in MobileMenu
-6. Update discount code prefix in edge function
-
-### Phase 3: Owner-Dependent Items
-7. Wait for new logo SVG from owner
-8. Wait for new OG image from owner
-9. Update index.html with new social image URLs
-
-### Phase 4: Optional Cleanup
-10. Evaluate localStorage key migration
-11. Delete or update orphaned OneThirdTwoThirdsSection component
+#### TestimonySpotlight.tsx
+| Element | Current | Status |
+|---------|---------|--------|
+| Customer Name | "Marcus T." | PLACEHOLDER |
+| Title | "Youth Pastor" | PLACEHOLDER |
+| Location | "Atlanta, GA" | PLACEHOLDER |
+| Quote | Full quote | PLACEHOLDER |
 
 ---
 
-## Verification Checklist
+### TIER 4: Performance & CRO Enhancements
 
-After implementation, search the entire codebase for these patterns to confirm zero matches:
+Based on the audit, these high-impact improvements align with premium streetwear standards:
 
+#### 4.1 Image Optimization Audit
 ```text
-□ "LINEA" (case-insensitive, excluding technical CSS like "linear-gradient")
-□ "Linea Jewelry"
-□ "lineajewelry"
-□ "@linea.com" (email)
-□ "Jewelry" in alt text (should be apparel-related)
+Files Found: 10 product images in /public/products/
+Current Format: PNG
+Recommended: Convert to WebP with AVIF fallback
+Expected LCP Improvement: 200-400ms
 ```
 
+#### 4.2 Missing SEO Metadata
+- `index.html` OG image contains old "Linea" branding
+- No product-specific meta descriptions
+- No JSON-LD structured data for products
+
+#### 4.3 Accessibility Gaps Identified
+- Color contrast ratio on muted text needs WCAG AA verification
+- Missing `aria-label` on some icon-only buttons
+- No skip-to-content link implemented (class exists but not used)
+
 ---
 
-## Questions for Owner
+### TIER 5: Trust & Conversion Engineering
 
-Before proceeding, please provide:
+#### Missing Trust Elements for Premium Perception
+1. **Real Review Integration** - ProductReviews component exists but needs data source
+2. **Payment Badges** - No Visa/MC/AMEX/Apple Pay badges visible
+3. **Security Seals** - No SSL/secure checkout indicators prominent
+4. **Guarantee Badge** - Component exists but content is placeholder
 
-1. **Official Logo SVG** — What is the exact logo file to use in header/footer?
-2. **Legal Entity Name** — Is it "Line of Judah LLC" or another entity for Terms of Service?
-3. **Discount Code Prefix** — Preferred prefix: `LOJ15-`, `JUDAH15-`, or `TRIBE15-`?
-4. **OG/Social Image** — New social sharing image for Facebook/Twitter previews?
-5. **LocalStorage Migration** — Should existing user size data be migrated or reset?
+#### Price Display Consistency
+- Some components use `formatPrice()`, others use `$${price.toFixed(2)}`
+- Recommendation: Audit all price displays for consistency
+
+---
+
+## Recommended Implementation Order
+
+### Phase 1: Brand Consistency (1-2 hours)
+1. Create centralized brand config file
+2. Update copyright year in Footer
+3. Add placeholder preparation for new logo
+4. Update Tailwind comment from "Linea" to "Line of Judah"
+
+### Phase 2: Content Authenticity (Owner Required)
+1. Gather real customer testimonials
+2. Confirm actual product pricing
+3. Get verified customer counts
+4. Collect real social proof data
+
+### Phase 3: Technical Polish (4-6 hours)
+1. Convert images to WebP format
+2. Implement skip-to-content link
+3. Add JSON-LD structured data
+4. Audit and fix accessibility issues
+
+### Phase 4: Trust Layer Enhancement (2-3 hours)
+1. Add payment method badges to checkout
+2. Integrate real review data source
+3. Polish guarantee badge content
+4. Add security indicators
+
+---
+
+## Centralized Brand Configuration Proposal
+
+Create `src/config/brand.ts`:
+
+```typescript
+export const BRAND = {
+  // Core Identity
+  name: "Line of Judah",
+  tagline: "For those who walk different",
+  legalEntity: "Line of Judah LLC",
+  
+  // Contact
+  email: {
+    support: "hello@lineofjudah.com",
+    legal: "legal@lineofjudah.com",
+  },
+  
+  // Social
+  social: {
+    instagram: "@lineofjudahwear",
+    tiktok: "@lineofjudah",
+    youtube: "@lineofjudah",
+  },
+  
+  // Stats (replace with real numbers)
+  stats: {
+    customers: "10,000+", // or null to hide
+    countries: 5,
+    cities: 45,
+  },
+  
+  // Trust Signals
+  trust: {
+    freeShippingThreshold: 99,
+    returnDays: 30,
+    warrantyDays: 365,
+  },
+  
+  // Discount Prefix
+  discountPrefix: "LOJ",
+} as const;
+```
+
+This centralization enables:
+- Single source of truth for all brand data
+- Easy updates without hunting through components
+- Type-safety for brand references
+
+---
+
+## Files to Modify (Summary)
+
+### Immediate Updates
+| File | Change |
+|------|--------|
+| `tailwind.config.ts` | Line 62: Comment "Linea" → "Line of Judah" |
+| `src/components/footer/Footer.tsx` | Line 146: "2024" → "2025" |
+| `src/components/header/StatusBar.tsx` | Verify/update customer count stat |
+
+### New Files to Create
+| File | Purpose |
+|------|---------|
+| `src/config/brand.ts` | Centralized brand configuration |
+| `public/line-of-judah-logo.svg` | Official logo (owner to provide) |
+| `public/og-line-of-judah.png` | Social sharing image (owner to provide) |
+
+### Assets Pending from Owner
+1. Official SVG logo for header/footer
+2. OG/Social sharing image (1200x630px)
+3. Real testimonials and customer data
+4. Confirmed pricing and product details
+
+---
+
+## Questions Before Implementation
+
+1. **Logo:** Can you provide the official Line of Judah logo in SVG format?
+
+2. **Social Image:** Do you have a branded social sharing image (1200x630px) for Facebook/Twitter previews?
+
+3. **Customer Stats:** What are the real numbers for:
+   - Happy customers
+   - Countries shipped to
+   - Cities reached
+
+4. **Testimonials:** Do you have verified customer testimonials to replace the placeholder quotes?
+
+5. **Copyright Year:** Should the footer say "2024" or "2025"?
+
+6. **Priority:** Would you like me to:
+   - **A)** Create the centralized brand config file now
+   - **B)** Focus on performance/image optimization
+   - **C)** Wait for real content before proceeding
+
