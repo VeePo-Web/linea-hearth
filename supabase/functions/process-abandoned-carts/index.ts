@@ -39,7 +39,7 @@ interface AbandonedCart {
 // Generate a unique discount code
 function generateDiscountCode(): string {
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-  let code = 'LINEA15-';
+  let code = 'LOJ15-';
   for (let i = 0; i < 6; i++) {
     code += characters.charAt(Math.floor(Math.random() * characters.length));
   }

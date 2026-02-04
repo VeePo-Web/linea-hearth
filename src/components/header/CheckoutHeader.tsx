@@ -23,7 +23,7 @@ const CheckoutHeader = () => {
             <Link to="/" className="absolute left-1/2 transform -translate-x-1/2">
               <img
                 src="/LINEA-1.svg"
-                alt="Linea Jewelry Inc"
+                alt="Line of Judah"
                 className="h-6 w-auto"
               />
             </Link>

@@ -138,7 +138,7 @@ const MobileMenu = ({
           >
             {/* Header with logo and close */}
             <div className="flex items-center justify-between px-6 py-5 border-b border-border">
-              <img src="/LINEA-1.svg" alt="LINEA" className="h-5 w-auto" />
+              <img src="/LINEA-1.svg" alt="Line of Judah" className="h-5 w-auto" />
               <motion.button
                 className="p-2 text-foreground hover:text-muted-foreground transition-colors relative group"
                 onClick={onClose}
@@ -326,7 +326,7 @@ const MobileMenu = ({
                     <Instagram size={18} strokeWidth={1.5} />
                   </a>
                   <a
-                    href="mailto:hello@linea.com"
+                    href="mailto:hello@lineofjudah.com"
                     className="p-2 text-muted-foreground hover:text-foreground transition-colors"
                     aria-label="Email"
                   >
