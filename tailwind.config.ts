@@ -59,7 +59,7 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        /* Linea specific colors */
+        /* Line of Judah specific colors */
         "status-bar": {
           DEFAULT: "hsl(var(--status-bar))",
           foreground: "hsl(var(--status-bar-foreground))",
