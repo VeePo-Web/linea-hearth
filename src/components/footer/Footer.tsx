@@ -143,7 +143,7 @@ const Footer = () => {
       <div className="border-t border-white/10 -mx-4 xs:-mx-6 px-4 xs:px-6 pt-4">
         <div className="flex flex-col md:flex-row justify-between items-center gap-3">
           <p className="text-xs md:text-sm font-light text-white/50 text-center md:text-left">
-            © 2024 Line of Judah. All rights reserved.
+            © 2025 Line of Judah. All rights reserved.
           </p>
           <div className="flex space-x-4 md:space-x-6">
             <Link to="/privacy-policy" className="text-xs md:text-sm font-light text-white/50 hover:text-amber-500 transition-colors touch-target-sm py-2">
