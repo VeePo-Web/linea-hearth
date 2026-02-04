@@ -1,11 +1,13 @@
 import { useState } from 'react';
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
 import { useTryOnState, EquippedItem } from '@/hooks/useTryOnState';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 import { cn } from '@/lib/utils';
 import { Check } from 'lucide-react';
 import { getTextureImageUrl } from '@/components/try-on/hooks/useGarmentTexture';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface ProductDrawerProps {
   isOpen: boolean;
@@ -123,10 +125,13 @@ export const ProductDrawer = ({ isOpen, onClose, slot }: ProductDrawerProps) => 
           <SheetTitle className="text-lg font-light">
             {slot ? slotLabels[slot] : 'Select Item'}
           </SheetTitle>
+          <SheetDescription className="sr-only">
+            Browse and select products to add to your outfit
+          </SheetDescription>
         </SheetHeader>
 
         {/* Size Quick Select */}
-        <div className="mb-6">
+        <div className="mb-6" role="radiogroup" aria-label="Select size">
           <div className="text-xs uppercase tracking-wider text-muted-foreground mb-2">
             Size
           </div>
@@ -135,8 +140,10 @@ export const ProductDrawer = ({ isOpen, onClose, slot }: ProductDrawerProps) => 
               <button
                 key={size}
                 onClick={() => setSelectedSize(size)}
+                role="radio"
+                aria-checked={selectedSize === size}
                 className={cn(
-                  "px-4 py-2 text-sm border transition-all duration-200",
+                  "px-4 py-2 min-h-[44px] min-w-[44px] text-sm border transition-all duration-200",
                   selectedSize === size
                     ? "border-foreground bg-foreground text-background"
                     : "border-border hover:border-foreground"
@@ -152,57 +159,83 @@ export const ProductDrawer = ({ isOpen, onClose, slot }: ProductDrawerProps) => 
         {isLoading ? (
           <div className="grid grid-cols-2 gap-4">
             {[...Array(6)].map((_, i) => (
-              <div key={i} className="aspect-[3/4] bg-muted animate-pulse" />
+              <div key={i} className="space-y-2">
+                <Skeleton className="aspect-[3/4] w-full" />
+                <Skeleton className="h-4 w-3/4" />
+                <Skeleton className="h-4 w-1/4" />
+              </div>
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-4">
-            {products?.map((product: any) => {
-              const primaryImage = product.product_images?.find((img: any) => img.is_primary)?.image_url 
-                || product.product_images?.[0]?.image_url;
-              const equipped = isEquipped(product.id);
+          <div className="grid grid-cols-2 gap-4" role="listbox" aria-label="Available products">
+            <AnimatePresence mode="popLayout">
+              {products?.map((product: any, index: number) => {
+                const primaryImage = product.product_images?.find((img: any) => img.is_primary)?.image_url 
+                  || product.product_images?.[0]?.image_url;
+                const equipped = isEquipped(product.id);
 
-              return (
-                <button
-                  key={product.id}
-                  onClick={() => handleSelectProduct(product)}
-                  className={cn(
-                    "group relative text-left transition-all duration-200",
-                    equipped && "ring-2 ring-foreground"
-                  )}
-                >
-                  <div className="aspect-[3/4] bg-muted overflow-hidden mb-2 relative">
-                    {primaryImage ? (
-                      <img
-                        src={primaryImage}
-                        alt={product.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-muted-foreground">
-                        No image
-                      </div>
+                return (
+                  <motion.button
+                    key={product.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    transition={{ duration: 0.2, delay: index * 0.05 }}
+                    onClick={() => handleSelectProduct(product)}
+                    role="option"
+                    aria-selected={equipped}
+                    className={cn(
+                      "group relative text-left transition-all duration-200",
+                      equipped && "ring-2 ring-foreground"
                     )}
-                    
-                    {equipped && (
-                      <div className="absolute inset-0 bg-foreground/20 flex items-center justify-center">
-                        <div className="w-10 h-10 rounded-full bg-foreground flex items-center justify-center">
-                          <Check className="w-5 h-5 text-background" />
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <div className="aspect-[3/4] bg-muted overflow-hidden mb-2 relative">
+                      {primaryImage ? (
+                        <img
+                          src={primaryImage}
+                          alt={product.name}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                          No image
                         </div>
-                      </div>
-                    )}
-                  </div>
-                  <div className="text-sm font-light truncate">{product.name}</div>
-                  <div className="text-sm font-medium">${product.price?.toLocaleString()}</div>
-                </button>
-              );
-            })}
+                      )}
+                      
+                      <AnimatePresence>
+                        {equipped && (
+                          <motion.div 
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="absolute inset-0 bg-foreground/20 flex items-center justify-center"
+                          >
+                            <motion.div 
+                              initial={{ scale: 0 }}
+                              animate={{ scale: 1 }}
+                              exit={{ scale: 0 }}
+                              className="w-10 h-10 rounded-full bg-foreground flex items-center justify-center"
+                            >
+                              <Check className="w-5 h-5 text-background" />
+                            </motion.div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                    <div className="text-sm font-light truncate">{product.name}</div>
+                    <div className="text-sm font-medium">${product.price?.toLocaleString()}</div>
+                  </motion.button>
+                );
+              })}
+            </AnimatePresence>
           </div>
         )}
 
         {!isLoading && products?.length === 0 && (
           <div className="text-center py-12 text-muted-foreground">
-            No products available for this category
+            <p>No products available for this category</p>
           </div>
         )}
       </SheetContent>
