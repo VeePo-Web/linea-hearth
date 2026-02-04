@@ -1,11 +1,13 @@
-import { Suspense, useRef, useState, useCallback } from 'react';
+import { Suspense, useRef, useState, useCallback, useEffect } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera, ContactShadows } from '@react-three/drei';
 import { Avatar3D } from './Avatar3D';
 import { SceneControls } from './SceneControls';
 import { StudioLighting } from './lighting/StudioLighting';
 import { useTryOnState } from '@/hooks/useTryOnState';
-import { Loader2 } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { Loader2, AlertTriangle, RotateCcw } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface TryOnCanvasProps {
   className?: string;
@@ -83,10 +85,43 @@ const Scene = ({
 
 export const TryOnCanvas = ({ className }: TryOnCanvasProps) => {
   const { isLoading } = useTryOnState();
+  const isMobile = useIsMobile();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const cameraRef = useRef<any>(null);
   const controlsRef = useRef<any>(null);
   const [lightingMode, setLightingMode] = useState<'studio' | 'natural' | 'dramatic'>('studio');
+  const [contextLost, setContextLost] = useState(false);
+
+  // Handle WebGL context loss/restore
+  const handleContextLost = useCallback((event: Event) => {
+    event.preventDefault();
+    console.warn('[TryOnCanvas] WebGL context lost');
+    setContextLost(true);
+  }, []);
+
+  const handleContextRestored = useCallback(() => {
+    console.log('[TryOnCanvas] WebGL context restored');
+    setContextLost(false);
+  }, []);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    canvas.addEventListener('webglcontextlost', handleContextLost, false);
+    canvas.addEventListener('webglcontextrestored', handleContextRestored, false);
+
+    return () => {
+      canvas.removeEventListener('webglcontextlost', handleContextLost);
+      canvas.removeEventListener('webglcontextrestored', handleContextRestored);
+    };
+  }, [handleContextLost, handleContextRestored]);
+
+  const handleReloadCanvas = useCallback(() => {
+    setContextLost(false);
+    // Force remount by key change handled in parent
+    window.location.reload();
+  }, []);
 
   const handleReset = useCallback(() => {
     if (controlsRef.current) {
@@ -128,7 +163,7 @@ export const TryOnCanvas = ({ className }: TryOnCanvasProps) => {
   return (
     <div className={`relative ${className}`}>
       {/* Loading Overlay */}
-      {isLoading && (
+      {isLoading && !contextLost && (
         <div className="absolute inset-0 bg-background/80 backdrop-blur-sm z-10 flex items-center justify-center">
           <div className="flex flex-col items-center gap-3">
             <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
@@ -137,16 +172,36 @@ export const TryOnCanvas = ({ className }: TryOnCanvasProps) => {
         </div>
       )}
 
+      {/* WebGL Context Lost Fallback */}
+      {contextLost && (
+        <div className="absolute inset-0 bg-background z-20 flex items-center justify-center">
+          <div className="flex flex-col items-center gap-4 text-center p-6">
+            <AlertTriangle className="w-12 h-12 text-destructive" />
+            <div className="space-y-2">
+              <h3 className="text-lg font-medium">3D View Unavailable</h3>
+              <p className="text-sm text-muted-foreground max-w-xs">
+                The 3D rendering context was lost. This can happen on devices with limited memory.
+              </p>
+            </div>
+            <Button onClick={handleReloadCanvas} variant="outline" className="gap-2">
+              <RotateCcw className="w-4 h-4" />
+              Reload 3D View
+            </Button>
+          </div>
+        </div>
+      )}
+
       {/* 3D Canvas */}
       <Canvas
         ref={canvasRef}
-        shadows
-        dpr={[1, 2]}
+        shadows={!isMobile}
+        dpr={isMobile ? [1, 1.5] : [1, 2]}
         gl={{ 
           preserveDrawingBuffer: true,
-          antialias: true,
+          antialias: !isMobile,
           toneMapping: 3, // ACESFilmicToneMapping
           toneMappingExposure: 1.1,
+          powerPreference: isMobile ? 'low-power' : 'high-performance',
         }}
         className="touch-none"
       >
