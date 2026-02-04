@@ -106,13 +106,8 @@ export const Avatar3D = ({ position = [0, 0, 0] }: Avatar3DProps) => {
     [avatarBodyType, avatarGender, measurements, useDetailedMeasurements]
   );
 
-  // Subtle breathing animation for the whole group
-  useFrame((state) => {
-    if (groupRef.current) {
-      const breathe = Math.sin(state.clock.getElapsedTime() * 1.5) * 0.002;
-      groupRef.current.scale.y = 1 + breathe;
-    }
-  });
+  // Note: Breathing animation is now handled inside Mannequin3D component
+  // to properly account for height scaling and reduced motion preferences
 
   return (
     <group ref={groupRef} position={position}>

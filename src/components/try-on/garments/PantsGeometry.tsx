@@ -52,7 +52,7 @@ export const PantsGeometry = ({
   }, [bodyScale, mult]);
 
   return (
-    <group position={[0, 0.67, 0]}>
+    <group position={[0, 0.85, 0]}>
       {/* Waistband */}
       <mesh position={[0, 0.26, 0]}>
         <torusGeometry args={[bodyScale.hipWidth / 2 + 0.02, 0.025, 8, 32]} />
