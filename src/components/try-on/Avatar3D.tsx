@@ -4,7 +4,7 @@ import { useTryOnState } from '@/hooks/useTryOnState';
 import { Mannequin3D } from './Mannequin3D';
 import { GarmentLayer } from './GarmentLayer';
 import { getBodyProportions } from './utils/measurementToProportions';
-import { RealisticAvatar } from './realistic-avatar';
+import { AvatarRenderer } from './avatar-renderer';
 
 interface Avatar3DProps {
   position?: [number, number, number];
@@ -13,9 +13,10 @@ interface Avatar3DProps {
 /**
  * Avatar3D - Composite component combining mannequin/avatar and garment layers
  * 
- * Supports two modes:
+ * Supports three modes:
  * - 'mannequin': Abstract ceramic mannequin (default)
- * - 'realistic': Photorealistic human avatar with face and hair
+ * - 'realistic': Photorealistic human avatar with enhanced procedural rendering
+ * - 'glb': External GLB model (Ready Player Me or custom)
  */
 
 export const Avatar3D = ({ position = [0, 0, 0] }: Avatar3DProps) => {
@@ -40,7 +41,7 @@ export const Avatar3D = ({ position = [0, 0, 0] }: Avatar3DProps) => {
     <group ref={groupRef} position={position}>
       {/* Render based on avatar mode */}
       {avatarMode === 'realistic' && customAvatar ? (
-        <RealisticAvatar config={customAvatar} position={[0, 0, 0]} />
+        <AvatarRenderer config={customAvatar} position={[0, 0, 0]} />
       ) : (
         <Mannequin3D position={[0, 0, 0]} />
       )}

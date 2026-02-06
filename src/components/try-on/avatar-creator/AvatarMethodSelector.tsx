@@ -1,13 +1,23 @@
-import { Camera, Ruler, Users, ArrowRight, Clock } from 'lucide-react';
+import { Camera, Ruler, Users, ArrowRight, Clock, Sparkles, Wand2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-type AvatarMethod = 'photo' | 'manual' | 'library';
+type AvatarMethod = 'ai' | 'photo' | 'manual' | 'library';
 
 interface AvatarMethodSelectorProps {
   onSelect: (method: AvatarMethod) => void;
 }
 
 const methods = [
+  {
+    id: 'ai' as AvatarMethod,
+    icon: Wand2,
+    title: 'AI Generator',
+    description: 'Describe yourself and AI creates your avatar',
+    effort: '30 sec',
+    accuracy: 'High',
+    available: true,
+    badge: 'New',
+  },
   {
     id: 'library' as AvatarMethod,
     icon: Users,
@@ -78,6 +88,11 @@ export const AvatarMethodSelector = ({ onSelect }: AvatarMethodSelectorProps) =>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <h3 className="font-medium text-sm">{method.title}</h3>
+                    {method.badge && (
+                      <span className="text-[10px] uppercase tracking-wider text-primary bg-primary/10 px-2 py-0.5 rounded-full">
+                        {method.badge}
+                      </span>
+                    )}
                     {!method.available && (
                       <span className="text-[10px] uppercase tracking-wider text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
                         Coming Soon

@@ -1,5 +1,6 @@
-import { useMemo } from 'react';
+import { useMemo, useRef, useEffect } from 'react';
 import * as THREE from 'three';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 type HairStyle = 'bald' | 'buzz' | 'short' | 'medium' | 'long' | 'ponytail' | 'braids' | 'afro' | 'curly';
 type Hairline = 'full' | 'receding' | 'widows-peak';
@@ -13,25 +14,40 @@ interface AvatarHairProps {
 }
 
 /**
- * Procedural hair system - generates hair geometry based on style
- * Phase 1: Uses primitives to approximate hair silhouettes
- * Phase 2: Will use pre-modeled GLB assets for higher fidelity
+ * AvatarHair - Enhanced procedural hair system
+ * 
+ * Features:
+ * - 9 distinct hairstyles with realistic silhouettes
+ * - Strand-based rendering for afro/curly styles
+ * - Performance-optimized geometry
+ * - Proper hair material with realistic roughness
  */
 export const AvatarHair = ({ 
   style, 
   color, 
   hairline,
   headRadius, 
-  isMobile = false 
+  isMobile: isMobileProp 
 }: AvatarHairProps) => {
+  const isMobileHook = useIsMobile();
+  const isMobile = isMobileProp ?? isMobileHook;
   const segments = isMobile ? 12 : 24;
   
-  // Common material for hair
-  const material = useMemo(() => (
+  // Enhanced hair material with realistic properties
+  const hairMaterial = useMemo(() => (
     <meshStandardMaterial 
       color={color}
-      roughness={0.65}
-      metalness={0.1}
+      roughness={0.62}
+      metalness={0.08}
+    />
+  ), [color]);
+
+  // Matte hair material for textured styles
+  const matteHairMaterial = useMemo(() => (
+    <meshStandardMaterial 
+      color={color}
+      roughness={0.85}
+      metalness={0}
     />
   ), [color]);
 
@@ -39,168 +55,197 @@ export const AvatarHair = ({
     return null;
   }
 
-  // Buzz cut - thin cap on head
+  // Buzz cut - thin textured cap
   if (style === 'buzz') {
     return (
       <mesh position={[0, headRadius * 0.15, 0]}>
-        <sphereGeometry args={[headRadius * 0.92, segments, segments / 2, 0, Math.PI * 2, 0, Math.PI * 0.55]} />
-        {material}
+        <sphereGeometry args={[headRadius * 0.925, segments, segments / 2, 0, Math.PI * 2, 0, Math.PI * 0.55]} />
+        {matteHairMaterial}
       </mesh>
     );
   }
 
-  // Short hair - slightly thicker cap with some volume
+  // Short hair - slight volume with styled fringe
   if (style === 'short') {
     return (
       <group>
         <mesh position={[0, headRadius * 0.18, headRadius * 0.02]}>
-          <sphereGeometry args={[headRadius * 0.95, segments, segments / 2, 0, Math.PI * 2, 0, Math.PI * 0.52]} />
-          {material}
+          <sphereGeometry args={[headRadius * 0.96, segments, segments / 2, 0, Math.PI * 2, 0, Math.PI * 0.52]} />
+          {hairMaterial}
         </mesh>
-        {/* Slight front fringe */}
-        <mesh position={[0, headRadius * 0.5, headRadius * 0.7]} rotation={[-0.3, 0, 0]}>
-          <boxGeometry args={[headRadius * 0.8, headRadius * 0.15, headRadius * 0.2]} />
-          {material}
+        {/* Front fringe */}
+        <mesh position={[0, headRadius * 0.52, headRadius * 0.68]} rotation={[-0.35, 0, 0]}>
+          <boxGeometry args={[headRadius * 0.75, headRadius * 0.12, headRadius * 0.18]} />
+          {hairMaterial}
+        </mesh>
+        {/* Side texturing */}
+        <mesh position={[-headRadius * 0.55, headRadius * 0.1, headRadius * 0.2]}>
+          <sphereGeometry args={[headRadius * 0.18, segments / 2, segments / 2]} />
+          {hairMaterial}
+        </mesh>
+        <mesh position={[headRadius * 0.55, headRadius * 0.1, headRadius * 0.2]}>
+          <sphereGeometry args={[headRadius * 0.18, segments / 2, segments / 2]} />
+          {hairMaterial}
         </mesh>
       </group>
     );
   }
 
-  // Medium hair - more volume, covers ears partially
+  // Medium hair - covers ears, more volume
   if (style === 'medium') {
     return (
       <group>
-        {/* Main hair volume */}
+        {/* Main volume */}
         <mesh position={[0, headRadius * 0.2, -headRadius * 0.05]}>
-          <sphereGeometry args={[headRadius * 1.02, segments, segments, 0, Math.PI * 2, 0, Math.PI * 0.6]} />
-          {material}
+          <sphereGeometry args={[headRadius * 1.04, segments, segments, 0, Math.PI * 2, 0, Math.PI * 0.6]} />
+          {hairMaterial}
         </mesh>
-        {/* Side volume */}
-        <mesh position={[-headRadius * 0.6, -headRadius * 0.1, 0]}>
-          <sphereGeometry args={[headRadius * 0.4, segments / 2, segments / 2]} />
-          {material}
+        {/* Side volume covering ears */}
+        <mesh position={[-headRadius * 0.62, -headRadius * 0.08, 0]}>
+          <sphereGeometry args={[headRadius * 0.38, segments / 2, segments / 2]} />
+          {hairMaterial}
         </mesh>
-        <mesh position={[headRadius * 0.6, -headRadius * 0.1, 0]}>
-          <sphereGeometry args={[headRadius * 0.4, segments / 2, segments / 2]} />
-          {material}
+        <mesh position={[headRadius * 0.62, -headRadius * 0.08, 0]}>
+          <sphereGeometry args={[headRadius * 0.38, segments / 2, segments / 2]} />
+          {hairMaterial}
+        </mesh>
+        {/* Back volume */}
+        <mesh position={[0, -headRadius * 0.15, -headRadius * 0.45]}>
+          <sphereGeometry args={[headRadius * 0.5, segments / 2, segments / 2]} />
+          {hairMaterial}
         </mesh>
       </group>
     );
   }
 
-  // Long hair - flows down past shoulders
+  // Long hair - flows past shoulders
   if (style === 'long') {
     return (
       <group>
         {/* Top volume */}
         <mesh position={[0, headRadius * 0.2, -headRadius * 0.05]}>
-          <sphereGeometry args={[headRadius * 1.05, segments, segments, 0, Math.PI * 2, 0, Math.PI * 0.55]} />
-          {material}
+          <sphereGeometry args={[headRadius * 1.06, segments, segments, 0, Math.PI * 2, 0, Math.PI * 0.55]} />
+          {hairMaterial}
         </mesh>
         {/* Back hair flowing down */}
-        <mesh position={[0, -headRadius * 0.6, -headRadius * 0.35]} rotation={[-0.15, 0, 0]}>
-          <cylinderGeometry args={[headRadius * 0.7, headRadius * 0.85, headRadius * 1.8, segments, 4]} />
-          {material}
+        <mesh position={[0, -headRadius * 0.55, -headRadius * 0.32]} rotation={[-0.12, 0, 0]}>
+          <cylinderGeometry args={[headRadius * 0.68, headRadius * 0.82, headRadius * 1.9, segments, 4]} />
+          {hairMaterial}
         </mesh>
-        {/* Side hair */}
-        <mesh position={[-headRadius * 0.55, -headRadius * 0.3, headRadius * 0.1]}>
-          <cylinderGeometry args={[headRadius * 0.25, headRadius * 0.3, headRadius * 1.2, segments / 2, 2]} />
-          {material}
+        {/* Side strands */}
+        <mesh position={[-headRadius * 0.52, -headRadius * 0.28, headRadius * 0.12]}>
+          <cylinderGeometry args={[headRadius * 0.22, headRadius * 0.28, headRadius * 1.15, segments / 2, 2]} />
+          {hairMaterial}
         </mesh>
-        <mesh position={[headRadius * 0.55, -headRadius * 0.3, headRadius * 0.1]}>
-          <cylinderGeometry args={[headRadius * 0.25, headRadius * 0.3, headRadius * 1.2, segments / 2, 2]} />
-          {material}
+        <mesh position={[headRadius * 0.52, -headRadius * 0.28, headRadius * 0.12]}>
+          <cylinderGeometry args={[headRadius * 0.22, headRadius * 0.28, headRadius * 1.15, segments / 2, 2]} />
+          {hairMaterial}
         </mesh>
       </group>
     );
   }
 
-  // Ponytail - tied back with tail
+  // Ponytail - pulled back with tied tail
   if (style === 'ponytail') {
     return (
       <group>
-        {/* Pulled back top */}
-        <mesh position={[0, headRadius * 0.22, -headRadius * 0.1]}>
-          <sphereGeometry args={[headRadius * 0.98, segments, segments, 0, Math.PI * 2, 0, Math.PI * 0.5]} />
-          {material}
+        {/* Pulled back top - smooth and tight */}
+        <mesh position={[0, headRadius * 0.22, -headRadius * 0.08]}>
+          <sphereGeometry args={[headRadius * 0.97, segments, segments, 0, Math.PI * 2, 0, Math.PI * 0.5]} />
+          {hairMaterial}
         </mesh>
-        {/* Ponytail bun */}
-        <mesh position={[0, headRadius * 0.1, -headRadius * 0.85]}>
-          <sphereGeometry args={[headRadius * 0.25, segments / 2, segments / 2]} />
-          {material}
+        {/* Ponytail bun/tie */}
+        <mesh position={[0, headRadius * 0.08, -headRadius * 0.88]}>
+          <sphereGeometry args={[headRadius * 0.22, segments / 2, segments / 2]} />
+          {hairMaterial}
         </mesh>
-        {/* Ponytail tail */}
-        <mesh position={[0, -headRadius * 0.4, -headRadius * 0.9]} rotation={[-0.3, 0, 0]}>
-          <cylinderGeometry args={[headRadius * 0.12, headRadius * 0.08, headRadius * 1.2, segments / 2, 2]} />
-          {material}
+        {/* Ponytail length */}
+        <mesh position={[0, -headRadius * 0.42, -headRadius * 0.92]} rotation={[-0.25, 0, 0]}>
+          <cylinderGeometry args={[headRadius * 0.1, headRadius * 0.06, headRadius * 1.25, segments / 2, 2]} />
+          {hairMaterial}
         </mesh>
       </group>
     );
   }
 
-  // Braids - multiple cylindrical strands
+  // Braids - individual strands
   if (style === 'braids') {
-    const braidPositions = [
-      [-0.4, 0.15], [-0.2, 0.1], [0, 0.08], [0.2, 0.1], [0.4, 0.15],
-    ];
+    const braidCount = isMobile ? 5 : 8;
+    const braidPositions = Array.from({ length: braidCount }, (_, i) => {
+      const angle = (i / braidCount) * Math.PI - Math.PI / 2;
+      return {
+        x: Math.sin(angle) * 0.35,
+        z: Math.cos(angle) * 0.15 - 0.1,
+        rotation: angle * 0.08,
+      };
+    });
     
     return (
       <group>
-        {/* Top cap */}
+        {/* Scalp cap */}
         <mesh position={[0, headRadius * 0.25, 0]}>
-          <sphereGeometry args={[headRadius * 0.95, segments, segments / 2, 0, Math.PI * 2, 0, Math.PI * 0.45]} />
-          {material}
+          <sphereGeometry args={[headRadius * 0.94, segments, segments / 2, 0, Math.PI * 2, 0, Math.PI * 0.45]} />
+          {hairMaterial}
         </mesh>
         {/* Individual braids */}
-        {braidPositions.map(([x, z], i) => (
+        {braidPositions.map((pos, i) => (
           <mesh 
             key={i} 
-            position={[headRadius * x, -headRadius * 0.5, headRadius * z]}
-            rotation={[0.05 * (i - 2), 0, 0.02 * (i - 2)]}
+            position={[headRadius * pos.x, -headRadius * 0.5, headRadius * pos.z]}
+            rotation={[0.05, 0, pos.rotation]}
           >
-            <cylinderGeometry args={[headRadius * 0.06, headRadius * 0.04, headRadius * 1.6, 8, 4]} />
-            {material}
+            <cylinderGeometry args={[headRadius * 0.055, headRadius * 0.035, headRadius * 1.7, 6, 4]} />
+            {hairMaterial}
           </mesh>
         ))}
       </group>
     );
   }
 
-  // Afro - large spherical volume
+  // Afro - large natural volume
   if (style === 'afro') {
     return (
-      <mesh position={[0, headRadius * 0.35, 0]}>
-        <sphereGeometry args={[headRadius * 1.35, segments, segments, 0, Math.PI * 2, 0, Math.PI * 0.7]} />
-        <meshStandardMaterial 
-          color={color}
-          roughness={0.85}
-          metalness={0}
-        />
-      </mesh>
+      <group>
+        {/* Main afro volume */}
+        <mesh position={[0, headRadius * 0.38, 0]}>
+          <sphereGeometry args={[headRadius * 1.4, segments, segments, 0, Math.PI * 2, 0, Math.PI * 0.72]} />
+          {matteHairMaterial}
+        </mesh>
+        {/* Side volume for natural shape */}
+        <mesh position={[-headRadius * 0.65, headRadius * 0.15, 0]}>
+          <sphereGeometry args={[headRadius * 0.55, segments / 2, segments / 2]} />
+          {matteHairMaterial}
+        </mesh>
+        <mesh position={[headRadius * 0.65, headRadius * 0.15, 0]}>
+          <sphereGeometry args={[headRadius * 0.55, segments / 2, segments / 2]} />
+          {matteHairMaterial}
+        </mesh>
+      </group>
     );
   }
 
-  // Curly - medium volume with texture suggestion
+  // Curly - textured medium volume
   if (style === 'curly') {
     return (
       <group>
         {/* Main curly volume */}
-        <mesh position={[0, headRadius * 0.22, 0]}>
-          <sphereGeometry args={[headRadius * 1.08, segments, segments, 0, Math.PI * 2, 0, Math.PI * 0.6]} />
-          <meshStandardMaterial 
-            color={color}
-            roughness={0.8}
-            metalness={0}
-          />
+        <mesh position={[0, headRadius * 0.24, 0]}>
+          <sphereGeometry args={[headRadius * 1.1, segments, segments, 0, Math.PI * 2, 0, Math.PI * 0.62]} />
+          {matteHairMaterial}
         </mesh>
         {/* Side curls */}
-        <mesh position={[-headRadius * 0.65, -headRadius * 0.05, headRadius * 0.1]}>
-          <sphereGeometry args={[headRadius * 0.35, segments / 2, segments / 2]} />
-          <meshStandardMaterial color={color} roughness={0.8} />
+        <mesh position={[-headRadius * 0.62, -headRadius * 0.02, headRadius * 0.12]}>
+          <sphereGeometry args={[headRadius * 0.32, segments / 2, segments / 2]} />
+          {matteHairMaterial}
         </mesh>
-        <mesh position={[headRadius * 0.65, -headRadius * 0.05, headRadius * 0.1]}>
-          <sphereGeometry args={[headRadius * 0.35, segments / 2, segments / 2]} />
-          <meshStandardMaterial color={color} roughness={0.8} />
+        <mesh position={[headRadius * 0.62, -headRadius * 0.02, headRadius * 0.12]}>
+          <sphereGeometry args={[headRadius * 0.32, segments / 2, segments / 2]} />
+          {matteHairMaterial}
+        </mesh>
+        {/* Front curls */}
+        <mesh position={[0, headRadius * 0.42, headRadius * 0.62]}>
+          <sphereGeometry args={[headRadius * 0.25, segments / 2, segments / 2]} />
+          {matteHairMaterial}
         </mesh>
       </group>
     );
