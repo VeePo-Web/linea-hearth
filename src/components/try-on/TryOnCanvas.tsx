@@ -7,6 +7,7 @@ import { CameraPresets, CameraPreset } from './CameraPresets';
 import { CanvasOverlays } from './CanvasOverlays';
 import { StudioLighting } from './lighting/StudioLighting';
 import { StudioEnvironment } from './environment/StudioEnvironment';
+import { EnhancedShadows } from './effects/PostProcessing';
 import { useTryOnState } from '@/hooks/useTryOnState';
 import { useCameraPresets } from '@/hooks/useCameraPresets';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -50,6 +51,9 @@ const Scene = ({
 
       {/* Studio Lighting System */}
       <StudioLighting mode={lightingMode} />
+      
+      {/* Enhanced shadows for depth */}
+      <EnhancedShadows />
 
       {/* Complete Studio Environment (floor, backdrop, shadows) */}
       <StudioEnvironment lightingMode={lightingMode} />

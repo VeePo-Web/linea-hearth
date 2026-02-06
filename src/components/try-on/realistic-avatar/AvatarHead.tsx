@@ -4,6 +4,9 @@ import { AvatarFaceConfig, AvatarHairConfig } from '../avatar-creator/avatarPres
 import { RealisticSkinMaterial } from './RealisticSkinMaterial';
 import { AvatarEyes } from './AvatarEyes';
 import { AvatarHair } from './AvatarHair';
+import { AvatarEyelids } from './AvatarEyelids';
+import { AvatarNose } from './AvatarNose';
+import { AvatarLips } from './AvatarLips';
 
 interface AvatarHeadProps {
   skinTone: string;
@@ -15,6 +18,7 @@ interface AvatarHeadProps {
 
 /**
  * Realistic human head with parametric face features
+ * Enhanced with anatomical eyelids, nose, and lips
  */
 export const AvatarHead = ({ 
   skinTone, 
@@ -74,33 +78,38 @@ export const AvatarHead = ({
         z *= 0.92;
       }
       
-      // Subtle brow ridge
-      if (normalizedY > 0.1 && normalizedY < 0.3 && z > headRadius * 0.6) {
-        z += headRadius * 0.02;
+      // Brow ridge - more pronounced
+      if (normalizedY > 0.08 && normalizedY < 0.25 && z > headRadius * 0.6) {
+        z += headRadius * 0.035;
+        y += headRadius * 0.01;
       }
       
-      // Nose projection (subtle bump)
-      const noseMod = faceConfig.noseWidth / 100;
-      if (normalizedY > -0.15 && normalizedY < 0.1 && z > headRadius * 0.75) {
-        const noseStrength = 1 - Math.abs(x) / (headRadius * 0.15);
-        if (noseStrength > 0) {
-          z += headRadius * 0.04 * noseStrength * (0.8 + noseMod * 0.4);
+      // Eye socket depressions
+      const eyeY = normalizedY > -0.05 && normalizedY < 0.15;
+      const eyeX = Math.abs(x) > headRadius * 0.12 && Math.abs(x) < headRadius * 0.35;
+      if (eyeY && eyeX && z > headRadius * 0.6) {
+        z -= headRadius * 0.02;
+      }
+      
+      // Cheekbone prominence
+      if (normalizedY > -0.15 && normalizedY < 0.05 && z > headRadius * 0.5) {
+        const cheekStrength = 1 - Math.abs(normalizedY + 0.05) / 0.15;
+        const sideStrength = Math.abs(x) / (headRadius * 0.5);
+        z += headRadius * 0.02 * cheekStrength * sideStrength * cheekMod;
+      }
+      
+      // Temple indentations
+      if (normalizedY > 0.1 && normalizedY < 0.35) {
+        const sideStrength = Math.abs(x) / (headRadius * 0.9);
+        if (sideStrength > 0.7) {
+          z -= headRadius * 0.015 * (sideStrength - 0.7) / 0.3;
         }
       }
       
-      // Lip volume (subtle)
-      const lipMod = faceConfig.lipFullness / 100;
-      if (normalizedY > -0.35 && normalizedY < -0.2 && z > headRadius * 0.7) {
-        const lipStrength = 1 - Math.abs(x) / (headRadius * 0.2);
-        if (lipStrength > 0) {
-          z += headRadius * 0.015 * lipStrength * (0.5 + lipMod * 0.5);
-        }
-      }
-      
-      // Chin definition
+      // Chin projection
       if (normalizedY < -0.5 && z > headRadius * 0.5) {
-        const chinStrength = Math.max(0, 1 - Math.abs(x) / (headRadius * 0.25));
-        z += headRadius * 0.02 * chinStrength * chinMod;
+        const chinStrength = Math.max(0, 1 - Math.abs(x) / (headRadius * 0.2));
+        z += headRadius * 0.03 * chinStrength * chinMod;
         y -= headRadius * 0.02 * chinStrength;
       }
       
@@ -111,23 +120,49 @@ export const AvatarHead = ({
     return geometry;
   }, [headRadius, faceConfig, segments]);
 
-  // Eyebrows
+  // Ear geometry - more detailed
+  const earGeometry = useMemo(() => {
+    const shape = new THREE.Shape();
+    const w = headRadius * 0.06;
+    const h = headRadius * 0.1;
+    
+    shape.moveTo(0, -h);
+    shape.bezierCurveTo(w * 1.5, -h * 0.5, w * 1.2, h * 0.5, w * 0.3, h);
+    shape.bezierCurveTo(-w * 0.2, h * 0.8, -w * 0.5, 0, 0, -h);
+    
+    return new THREE.ExtrudeGeometry(shape, {
+      depth: headRadius * 0.03,
+      bevelEnabled: true,
+      bevelThickness: 0.005,
+      bevelSize: 0.005,
+      bevelSegments: 2,
+    });
+  }, [headRadius]);
+
+  // Eyebrow geometry
   const eyebrowGeometry = useMemo(() => {
     const shape = new THREE.Shape();
-    shape.moveTo(-0.02, 0);
-    shape.quadraticCurveTo(0, 0.005, 0.02, 0);
-    shape.quadraticCurveTo(0, -0.002, -0.02, 0);
+    const w = headRadius * 0.06;
+    const h = headRadius * 0.008;
+    
+    shape.moveTo(-w, 0);
+    shape.bezierCurveTo(-w * 0.5, h * 2, w * 0.5, h * 2, w, h * 0.5);
+    shape.bezierCurveTo(w * 0.5, -h, -w * 0.5, -h, -w, 0);
     
     return new THREE.ExtrudeGeometry(shape, { 
-      depth: 0.003, 
-      bevelEnabled: false 
+      depth: headRadius * 0.015, 
+      bevelEnabled: true,
+      bevelThickness: 0.002,
+      bevelSize: 0.002,
+      bevelSegments: 2,
     });
-  }, []);
+  }, [headRadius]);
 
   const eyeY = headRadius * 0.05;
   const eyeZ = headRadius * 0.78;
   const eyeSpacing = headRadius * 0.22;
-  const browY = headRadius * 0.18;
+  const eyeRadius = headRadius * 0.065 * (0.7 + (faceConfig.eyeSize / 100) * 0.6);
+  const browY = headRadius * 0.2;
 
   return (
     <group>
@@ -137,41 +172,71 @@ export const AvatarHead = ({
       </mesh>
       
       {/* Ears */}
-      <mesh position={[-headRadius * 0.88, 0, 0]} rotation={[0, 0, 0.1]}>
-        <sphereGeometry args={[headRadius * 0.12, 12, 8]} />
+      <mesh 
+        geometry={earGeometry}
+        position={[-headRadius * 0.92, 0, -headRadius * 0.1]} 
+        rotation={[0, -0.3, 0.1]}
+      >
         <RealisticSkinMaterial skinTone={skinTone} isMobile={isMobile} />
       </mesh>
-      <mesh position={[headRadius * 0.88, 0, 0]} rotation={[0, 0, -0.1]}>
-        <sphereGeometry args={[headRadius * 0.12, 12, 8]} />
+      <mesh 
+        geometry={earGeometry}
+        position={[headRadius * 0.92, 0, -headRadius * 0.1]} 
+        rotation={[0, 0.3, -0.1]}
+        scale={[-1, 1, 1]}
+      >
         <RealisticSkinMaterial skinTone={skinTone} isMobile={isMobile} />
       </mesh>
       
-      {/* Eyes */}
+      {/* Eyes with enhanced realism */}
       <AvatarEyes 
         headRadius={headRadius} 
         eyeSize={faceConfig.eyeSize}
         skinTone={skinTone}
       />
       
-      {/* Eyebrows */}
-      <group position={[-eyeSpacing, browY, eyeZ]} rotation={[0, 0, 0.05]}>
-        <mesh geometry={eyebrowGeometry} scale={[1.2, 1, 1]}>
-          <meshStandardMaterial color={hairConfig.color} roughness={0.8} />
-        </mesh>
-      </group>
-      <group position={[eyeSpacing, browY, eyeZ]} rotation={[0, 0, -0.05]}>
-        <mesh geometry={eyebrowGeometry} scale={[-1.2, 1, 1]}>
-          <meshStandardMaterial color={hairConfig.color} roughness={0.8} />
-        </mesh>
-      </group>
+      {/* Eyelids and eyelashes - CRITICAL for realism */}
+      <AvatarEyelids
+        headRadius={headRadius}
+        eyeSpacing={eyeSpacing}
+        eyeY={eyeY}
+        eyeZ={eyeZ}
+        eyeRadius={eyeRadius}
+        skinTone={skinTone}
+        isMobile={isMobile}
+      />
       
-      {/* Lips */}
-      <mesh position={[0, -headRadius * 0.28, headRadius * 0.82]}>
-        <sphereGeometry args={[headRadius * 0.08, 16, 8, 0, Math.PI * 2, 0, Math.PI * 0.5]} />
-        <meshStandardMaterial 
-          color={`color-mix(in srgb, ${skinTone} 60%, #C48080)`}
-          roughness={0.4}
-        />
+      {/* Anatomical nose */}
+      <AvatarNose
+        headRadius={headRadius}
+        noseWidth={faceConfig.noseWidth}
+        skinTone={skinTone}
+        isMobile={isMobile}
+      />
+      
+      {/* Anatomical lips */}
+      <AvatarLips
+        headRadius={headRadius}
+        lipFullness={faceConfig.lipFullness}
+        skinTone={skinTone}
+        isMobile={isMobile}
+      />
+      
+      {/* Eyebrows */}
+      <mesh 
+        geometry={eyebrowGeometry}
+        position={[-eyeSpacing, browY, eyeZ]} 
+        rotation={[0.1, 0, 0.08]}
+      >
+        <meshStandardMaterial color={hairConfig.color} roughness={0.8} />
+      </mesh>
+      <mesh 
+        geometry={eyebrowGeometry}
+        position={[eyeSpacing, browY, eyeZ]} 
+        rotation={[0.1, 0, -0.08]}
+        scale={[-1, 1, 1]}
+      >
+        <meshStandardMaterial color={hairConfig.color} roughness={0.8} />
       </mesh>
       
       {/* Facial hair (if applicable) */}

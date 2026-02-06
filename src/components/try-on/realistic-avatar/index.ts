@@ -3,4 +3,8 @@ export { AvatarBody } from './AvatarBody';
 export { AvatarHead } from './AvatarHead';
 export { AvatarHair } from './AvatarHair';
 export { AvatarEyes } from './AvatarEyes';
+export { AvatarEyelids } from './AvatarEyelids';
+export { AvatarNose } from './AvatarNose';
+export { AvatarLips } from './AvatarLips';
+export { AvatarFingers } from './AvatarFingers';
 export { RealisticSkinMaterial } from './RealisticSkinMaterial';
