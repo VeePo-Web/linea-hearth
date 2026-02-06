@@ -9,6 +9,7 @@ import { AvatarBodyEditor } from './AvatarBodyEditor';
 import { AvatarFaceEditor } from './AvatarFaceEditor';
 import { AvatarHairPicker } from './AvatarHairPicker';
 import { AvatarPreview } from './AvatarPreview';
+import { AIAvatarGenerator } from '../avatar-renderer/AIAvatarGenerator';
 import { 
   AvatarConfig, 
   AvatarBodyConfig, 
@@ -18,7 +19,7 @@ import {
   getAvatarPreset,
 } from './avatarPresets';
 
-type WizardStep = 'method' | 'library' | 'body' | 'face' | 'preview';
+type WizardStep = 'method' | 'ai' | 'library' | 'body' | 'face' | 'preview';
 
 interface AvatarCreationFlowProps {
   isOpen: boolean;
@@ -41,19 +42,26 @@ export const AvatarCreationFlow = ({
   initialAvatar,
 }: AvatarCreationFlowProps) => {
   const [step, setStep] = useState<WizardStep>('method');
-  const [selectedMethod, setSelectedMethod] = useState<'photo' | 'manual' | 'library' | null>(null);
+  const [selectedMethod, setSelectedMethod] = useState<'ai' | 'photo' | 'manual' | 'library' | null>(null);
   const [avatar, setAvatar] = useState<AvatarConfig>(
     initialAvatar || createDefaultAvatarConfig('male')
   );
 
-  const handleMethodSelect = useCallback((method: 'photo' | 'manual' | 'library') => {
+  const handleMethodSelect = useCallback((method: 'ai' | 'photo' | 'manual' | 'library') => {
     setSelectedMethod(method);
-    if (method === 'library') {
+    if (method === 'ai') {
+      setStep('ai');
+    } else if (method === 'library') {
       setStep('library');
     } else if (method === 'manual') {
       setStep('body');
     }
     // Photo method is coming soon
+  }, []);
+
+  const handleAIGenerated = useCallback((generatedAvatar: AvatarConfig) => {
+    setAvatar(generatedAvatar);
+    setStep('body'); // Go to body editor to allow refinement
   }, []);
 
   const handleLibrarySelect = useCallback((selectedAvatar: AvatarConfig) => {
@@ -111,11 +119,14 @@ export const AvatarCreationFlow = ({
 
   const handleBack = useCallback(() => {
     switch (step) {
+      case 'ai':
+        setStep('method');
+        break;
       case 'library':
         setStep('method');
         break;
       case 'body':
-        setStep(selectedMethod === 'library' ? 'library' : 'method');
+        setStep(selectedMethod === 'library' ? 'library' : selectedMethod === 'ai' ? 'ai' : 'method');
         break;
       case 'face':
         setStep('body');
@@ -128,6 +139,9 @@ export const AvatarCreationFlow = ({
 
   const handleNext = useCallback(() => {
     switch (step) {
+      case 'ai':
+        setStep('body');
+        break;
       case 'library':
         setStep('body');
         break;
@@ -145,6 +159,7 @@ export const AvatarCreationFlow = ({
 
   const getCurrentStepIndex = () => {
     if (step === 'method') return 0;
+    if (step === 'ai') return 0.5;
     if (step === 'library') return 0.5;
     if (step === 'body') return 1;
     if (step === 'face') return 2;
@@ -153,6 +168,7 @@ export const AvatarCreationFlow = ({
 
   const canProceed = () => {
     if (step === 'library') return avatar.id !== '';
+    if (step === 'ai') return false; // AI step handles its own progression
     return true;
   };
 
@@ -165,7 +181,7 @@ export const AvatarCreationFlow = ({
           </DialogTitle>
           
           {/* Progress indicator */}
-          {step !== 'method' && (
+          {step !== 'method' && step !== 'ai' && (
             <div className="flex items-center gap-2 mt-4">
               {STEPS.slice(1).map((s, i) => {
                 const stepIndex = i + 1;
@@ -200,6 +216,13 @@ export const AvatarCreationFlow = ({
         <div className="flex-1 overflow-y-auto p-6">
           {step === 'method' && (
             <AvatarMethodSelector onSelect={handleMethodSelect} />
+          )}
+          
+          {step === 'ai' && (
+            <AIAvatarGenerator
+              onGenerate={handleAIGenerated}
+              onBack={() => setStep('method')}
+            />
           )}
           
           {step === 'library' && (

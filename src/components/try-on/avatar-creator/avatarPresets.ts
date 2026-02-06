@@ -43,12 +43,14 @@ export interface AvatarConfig {
   id: string;
   name: string;
   createdAt: Date;
-  method: 'photo' | 'manual' | 'library';
+  method: 'photo' | 'manual' | 'library' | 'readyplayerme' | 'ai-generated';
   gender: 'male' | 'female' | 'non-binary';
   skinTone: string;
   body: AvatarBodyConfig;
   face: AvatarFaceConfig;
   hair: AvatarHairConfig;
+  /** GLB URL for Ready Player Me or custom uploaded avatars */
+  glbUrl?: string;
 }
 
 // Extended skin tone palette - 20 diverse tones
