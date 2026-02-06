@@ -1,637 +1,673 @@
 
-
-# World-Class Try-On Room: Complete 3D Environment & Avatar Reconstruction
-## "$1 Million" Implementation Plan
+# Photorealistic AI-Powered Avatar System
+## Complete Technical Implementation Plan
 
 ---
 
 ## Executive Summary
 
-After an exhaustive forensic analysis of the Try-On Room codebase, I've identified the core issues preventing world-class quality. While the fundamental architecture is sound, the **3D environment lacks real-world spatial fidelity** and the **avatar/mannequin has critical proportion and positioning bugs**. This plan delivers a complete reconstruction of the 3D studio environment to match physical photo studio dimensions, fixes all mannequin proportion issues, and establishes a proper grounding system.
+This plan transforms the current parametric geometric avatar into a **photorealistic human avatar system** that makes users truly see themselves in the garments. The solution leverages:
+
+1. **Ready Player Me API** - Industry-leading avatar creation SDK with GLB export
+2. **AI-Enhanced Avatar Generation** - Using Lovable AI to generate avatar parameters from text descriptions  
+3. **High-Fidelity GLB Models** - Pre-loaded photorealistic human meshes with morphing support
+4. **Enhanced Procedural System** - Upgraded skin, eye, and hair rendering for the fallback system
+
+The goal: **Avatars that look like real fashion models, not geometric approximations.**
 
 ---
 
-## PART 1: CRITICAL ISSUES IDENTIFIED
+## Part 1: Current State Analysis
 
-### 1.1 Studio Environment Deficiencies
+### What Exists
+| Component | Status | Quality |
+|-----------|--------|---------|
+| `RealisticAvatar.tsx` | Implemented | Low - uses primitive geometry |
+| `AvatarBody.tsx` | Implemented | Medium - anatomical but geometric |
+| `AvatarHead.tsx` | Implemented | Low - morphed sphere with bumps |
+| `AvatarHair.tsx` | Implemented | Low - basic primitives |
+| `AvatarEyes.tsx` | Implemented | Medium - stylized eyes |
+| Avatar Creation Flow | Implemented | Good - 4-step wizard |
+| 12 Preset Avatars | Implemented | Good - diverse library |
 
-| Issue | Current State | Real-World Standard |
-|-------|---------------|---------------------|
-| **Floor plane too small** | `circleGeometry args={[3, 64]}` (3m radius) | Photo studios use 6-10m floors |
-| **Backdrop insufficient** | 8m×5m plane at z=-2 | Cyclorama should curve from floor |
-| **No horizon gradient** | Flat color | Seamless infinite horizon effect |
-| **Camera too close** | z=2.8, FOV=45° | Needs z=3.5-4.0 for fashion framing |
-| **No environment depth** | Single layer | Multiple depth layers for parallax |
-| **Reflective floor broken** | Only roughness=0.15 | True mirror reflection needed |
-
-### 1.2 Avatar/Mannequin Proportion Issues
-
-| Issue | Current State | Fashion Industry Standard |
-|-------|---------------|---------------------------|
-| **Y-offset calculation** | `(heightScale - 1) * crotchLine` | Feet should always be at Y=0 |
-| **Arm attachment** | `positions.shoulderLine` | Should be shoulderLine - offset |
-| **Head size** | `headRadius * 0.9` | Should be exactly 1/8 of height |
-| **Foot grounding** | `-legLength * 0.94` | Not accounting for foot depth |
-| **Group scaling** | `[heightScale * 0.97, heightScale, heightScale * 0.97]` | Non-uniform creates distortion |
-
-### 1.3 Realistic Avatar Body (AvatarBody.tsx) Issues
-
-| Issue | Current State | Required Fix |
-|-------|---------------|--------------|
-| **Torso position** | `position={[0, crotchY, 0]}` | Torso floats, not connected to pelvis |
-| **Limb separation** | Visible gaps at joints | Need overlapping geometry |
-| **Foot geometry** | `boxGeometry` | Box feet look robotic |
-| **Scale miscalculation** | `scale = 0.01` | Creates microscopic avatar |
-| **No ground contact** | Feet float above floor | Need foot sole at Y=0 |
+### Why It Looks "Not Real"
+1. **Body**: LatheGeometry/CylinderGeometry creates mechanical appearance
+2. **Face**: SphereGeometry with vertex displacement lacks organic detail
+3. **Skin**: SSS material is good but applied to primitive geometry  
+4. **Hair**: Sphere/cylinder approximations lack strand definition
+5. **Eyes**: Missing corneal wetness, iris depth, and proper reflections
+6. **No Textures**: Relies entirely on procedural materials
 
 ---
 
-## PART 2: 3D STUDIO ENVIRONMENT RECONSTRUCTION
+## Part 2: Solution Architecture
 
-### 2.1 Professional Photography Studio Dimensions
+### Hybrid Approach - Best of Both Worlds
 
-Real photo studios follow these spatial standards:
-
-```
-┌────────────────────────────────────────────────────────────────┐
-│                                                                │
-│                        INFINITY COVE                           │
-│                     (Curved cyclorama)                         │
-│                                                                │
-│                    ┌──────────────────┐                        │
-│                    │                  │                        │
-│                    │    MANNEQUIN     │ ← Subject position     │
-│                    │                  │                        │
-│                    └──────────────────┘                        │
-│                          │                                     │
-│    ─────────────────────────────────────────── Floor plane     │
-│                                                                │
-│                                                                │
-│                    🎥 Camera (3.5-4.5m away)                   │
-│                                                                │
-└────────────────────────────────────────────────────────────────┘
-
-Floor: 8m × 8m minimum
-Ceiling: 4-5m high
-Backdrop: Curved "cove" from floor to wall (no visible seam)
-```
-
-### 2.2 New StudioEnvironment.tsx Component
-
-Create a proper 3D studio with:
-
-**A. Seamless Cyclorama (Infinity Cove)**
-```typescript
-// Creates the curved backdrop that real studios use
-const CycloramaGeometry = () => {
-  // L-shaped profile that curves from floor to wall
-  const path = new THREE.QuadraticBezierCurve3(
-    new THREE.Vector3(0, 0, -4),      // Floor back edge
-    new THREE.Vector3(0, 2, -4),      // Curve control point
-    new THREE.Vector3(0, 5, -3.5)     // Wall top
-  );
-  
-  // Sweep the curve across the width
-  const geometry = new THREE.ExtrudeGeometry(curveShape, {
-    steps: 32,
-    depth: 10,       // 10m wide
-    bevelEnabled: false,
-  });
-  
-  return geometry;
-};
-```
-
-**B. Reflective Floor with Real Mirror Effect**
-```typescript
-// True reflections, not just low roughness
-import { Reflector } from '@react-three/drei';
-
-<Reflector
-  resolution={1024}
-  args={[10, 10]}       // 10m × 10m floor
-  mirror={0.5}          // 50% reflection
-  mixBlur={0.8}
-  mixStrength={0.6}
-  blur={[200, 200]}
-  position={[0, -0.001, 0]}
-  rotation={[-Math.PI / 2, 0, 0]}
->
-  {(Material, props) => (
-    <Material
-      color="#FAFAF8"
-      roughness={0.1}
-      metalness={0.1}
-      {...props}
-    />
-  )}
-</Reflector>
-```
-
-**C. Infinite Horizon Effect**
-```typescript
-// Sky dome creates seamless horizon
-<mesh rotation={[0, 0, 0]}>
-  <sphereGeometry args={[50, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2]} />
-  <shaderMaterial
-    vertexShader={horizonVertexShader}
-    fragmentShader={horizonFragmentShader}
-    uniforms={{
-      colorTop: { value: new THREE.Color('#FAFAF8') },
-      colorBottom: { value: new THREE.Color('#E8E4E0') },
-      horizonLine: { value: 0.15 },
-    }}
-    side={THREE.BackSide}
-  />
-</mesh>
-```
-
-### 2.3 Lighting Reconstruction
-
-Current lighting is good but needs:
-
-**A. Ground Bounce Light**
-```typescript
-// Simulates light bouncing off the studio floor
-<rectAreaLight
-  width={6}
-  height={6}
-  intensity={0.5}
-  color="#FAFAF8"
-  position={[0, 0.1, 2]}
-  rotation={[-Math.PI / 2, 0, 0]}
-/>
-```
-
-**B. Soft Box Key Light**
-```typescript
-// Replace spotLight with realistic soft box
-<rectAreaLight
-  width={2}
-  height={3}
-  intensity={3}
-  color="#FFF8F0"
-  position={[3, 3, 4]}
-  lookAt={[0, 1.2, 0]}
-/>
-```
-
-**C. Background Gradient Lights**
-```typescript
-// Hidden lights that create backdrop gradient
-<spotLight
-  position={[0, 5, -3]}
-  angle={Math.PI}
-  intensity={0.3}
-  color="#FFFFFF"
-  target-position={[0, 2, -4]}
-/>
-```
-
-### 2.4 Camera System Refinement
-
-**A. Proper Fashion Photography Framing**
-```typescript
-// Matchmoving to real-world camera setups
-const CAMERA_CONFIGS = {
-  fullBody: {
-    position: [0, 1.1, 3.8],    // 3.8m back for full framing
-    target: [0, 0.95, 0],       // Look at chest level
-    fov: 35,                    // Narrower = less distortion
-  },
-  upperBody: {
-    position: [0, 1.4, 2.0],
-    target: [0, 1.35, 0],
-    fov: 40,
-  },
-  detail: {
-    position: [0, 1.2, 1.2],
-    target: [0, 1.2, 0],
-    fov: 28,                    // Telephoto feel
-  },
-  threeQuarter: {
-    position: [1.5, 1.2, 3.2],
-    target: [0, 1.0, 0],
-    fov: 38,
-  },
-  lowAngle: {
-    position: [0, 0.4, 3.5],    // Hero shot from below
-    target: [0, 1.0, 0],
-    fov: 32,
-  },
-};
-```
-
-**B. Orbit Control Refinement**
-```typescript
-<OrbitControls
-  minDistance={1.5}
-  maxDistance={6.0}
-  minPolarAngle={Math.PI / 10}    // Don't look straight down
-  maxPolarAngle={Math.PI / 1.5}   // Don't look straight up
-  minAzimuthAngle={-Math.PI / 2}  // Limit side rotation
-  maxAzimuthAngle={Math.PI / 2}
-  enablePan={false}
-  dampingFactor={0.03}            // Silkier than 0.05
-/>
+```text
+                    ┌─────────────────────────────────────┐
+                    │       AVATAR CREATION OPTIONS       │
+                    └─────────────────────────────────────┘
+                                    │
+           ┌────────────────────────┼────────────────────────┐
+           │                        │                        │
+           ▼                        ▼                        ▼
+   ┌───────────────┐      ┌─────────────────┐      ┌─────────────────┐
+   │ Ready Player  │      │  AI-Generated   │      │   Pre-Made     │
+   │ Me Integration │      │  Avatar Config  │      │   GLB Models   │
+   └───────────────┘      └─────────────────┘      └─────────────────┘
+           │                        │                        │
+           │  iframe + callback     │  Text → Params         │  Direct load
+           │                        │                        │
+           └────────────────────────┼────────────────────────┘
+                                    │
+                                    ▼
+                    ┌─────────────────────────────────────┐
+                    │         GLB AVATAR RENDERER         │
+                    │   (useGLTF + morph targets + PBR)   │
+                    └─────────────────────────────────────┘
+                                    │
+                                    ▼
+                    ┌─────────────────────────────────────┐
+                    │         GARMENT LAYER SYSTEM        │
+                    │      (unchanged - receives body)    │
+                    └─────────────────────────────────────┘
 ```
 
 ---
 
-## PART 3: MANNEQUIN GROUNDING SYSTEM
+## Part 3: Ready Player Me Integration
 
-### 3.1 The "Feet on Ground" Problem
+### Why Ready Player Me
+- **1M+ Daily Avatar Creations** - Proven at scale
+- **Free Tier Available** - No cost for initial integration
+- **React SDK** - Official `@readyplayerme/react-avatar-creator` package
+- **GLB Export** - Standard format compatible with Three.js
+- **Full-Body Avatars** - Not just heads, includes body with morphing
 
-The current mannequin floats because:
+### Integration Components
 
-1. Body segments are positioned relative to `crotchLine` which is at Y=0.875 (for 1.75m height)
-2. Legs extend downward from crotch but don't reach exactly Y=0
-3. Height scaling moves the entire group up/down incorrectly
-
-**Solution: Fixed Ground Anchor System**
-
+#### A. Avatar Creator Iframe
 ```typescript
-// Calculate exact ground contact offset
-const calculateGroundOffset = (proportions: MannequinProportions): number => {
-  // Bottom of foot should be at Y=0
-  // Foot geometry is 0.10m tall at deepest point
-  // Ankle starts at legLength * 0.94 below crotch
-  // Crotch is at crotchLine
-  
-  const crotchY = EIGHT_HEAD_SCALE.crotchLine * (proportions.height / 1.75);
-  const ankleY = crotchY - proportions.legLength * 0.94;
-  const footBottomY = ankleY - 0.05; // Foot depth
-  
-  // This is how much we need to move the model up
-  return -footBottomY;
-};
+// New: ReadyPlayerMeCreator.tsx
+import { AvatarCreator } from '@readyplayerme/react-avatar-creator';
 
-// Apply in Mannequin3D.tsx
-<group position={[0, groundOffset, 0]}>
-  {/* All body parts */}
-</group>
-```
+interface ReadyPlayerMeCreatorProps {
+  onAvatarExported: (url: string) => void;
+  onClose: () => void;
+}
 
-### 3.2 Leg-to-Ground Connection
-
-Current leg ends at `-legLength * 0.94` which doesn't account for foot geometry.
-
-**Fix:**
-```typescript
-// Leg component ends
-const legEndY = -proportions.legLength;
-
-// Foot component positioned to continue from leg end
-const footY = legEndY + 0.02; // Overlap for seamless joint
-
-// Foot bottom at exact ground level
-<mesh position={[0, footY, 0.04]}>
-  {/* Foot geometry with bottom at Y=0 relative to group */}
-</mesh>
-```
-
----
-
-## PART 4: AVATAR BODY RECONSTRUCTION
-
-### 4.1 AvatarBody.tsx Complete Rewrite
-
-The current AvatarBody has these critical bugs:
-
-**A. Scale Calculation Error**
-```typescript
-// CURRENT (BROKEN):
-const scale = 0.01; // cm to meters
-// This creates a 1.7 CENTIMETER avatar!
-
-// FIXED:
-const scale = 1 / 100; // cm to meters (same number, clearer intent)
-// Then use heightCm * scale = 1.70m for 170cm person
-```
-
-**B. Position Calculations Wrong**
-```typescript
-// CURRENT (BROKEN):
-const crotchY = proportions.height * 0.5;
-// For 170cm person: 0.85m - but proportions.height is in wrong units
-
-// FIXED:
-const crotchY = (config.heightCm / 100) * 0.5; // 0.85m for 170cm
-```
-
-**C. Joint Gaps**
-Currently each limb is a separate mesh with no overlap, creating visible gaps.
-
-**Fix: Overlapping Joint Spheres**
-```typescript
-// At each joint, add a sphere that bridges the gap
-<mesh position={jointPosition}>
-  <sphereGeometry args={[jointRadius * 1.05, 16, 16]} />
-  <RealisticSkinMaterial skinTone={skinTone} />
-</mesh>
-```
-
-### 4.2 Proper Anatomical Foot
-
-Replace `boxGeometry` with anatomical foot:
-
-```typescript
-const AnatomicalFoot = ({ legThickness, side }: { legThickness: number; side: 'left' | 'right' }) => {
-  const footGeometry = useMemo(() => {
-    // Foot profile from heel to toe
-    const points: THREE.Vector2[] = [];
-    const footLength = legThickness * 2.5;
-    const footHeight = legThickness * 0.4;
-    
-    // Create foot outline
-    for (let i = 0; i <= 20; i++) {
-      const t = i / 20;
-      let x: number, y: number;
-      
-      if (t < 0.2) {
-        // Heel (rounded)
-        const angle = t / 0.2 * Math.PI;
-        x = -footLength * 0.15 + Math.cos(angle) * footHeight * 0.8;
-        y = footHeight * 0.5 + Math.sin(angle) * footHeight * 0.3;
-      } else if (t < 0.7) {
-        // Arch and ball
-        const localT = (t - 0.2) / 0.5;
-        x = THREE.MathUtils.lerp(-footLength * 0.1, footLength * 0.35, localT);
-        const archHeight = Math.sin(localT * Math.PI) * footHeight * 0.15;
-        y = footHeight * 0.1 + archHeight;
-      } else {
-        // Toes
-        const localT = (t - 0.7) / 0.3;
-        x = THREE.MathUtils.lerp(footLength * 0.35, footLength * 0.5, localT);
-        y = footHeight * 0.08 * (1 - localT * 0.5);
-      }
-      
-      points.push(new THREE.Vector2(x, y));
-    }
-    
-    // Extrude to 3D
-    const shape = new THREE.Shape(points);
-    return new THREE.ExtrudeGeometry(shape, {
-      depth: legThickness * 0.8,
-      bevelEnabled: true,
-      bevelThickness: 0.005,
-      bevelSize: 0.005,
-      bevelSegments: 2,
-    });
-  }, [legThickness]);
+export const ReadyPlayerMeCreator = ({ onAvatarExported, onClose }: ReadyPlayerMeCreatorProps) => {
+  const handleComplete = (event: { url: string }) => {
+    // URL is https://models.readyplayer.me/{id}.glb
+    onAvatarExported(event.url);
+    onClose();
+  };
 
   return (
-    <mesh 
-      geometry={footGeometry} 
-      rotation={[0, side === 'left' ? 0.05 : -0.05, 0]}
-    >
-      <RealisticSkinMaterial skinTone={skinTone} />
-    </mesh>
+    <div className="w-full h-[600px] rounded-lg overflow-hidden">
+      <AvatarCreator
+        subdomain="line-of-judah" // Custom subdomain from RPM dashboard
+        config={{
+          bodyType: 'fullbody',
+          quickStart: false,
+          language: 'en',
+        }}
+        style={{ width: '100%', height: '100%', border: 'none' }}
+        onAvatarExported={handleComplete}
+      />
+    </div>
+  );
+};
+```
+
+#### B. GLB Avatar Loader
+```typescript
+// New: GLBAvatarLoader.tsx
+import { useGLTF } from '@react-three/drei';
+import { useEffect, useMemo, useRef } from 'react';
+import * as THREE from 'three';
+
+interface GLBAvatarLoaderProps {
+  url: string;
+  position?: [number, number, number];
+}
+
+export const GLBAvatarLoader = ({ url, position = [0, 0, 0] }: GLBAvatarLoaderProps) => {
+  const { scene, nodes, materials } = useGLTF(url);
+  const avatarRef = useRef<THREE.Group>(null);
+  
+  // Calculate grounding offset
+  const groundingOffset = useMemo(() => {
+    if (!scene) return 0;
+    const box = new THREE.Box3().setFromObject(scene);
+    return -box.min.y; // Move up so feet touch Y=0
+  }, [scene]);
+  
+  // Apply skin material enhancements
+  useEffect(() => {
+    scene.traverse((child) => {
+      if (child instanceof THREE.Mesh) {
+        const material = child.material as THREE.MeshStandardMaterial;
+        if (material.name.toLowerCase().includes('skin')) {
+          // Upgrade to physical material with SSS
+          child.material = new THREE.MeshPhysicalMaterial({
+            color: material.color,
+            roughness: 0.45,
+            metalness: 0,
+            transmission: 0.1,
+            thickness: 0.2,
+            ior: 1.38,
+          });
+        }
+      }
+    });
+  }, [scene]);
+  
+  return (
+    <group ref={avatarRef} position={[position[0], position[1] + groundingOffset, position[2]]}>
+      <primitive object={scene} />
+    </group>
+  );
+};
+```
+
+### Flow Integration
+
+Update `AvatarMethodSelector.tsx` to include Ready Player Me:
+
+```typescript
+const METHODS = [
+  {
+    id: 'readyplayerme',
+    title: 'Create with AI',
+    description: 'Build your realistic avatar with our AI-powered creator',
+    icon: Sparkles,
+    badge: 'Recommended',
+  },
+  {
+    id: 'library',
+    title: 'Choose Model',
+    description: 'Pick from 12 diverse pre-made realistic models',
+    icon: Users,
+  },
+  {
+    id: 'manual',
+    title: 'Customize',
+    description: 'Fine-tune body measurements for precise fit',
+    icon: Sliders,
+  },
+];
+```
+
+---
+
+## Part 4: Pre-Made Photorealistic GLB Models
+
+### Rationale
+Ready Player Me requires network connectivity and adds dependency. For offline/fast experience, we pre-create 12 high-quality GLB avatars matching our preset library.
+
+### Model Specifications
+
+| Requirement | Specification |
+|-------------|---------------|
+| Format | GLB (binary glTF) |
+| Poly Count | 20-40K triangles |
+| Textures | 1K diffuse, normal, roughness |
+| Rig | Standard humanoid (mixamo-compatible) |
+| Morph Targets | Body shape, face shape |
+| File Size | < 5MB each |
+
+### Model Library
+
+Create 12 GLB files matching `avatarPresets.ts`:
+
+```text
+public/avatars/
+├── alex.glb      # Male, athletic, light skin
+├── jordan.glb    # Male, slim, medium skin
+├── marcus.glb    # Male, average, dark skin
+├── ethan.glb     # Male, muscular, light skin
+├── chen.glb      # Male, slim, light-medium skin
+├── sofia.glb     # Female, curvy, light skin
+├── maya.glb      # Female, athletic, medium skin
+├── amara.glb     # Female, slim, dark skin
+├── luna.glb      # Female, average, medium skin
+├── priya.glb     # Female, curvy, medium-dark skin
+├── river.glb     # Non-binary, slim, light skin
+└── sage.glb      # Non-binary, average, medium skin
+```
+
+### Source Options for GLB Models
+1. **Ready Player Me** - Generate via their dashboard, export GLBs
+2. **Character Creator (Reallusion)** - Professional tool, export-friendly
+3. **Mixamo** - Free characters with rigging
+4. **SketchFab** - CC0/paid realistic humans
+
+---
+
+## Part 5: AI-Powered Avatar Generation
+
+### Using Lovable AI for Avatar Parameters
+
+Create an edge function that uses Lovable's AI to generate avatar configurations from text descriptions:
+
+```typescript
+// supabase/functions/generate-avatar-config/index.ts
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
+
+const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+
+serve(async (req) => {
+  const { description } = await req.json();
+  
+  const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      model: 'google/gemini-2.5-flash',
+      messages: [
+        {
+          role: 'system',
+          content: `You are an avatar configuration generator. Given a text description of a person, 
+          output a JSON object matching the AvatarConfig schema. Include realistic body measurements 
+          based on the description. Be inclusive and respectful.`
+        },
+        {
+          role: 'user',
+          content: `Generate avatar config for: "${description}"`
+        }
+      ],
+      response_format: { type: 'json_object' }
+    })
+  });
+  
+  const data = await response.json();
+  const avatarConfig = JSON.parse(data.choices[0].message.content);
+  
+  return new Response(JSON.stringify(avatarConfig), {
+    headers: { 'Content-Type': 'application/json' }
+  });
+});
+```
+
+### AI Description Input UI
+
+```typescript
+// New: AIAvatarGenerator.tsx
+const AIAvatarGenerator = ({ onGenerate }: { onGenerate: (config: AvatarConfig) => void }) => {
+  const [description, setDescription] = useState('');
+  const [isGenerating, setIsGenerating] = useState(false);
+  
+  const handleGenerate = async () => {
+    setIsGenerating(true);
+    const response = await supabase.functions.invoke('generate-avatar-config', {
+      body: { description }
+    });
+    setIsGenerating(false);
+    onGenerate(response.data);
+  };
+  
+  return (
+    <div className="space-y-4">
+      <Label>Describe your avatar</Label>
+      <Textarea
+        placeholder="E.g., 'A tall athletic woman with brown skin and curly black hair' or 'A slim guy, about 5'10, with a beard'"
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
+      />
+      <Button onClick={handleGenerate} disabled={isGenerating}>
+        {isGenerating ? <Loader2 className="animate-spin" /> : <Sparkles />}
+        Generate Avatar
+      </Button>
+    </div>
   );
 };
 ```
 
 ---
 
-## PART 5: ENHANCED REALISM FEATURES
+## Part 6: Enhanced Procedural Avatar (Fallback)
 
-### 5.1 Ambient Occlusion for Depth
+For users who don't use RPM or GLB models, upgrade the current procedural system:
 
-Add screen-space ambient occlusion to ground the avatar:
-
-```typescript
-import { EffectComposer, SSAO } from '@react-three/postprocessing';
-
-<EffectComposer>
-  <SSAO
-    samples={31}
-    radius={0.2}
-    intensity={20}
-    luminanceInfluence={0.5}
-    color="black"
-  />
-</EffectComposer>
-```
-
-### 5.2 Contact Shadows Enhancement
-
-Current contact shadows are good but need:
+### A. Photorealistic Skin Shader
 
 ```typescript
-<ContactShadows
-  position={[0, 0, 0]}
-  opacity={0.5}           // Stronger than 0.35
-  scale={8}               // Larger than 4
-  blur={3}                // Softer than 2.5
-  far={2}                 // Extended from 1.5
-  color="#1C1917"
-  frames={1}              // Performance: don't update every frame
-/>
-```
-
-### 5.3 Subsurface Scattering Material Upgrade
-
-Current skin material uses transmission but needs proper SSS:
-
-```typescript
-const RealisticSkinMaterialAdvanced = ({ skinTone }: { skinTone: string }) => {
-  // Decompose skin tone for SSS color
+// New: PhotorealisticSkinMaterial.tsx
+export const PhotorealisticSkinMaterial = ({ skinTone }: { skinTone: string }) => {
+  const { isMobile } = useIsMobile();
+  
+  // Calculate SSS and specular colors from base skin tone
   const baseColor = new THREE.Color(skinTone);
-  const sssColor = baseColor.clone().offsetHSL(0, 0.1, 0.1); // Warmer, lighter
+  const sssColor = baseColor.clone().offsetHSL(0.02, 0.1, 0.08);
+  const specularColor = baseColor.clone().offsetHSL(-0.02, -0.1, 0.15);
   
   return (
     <meshPhysicalMaterial
       color={skinTone}
-      roughness={0.42}
+      roughness={0.4}
       metalness={0}
-      // SSS simulation
-      transmission={0.15}
-      thickness={0.3}
+      // Subsurface scattering via transmission
+      transmission={isMobile ? 0.05 : 0.12}
+      thickness={isMobile ? 0.1 : 0.25}
       ior={1.38}
-      // Skin sheen
-      sheen={0.2}
-      sheenRoughness={0.4}
+      // Skin sheen (velvety look)
+      sheen={0.25}
+      sheenRoughness={0.35}
       sheenColor={sssColor}
-      // Micro surface
-      clearcoat={0.02}
-      clearcoatRoughness={0.8}
+      // Micro surface detail
+      clearcoat={0.05}
+      clearcoatRoughness={0.7}
       // Environment
-      envMapIntensity={0.2}
+      envMapIntensity={0.25}
     />
   );
 };
 ```
 
-### 5.4 Subtle Breathing Animation Fix
-
-Current breathing scales height (wrong). Fix:
+### B. Realistic Eye System
 
 ```typescript
-useFrame((state) => {
-  if (prefersReducedMotion || !torsoRef.current) return;
+// Enhanced: AvatarEyes.tsx
+export const AvatarEyes = ({ headRadius, eyeSize, skinTone }: AvatarEyesProps) => {
+  const irisColors = ['#4A6FA5', '#6B4423', '#2E5233', '#8B7355', '#3D3D3D'];
   
-  const t = state.clock.getElapsedTime();
-  // Multiple frequencies for natural rhythm
-  const breathCycle = Math.sin(t * 0.8) * 0.7 + Math.sin(t * 1.6) * 0.3;
-  
-  // Chest expands OUTWARD, not upward
-  torsoRef.current.scale.set(
-    1 + breathCycle * 0.005,  // Slight X expansion
-    1,                         // NO Y change!
-    1 + breathCycle * 0.008   // Primary Z expansion (forward)
+  return (
+    <group>
+      {/* Eye socket shadows */}
+      <mesh position={[-eyeSpacing, eyeY - 0.005, eyeZ - 0.005]}>
+        <sphereGeometry args={[eyeRadius * 1.3, 16, 16]} />
+        <meshBasicMaterial color={skinTone} transparent opacity={0.8} />
+      </mesh>
+      
+      {/* Eyeball (sclera) */}
+      <mesh position={[-eyeSpacing, eyeY, eyeZ]}>
+        <sphereGeometry args={[eyeRadius, 32, 32]} />
+        <meshPhysicalMaterial
+          color="#FFFDF8"
+          roughness={0.15}
+          metalness={0}
+          clearcoat={0.8}
+          clearcoatRoughness={0.1}
+        />
+      </mesh>
+      
+      {/* Iris */}
+      <mesh position={[-eyeSpacing, eyeY, eyeZ + eyeRadius * 0.85]}>
+        <circleGeometry args={[eyeRadius * 0.45, 32]} />
+        <meshStandardMaterial color="#6B4423" roughness={0.3} />
+      </mesh>
+      
+      {/* Pupil */}
+      <mesh position={[-eyeSpacing, eyeY, eyeZ + eyeRadius * 0.87]}>
+        <circleGeometry args={[eyeRadius * 0.2, 32]} />
+        <meshBasicMaterial color="#0A0A0A" />
+      </mesh>
+      
+      {/* Cornea (wet reflection layer) */}
+      <mesh position={[-eyeSpacing, eyeY, eyeZ + eyeRadius * 0.9]}>
+        <sphereGeometry args={[eyeRadius * 0.52, 24, 24, 0, Math.PI * 2, 0, Math.PI * 0.5]} />
+        <meshPhysicalMaterial
+          color="#FFFFFF"
+          transparent
+          opacity={0.15}
+          roughness={0}
+          metalness={0.5}
+          envMapIntensity={1.5}
+        />
+      </mesh>
+      
+      {/* Repeat for right eye... */}
+    </group>
   );
-  
-  // Subtle shoulder rise
-  if (leftArmRef.current && rightArmRef.current) {
-    const shoulderRise = breathCycle * 0.002;
-    leftArmRef.current.position.y = baseArmY + shoulderRise;
-    rightArmRef.current.position.y = baseArmY + shoulderRise;
-  }
-});
-```
-
----
-
-## PART 6: PERFORMANCE OPTIMIZATIONS
-
-### 6.1 Geometry Instancing
-
-Reduce draw calls by instancing repeated elements:
-
-```typescript
-// For symmetric limbs
-import { Instances, Instance } from '@react-three/drei';
-
-<Instances limit={100} geometry={armGeometry} material={skinMaterial}>
-  <Instance position={leftArmPos} rotation={leftArmRot} />
-  <Instance position={rightArmPos} rotation={rightArmRot} scale={[-1, 1, 1]} />
-</Instances>
-```
-
-### 6.2 Level of Detail (LOD) Tiers
-
-```typescript
-const LOD_TIERS = {
-  ultra: { segments: 48, shadowQuality: 2048 },
-  high: { segments: 32, shadowQuality: 1024 },
-  medium: { segments: 24, shadowQuality: 512 },
-  low: { segments: 16, shadowQuality: 256 },
 };
-
-// Auto-detect based on device
-const tier = useMemo(() => {
-  if (isMobile) return 'low';
-  const gpu = (navigator as any).gpu;
-  if (gpu) return 'ultra';
-  return 'high';
-}, [isMobile]);
 ```
 
-### 6.3 Texture Optimization
+### C. Strand-Based Hair System
 
 ```typescript
-// Resize textures on the fly
-const useOptimizedTexture = (url: string) => {
-  const texture = useTexture(url);
+// Enhanced: AvatarHair.tsx using instancedMesh for strands
+export const AvatarHairStrands = ({ style, color, headRadius }: AvatarHairProps) => {
+  const strandCount = isMobile ? 500 : 2000;
+  const instancedMeshRef = useRef<THREE.InstancedMesh>(null);
   
   useEffect(() => {
-    // Limit texture size for mobile
-    if (isMobile) {
-      texture.image.width = Math.min(texture.image.width, 512);
-      texture.image.height = Math.min(texture.image.height, 512);
+    if (!instancedMeshRef.current) return;
+    
+    const dummy = new THREE.Object3D();
+    const hairCurve = getHairCurveForStyle(style);
+    
+    for (let i = 0; i < strandCount; i++) {
+      // Position strand on scalp
+      const theta = Math.random() * Math.PI * 2;
+      const phi = Math.random() * Math.PI * 0.4; // Top hemisphere only
+      
+      const x = Math.sin(phi) * Math.cos(theta) * headRadius * 0.95;
+      const y = Math.cos(phi) * headRadius * 0.95;
+      const z = Math.sin(phi) * Math.sin(theta) * headRadius * 0.95;
+      
+      dummy.position.set(x, y + headRadius * 0.1, z);
+      dummy.rotation.set(phi - Math.PI / 2, theta, 0);
+      dummy.scale.setScalar(0.8 + Math.random() * 0.4);
+      dummy.updateMatrix();
+      
+      instancedMeshRef.current.setMatrixAt(i, dummy.matrix);
     }
-    texture.anisotropy = isMobile ? 2 : 8;
-    texture.needsUpdate = true;
-  }, [texture]);
+    
+    instancedMeshRef.current.instanceMatrix.needsUpdate = true;
+  }, [style, headRadius, strandCount]);
   
-  return texture;
+  return (
+    <instancedMesh ref={instancedMeshRef} args={[undefined, undefined, strandCount]}>
+      <cylinderGeometry args={[0.001, 0.0005, hairLength, 4]} />
+      <meshStandardMaterial color={color} roughness={0.6} />
+    </instancedMesh>
+  );
 };
 ```
 
 ---
 
-## PART 7: FILE CHANGES SUMMARY
+## Part 7: State & Storage Updates
 
-### New Files to Create
+### Enhanced AvatarConfig
 
-| File | Purpose |
-|------|---------|
-| `src/components/try-on/environment/StudioEnvironment.tsx` | Complete studio cyclorama, floor, and horizon |
-| `src/components/try-on/environment/InfinityFloor.tsx` | Reflective floor with real mirror effect |
-| `src/components/try-on/environment/StudioBackdrop.tsx` | Curved cyclorama geometry |
-| `src/components/try-on/environment/HorizonGradient.tsx` | Seamless sky dome |
-| `src/components/try-on/utils/groundingSystem.ts` | Calculate exact ground contact for any height |
-| `src/components/try-on/materials/RealisticSkinMaterialAdvanced.tsx` | Enhanced SSS skin shader |
-| `src/components/try-on/geometry/AnatomicalFoot.tsx` | Proper foot geometry |
-| `src/components/try-on/hooks/useLODTier.ts` | Automatic quality tier detection |
-| `src/components/try-on/postprocessing/StudioEffects.tsx` | SSAO, bloom, color grading |
+```typescript
+// Updated: avatarPresets.ts
+export interface AvatarConfig {
+  id: string;
+  name: string;
+  createdAt: Date;
+  method: 'photo' | 'manual' | 'library' | 'readyplayerme' | 'ai-generated';
+  
+  // NEW: GLB URL for external models
+  glbUrl?: string;
+  
+  // Existing configs...
+  gender: 'male' | 'female' | 'non-binary';
+  skinTone: string;
+  body: AvatarBodyConfig;
+  face: AvatarFaceConfig;
+  hair: AvatarHairConfig;
+}
+```
 
-### Files to Modify
+### Avatar Persistence
 
-| File | Changes |
-|------|---------|
-| `src/components/try-on/TryOnCanvas.tsx` | Replace Scene with StudioEnvironment, add postprocessing |
-| `src/components/try-on/Mannequin3D.tsx` | Fix grounding, update proportions, enhance breathing |
-| `src/components/try-on/realistic-avatar/AvatarBody.tsx` | Fix scale, fix positions, add joints, replace feet |
-| `src/components/try-on/lighting/StudioLighting.tsx` | Add rectArea lights, ground bounce |
-| `src/components/try-on/utils/measurementToProportions.ts` | Add grounding offset calculation |
-| `src/hooks/useCameraPresets.ts` | Update camera configs for proper framing |
-
----
-
-## PART 8: IMPLEMENTATION PHASES
-
-### Phase 1: Foundation (Critical)
-1. Create `groundingSystem.ts` with exact foot-to-floor calculation
-2. Fix Mannequin3D positioning to use grounding system
-3. Fix AvatarBody scale and positioning bugs
-4. Update camera default position to 3.8m back
-
-### Phase 2: Environment
-1. Create `StudioEnvironment.tsx` with cyclorama
-2. Implement `InfinityFloor.tsx` with Reflector
-3. Add horizon gradient dome
-4. Update lighting with rectArea lights
-
-### Phase 3: Avatar Quality
-1. Implement anatomical feet
-2. Add joint overlap geometry
-3. Upgrade skin material with advanced SSS
-4. Fix breathing animation
-
-### Phase 4: Polish
-1. Add SSAO postprocessing
-2. Implement LOD tier system
-3. Optimize textures
-4. Add smooth transitions between camera presets
+```typescript
+// Enhanced: useAvatarStorage.ts
+export const useAvatarStorage = () => {
+  // Save GLB URL to localStorage
+  const saveAvatarGLB = (avatarId: string, glbUrl: string) => {
+    const avatars = getStoredAvatars();
+    avatars[avatarId] = { ...avatars[avatarId], glbUrl };
+    localStorage.setItem('loj-avatars', JSON.stringify(avatars));
+  };
+  
+  // Cache GLB file locally (IndexedDB for large files)
+  const cacheGLB = async (url: string): Promise<string> => {
+    const response = await fetch(url);
+    const blob = await response.blob();
+    const objectUrl = URL.createObjectURL(blob);
+    // Store in IndexedDB for persistence
+    await idbStore.put('avatar-glb', blob, url);
+    return objectUrl;
+  };
+  
+  return { saveAvatarGLB, cacheGLB, /* existing methods */ };
+};
+```
 
 ---
 
-## SUCCESS CRITERIA
+## Part 8: Rendering Pipeline
 
-After implementation:
+### Avatar Renderer Component
 
-1. **Avatar feet touch the ground at Y=0** for all heights
-2. **No visible joint gaps** in mannequin or realistic avatar
-3. **Studio environment has infinite horizon** effect
-4. **Floor shows real reflections** of avatar
-5. **Camera framing matches fashion photography** standards
-6. **Breathing animates chest, not height**
-7. **Performance maintains 30+ FPS** on mobile
-8. **Avatar looks human** not robotic
+```typescript
+// New: AvatarRenderer.tsx
+export const AvatarRenderer = ({ config, position }: AvatarRendererProps) => {
+  const isMobile = useIsMobile();
+  
+  // Priority 1: Ready Player Me GLB
+  if (config.glbUrl) {
+    return (
+      <Suspense fallback={<LoadingAvatar position={position} />}>
+        <GLBAvatarLoader url={config.glbUrl} position={position} />
+      </Suspense>
+    );
+  }
+  
+  // Priority 2: Pre-made GLB from library
+  if (config.method === 'library' && PRE_MADE_GLBS[config.id]) {
+    return (
+      <Suspense fallback={<LoadingAvatar position={position} />}>
+        <GLBAvatarLoader url={PRE_MADE_GLBS[config.id]} position={position} />
+      </Suspense>
+    );
+  }
+  
+  // Priority 3: Enhanced procedural avatar
+  return (
+    <RealisticAvatar config={config} position={position} />
+  );
+};
+```
 
 ---
 
-## ESTIMATED CODE VOLUME
+## Part 9: Implementation Phases
 
-| Category | New Lines | Modified Lines |
-|----------|-----------|----------------|
-| Environment | ~800 | ~200 |
-| Mannequin/Avatar | ~600 | ~400 |
-| Materials | ~200 | ~100 |
-| Camera/Controls | ~150 | ~100 |
-| Performance/LOD | ~200 | ~50 |
-| **Total** | **~1,950** | **~850** |
+### Phase 1: GLB Infrastructure (Week 1)
+- [ ] Create `GLBAvatarLoader.tsx` component
+- [ ] Add GLTF/GLB loading utilities
+- [ ] Update `AvatarRenderer.tsx` routing logic
+- [ ] Test with sample GLB models
+- [ ] Implement grounding system for GLB models
 
-This reconstruction transforms the Try-On Room from a "functional prototype" to a **world-class virtual fitting experience** matching the quality of Viubox, BODS, and Reactive Reality deployments.
+### Phase 2: Ready Player Me Integration (Week 1-2)
+- [ ] Install `@readyplayerme/react-avatar-creator`
+- [ ] Create `ReadyPlayerMeCreator.tsx` component
+- [ ] Update `AvatarMethodSelector.tsx` with RPM option
+- [ ] Handle avatar export callback and storage
+- [ ] Add GLB caching layer
 
+### Phase 3: Pre-Made GLB Library (Week 2)
+- [ ] Source/create 12 diverse GLB models
+- [ ] Optimize models (poly count, textures)
+- [ ] Add to `public/avatars/` directory
+- [ ] Update `avatarPresets.ts` with GLB paths
+- [ ] Implement lazy loading
+
+### Phase 4: AI Avatar Generation (Week 2-3)
+- [ ] Create `generate-avatar-config` edge function
+- [ ] Build `AIAvatarGenerator.tsx` UI component
+- [ ] Connect to Lovable AI API
+- [ ] Test with various descriptions
+- [ ] Add validation and error handling
+
+### Phase 5: Enhanced Procedural Fallback (Week 3)
+- [ ] Upgrade `PhotorealisticSkinMaterial.tsx`
+- [ ] Implement strand-based hair system
+- [ ] Enhance eye system with cornea/iris depth
+- [ ] Add normal maps for skin detail
+- [ ] Performance optimization for mobile
+
+---
+
+## Part 10: File Changes Summary
+
+### New Files
+```text
+src/components/try-on/avatar-renderer/
+├── AvatarRenderer.tsx            # Main routing component
+├── GLBAvatarLoader.tsx           # GLTF/GLB loading
+├── ReadyPlayerMeCreator.tsx      # RPM iframe integration
+├── AIAvatarGenerator.tsx         # AI text-to-avatar UI
+├── LoadingAvatar.tsx             # Loading state placeholder
+└── index.ts
+
+src/components/try-on/materials/
+├── PhotorealisticSkinMaterial.tsx
+└── HairStrandMaterial.tsx
+
+supabase/functions/
+└── generate-avatar-config/index.ts
+
+public/avatars/
+└── [12 GLB files]
+```
+
+### Modified Files
+```text
+src/components/try-on/avatar-creator/
+├── AvatarMethodSelector.tsx      # Add RPM option
+├── AvatarCreationFlow.tsx        # New flow paths
+└── avatarPresets.ts              # Add glbUrl field
+
+src/components/try-on/Avatar3D.tsx           # Use AvatarRenderer
+src/components/try-on/realistic-avatar/
+├── AvatarEyes.tsx                # Enhanced realism
+└── AvatarHair.tsx                # Strand system
+
+src/hooks/useAvatarStorage.ts     # GLB caching
+package.json                       # Add @readyplayerme/react-avatar-creator
+```
+
+---
+
+## Part 11: Dependencies
+
+### NPM Packages
+```json
+{
+  "@readyplayerme/react-avatar-creator": "^1.3.0"
+}
+```
+
+### External Services
+- **Ready Player Me** - Free tier account for avatar creation
+- **Lovable AI** - Already available via Lovable Cloud
+
+### Asset Requirements
+- 12 GLB avatar models (~5MB each, ~60MB total)
+- Optional: Normal map textures for skin detail
+
+---
+
+## Success Criteria
+
+After implementation, avatars must:
+
+1. ✅ **Look human** - Not geometric primitives
+2. ✅ **Have realistic faces** - Eyes, nose, lips visible
+3. ✅ **Support diverse representation** - All body types, skin tones
+4. ✅ **Load under 3 seconds** - Progressive loading
+5. ✅ **Work offline** - Cached GLB models
+6. ✅ **Integrate with garments** - Proper layering maintained
+7. ✅ **Support customization** - Body morphing still works
+8. ✅ **Perform on mobile** - 30+ FPS maintained
