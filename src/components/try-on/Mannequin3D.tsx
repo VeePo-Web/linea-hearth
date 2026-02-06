@@ -10,6 +10,7 @@ import {
   EIGHT_HEAD_SCALE,
   getScaledBodyPositions,
 } from './utils/measurementToProportions';
+import { calculateGroundingOffset, getHeightScale } from './utils/groundingSystem';
 
 /**
  * WORLD-CLASS MANNEQUIN 3D
@@ -747,33 +748,36 @@ export const Mannequin3D = ({ position = [0, 0, 0] }: MannequinProps) => {
 
   // Height scale for overall sizing
   const heightScale = useMemo(() => {
-    return proportions.height / EIGHT_HEAD_SCALE.referenceHeight;
-  }, [proportions.height]);
+    return getHeightScale(proportions);
+  }, [proportions]);
 
-  // Enhanced breathing animation - chest expansion, not height
+  // FIXED: Proper grounding offset using new grounding system
+  // This ensures feet always touch the floor at Y=0
+  const groundingOffset = useMemo(() => {
+    return calculateGroundingOffset(proportions);
+  }, [proportions]);
+
+  // Enhanced breathing animation - chest expansion, not height (FIXED!)
   useFrame((state) => {
     if (reducedMotion) return;
     
     const t = state.clock.getElapsedTime();
-    const breathCycle = Math.sin(t * 1.2);
+    // Natural multi-frequency breathing
+    const breathCycle = Math.sin(t * 0.8) * 0.7 + Math.sin(t * 1.6) * 0.3;
     
-    // Subtle chest expansion (Z and X scale)
+    // Chest expands OUTWARD (Z and X), NOT upward
     if (torsoRef.current) {
-      torsoRef.current.scale.z = 1 + breathCycle * 0.006;
-      torsoRef.current.scale.x = 1 + breathCycle * 0.004;
+      torsoRef.current.scale.z = 1 + breathCycle * 0.008; // Primary Z expansion (forward)
+      torsoRef.current.scale.x = 1 + breathCycle * 0.005; // Slight X expansion
+      // NO Y scaling - this was the bug!
     }
   });
-
-  // Y offset to keep feet grounded
-  const yOffset = useMemo(() => {
-    return (heightScale - 1) * EIGHT_HEAD_SCALE.crotchLine;
-  }, [heightScale]);
 
   return (
     <group 
       ref={groupRef} 
-      position={[position[0], position[1] + yOffset, position[2]]} 
-      scale={[heightScale * 0.97, heightScale, heightScale * 0.97]}
+      position={[position[0], position[1] + groundingOffset, position[2]]} 
+      scale={[heightScale, heightScale, heightScale]}
     >
       {/* Head */}
       <Head 
