@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useCallback, ReactNode, useEffect } from 'react';
+import type { AvatarConfig } from '@/components/try-on/avatar-creator/avatarPresets';
 
 export interface EquippedItem {
   productId: string;
@@ -42,6 +43,10 @@ export interface TryOnState {
   measurements: BodyMeasurements;
   unitSystem: 'metric' | 'imperial';
   useDetailedMeasurements: boolean;
+  // NEW: Realistic Avatar System
+  customAvatar: AvatarConfig | null;
+  avatarMode: 'mannequin' | 'realistic';
+  showAvatarWizard: boolean;
 }
 
 interface TryOnContextType extends TryOnState {
@@ -59,6 +64,10 @@ interface TryOnContextType extends TryOnState {
   setMeasurements: (measurements: BodyMeasurements) => void;
   setUnitSystem: (unit: 'metric' | 'imperial') => void;
   setUseDetailedMeasurements: (use: boolean) => void;
+  // NEW: Avatar methods
+  setCustomAvatar: (avatar: AvatarConfig | null) => void;
+  setAvatarMode: (mode: 'mannequin' | 'realistic') => void;
+  setShowAvatarWizard: (show: boolean) => void;
 }
 
 const TryOnContext = createContext<TryOnContextType | undefined>(undefined);
@@ -71,6 +80,8 @@ const defaultMeasurements: BodyMeasurements = {
   hipsCm: 98,
   inseamCm: 76,
 };
+
+const AVATAR_STORAGE_KEY = 'loj-custom-avatar';
 
 const defaultState: TryOnState = {
   avatarGender: 'male',
@@ -88,10 +99,32 @@ const defaultState: TryOnState = {
   measurements: defaultMeasurements,
   unitSystem: 'metric',
   useDetailedMeasurements: false,
+  // NEW: Avatar defaults
+  customAvatar: null,
+  avatarMode: 'mannequin',
+  showAvatarWizard: false,
 };
 
 export const TryOnProvider = ({ children }: { children: ReactNode }) => {
   const [state, setState] = useState<TryOnState>(defaultState);
+
+  // Load saved avatar from localStorage on mount
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(AVATAR_STORAGE_KEY);
+      if (stored) {
+        const parsed = JSON.parse(stored) as AvatarConfig;
+        parsed.createdAt = new Date(parsed.createdAt);
+        setState(prev => ({ 
+          ...prev, 
+          customAvatar: parsed,
+          avatarMode: 'realistic', // Auto-switch to realistic if avatar exists
+        }));
+      }
+    } catch (error) {
+      console.error('[TryOnProvider] Failed to load saved avatar:', error);
+    }
+  }, []);
 
   const setAvatarGender = useCallback((gender: 'male' | 'female') => {
     setState(prev => ({ ...prev, avatarGender: gender }));
@@ -169,6 +202,29 @@ export const TryOnProvider = ({ children }: { children: ReactNode }) => {
     setState(prev => ({ ...prev, useDetailedMeasurements }));
   }, []);
 
+  // NEW: Avatar methods
+  const setCustomAvatar = useCallback((avatar: AvatarConfig | null) => {
+    setState(prev => ({ ...prev, customAvatar: avatar }));
+    // Persist to localStorage
+    if (avatar) {
+      try {
+        localStorage.setItem(AVATAR_STORAGE_KEY, JSON.stringify(avatar));
+      } catch (error) {
+        console.error('[TryOnProvider] Failed to save avatar:', error);
+      }
+    } else {
+      localStorage.removeItem(AVATAR_STORAGE_KEY);
+    }
+  }, []);
+
+  const setAvatarMode = useCallback((avatarMode: 'mannequin' | 'realistic') => {
+    setState(prev => ({ ...prev, avatarMode }));
+  }, []);
+
+  const setShowAvatarWizard = useCallback((showAvatarWizard: boolean) => {
+    setState(prev => ({ ...prev, showAvatarWizard }));
+  }, []);
+
   return (
     <TryOnContext.Provider
       value={{
@@ -186,6 +242,9 @@ export const TryOnProvider = ({ children }: { children: ReactNode }) => {
         setMeasurements,
         setUnitSystem,
         setUseDetailedMeasurements,
+        setCustomAvatar,
+        setAvatarMode,
+        setShowAvatarWizard,
       }}
     >
       {children}

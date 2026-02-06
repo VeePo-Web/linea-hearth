@@ -4,16 +4,18 @@ import { useTryOnState } from '@/hooks/useTryOnState';
 import { Mannequin3D } from './Mannequin3D';
 import { GarmentLayer } from './GarmentLayer';
 import { getBodyProportions } from './utils/measurementToProportions';
+import { RealisticAvatar } from './realistic-avatar';
 
 interface Avatar3DProps {
   position?: [number, number, number];
 }
 
 /**
- * Avatar3D - Composite component combining mannequin and garment layers
+ * Avatar3D - Composite component combining mannequin/avatar and garment layers
  * 
- * Proportions are calculated from the unified measurementToProportions.ts
- * to ensure consistency between mannequin and garment fitting.
+ * Supports two modes:
+ * - 'mannequin': Abstract ceramic mannequin (default)
+ * - 'realistic': Photorealistic human avatar with face and hair
  */
 
 export const Avatar3D = ({ position = [0, 0, 0] }: Avatar3DProps) => {
@@ -24,6 +26,8 @@ export const Avatar3D = ({ position = [0, 0, 0] }: Avatar3DProps) => {
     equippedItems,
     measurements,
     useDetailedMeasurements,
+    customAvatar,
+    avatarMode,
   } = useTryOnState();
 
   // Get body proportions from unified source
@@ -34,8 +38,12 @@ export const Avatar3D = ({ position = [0, 0, 0] }: Avatar3DProps) => {
 
   return (
     <group ref={groupRef} position={position}>
-      {/* Premium Mannequin Base */}
-      <Mannequin3D position={[0, 0, 0]} />
+      {/* Render based on avatar mode */}
+      {avatarMode === 'realistic' && customAvatar ? (
+        <RealisticAvatar config={customAvatar} position={[0, 0, 0]} />
+      ) : (
+        <Mannequin3D position={[0, 0, 0]} />
+      )}
       
       {/* Garment Layers - render equipped items */}
       <GarmentLayer 
