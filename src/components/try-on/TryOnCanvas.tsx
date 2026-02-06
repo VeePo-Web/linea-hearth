@@ -1,11 +1,12 @@
 import { Suspense, useRef, useState, useCallback, useEffect } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls, PerspectiveCamera, ContactShadows } from '@react-three/drei';
+import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
 import { Avatar3D } from './Avatar3D';
 import { SceneControls } from './SceneControls';
 import { CameraPresets, CameraPreset } from './CameraPresets';
 import { CanvasOverlays } from './CanvasOverlays';
 import { StudioLighting } from './lighting/StudioLighting';
+import { StudioEnvironment } from './environment/StudioEnvironment';
 import { useTryOnState } from '@/hooks/useTryOnState';
 import { useCameraPresets } from '@/hooks/useCameraPresets';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -31,58 +32,30 @@ const Scene = ({
       <PerspectiveCamera 
         ref={cameraRef}
         makeDefault 
-        position={[0, 1.2, 2.8]} 
-        fov={45}
+        position={[0, 1.1, 3.8]} 
+        fov={35}
       />
       
       <OrbitControls 
         ref={controlsRef}
         enablePan={false}
-        minDistance={1.2}
-        maxDistance={4.5}
-        minPolarAngle={Math.PI / 6}
-        maxPolarAngle={Math.PI / 1.6}
-        target={[0, 1.1, 0]}
+        minDistance={1.5}
+        maxDistance={6.0}
+        minPolarAngle={Math.PI / 10}
+        maxPolarAngle={Math.PI / 1.5}
+        target={[0, 0.95, 0]}
         enableDamping
-        dampingFactor={0.05}
+        dampingFactor={0.03}
       />
 
       {/* Studio Lighting System */}
       <StudioLighting mode={lightingMode} />
 
+      {/* Complete Studio Environment (floor, backdrop, shadows) */}
+      <StudioEnvironment lightingMode={lightingMode} />
+
       {/* Avatar with Garments */}
       <Avatar3D position={[0, 0, 0]} />
-
-      {/* Ground shadow - soft and premium */}
-      <ContactShadows 
-        position={[0, -0.01, 0]}
-        opacity={0.35}
-        scale={4}
-        blur={2.5}
-        far={1.5}
-        color="#1C1917"
-      />
-
-      {/* Reflective floor */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.02, 0]} receiveShadow>
-        <circleGeometry args={[3, 64]} />
-        <meshStandardMaterial 
-          color="#FAFAFA" 
-          roughness={0.15}
-          metalness={0.1}
-          envMapIntensity={0.3}
-        />
-      </mesh>
-      
-      {/* Subtle gradient backdrop */}
-      <mesh position={[0, 2, -2]} rotation={[0, 0, 0]}>
-        <planeGeometry args={[8, 5]} />
-        <meshBasicMaterial 
-          color="#F5F5F4" 
-          transparent 
-          opacity={0.5}
-        />
-      </mesh>
     </>
   );
 };
@@ -174,11 +147,11 @@ export const TryOnCanvas = ({ className }: TryOnCanvasProps) => {
     } else {
       // Instant transition for reduced motion
       const config = {
-        full: { pos: [0, 1.2, 2.8], target: [0, 1.1, 0] },
-        upper: { pos: [0, 1.5, 1.6], target: [0, 1.4, 0] },
-        detail: { pos: [0, 1.3, 1.0], target: [0, 1.3, 0] },
-        'three-quarter': { pos: [1.2, 1.3, 2.2], target: [0, 1.1, 0] },
-      }[preset];
+        full: { pos: [0, 1.1, 3.8], target: [0, 0.95, 0] },
+        upper: { pos: [0, 1.45, 2.0], target: [0, 1.35, 0] },
+        detail: { pos: [0, 1.2, 1.3], target: [0, 1.2, 0] },
+        'three-quarter': { pos: [1.5, 1.2, 3.2], target: [0, 1.0, 0] },
+      }[preset] as { pos: number[]; target: number[] };
       if (cameraRef.current && controlsRef.current && config) {
         cameraRef.current.position.set(...config.pos);
         controlsRef.current.target.set(...config.target);

@@ -9,22 +9,32 @@ interface PresetConfig {
   fov?: number;
 }
 
+// Fashion photography camera positions
+// Based on real-world studio setups for apparel photography
 const CAMERA_PRESETS: Record<CameraPreset, PresetConfig> = {
   full: {
-    position: [0, 1.2, 2.8],
-    target: [0, 1.1, 0],
+    // Full body shot - wider framing for outfit overview
+    position: [0, 1.1, 3.8],
+    target: [0, 0.95, 0],
+    fov: 35,
   },
   upper: {
-    position: [0, 1.5, 1.6],
-    target: [0, 1.4, 0],
+    // Upper body - focus on tops/hoodies
+    position: [0, 1.45, 2.0],
+    target: [0, 1.35, 0],
+    fov: 40,
   },
   detail: {
-    position: [0, 1.3, 1.0],
-    target: [0, 1.3, 0],
+    // Detail shot - close for texture inspection
+    position: [0, 1.2, 1.3],
+    target: [0, 1.2, 0],
+    fov: 28,
   },
   'three-quarter': {
-    position: [1.2, 1.3, 2.2],
-    target: [0, 1.1, 0],
+    // 3/4 view - most flattering angle for fashion
+    position: [1.5, 1.2, 3.2],
+    target: [0, 1.0, 0],
+    fov: 38,
   },
 };
 
