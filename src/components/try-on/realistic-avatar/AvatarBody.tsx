@@ -3,6 +3,7 @@ import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { AvatarBodyConfig } from '../avatar-creator/avatarPresets';
 import { RealisticSkinMaterial } from './RealisticSkinMaterial';
+import { AvatarFingers } from './AvatarFingers';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 
 interface AvatarBodyProps {
@@ -206,11 +207,16 @@ export const AvatarBody = ({ config, gender, skinTone, isMobile = false }: Avata
           <sphereGeometry args={[armThickness * 0.55, segments / 2, segments / 2]} />
           <RealisticSkinMaterial skinTone={skinTone} isMobile={isMobile} />
         </mesh>
-        {/* Hand */}
-        <mesh position={[0, -proportions.armLength * 0.96, 0]}>
-          <capsuleGeometry args={[armThickness * 0.45, armThickness * 0.6, 4, 8]} />
-          <RealisticSkinMaterial skinTone={skinTone} isMobile={isMobile} />
-        </mesh>
+        {/* Hand with fingers */}
+        <group position={[0, -proportions.armLength * 0.92, 0]} rotation={[0.1, 0.05, 0]}>
+          <AvatarFingers
+            handLength={armThickness * 2.2}
+            handWidth={armThickness * 1.4}
+            skinTone={skinTone}
+            side="left"
+            isMobile={isMobile}
+          />
+        </group>
       </group>
       
       {/* Right Arm (mirrored) */}
@@ -235,10 +241,16 @@ export const AvatarBody = ({ config, gender, skinTone, isMobile = false }: Avata
           <sphereGeometry args={[armThickness * 0.55, segments / 2, segments / 2]} />
           <RealisticSkinMaterial skinTone={skinTone} isMobile={isMobile} />
         </mesh>
-        <mesh position={[0, -proportions.armLength * 0.96, 0]}>
-          <capsuleGeometry args={[armThickness * 0.45, armThickness * 0.6, 4, 8]} />
-          <RealisticSkinMaterial skinTone={skinTone} isMobile={isMobile} />
-        </mesh>
+        {/* Hand with fingers */}
+        <group position={[0, -proportions.armLength * 0.92, 0]} rotation={[0.1, -0.05, 0]}>
+          <AvatarFingers
+            handLength={armThickness * 2.2}
+            handWidth={armThickness * 1.4}
+            skinTone={skinTone}
+            side="right"
+            isMobile={isMobile}
+          />
+        </group>
       </group>
       
       {/* Left Leg */}
