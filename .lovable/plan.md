@@ -1,422 +1,443 @@
 
+# World-Class Mannequin Reconstruction Plan
+## Line of Judah Try-On Room
 
-# Forensic Critique: Mannequin 3D Model & Measurement System
+---
 
 ## Executive Summary
 
-After a comprehensive forensic analysis of the Try-On Room's 3D mannequin system, I've identified several critical issues that prevent the mannequin from reflecting true human proportions and properly responding to user measurements. While the recent reconstruction addressed the major positioning errors (floating body parts, inverted torso), there remain **systemic issues in how measurements flow through the system** and **anatomical proportion calculations** that produce a mannequin that doesn't look authentically human.
+After a forensic analysis of the current 3D mannequin implementation, I've identified that while the fundamental architecture (8-head scale, unified proportion system, measurement flow) is now correctly structured, **the visual execution falls short of world-class standards**. The mannequin appears robotic, with visible geometric primitives, unnatural joint transitions, and a surface quality that lacks the museum-grade ceramic aesthetic the design spec requires.
+
+This plan transforms the mannequin from "functional geometry" to "fashion industry display quality."
 
 ---
 
-## PART 1: CRITICAL ISSUES IDENTIFIED
+## Current State Analysis
 
-### Issue 1: Dual Proportion Systems Create Inconsistency
+### What's Working Well
+- Unified proportion system in `measurementToProportions.ts`
+- 8-head fashion scale implemented correctly (legs = 50% height)
+- Measurement flow properly enables `useDetailedMeasurements`
+- Gender/body type presets cover inclusive range
+- Skin material with subsurface scattering for realistic tones
 
-**Severity: CRITICAL**
+### Critical Visual Issues
 
-There are **THREE separate implementations** of body proportion calculations that can produce different results:
-
-| Location | Function | Problem |
-|----------|----------|---------|
-| `Mannequin3D.tsx` (lines 33-61) | `getPresetProportions()` | Returns `height: 1.75` for male |
-| `Mannequin3D.tsx` (lines 70-106) | `getMeasurementBasedProportions()` | Returns `height: 1.75 * heightScale` |
-| `Avatar3D.tsx` (lines 19-45) | Duplicate `getPresetProportions()` | Returns `height: 1.78` for male |
-| `measurementToProportions.ts` (lines 82-129) | `measurementToProportions()` | Returns `height: 1.7 * heightScale` |
-
-**The base mannequin height differs across files: 1.7m, 1.75m, and 1.78m.** This causes garments aligned to one height to misalign when using another calculation path.
-
-### Issue 2: `useDetailedMeasurements` Flag Never Set to True
-
-**Severity: HIGH**
-
-The TryOnState context has a `useDetailedMeasurements` boolean that switches between preset body types and real measurement-based proportions:
-
-```typescript
-// useTryOnState.tsx line 90
-useDetailedMeasurements: false,  // DEFAULT: Always false!
-```
-
-**But there's no UI control to enable this!** The BodyMeasurementsPanel allows users to adjust height/weight/chest/waist/hips/inseam, but these measurements **never actually affect the mannequin** because `useDetailedMeasurements` stays `false`.
-
-The mannequin only responds to:
-- Gender toggle → basic male/female proportions
-- Body type presets → slim/athletic/average/curvy
-
-The detailed sliders in the "Detailed" tab are **visual-only** — they update the state but don't change the 3D model.
-
-### Issue 3: Anatomical Proportions Don't Follow Fashion Industry Standards
-
-**Severity: HIGH**
-
-The current proportions use simplified cylinder/lathe combinations that don't reflect the anatomically correct **8-head fashion scale**:
-
-| Mannequin Issue | Current | Expected (8-Head Scale) |
-|-----------------|---------|------------------------|
-| Head size | ~0.19m (sphere r=0.095) | 0.22m (1/8 of 1.75m) |
-| Torso length | 0.50m (Y: 0.95→1.45) | 0.44m (2 heads = 2/8) |
-| Leg length | 0.80m (legLength prop) | 0.875m (4 heads = 50%) |
-| Shoulder-to-hip | Uniform width ratio | Should narrow 15-20% at waist |
-| Neck | 0.10m cylinder | Should be 0.12m with anatomical taper |
-
-The leg-to-torso ratio is particularly wrong: legs should be 50% of total height, but current implementation has ~46%.
-
-### Issue 4: Joint Spheres Create Unnatural Bulges
-
-**Severity: MEDIUM**
-
-The joint sphere approach (added to fix gaps) creates visible bulges at:
-- Shoulders: `sphereGeometry args={[proportions.armThickness * 1.15, 16, 16]}`
-- Hips: `sphereGeometry args={[proportions.legThickness * 1.15, 16, 16]}`
-
-These 1.15x multipliers make joints appear swollen rather than natural. Real mannequins use smooth bezier transitions, not overlapping spheres.
-
-### Issue 5: Height Scaling Produces Distorted Proportions
-
-**Severity: MEDIUM**
-
-The height scaling in Mannequin3D.tsx only scales Y:
-
-```typescript
-// Line 394
-<group scale={[1, heightScale, 1]}>
-```
-
-This means a 6'3" (191cm) person appears stretched vertically but has the same shoulder width as a 5'2" (157cm) person. Real bodies scale **proportionally** — taller people have wider shoulders.
-
-### Issue 6: Gender Modifier Values Are Arbitrary
-
-**Severity: MEDIUM**
-
-```typescript
-const genderModifiers = gender === 'female' 
-  ? { shoulderMod: 0.9, hipMod: 1.1, chestMod: 1.1 }
-  : { shoulderMod: 1.1, hipMod: 0.9, chestMod: 1.0 };
-```
-
-These 10% modifiers are simplistic. Anthropometric studies show:
-- Female shoulders are typically 78-82% of male shoulders (not 90%)
-- Female hips are typically 108-115% of male hips (close, but varies by body type)
-- The waist-to-hip ratio matters more than absolute values
-
-### Issue 7: Material Lacks Subsurface Scattering for Skin Tones
-
-**Severity: LOW**
-
-When skin tones are selected, the mannequin uses basic `meshStandardMaterial`:
-
-```typescript
-<meshStandardMaterial
-  color={skinTone}
-  roughness={0.75}
-  metalness={0.0}
-  envMapIntensity={0.2}
-/>
-```
-
-This produces a plastic/ceramic look rather than realistic skin. Skin has subsurface scattering (SSS) where light penetrates and scatters within the tissue. THREE.js can simulate this with custom shaders or `meshPhysicalMaterial` with transmission.
+| Problem | Location | Impact |
+|---------|----------|--------|
+| **Cylindrical limbs** | Arms, legs in Mannequin3D | Robot-like appearance |
+| **Visible joint spheres** | Shoulder, elbow, hip, knee | Swollen, unnatural joints |
+| **Segmented torso** | LatheGeometry with hard transitions | Mannequin vs sculpture |
+| **Faceless head** | Simple sphere + jaw | Lacks facial suggestion |
+| **Flat feet** | Capsule geometry | Unrealistic foot shape |
+| **Surface uniformity** | No subtle anatomical detail | Lifeless appearance |
+| **Stiff posture** | T-pose with no contrapposto | Not fashion-forward |
 
 ---
 
-## PART 2: MEASUREMENT FLOW AUDIT
+## Phase 1: Anatomical Geometry Overhaul
 
-### Current Flow (Broken)
+### 1.1 Torso Reconstruction — Sculpted Body Form
 
-```
-User adjusts slider in "Detailed" tab
-    ↓
-setMeasurements() updates state.measurements in TryOnContext
-    ↓
-Mannequin3D receives measurements from useTryOnState()
-    ↓
-getBodyProportions() checks useDetailedMeasurements flag
-    ↓
-⚠️ Flag is ALWAYS false → getMeasurementBasedProportions() NEVER called
-    ↓
-Returns preset proportions ignoring actual measurements
-    ↓
-Mannequin renders with preset body type, NOT user measurements
-```
+**Current:** LatheGeometry with linear interpolation produces a "vase shape"
 
-### Expected Flow (Fix Required)
+**Target:** Anatomically contoured torso with:
+- Subtle chest/pectoral definition
+- Natural waist indentation
+- Hip bone suggestion at pelvis
+- Back curvature (slight S-spine)
 
-```
-User adjusts slider in "Detailed" tab
-    ↓
-setMeasurements() updates state.measurements
-    ↓
-⭐ ALSO: setUseDetailedMeasurements(true) to enable measurement mode
-    ↓
-Mannequin3D calls getBodyProportions() with useDetailedMeasurements=true
-    ↓
-getMeasurementBasedProportions() uses actual measurements
-    ↓
-Mannequin morphs to match user's body
-```
-
-### Missing Connection: Quick Tab to Detailed Measurements
-
-When a user selects a Quick Preset (e.g., "Tall 6'0""), the `handlePresetSelect` function sets measurements:
-
+**Implementation:**
 ```typescript
-const handlePresetSelect = (presetMeasurements: BodyMeasurements) => {
-  setMeasurements(presetMeasurements);
-  // ⚠️ Missing: setUseDetailedMeasurements(true) or a preset flag
+// Enhanced torso profile using cubic Bezier curves
+const createSculptedTorsoProfile = (props, gender) => {
+  const path = new THREE.CurvePath();
+  
+  // Hip curve
+  path.add(new THREE.CubicBezierCurve3(
+    new THREE.Vector3(props.hipWidth/2, 0, 0),        // Start at hips
+    new THREE.Vector3(props.hipWidth/2 * 0.95, 0.1, 0), // Control
+    new THREE.Vector3(props.waistWidth/2 * 1.02, 0.3, 0), // Control
+    new THREE.Vector3(props.waistWidth/2, 0.35, 0)    // Waist point
+  ));
+  
+  // Ribcage curve  
+  path.add(new THREE.CubicBezierCurve3(
+    new THREE.Vector3(props.waistWidth/2, 0.35, 0),
+    new THREE.Vector3(props.waistWidth/2 * 1.05, 0.42, 0),
+    new THREE.Vector3(props.chestDepth * 0.98, 0.50, 0),
+    new THREE.Vector3(props.chestDepth, 0.55, 0)
+  ));
+  
+  // Convert to LatheGeometry with higher segment count
+  return new THREE.LatheGeometry(
+    path.getPoints(48),  // More points = smoother
+    48,                  // 48 radial segments
+    0,
+    Math.PI * 2
+  );
 };
 ```
 
-But the mannequin doesn't use these measurements because `useDetailedMeasurements` stays `false`.
+### 1.2 Limb Reconstruction — Organic Tubes
 
----
+**Current:** `cylinderGeometry` produces mechanical cylinders
 
-## PART 3: HUMAN PROPORTIONS REFERENCE
+**Target:** `TubeGeometry` with anatomical profile curves
 
-### Fashion Industry 8-Head Scale
-
-For a 1.75m (5'9") reference mannequin:
-
-| Body Region | Heads | Height Range (m) | Percentage |
-|-------------|-------|------------------|------------|
-| Head | 1 | 1.53 → 1.75 | 12.5% |
-| Neck to Shoulders | 0.5 | 1.42 → 1.53 | 6.25% |
-| Shoulders to Nipples | 1 | 1.31 → 1.42 | 6.25% |
-| Nipples to Navel | 1 | 1.09 → 1.31 | 12.5% |
-| Navel to Crotch | 0.5 | 0.875 → 1.09 | 12.5% |
-| Crotch to Mid-Thigh | 1 | 0.656 → 0.875 | 12.5% |
-| Mid-Thigh to Knee | 1 | 0.438 → 0.656 | 12.5% |
-| Knee to Mid-Calf | 1 | 0.219 → 0.438 | 12.5% |
-| Mid-Calf to Ground | 1 | 0 → 0.219 | 12.5% |
-
-**Legs = 4 heads = 50% of total height**
-
-### Anthropometric Measurements (Average Adults)
-
-| Measurement | Male (cm) | Female (cm) | Ratio |
-|-------------|-----------|-------------|-------|
-| Height | 175.3 | 161.3 | 0.92 |
-| Shoulder Width | 45.0 | 36.5 | 0.81 |
-| Chest Circumference | 100.0 | 92.0 | 0.92 |
-| Waist Circumference | 86.0 | 73.0 | 0.85 |
-| Hip Circumference | 100.0 | 102.0 | 1.02 |
-| Inseam | 80.0 | 74.0 | 0.93 |
-| Arm Length | 60.0 | 55.0 | 0.92 |
-
----
-
-## PART 4: RECOMMENDED FIXES
-
-### Fix 1: Unify Proportion Calculation System
-
-**Delete duplicate functions** — keep only ONE source of truth in `measurementToProportions.ts`. Import this into `Mannequin3D.tsx` and `Avatar3D.tsx`.
-
+**Implementation:**
 ```typescript
-// Delete from Mannequin3D.tsx:
-- const getPresetProportions = ...
-- const getMeasurementBasedProportions = ...
-- const getBodyProportions = ...
+// Arm with natural muscle/bone curvature
+const createAnatomicalArm = (armLength, armThickness) => {
+  // Path follows natural arm curvature (slight S-bend)
+  const armPath = new THREE.CubicBezierCurve3(
+    new THREE.Vector3(0, 0, 0),                    // Shoulder
+    new THREE.Vector3(-0.02, -armLength * 0.35, 0.01),  // Bicep outward
+    new THREE.Vector3(0.01, -armLength * 0.65, -0.01),  // Forearm inward
+    new THREE.Vector3(0, -armLength, 0)            // Wrist
+  );
 
-// Import from utils:
-+ import { measurementToProportions, quickPresets } from './utils/measurementToProportions';
-```
-
-### Fix 2: Enable Detailed Measurements Mode
-
-Add automatic toggle when user interacts with detailed sliders:
-
-```typescript
-// In BodyMeasurementsPanel.tsx, handleMeasurementChange:
-const handleMeasurementChange = (key: keyof BodyMeasurements, value: number) => {
-  if (!measurements) return;
-  setMeasurements({ ...measurements, [key]: value });
-  setUseDetailedMeasurements(true);  // ← ADD THIS
-  setSelectedPresetId(undefined);
-  setActiveProfile(null);
-};
-```
-
-When selecting a quick preset, also enable detailed mode:
-
-```typescript
-const handlePresetSelect = (presetMeasurements: BodyMeasurements) => {
-  setMeasurements(presetMeasurements);
-  setUseDetailedMeasurements(true);  // ← ADD THIS
-  // ... rest of function
-};
-```
-
-### Fix 3: Correct 8-Head Scale Proportions
-
-Recalculate all body segment positions to match the 8-head scale:
-
-```typescript
-// New Y-Coordinate Reference for 1.75m mannequin:
-const EIGHT_HEAD_SCALE = {
-  headTop: 1.75,
-  headBottom: 1.53,      // Head = 0.22m
-  neckBase: 1.48,        // Neck = 0.05m  
-  shoulderLine: 1.42,    // Shoulder = 0.06m from neck
-  chestLine: 1.31,       // Chest = 0.11m
-  waistLine: 1.09,       // Waist = 0.22m from chest
-  crotchLine: 0.875,     // Pelvis = 0.215m
-  kneeCenter: 0.438,     // Upper leg = 0.437m
-  ankleTop: 0.08,        // Lower leg = 0.358m
-  ground: 0.00,          // Foot = 0.08m
-};
-```
-
-### Fix 4: Replace Joint Spheres with Bezier Transitions
-
-Instead of overlapping spheres at joints, use smooth `TubeGeometry` with bezier curves:
-
-```typescript
-// Example for shoulder junction:
-const shoulderCurve = new THREE.CubicBezierCurve3(
-  new THREE.Vector3(0, shoulderY, 0),                    // Start at torso
-  new THREE.Vector3(shoulderWidth * 0.6, shoulderY - 0.02, 0),  // Control 1
-  new THREE.Vector3(shoulderWidth * 0.9, shoulderY - 0.06, 0),  // Control 2
-  new THREE.Vector3(shoulderWidth + armOffset, shoulderY - armDrop, 0)  // End at arm
-);
-
-const tubeGeometry = new THREE.TubeGeometry(shoulderCurve, 12, armRadius, 16, false);
-```
-
-### Fix 5: Proportional Height Scaling
-
-Scale all dimensions proportionally, not just Y:
-
-```typescript
-const heightScale = measurements.heightCm / 170;
-
-// Calculate proportional shoulder width based on height
-const baseShoulderWidth = gender === 'male' ? 0.45 : 0.365;
-const scaledShoulderWidth = baseShoulderWidth * Math.pow(heightScale, 0.85);
-// Power < 1 prevents shoulders from growing too fast for tall people
-
-// Apply to group
-<group scale={[heightScale * 0.95, heightScale, heightScale * 0.95]}>
-```
-
-### Fix 6: Implement Gender-Specific Proportions from Anthropometric Data
-
-Replace arbitrary 10% modifiers with data-driven ratios:
-
-```typescript
-const getGenderProportions = (gender: 'male' | 'female', measurements: BodyMeasurements) => {
-  if (gender === 'female') {
-    return {
-      shoulderMultiplier: 0.81,  // From anthropometric data
-      hipMultiplier: 1.02,
-      waistToHipRatio: 0.72,    // Hourglass baseline
-      armLengthRatio: 0.32,     // Of total height
-      legLengthRatio: 0.46,     // Of total height (slightly shorter for women)
-    };
-  }
-  return {
-    shoulderMultiplier: 1.0,
-    hipMultiplier: 1.0,
-    waistToHipRatio: 0.90,     // Male V-shape
-    armLengthRatio: 0.34,
-    legLengthRatio: 0.48,
+  // Custom radius function for anatomical taper
+  const radiusFunction = (t) => {
+    // Bicep bulge at 0.3, forearm taper
+    const bicepBulge = Math.sin(t * Math.PI) * 0.012;
+    const baseTaper = THREE.MathUtils.lerp(armThickness, armThickness * 0.55, t);
+    return baseTaper + bicepBulge * (1 - t); // Bulge fades toward wrist
   };
+
+  // Generate tube with variable radius
+  return createVariableRadiusTube(armPath, 20, radiusFunction, 16);
 };
 ```
 
-### Fix 7: Add Subsurface Scattering for Skin Tones
+### 1.3 Joint Transitions — Seamless Blends
 
-When a non-default skin tone is selected, use `meshPhysicalMaterial` with transmission:
+**Current:** Overlapping spheres create visible bulges
 
+**Target:** Smooth bezier transitions with no visible seams
+
+**Implementation:**
 ```typescript
-const SkinMaterial = ({ skinTone, isDefault }: { skinTone: string; isDefault: boolean }) => {
-  if (isDefault) {
-    // Default ceramic mannequin look
+// Shoulder junction using swept bezier
+const createShoulderBlend = (bodyRadius, sleeveRadius) => {
+  const curve = new THREE.QuadraticBezierCurve3(
+    new THREE.Vector3(0, 0, 0),                    // Torso surface
+    new THREE.Vector3(0.03, -0.02, 0),             // Control (smooth out)
+    new THREE.Vector3(0.06, -0.05, 0)              // Arm attachment
+  );
+  
+  // Swept geometry following curve with radius interpolation
+  return new THREE.TubeGeometry(curve, 12, (t) => {
+    return THREE.MathUtils.lerp(bodyRadius * 0.4, sleeveRadius, t);
+  }, 16, false);
+};
+```
+
+### 1.4 Head — Abstracted Fashion Mannequin
+
+**Current:** Sphere + jaw sphere = alien appearance
+
+**Target:** Stylized egg-form head with:
+- Subtle brow ridge
+- Nose suggestion (no details)
+- Chin definition
+- Smooth neckline transition
+
+**Implementation:**
+```typescript
+const createMannequinHead = (headRadius) => {
+  // Main skull - elongated egg shape
+  const skullGeometry = new THREE.SphereGeometry(headRadius, 32, 24);
+  
+  // Morph skull to egg shape
+  const positions = skullGeometry.attributes.position;
+  for (let i = 0; i < positions.count; i++) {
+    const y = positions.getY(i);
+    const scale = 1 + (y / headRadius) * 0.08; // Taller at top
+    positions.setX(i, positions.getX(i) * 0.95);
+    positions.setZ(i, positions.getZ(i) * 0.92);
+    positions.setY(i, y * scale);
+  }
+  skullGeometry.computeVertexNormals();
+  
+  // Subtle facial plane (not features, just surface)
+  const facePlane = createFacialPlane(headRadius);
+  
+  return { skull: skullGeometry, face: facePlane };
+};
+
+const createFacialPlane = (headRadius) => {
+  // Slightly flattened front with brow suggestion
+  const shape = new THREE.Shape();
+  // ... egg cross-section with brow and chin points
+  return new THREE.ExtrudeGeometry(shape, { depth: 0.01 });
+};
+```
+
+### 1.5 Feet — Anatomical Foundation
+
+**Current:** Capsule geometry = hot dog feet
+
+**Target:** Proper foot form with:
+- Heel definition
+- Arch suggestion
+- Ankle bone subtlety
+
+**Implementation:**
+```typescript
+const createAnatomicalFoot = (legThickness, side) => {
+  // Foot profile as bezier path
+  const footPath = [
+    [0, 0.03, -0.02],     // Heel back
+    [0, 0.02, 0.04],      // Mid-sole
+    [0, 0.01, 0.10],      // Ball of foot
+    [0, 0.02, 0.13],      // Toe tip
+  ];
+  
+  // Extruded shape with anatomical cross-section
+  const footShape = new THREE.Shape();
+  footShape.moveTo(-legThickness * 0.4, 0);
+  footShape.quadraticCurveTo(-legThickness * 0.45, 0.015, -legThickness * 0.35, 0.025);
+  // ... complete foot cross-section
+  
+  return new THREE.ExtrudeGeometry(footShape, {
+    steps: 12,
+    extrudePath: new THREE.CatmullRomCurve3(footPath.map(p => new THREE.Vector3(...p)))
+  });
+};
+```
+
+---
+
+## Phase 2: Surface & Material Excellence
+
+### 2.1 Premium Matte Ceramic Finish
+
+**Current:** Basic MeshStandardMaterial or MeshPhysicalMaterial
+
+**Target:** Museum-quality mannequin surface with:
+- Subtle surface micro-variations
+- Soft edge reflections
+- Zero specular hotspots
+
+**Implementation:**
+```typescript
+const PremiumMannequinMaterial = ({ skinTone, isDefaultCeramic }) => {
+  // Custom matcap for controlled reflections
+  const matcap = useLoader(THREE.TextureLoader, '/textures/ceramic-soft-matcap.png');
+  
+  if (isDefaultCeramic) {
     return (
-      <meshStandardMaterial
-        color="#D4D4D4"
-        roughness={0.75}
-        metalness={0.0}
+      <meshMatcapMaterial
+        matcap={matcap}
+        color="#E8E4E0"  // Warm off-white
       />
     );
   }
   
-  // Realistic skin with subsurface scattering
+  // Skin tones with subsurface scattering
   return (
     <meshPhysicalMaterial
       color={skinTone}
-      roughness={0.6}
-      metalness={0.0}
-      transmission={0.1}        // Slight transparency for SSS effect
-      thickness={0.3}           // Depth for transmission
-      ior={1.4}                 // Skin's index of refraction
-      clearcoat={0.1}           // Slight sheen
-      clearcoatRoughness={0.4}
+      roughness={0.55}
+      metalness={0}
+      clearcoat={0.05}
+      clearcoatRoughness={0.6}
+      transmission={0.08}
+      thickness={0.15}
+      ior={1.35}
+      // Custom normal map for subtle skin texture
+      normalMap={skinNormalMap}
+      normalScale={[0.02, 0.02]}
     />
   );
 };
 ```
 
----
+### 2.2 Subtle Anatomical Normals
 
-## PART 5: IMPLEMENTATION PLAN
+Add procedural normal variation to suggest muscle/bone structure without modeling it:
 
-### Phase 1: Critical Fixes (Immediate)
-
-| Task | File | Estimated Lines |
-|------|------|-----------------|
-| Delete duplicate proportion functions | `Mannequin3D.tsx`, `Avatar3D.tsx` | -150 lines |
-| Centralize to `measurementToProportions.ts` | `measurementToProportions.ts` | +50 lines |
-| Enable `useDetailedMeasurements` on slider change | `BodyMeasurementsPanel.tsx` | +5 lines |
-| Enable `useDetailedMeasurements` on preset select | `BodyMeasurementsPanel.tsx` | +2 lines |
-
-### Phase 2: Anatomical Accuracy
-
-| Task | File | Estimated Lines |
-|------|------|-----------------|
-| Implement 8-head scale constants | `measurementToProportions.ts` | +30 lines |
-| Update Mannequin3D segment positions | `Mannequin3D.tsx` | ~80 lines modified |
-| Update garment Y-positions to match | All garment geometry files | ~20 lines each |
-
-### Phase 3: Visual Quality
-
-| Task | File | Estimated Lines |
-|------|------|-----------------|
-| Replace sphere joints with bezier tubes | `Mannequin3D.tsx` | +100 lines |
-| Add skin material component with SSS | `Mannequin3D.tsx` | +40 lines |
-| Implement proportional height scaling | `Mannequin3D.tsx` | +20 lines |
-
-### Phase 4: Validation & Testing
-
-| Task | Description |
-|------|-------------|
-| Test all 5 quick presets | Verify mannequin morphs correctly |
-| Test extreme measurements | 140cm / 210cm height, 40kg / 150kg weight |
-| Test garment alignment | Ensure hoodies/pants fit all body types |
-| Test skin tone transitions | All 6 tones render with proper material |
-| Cross-check with size recommendation | Mannequin matches recommended size |
+```typescript
+const createAnatomyNormalMap = () => {
+  // Generate subtle normal variations programmatically
+  const canvas = document.createElement('canvas');
+  canvas.width = 512;
+  canvas.height = 512;
+  const ctx = canvas.getContext('2d');
+  
+  // Subtle gradient variations for anatomical suggestion
+  // ... procedural normal map generation
+  
+  return new THREE.CanvasTexture(canvas);
+};
+```
 
 ---
 
-## FILES TO MODIFY
+## Phase 3: Pose & Posture Refinement
+
+### 3.1 Contrapposto — Fashion Stance
+
+**Current:** T-pose / straight stance
+
+**Target:** Relaxed fashion pose with:
+- Slight weight shift to one leg
+- Natural arm hang (not 90° out)
+- Head tilt suggestion
+
+**Implementation:**
+```typescript
+// Posture constants
+const FASHION_POSE = {
+  // Pelvis tilt
+  pelvisTiltZ: 0.03,      // Slight hip drop on relaxed side
+  
+  // Leg stance  
+  weightLeg: 'right',      // Weight-bearing leg
+  relaxedLegAngle: 0.05,   // Slight bend in relaxed leg
+  
+  // Arm positions
+  leftArmAngle: [0, 0, 0.12],   // Natural hang
+  rightArmAngle: [0, 0, -0.08], // Slight variation
+  
+  // Head  
+  headTilt: 0.02,          // Subtle tilt
+};
+
+// Apply to group transforms
+<group position={[0, 0, 0]} rotation={[0, 0, FASHION_POSE.pelvisTiltZ]}>
+  {/* Pelvis with weight shift */}
+</group>
+```
+
+### 3.2 Breathing Animation Enhancement
+
+**Current:** Y-scale oscillation (breathing = getting taller?!)
+
+**Target:** Chest expansion + subtle shoulder rise
+
+```typescript
+useFrame((state) => {
+  if (reducedMotion) return;
+  
+  const t = state.clock.getElapsedTime();
+  const breathCycle = Math.sin(t * 1.2);
+  
+  // Chest expands forward/outward, not upward
+  torsoRef.current.scale.z = 1 + breathCycle * 0.008;
+  torsoRef.current.scale.x = 1 + breathCycle * 0.005;
+  
+  // Subtle shoulder rise
+  shoulderRef.current.position.y = baseShoulderY + breathCycle * 0.002;
+});
+```
+
+---
+
+## Phase 4: Performance Optimization
+
+### 4.1 Geometry Instancing & Merging
+
+```typescript
+// Merge static body parts into single geometry
+const mergedBodyGeometry = useMemo(() => {
+  const merged = BufferGeometryUtils.mergeBufferGeometries([
+    torsoGeometry,
+    pelvisGeometry,
+    neckGeometry,
+    headGeometry,
+  ]);
+  return merged;
+}, [proportions]);
+
+// Single mesh draw call for body core
+<mesh geometry={mergedBodyGeometry}>
+  <SkinMaterial skinTone={skinTone} />
+</mesh>
+```
+
+### 4.2 LOD (Level of Detail) for Mobile
+
+```typescript
+// Reduce segment counts on mobile
+const LOD_SETTINGS = {
+  desktop: { torsoSegments: 48, limbSegments: 24 },
+  mobile: { torsoSegments: 24, limbSegments: 12 },
+};
+
+const settings = isMobile ? LOD_SETTINGS.mobile : LOD_SETTINGS.desktop;
+```
+
+### 4.3 Memoization & Dependency Optimization
+
+```typescript
+// Already good, but ensure all geometry creates are memoized
+const torsoGeometry = useMemo(
+  () => createSculptedTorso(proportions, gender),
+  [proportions.height, proportions.waistWidth, proportions.chestDepth, gender]
+);
+```
+
+---
+
+## Phase 5: Garment Alignment Verification
+
+After mannequin changes, verify garment positions:
+
+| Garment | Anchor Point | Expected Y |
+|---------|--------------|------------|
+| Hoodie/Crewneck/Tshirt | Chest center | 1.15 (chest line - offset) |
+| Pants/Shorts | Hip line | 0.875 (crotch line) |
+| Beanie | Head top | 1.70 |
+| Sneakers | Ground | 0.00 |
+
+Adjust garment geometry files if mannequin silhouette changes.
+
+---
+
+## Implementation File Changes
 
 | File | Changes |
 |------|---------|
-| `src/components/try-on/Mannequin3D.tsx` | Remove duplicate functions, update segment positions, implement bezier joints, add skin material |
-| `src/components/try-on/Avatar3D.tsx` | Remove duplicate functions, import from utils |
-| `src/components/try-on/utils/measurementToProportions.ts` | Add 8-head scale constants, unify proportion calculations |
-| `src/components/try-on/BodyMeasurementsPanel.tsx` | Enable `useDetailedMeasurements` on slider/preset changes |
-| `src/hooks/useTryOnState.tsx` | No changes needed (already has all methods) |
-| `src/components/try-on/garments/HoodieGeometry.tsx` | Verify Y-position matches new mannequin |
-| `src/components/try-on/garments/PantsGeometry.tsx` | Verify Y-position matches new mannequin |
+| `src/components/try-on/Mannequin3D.tsx` | Complete geometry overhaul: sculpted torso, anatomical limbs, bezier joints, fashion head, proper feet, pose system, enhanced breathing |
+| `src/components/try-on/utils/measurementToProportions.ts` | Add pose configuration constants |
+| `src/components/try-on/garments/HoodieGeometry.tsx` | Verify Y alignment after mannequin changes |
+| `src/components/try-on/garments/PantsGeometry.tsx` | Verify Y alignment after mannequin changes |
+| `public/textures/` | Add ceramic matcap texture (optional) |
 
 ---
 
-## SUCCESS CRITERIA
+## Success Criteria
 
 After implementation, the mannequin must:
 
-1. **Respond to measurement sliders in real-time** — adjusting height slider visibly changes mannequin height
-2. **Reflect accurate human proportions** — legs are 50% of height, shoulders scale with height
-3. **Show smooth joint transitions** — no visible bulges at shoulders, hips, elbows, knees
-4. **Apply skin tones realistically** — with subsurface scattering when non-default
-5. **Match quick preset measurements** — selecting "Tall (6'0")" produces a visibly taller mannequin
-6. **Maintain garment alignment** — hoodies/pants fit correctly across all body configurations
-7. **Support inclusive body types** — petite to extra-tall, slim to curvy, all render correctly
+1. **Look human at first glance** — No visible geometric primitives
+2. **Have smooth joint transitions** — No spheres, no gaps, no bulges
+3. **Stand like a fashion model** — Subtle contrapposto, confident stance
+4. **Breathe naturally** — Chest expansion, not height oscillation
+5. **Render with premium materials** — Museum ceramic or realistic skin
+6. **Morph smoothly** — Body type changes without jarring
+7. **Maintain garment fit** — All equipped items align correctly
+8. **Perform excellently** — <2s load, 30+ FPS on mobile
 
+---
+
+## Technical Dependencies
+
+- **three.js** (already installed via @react-three/fiber)
+- **BufferGeometryUtils** from three/addons (for geometry merging)
+- Optional: Matcap texture file for premium ceramic finish
+
+---
+
+## Estimated Effort
+
+| Phase | Effort |
+|-------|--------|
+| Phase 1: Geometry Overhaul | ~400 lines |
+| Phase 2: Materials | ~50 lines |
+| Phase 3: Pose/Animation | ~80 lines |
+| Phase 4: Performance | ~40 lines |
+| Phase 5: Garment Verification | ~20 lines |
+| **Total** | ~590 lines (net change) |
