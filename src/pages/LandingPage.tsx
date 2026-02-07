@@ -20,38 +20,71 @@ const LandingPage = () => {
   const prefersReducedMotion = useReducedMotion();
   const { user } = useAuth();
 
-  // Animation variants
+  // Full animation variants
   const backgroundVariants = {
-    initial: { opacity: 0, scale: 1.02 },
+    initial: { opacity: 0, scale: 1.03 },
     animate: {
       opacity: 1,
       scale: 1,
-      transition: { duration: 0.7, ease: editorialEase },
+      transition: { duration: 0.8, ease: editorialEase },
     },
   };
 
-  const headerVariants = {
-    initial: { opacity: 0, y: -10 },
+  const scrimVariants = {
+    initial: { opacity: 0 },
+    animate: {
+      opacity: 1,
+      transition: { duration: 0.6, delay: 0.2, ease: editorialEase },
+    },
+  };
+
+  const brandWordVariants = {
+    initial: { 
+      clipPath: "inset(0 100% 0 0)",
+      opacity: 0 
+    },
+    animate: (i: number) => ({
+      clipPath: "inset(0 0% 0 0)",
+      opacity: 1,
+      transition: { 
+        duration: 0.7, 
+        delay: 0.5 + i * 0.12, 
+        ease: editorialEase 
+      },
+    }),
+  };
+
+  const dividerVariants = {
+    initial: { scaleX: 0, opacity: 0 },
+    animate: {
+      scaleX: 1,
+      opacity: 1,
+      transition: { duration: 0.5, delay: 1.0, ease: editorialEase },
+    },
+  };
+
+  const taglineVariants = {
+    initial: { opacity: 0, y: 10 },
     animate: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.4, delay: 0.15, ease: editorialEase },
+      transition: { duration: 0.5, delay: 1.15, ease: editorialEase },
     },
   };
 
-  const containerVariants = {
+  const navContainerVariants = {
     initial: {},
     animate: {
-      transition: { staggerChildren: 0.05, delayChildren: 0.25 },
+      transition: { staggerChildren: 0.06, delayChildren: 1.1 },
     },
   };
 
-  const linkVariants = {
-    initial: { opacity: 0, y: 20 },
+  const navLinkVariants = {
+    initial: { opacity: 0, y: 15 },
     animate: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.5, ease: editorialEase },
+      transition: { duration: 0.45, ease: editorialEase },
     },
   };
 
@@ -59,29 +92,43 @@ const LandingPage = () => {
     initial: { opacity: 0 },
     animate: {
       opacity: 1,
-      transition: { duration: 0.4, delay: 0.5, ease: editorialEase },
+      transition: { duration: 0.5, delay: 1.5, ease: editorialEase },
     },
   };
 
   // Simple variants for reduced motion
   const simpleVariants = {
     initial: { opacity: 0 },
-    animate: { opacity: 1, transition: { duration: 0.2 } },
+    animate: { opacity: 1, transition: { duration: 0.3 } },
   };
 
-  const variants = prefersReducedMotion
+  const simpleWordVariants = {
+    initial: { opacity: 0 },
+    animate: () => ({
+      opacity: 1,
+      transition: { duration: 0.3 },
+    }),
+  };
+
+  const v = prefersReducedMotion
     ? {
         background: simpleVariants,
-        header: simpleVariants,
-        container: { initial: {}, animate: {} },
-        link: simpleVariants,
+        scrim: simpleVariants,
+        brandWord: simpleWordVariants,
+        divider: simpleVariants,
+        tagline: simpleVariants,
+        navContainer: { initial: {}, animate: {} },
+        navLink: simpleVariants,
         footer: simpleVariants,
       }
     : {
         background: backgroundVariants,
-        header: headerVariants,
-        container: containerVariants,
-        link: linkVariants,
+        scrim: scrimVariants,
+        brandWord: brandWordVariants,
+        divider: dividerVariants,
+        tagline: taglineVariants,
+        navContainer: navContainerVariants,
+        navLink: navLinkVariants,
         footer: footerVariants,
       };
 
@@ -95,103 +142,156 @@ const LandingPage = () => {
         />
       </Helmet>
 
-      <motion.main
-        className="fixed inset-0 flex flex-col h-[100dvh]"
-        style={{
-          backgroundImage: `url('/nav-hero-hoodie.png')`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
-        }}
-        variants={variants.background}
-        initial="initial"
-        animate="animate"
-      >
-        {/* Subtle texture overlay */}
-        <div className="absolute inset-0 bg-stone-50/5 pointer-events-none" />
-
-        {/* Header: Logo only */}
-        <motion.header
-          className="relative z-10 px-6 md:px-8"
-          style={{
-            paddingTop: "max(env(safe-area-inset-top), 24px)",
-          }}
-          variants={variants.header}
+      <main className="fixed inset-0 h-[100dvh] overflow-hidden bg-black">
+        {/* Layer 0: Background Image (with subtle blur) */}
+        <motion.div
+          className="absolute inset-0"
+          variants={v.background}
+          initial="initial"
+          animate="animate"
         >
-          <Link
-            to="/home"
-            className="inline-block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-700 focus-visible:ring-offset-2 rounded"
-            aria-label="Go to homepage"
-          >
-            <img
-              src="/logo.svg"
-              alt="Line of Judah"
-              className="h-5 w-auto filter brightness-0"
-            />
-          </Link>
-        </motion.header>
+          <img
+            src="/nav-hero-hoodie.png"
+            alt=""
+            className="w-full h-full object-cover"
+            style={{ filter: "blur(1px)" }}
+          />
+        </motion.div>
 
-        {/* Centered navigation links */}
-        <nav
-          className="flex-1 flex items-center justify-center relative z-10"
-          role="navigation"
-          aria-label="Main navigation"
-        >
-          <motion.ul
-            className="text-center space-y-0"
-            variants={variants.container}
+        {/* Layer 1: Gradient Scrim (dark bottom/edges) */}
+        <motion.div
+          className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/30"
+          variants={v.scrim}
+          initial="initial"
+          animate="animate"
+        />
+
+        {/* Layer 2: Warm Color Wash */}
+        <div className="absolute inset-0 landing-warm-wash pointer-events-none" />
+
+        {/* Layer 3: Film Grain */}
+        <div className="absolute inset-0 hero-noise pointer-events-none" />
+
+        {/* Layer 4: Vignette */}
+        <div className="absolute inset-0 landing-vignette pointer-events-none" />
+
+        {/* Content Layer */}
+        <div className="relative z-10 h-full flex flex-col">
+          {/* Spacer for safe area */}
+          <div
+            className="shrink-0"
+            style={{ height: "max(env(safe-area-inset-top), 24px)" }}
+          />
+
+          {/* Main Content Area */}
+          <div className="flex-1 flex flex-col lg:flex-row lg:items-center lg:justify-between px-6 md:px-12 lg:px-20 xl:px-24">
+            {/* Left: Brand Lockup */}
+            <div className="flex flex-col justify-center lg:justify-start pt-8 lg:pt-0">
+              <h1 className="text-brand-massive text-white uppercase select-none">
+                <motion.span
+                  className="block"
+                  variants={v.brandWord}
+                  initial="initial"
+                  animate="animate"
+                  custom={0}
+                >
+                  Line
+                </motion.span>
+                <motion.span
+                  className="block"
+                  variants={v.brandWord}
+                  initial="initial"
+                  animate="animate"
+                  custom={1}
+                >
+                  Of
+                </motion.span>
+                <motion.span
+                  className="block text-amber-400"
+                  variants={v.brandWord}
+                  initial="initial"
+                  animate="animate"
+                  custom={2}
+                >
+                  Judah
+                </motion.span>
+              </h1>
+
+              {/* Divider */}
+              <motion.div
+                className="w-16 h-px bg-white/40 mt-6 mb-4 origin-left"
+                variants={v.divider}
+                initial="initial"
+                animate="animate"
+              />
+
+              {/* Tagline */}
+              <motion.p
+                className="text-[10px] md:text-xs uppercase tracking-[0.3em] text-white/60 font-light"
+                variants={v.tagline}
+                initial="initial"
+                animate="animate"
+              >
+                For those who walk different
+              </motion.p>
+            </div>
+
+            {/* Right: Navigation */}
+            <nav
+              className="mt-12 lg:mt-0 lg:text-right"
+              role="navigation"
+              aria-label="Main navigation"
+            >
+              <motion.ul
+                className="space-y-1"
+                variants={v.navContainer}
+                initial="initial"
+                animate="animate"
+              >
+                {NAV_LINKS.map((link) => (
+                  <motion.li key={link.label} variants={v.navLink}>
+                    <Link
+                      to={link.href}
+                      className="block py-2 text-[11px] md:text-[12px] font-light uppercase tracking-[0.3em] text-white/70 hover:text-white transition-colors duration-300 focus-visible:outline-none focus-visible:text-amber-400"
+                    >
+                      {link.label}
+                    </Link>
+                  </motion.li>
+                ))}
+              </motion.ul>
+            </nav>
+          </div>
+
+          {/* Footer */}
+          <motion.footer
+            className="flex items-center justify-between px-6 md:px-12 lg:px-20 xl:px-24 shrink-0"
+            style={{
+              paddingBottom: "max(env(safe-area-inset-bottom), 24px)",
+            }}
+            variants={v.footer}
             initial="initial"
             animate="animate"
           >
-            {NAV_LINKS.map((link) => (
-              <motion.li key={link.label} variants={variants.link}>
-                <Link
-                  to={link.href}
-                  className="block py-3 text-[14px] md:text-[15px] font-light uppercase tracking-[0.25em] leading-[3.5] text-stone-900 hover:text-amber-700 transition-colors duration-300 focus-visible:outline-none focus-visible:text-amber-700"
-                >
-                  {link.label}
-                </Link>
-              </motion.li>
-            ))}
-          </motion.ul>
-        </nav>
-
-        {/* Footer: Account + Social */}
-        <motion.footer
-          className="relative z-10 flex items-center justify-between px-6 md:px-8"
-          style={{
-            paddingBottom: "max(env(safe-area-inset-bottom), 24px)",
-          }}
-          variants={variants.footer}
-        >
-          {/* Account link */}
-          {user ? (
+            {/* Account link */}
             <Link
               to="/account"
-              className="text-[11px] uppercase tracking-[0.15em] text-stone-700 hover:text-stone-900 transition-colors duration-300 focus-visible:outline-none focus-visible:text-amber-700 py-2"
+              className="text-[10px] uppercase tracking-[0.2em] text-white/40 hover:text-white/70 transition-colors duration-300 focus-visible:outline-none focus-visible:text-amber-400 py-3"
             >
-              My Account
+              {user ? "My Account" : "Sign In"}
             </Link>
-          ) : (
-            <Link
-              to="/account"
-              className="text-[11px] uppercase tracking-[0.15em] text-stone-700 hover:text-stone-900 transition-colors duration-300 focus-visible:outline-none focus-visible:text-amber-700 py-2"
-            >
-              Sign In
-            </Link>
-          )}
 
-          {/* Social link */}
-          <a
-            href={BRAND.social.instagram.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[11px] uppercase tracking-[0.15em] text-stone-700 hover:text-stone-900 transition-colors duration-300 focus-visible:outline-none focus-visible:text-amber-700 py-2"
-          >
-            {BRAND.social.instagram.handle}
-          </a>
-        </motion.footer>
-      </motion.main>
+            {/* Social link */}
+            <a
+              href={BRAND.social.instagram.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[10px] uppercase tracking-[0.2em] text-white/40 hover:text-white/70 transition-colors duration-300 focus-visible:outline-none focus-visible:text-amber-400 py-3"
+            >
+              {BRAND.social.instagram.handle}
+            </a>
+          </motion.footer>
+        </div>
+      </main>
     </>
   );
 };
