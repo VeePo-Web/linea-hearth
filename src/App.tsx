@@ -15,6 +15,7 @@ import { migrateLocalStorage } from "@/lib/storageMigration";
 migrateLocalStorage();
 import ScrollToTop from "./components/ScrollToTop";
 import PageTransition from "./components/motion/PageTransition";
+import LandingPage from "./pages/LandingPage";
 import Index from "./pages/Index";
 import Category from "./pages/Category";
 import ProductDetail from "./pages/ProductDetail";
@@ -60,7 +61,8 @@ const AnimatedRoutes = () => {
   return (
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
-        <Route path="/" element={<PageTransition><Index /></PageTransition>} />
+        <Route path="/" element={<PageTransition><LandingPage /></PageTransition>} />
+        <Route path="/home" element={<PageTransition><Index /></PageTransition>} />
         <Route path="/category/:category" element={<PageTransition><Category /></PageTransition>} />
         <Route path="/product/:productId" element={<PageTransition><ProductDetail /></PageTransition>} />
         <Route path="/checkout" element={<PageTransition><Checkout /></PageTransition>} />
