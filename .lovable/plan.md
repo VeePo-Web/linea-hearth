@@ -1,385 +1,450 @@
 
 
-# Editorial Landing Page Transformation
-## From "Cheap & Tacky" to World-Class LA Streetwear
+# Landing Page Transformation: From "Friendly Youth" to "High-Status LA Streetwear"
+## Elevating Line of Judah to Fear of God / Travis Scott / 032c Tier
 
 ---
 
-## Problem Analysis: Why It Feels "Cheap"
+## The Problem: Why It Feels "For Kids"
 
-The current implementation has these specific issues:
-
-| Issue | Current State | Why It Feels Cheap |
-|-------|---------------|-------------------|
-| **Visual depth** | Flat image, single overlay | No layering, no atmosphere |
-| **Background treatment** | Raw image, no effects | Template vibes, no editorial craft |
-| **Typography** | Small, safe, centered | No hierarchy, no magazine tension |
-| **Color palette** | Stone-900 on cream | Safe, generic, lacks streetwear edge |
-| **Animation** | Basic stagger | Predictable, doesn't create tension |
-| **Layout** | Symmetrical, centered | No 032c asymmetry, no editorial "break" |
-| **Brand identity** | Logo only | No typographic brand statement |
+| Current Element | Why It's Not Working |
+|-----------------|---------------------|
+| **Amber/gold accent** (`text-amber-400`) | Feels youth-group friendly, not high-status |
+| **Warm sepia wash** | Too cozy, lacks edge and tension |
+| **"For those who walk different"** tagline | Generic, sounds like a church slogan |
+| **Stacked word layout** (Line / Of / Judah) | Standard, predictable, lacks magazine tension |
+| **Visible navigation** | Too much content, feels like a website not a statement |
+| **Light background image** | Soft, approachable - not mysterious or exclusive |
 
 ---
 
-## The Transformation Blueprint
+## The Vision: High-Status LA Rapper Aesthetic
 
-### 1. Visual Atmosphere Layers
+Drawing from **Fear of God**, **Travis Scott**, **032c**, and **Kanye's Sunday Service**:
 
-**Add cinematic depth with multiple overlays:**
+### Core Principles
+1. **Near-total darkness** - Black as the dominant color (95%+ of viewport)
+2. **Whisper typography** - Ultra-thin weights, massive scale, barely there
+3. **Austerity as luxury** - Remove everything possible, what remains is sacred
+4. **Tension through absence** - Navigation hidden until interaction
+5. **Mysterious exclusivity** - Enter a world, don't browse a store
+
+---
+
+## Part 1: Visual Transformation
+
+### Color Shift
+
+| Element | Current | New |
+|---------|---------|-----|
+| Background | Light image + warm wash | Deep black (#0a0a0a) with subtle image |
+| Brand text | White + amber accent | Pure white, or bone (#f5f5f0) |
+| Accent color | Amber-400 (warm gold) | None - all monochrome, or blood red (#991b1b) sparingly |
+| Overlays | Sepia warm wash | Cool/neutral gradient, or pure black |
+
+### New Layer Stack
 
 ```text
-Layer Stack (bottom to top):
+Layer 0: Pure black (#000000)
+Layer 1: Background image (20-30% opacity, heavily desaturated)
+Layer 2: Radial gradient (center glow, edge darkness)
+Layer 3: Film grain (intensified to 5% opacity)
+Layer 4: Content (ultra-minimal)
+```
+
+### Typography Transformation
+
+**Current:** "Line / Of / Judah" stacked vertically with amber accent
+
+**New Options (pick one):**
+
+**Option A - Horizontal Statement:**
+```
+L I N E   O F   J U D A H
+```
+- Massive horizontal with extreme letter-spacing (`tracking-[0.5em]`)
+- Single line, centered
+- Font-weight: 100 (ultra-thin)
+- Size: `text-[4vw] md:text-[3vw]`
+
+**Option B - Cinematic Reveal (Fear of God style):**
+```
+            LINE OF
+              JUDAH
+```
+- Right-aligned, offset
+- Ultra-light weight
+- Appears almost floating in black space
+
+**Option C - 032c Industrial:**
+```
+LINE OF JUDAH
+─────────────────
+```
+- All caps, no word breaks
+- Underline divider
+- Left-aligned, massive
+
+---
+
+## Part 2: Layout Transformation
+
+### From "Website" to "Portal"
+
+**Current Layout:**
+```text
 ┌─────────────────────────────────────────┐
-│ Layer 0: Background Image               │  /nav-hero-hoodie.png
-├─────────────────────────────────────────┤
-│ Layer 1: Blur Vignette                  │  backdrop-blur on edges (3px)
-├─────────────────────────────────────────┤
-│ Layer 2: Film Grain Texture             │  hero-noise CSS class
-├─────────────────────────────────────────┤
-│ Layer 3: Color Wash (warm sepia tone)   │  bg-amber-900/5 mix-blend-overlay
-├─────────────────────────────────────────┤
-│ Layer 4: Gradient Scrim (bottom fade)   │  bg-gradient-to-t from-black/60
-├─────────────────────────────────────────┤
-│ Layer 5: Edge Vignette                  │  radial-gradient (dark edges)
-├─────────────────────────────────────────┤
-│ Layer 6: Content                        │  Typography + navigation
-└─────────────────────────────────────────┘
+│  Brand (left)          Navigation (right)│
+│                                          │
+│  LINE                         SHOP       │
+│  OF                           LOOKBOOK   │
+│  JUDAH                        COMMUNITY  │
+│                               ABOUT      │
+│                               CONTACT    │
+│                                          │
+│  Footer                                  │
+└──────────────────────────────────────────┘
 ```
 
-### 2. Typography Transformation
-
-**From safe to statement:**
-
-| Element | Before | After |
-|---------|--------|-------|
-| Brand mark | Logo SVG (small, h-5) | "LINE OF JUDAH" as massive typographic lockup |
-| Logo position | Top-left, small | Bottom corner or hidden |
-| Nav links | 14px, centered | 11-12px, positioned to create asymmetry |
-| Tagline | None | Manifesto-style micro-copy |
-
-**Typography System:**
-- Brand name: `text-[8vw] md:text-[5vw]` - massive, unapologetic
-- Tracking: `-0.04em` for brand, `0.3em` for nav links
-- Weight: `font-extralight` (100) for massive text, creates elegance
-
-### 3. Color Palette Shift
-
-**Move from cream/beige to moody streetwear:**
-
-```css
-/* Current: Cream background, stone text */
-text-stone-900 on cream
-
-/* New: Dark/atmospheric with warm accent */
-- Background scrim: from-black/70 via-black/40 to-transparent
-- Primary text: text-white (on dark scrim)
-- Accent: text-amber-400 (warm gold, not generic amber-700)
-- Secondary: text-white/60 (muted for hierarchy)
-```
-
-### 4. Layout Architecture
-
-**032c-inspired asymmetric composition:**
-
+**New Layout - Ultra Minimal:**
 ```text
-Mobile Layout:
-┌─────────────────────────────────┐
-│                                 │
-│                                 │
-│    LINE                         │  Brand name (left-aligned)
-│    OF                           │  Stacked, massive
-│    JUDAH                        │  Each word on own line
-│                                 │
-│    ─────────                    │  Divider line
-│                                 │
-│    SHOP                         │  Links (centered or left)
-│    LOOKBOOK                     │
-│    COMMUNITY                    │
-│    ABOUT                        │
-│    CONTACT                      │
-│                                 │
-│                                 │
-│ Account        @lineofjudahwear │  Footer
-└─────────────────────────────────┘
-
-Desktop Layout:
-┌─────────────────────────────────────────────────────────────┐
-│                                                             │
-│                                                             │
-│  LINE                                                       │
-│  OF                                               SHOP      │
-│  JUDAH                                          LOOKBOOK    │
-│                                                COMMUNITY    │
-│                                                   ABOUT     │
-│                                                 CONTACT     │
-│                                                             │
-│                                                             │
-│                                                             │
-│  For those who walk different.                              │
-│                                                             │
-│  Account                               @lineofjudahwear     │
-└─────────────────────────────────────────────────────────────┘
-     ↑                                              ↑
-   Left-aligned brand                    Right-aligned nav
-   creates editorial tension
+┌─────────────────────────────────────────┐
+│                                          │
+│                                          │
+│                                          │
+│                                          │
+│        L I N E   O F   J U D A H        │  ← Single element, dead center
+│                                          │
+│                                          │
+│                    ENTER                 │  ← Tiny CTA or auto-advance
+│                                          │
+│                                          │
+└──────────────────────────────────────────┘
 ```
 
-### 5. Animation Choreography
+**Navigation Strategy:**
+- Hide all navigation initially
+- Show on hover (desktop) or tap (mobile)
+- OR: Single "ENTER" that leads to `/home` with full nav
 
-**Cinematic sequence, not just stagger:**
+---
 
-| Step | Element | Effect | Timing |
-|------|---------|--------|--------|
-| 0ms | Black screen | Start dark | - |
-| 0-700ms | Background | Fade in with subtle scale (1.03→1.0) | 0.7s |
-| 200ms | Grain overlay | Fade in | 0.3s |
-| 400ms | Gradient scrim | Fade in | 0.5s |
-| 600ms | "LINE" | Clip reveal left-to-right | 0.6s |
-| 700ms | "OF" | Clip reveal left-to-right | 0.6s |
-| 800ms | "JUDAH" | Clip reveal left-to-right | 0.6s |
-| 1000ms | Divider line | Scale from center | 0.4s |
-| 1100ms | Nav links | Stagger up (50ms each) | 0.4s each |
-| 1500ms | Footer | Fade in | 0.4s |
+## Part 3: New Visual Elements
 
-### 6. Visual Effects
+### A. Glow Effect (Kanye/Travis style)
 
-**Premium touches that separate world-class from template:**
+Add a subtle center glow that makes the brand name feel like it's emanating light:
 
-#### A. Film Grain
-Already have `hero-noise` class - will use it
-
-#### B. Edge Vignette
 ```css
-/* Radial gradient for cinematic vignette */
-background: radial-gradient(
-  ellipse at center,
-  transparent 40%,
-  rgba(0,0,0,0.4) 100%
-);
+.landing-glow::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 60vw;
+  height: 60vh;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 255, 255, 0.03) 0%,
+    transparent 70%
+  );
+  pointer-events: none;
+}
 ```
 
-#### C. Subtle Image Blur (background)
+### B. Intensified Grain
+
+Increase grain opacity from 3% to 6-8% for more "film" texture:
+
 ```css
-/* Slight blur on image to push it back */
-filter: blur(1px);
+.hero-noise-heavy::after {
+  opacity: 0.06;
+}
 ```
 
-#### D. Warm Color Wash
+### C. Subtle Breathing Animation
+
+A near-imperceptible scale animation on the brand name:
+
 ```css
-/* Sepia/warm tone overlay */
-mix-blend-mode: overlay;
-background: linear-gradient(
-  to bottom,
-  rgba(180, 140, 100, 0.1),
-  rgba(0, 0, 0, 0.3)
-);
+@keyframes breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.01); }
+}
+
+.animate-breathe {
+  animation: breathe 6s ease-in-out infinite;
+}
 ```
 
-#### E. Horizontal Divider Line
+### D. Edge Fade (Travis Scott style)
+
+Extreme vignette that makes edges almost pure black:
+
 ```css
-/* 032c-style divider */
-width: 60px;
-height: 1px;
-background: white;
+.landing-edge-fade {
+  background: radial-gradient(
+    ellipse 50% 50% at center,
+    transparent 0%,
+    rgba(0, 0, 0, 0.7) 60%,
+    rgba(0, 0, 0, 0.95) 100%
+  );
+}
 ```
 
 ---
 
-## Technical Implementation
+## Part 4: Tagline Transformation
+
+**Current:** "For those who walk different"  
+*Problem: Sounds like a youth group motto*
+
+**New Options (pick one):**
+
+| Option | Tagline | Vibe |
+|--------|---------|------|
+| A | *no tagline* | Pure mystery - Fear of God approach |
+| B | `EST. MMXXIV` | Minimal, architectural |
+| C | `LOS ANGELES` | Geographic flex, premium |
+| D | `MMXXIV` | Year only, cryptic |
+| E | `SET APART` | Biblical but edgy |
+
+---
+
+## Part 5: Interaction Design
+
+### Desktop Behavior
+
+1. **Page loads** → Pure black for 0.3s
+2. **Brand name reveals** → Slow fade (1.5s), letter by letter
+3. **Hover anywhere** → Navigation slides in from edges
+4. **Click brand name** → Goes to `/home`
+
+### Mobile Behavior
+
+1. **Page loads** → Pure black for 0.3s
+2. **Brand name reveals** → Slow fade (1.2s)
+3. **Tap anywhere** → Reveals minimal navigation overlay
+4. **Swipe up** → Goes to `/home`
+
+### "ENTER" Approach (Alternative)
+
+Instead of hidden navigation:
+- Single word "ENTER" below brand name
+- Links to `/home` which has full site
+- Landing page is purely a brand statement
+
+---
+
+## Part 6: Technical Implementation
 
 ### Files to Modify
 
 | File | Changes |
 |------|---------|
-| `src/pages/LandingPage.tsx` | Complete rewrite with new layout + effects |
-| `src/index.css` | Add new CSS classes for vignette + effects |
+| `src/pages/LandingPage.tsx` | Complete rewrite with new dark aesthetic |
+| `src/index.css` | Add new CSS classes for glow, heavy grain, breathing animation |
 
-### New CSS Classes to Add
+### New CSS Classes
 
 ```css
-/* Landing page vignette effect */
-.landing-vignette::before {
+/* Deep black background */
+.landing-abyss {
+  background: linear-gradient(
+    180deg,
+    #000000 0%,
+    #050505 50%,
+    #0a0a0a 100%
+  );
+}
+
+/* Center glow effect */
+.landing-glow::before {
   content: '';
   position: absolute;
-  inset: 0;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80vw;
+  height: 80vh;
   background: radial-gradient(
-    ellipse 80% 80% at center,
-    transparent 30%,
-    rgba(0,0,0,0.5) 100%
+    ellipse at center,
+    rgba(255, 255, 255, 0.02) 0%,
+    transparent 50%
   );
   pointer-events: none;
 }
 
-/* Landing page warm wash */
-.landing-warm-wash {
-  background: linear-gradient(
-    180deg,
-    rgba(180, 130, 90, 0.08) 0%,
-    rgba(0, 0, 0, 0.4) 100%
+/* Ultra-thin massive typography */
+.text-brand-statement {
+  font-size: clamp(1rem, 4vw, 3rem);
+  font-weight: 100;
+  letter-spacing: 0.5em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+/* Heavy grain overlay */
+.hero-noise-heavy::after {
+  opacity: 0.06;
+}
+
+/* Breathing animation */
+@keyframes breathe {
+  0%, 100% { opacity: 0.9; }
+  50% { opacity: 1; }
+}
+
+.animate-breathe {
+  animation: breathe 4s ease-in-out infinite;
+}
+
+/* Extreme edge vignette */
+.landing-extreme-vignette::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse 60% 60% at center,
+    transparent 20%,
+    rgba(0, 0, 0, 0.5) 60%,
+    rgba(0, 0, 0, 0.9) 100%
   );
-  mix-blend-mode: overlay;
-}
-
-/* Landing brand typography */
-.text-brand-massive {
-  font-size: clamp(2.5rem, 12vw, 8rem);
-  font-weight: 200;
-  letter-spacing: -0.04em;
-  line-height: 0.9;
-}
-
-/* Clip reveal animation */
-@keyframes clip-reveal {
-  from { clip-path: inset(0 100% 0 0); }
-  to { clip-path: inset(0 0% 0 0); }
-}
-
-.animate-clip-reveal {
-  animation: clip-reveal 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  pointer-events: none;
 }
 ```
 
 ### Component Structure
 
 ```tsx
-<main className="fixed inset-0 h-[100dvh] overflow-hidden">
-  {/* Layer 0: Background Image (with subtle blur) */}
-  <motion.div 
-    className="absolute inset-0"
-    style={{ filter: 'blur(1px)' }}
-  >
-    <img src="/nav-hero-hoodie.png" className="w-full h-full object-cover" />
-  </motion.div>
+<main className="fixed inset-0 h-[100dvh] overflow-hidden landing-abyss">
+  {/* Optional: Background image at very low opacity */}
+  <div 
+    className="absolute inset-0 opacity-20"
+    style={{
+      backgroundImage: `url('/nav-hero-hoodie.png')`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      filter: 'grayscale(100%) contrast(1.2)',
+    }}
+  />
   
-  {/* Layer 1: Gradient Scrim (dark bottom) */}
-  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-black/20" />
+  {/* Center glow */}
+  <div className="absolute inset-0 landing-glow" />
   
-  {/* Layer 2: Warm Color Wash */}
-  <div className="absolute inset-0 landing-warm-wash" />
+  {/* Extreme vignette */}
+  <div className="absolute inset-0 landing-extreme-vignette" />
   
-  {/* Layer 3: Film Grain */}
-  <div className="absolute inset-0 hero-noise" />
+  {/* Heavy grain */}
+  <div className="absolute inset-0 hero-noise-heavy" />
   
-  {/* Layer 4: Vignette */}
-  <div className="absolute inset-0 landing-vignette" />
-  
-  {/* Content Layer */}
-  <div className="relative z-10 h-full flex flex-col justify-between">
-    {/* Main Content Area */}
-    <div className="flex-1 flex flex-col lg:flex-row items-end lg:items-center justify-center lg:justify-between px-6 md:px-12 lg:px-16">
-      
-      {/* Left: Brand Lockup */}
-      <div className="text-left">
-        <motion.h1 className="text-brand-massive text-white uppercase">
-          <span className="block">Line</span>
-          <span className="block">Of</span>
-          <span className="block text-amber-400">Judah</span>
-        </motion.h1>
-        
-        {/* Divider */}
-        <motion.div className="w-16 h-px bg-white/40 mt-6 mb-4" />
-        
-        {/* Tagline */}
-        <motion.p className="text-xs uppercase tracking-[0.3em] text-white/60">
-          For those who walk different
-        </motion.p>
-      </div>
-      
-      {/* Right: Navigation */}
-      <nav className="lg:text-right mt-12 lg:mt-0">
-        <motion.ul className="space-y-1">
-          {NAV_LINKS.map((link) => (
-            <motion.li key={link.label}>
-              <Link 
-                to={link.href}
-                className="block py-2 text-[11px] md:text-[12px] font-light uppercase tracking-[0.3em] text-white/80 hover:text-white transition-colors"
-              >
-                {link.label}
-              </Link>
-            </motion.li>
-          ))}
-        </motion.ul>
-      </nav>
-    </div>
+  {/* Centered Content */}
+  <div className="relative z-10 h-full flex flex-col items-center justify-center">
+    {/* Brand Statement */}
+    <motion.h1 
+      className="text-brand-statement text-white/90 animate-breathe"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 1.5, ease: [0.25, 0.46, 0.45, 0.94] }}
+    >
+      LINE OF JUDAH
+    </motion.h1>
     
-    {/* Footer */}
-    <footer className="flex justify-between px-6 md:px-12 lg:px-16 pb-8">
-      <Link className="text-[10px] uppercase tracking-[0.2em] text-white/50">
-        {user ? 'My Account' : 'Sign In'}
+    {/* Minimal CTA */}
+    <motion.div 
+      className="mt-16"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5, delay: 2 }}
+    >
+      <Link 
+        to="/home"
+        className="text-[10px] uppercase tracking-[0.4em] text-white/30 hover:text-white/60 transition-colors duration-700"
+      >
+        Enter
       </Link>
-      <a className="text-[10px] uppercase tracking-[0.2em] text-white/50">
-        @lineofjudahwear
-      </a>
-    </footer>
+    </motion.div>
   </div>
 </main>
 ```
 
 ---
 
-## Before/After Comparison
+## Part 7: Animation Choreography
 
-| Aspect | Before (Cheap) | After (World-Class) |
-|--------|----------------|---------------------|
-| Background | Flat image, no treatment | Blur + grain + vignette + warm wash |
-| Brand | Small logo, top-left | Massive "LINE OF JUDAH" typography |
-| Layout | Centered, symmetric | Asymmetric, editorial tension |
-| Color | Stone on cream | White/gold on dark scrim |
-| Typography | 14px nav links | 12vw brand, 11px links |
-| Animation | Basic fade/stagger | Cinematic sequence with clip reveals |
-| Atmosphere | Template vibes | Moody, LA streetwear editorial |
+### Cinematic Sequence
+
+| Time | Element | Effect |
+|------|---------|--------|
+| 0-300ms | Pure black screen | Hold |
+| 300-600ms | Background image | Fade in to 20% opacity |
+| 600-800ms | Center glow | Fade in |
+| 800-2300ms | Brand name | Letter-by-letter reveal (100ms per letter) |
+| 2500-3000ms | "ENTER" CTA | Fade in at 30% opacity |
+| Continuous | Brand name | Subtle breathing |
+
+### Reduced Motion Fallback
+
+```tsx
+const v = prefersReducedMotion
+  ? { initial: { opacity: 1 }, animate: { opacity: 1 } }
+  : { initial: { opacity: 0 }, animate: { opacity: 1 } };
+```
 
 ---
 
-## Mobile-Specific Optimizations
+## Part 8: Mobile Considerations
 
 | Element | Mobile Treatment |
 |---------|------------------|
-| Brand typography | `text-[15vw]` for impact |
-| Layout | Stacked (brand top, nav center, footer bottom) |
-| Spacing | More vertical rhythm between elements |
-| Touch targets | 48px minimum for all links |
-| Safe areas | `env(safe-area-inset-*)` on header/footer |
+| Brand typography | `text-[3vw]` → `text-[5vw]` on mobile |
+| Letter-spacing | Reduce from `0.5em` to `0.3em` on mobile |
+| "ENTER" CTA | Larger touch target (48px height) |
+| Safe areas | `env(safe-area-inset-*)` on all edges |
+| Background image | May be hidden entirely on mobile for performance |
 
 ---
 
-## Quality Checklist
+## Part 9: Before/After Comparison
 
-### Visual Quality
-- [ ] Vignette creates depth without obscuring image
-- [ ] Film grain adds texture without being distracting
-- [ ] Warm wash feels authentic, not artificial
-- [ ] Typography creates visual tension (not just "big text")
-- [ ] Asymmetric layout feels intentional, not broken
-
-### Animation Quality
-- [ ] Entrance feels cinematic (2-3 seconds total)
-- [ ] Each element has purpose in the sequence
-- [ ] Reduced motion falls back gracefully
-- [ ] No jank or layout shift during animation
-
-### Accessibility
-- [ ] Contrast ratio ≥ 4.5:1 for all text
-- [ ] Focus states visible on dark background
-- [ ] All links keyboard accessible
-- [ ] Screen reader announces navigation correctly
-
-### Performance
-- [ ] No additional image assets (use existing nav-hero-hoodie.png)
-- [ ] CSS-only effects (no heavy JS)
-- [ ] Blur applied via CSS, not image processing
-- [ ] Total JS impact minimal (<5KB)
+| Aspect | Before (Youth Group) | After (High Status) |
+|--------|---------------------|---------------------|
+| Dominant color | Warm cream/amber | Pure black |
+| Text color | White + amber | White/bone only |
+| Typography | Stacked, 3 lines | Single horizontal line |
+| Weight | font-weight: 200 | font-weight: 100 |
+| Navigation | Visible, 5 links | Hidden or single "ENTER" |
+| Tagline | "For those who walk different" | None or "MMXXIV" |
+| Background | Visible hoodie image | Near-invisible or none |
+| Vibe | Friendly, approachable | Exclusive, mysterious |
+| Reference | Anointed LA | Fear of God / Travis Scott |
 
 ---
 
-## Success Criteria
+## Part 10: Success Criteria
 
-After implementation, the landing page must:
+The transformed landing page must:
 
-1. **Feel like a brand manifesto** - Not a navigation page, but a statement
-2. **Create immediate visual tension** - 032c/DAZED asymmetry
-3. **Establish luxury through restraint** - Swedish design principles
-4. **Work as a magazine spread** - Editorial pacing and hierarchy
-5. **Feel like LA streetwear** - Moody, confident, slightly raw
-6. **Load instantly** - All effects are CSS/SVG, no heavy assets
+1. **Feel exclusive** - Like you're entering a world, not browsing a store
+2. **Be nearly all black** - 90%+ of viewport should be deep black
+3. **Create tension** - Minimal elements, maximum mystery
+4. **Feel expensive** - Ultra-thin typography, restrained design
+5. **Polarize** - Some will hate it, true fans will love it
+6. **Load instantly** - No heavy assets, CSS-only effects
+7. **Work on mobile** - Touch-friendly, safe-area aware
+
+---
+
+## Recommended Approach
+
+**I recommend Option A: Ultra-Minimal with "ENTER"**
+
+This creates maximum impact:
+- Pure black void
+- Single horizontal brand statement
+- "ENTER" as the only interaction
+- Navigation revealed only on `/home`
+
+This positions Line of Judah as a **brand experience**, not just a store - which is exactly what Fear of God, Travis Scott, and high-end LA streetwear brands do.
 
