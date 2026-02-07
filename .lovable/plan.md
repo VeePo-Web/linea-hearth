@@ -1,358 +1,385 @@
 
 
-# Editorial Landing Page ("Brand Gate") for Line of Judah
-## Full-Screen Immersive Entry Experience at Root URL
+# Editorial Landing Page Transformation
+## From "Cheap & Tacky" to World-Class LA Streetwear
 
 ---
 
-## Executive Summary
+## Problem Analysis: Why It Feels "Cheap"
 
-This plan creates a **dedicated landing page** at the root URL (`/`) that serves as the brand's "front door" - a full-screen editorial experience that visitors see first when they arrive at `lineofjudah.com`. This is NOT a navigation overlay, but an actual page component.
+The current implementation has these specific issues:
 
-**The Architecture Change:**
+| Issue | Current State | Why It Feels Cheap |
+|-------|---------------|-------------------|
+| **Visual depth** | Flat image, single overlay | No layering, no atmosphere |
+| **Background treatment** | Raw image, no effects | Template vibes, no editorial craft |
+| **Typography** | Small, safe, centered | No hierarchy, no magazine tension |
+| **Color palette** | Stone-900 on cream | Safe, generic, lacks streetwear edge |
+| **Animation** | Basic stagger | Predictable, doesn't create tension |
+| **Layout** | Symmetrical, centered | No 032c asymmetry, no editorial "break" |
+| **Brand identity** | Logo only | No typographic brand statement |
+
+---
+
+## The Transformation Blueprint
+
+### 1. Visual Atmosphere Layers
+
+**Add cinematic depth with multiple overlays:**
+
 ```text
-CURRENT:
-  /           → Index.tsx (full homepage with products, sections, etc.)
-  
-PROPOSED:
-  /           → LandingPage.tsx (full-screen editorial brand gate)
-  /home       → Index.tsx (full homepage - renamed route)
-  /shop       → /category/shop (unchanged)
+Layer Stack (bottom to top):
+┌─────────────────────────────────────────┐
+│ Layer 0: Background Image               │  /nav-hero-hoodie.png
+├─────────────────────────────────────────┤
+│ Layer 1: Blur Vignette                  │  backdrop-blur on edges (3px)
+├─────────────────────────────────────────┤
+│ Layer 2: Film Grain Texture             │  hero-noise CSS class
+├─────────────────────────────────────────┤
+│ Layer 3: Color Wash (warm sepia tone)   │  bg-amber-900/5 mix-blend-overlay
+├─────────────────────────────────────────┤
+│ Layer 4: Gradient Scrim (bottom fade)   │  bg-gradient-to-t from-black/60
+├─────────────────────────────────────────┤
+│ Layer 5: Edge Vignette                  │  radial-gradient (dark edges)
+├─────────────────────────────────────────┤
+│ Layer 6: Content                        │  Typography + navigation
+└─────────────────────────────────────────┘
+```
+
+### 2. Typography Transformation
+
+**From safe to statement:**
+
+| Element | Before | After |
+|---------|--------|-------|
+| Brand mark | Logo SVG (small, h-5) | "LINE OF JUDAH" as massive typographic lockup |
+| Logo position | Top-left, small | Bottom corner or hidden |
+| Nav links | 14px, centered | 11-12px, positioned to create asymmetry |
+| Tagline | None | Manifesto-style micro-copy |
+
+**Typography System:**
+- Brand name: `text-[8vw] md:text-[5vw]` - massive, unapologetic
+- Tracking: `-0.04em` for brand, `0.3em` for nav links
+- Weight: `font-extralight` (100) for massive text, creates elegance
+
+### 3. Color Palette Shift
+
+**Move from cream/beige to moody streetwear:**
+
+```css
+/* Current: Cream background, stone text */
+text-stone-900 on cream
+
+/* New: Dark/atmospheric with warm accent */
+- Background scrim: from-black/70 via-black/40 to-transparent
+- Primary text: text-white (on dark scrim)
+- Accent: text-amber-400 (warm gold, not generic amber-700)
+- Secondary: text-white/60 (muted for hierarchy)
+```
+
+### 4. Layout Architecture
+
+**032c-inspired asymmetric composition:**
+
+```text
+Mobile Layout:
+┌─────────────────────────────────┐
+│                                 │
+│                                 │
+│    LINE                         │  Brand name (left-aligned)
+│    OF                           │  Stacked, massive
+│    JUDAH                        │  Each word on own line
+│                                 │
+│    ─────────                    │  Divider line
+│                                 │
+│    SHOP                         │  Links (centered or left)
+│    LOOKBOOK                     │
+│    COMMUNITY                    │
+│    ABOUT                        │
+│    CONTACT                      │
+│                                 │
+│                                 │
+│ Account        @lineofjudahwear │  Footer
+└─────────────────────────────────┘
+
+Desktop Layout:
+┌─────────────────────────────────────────────────────────────┐
+│                                                             │
+│                                                             │
+│  LINE                                                       │
+│  OF                                               SHOP      │
+│  JUDAH                                          LOOKBOOK    │
+│                                                COMMUNITY    │
+│                                                   ABOUT     │
+│                                                 CONTACT     │
+│                                                             │
+│                                                             │
+│                                                             │
+│  For those who walk different.                              │
+│                                                             │
+│  Account                               @lineofjudahwear     │
+└─────────────────────────────────────────────────────────────┘
+     ↑                                              ↑
+   Left-aligned brand                    Right-aligned nav
+   creates editorial tension
+```
+
+### 5. Animation Choreography
+
+**Cinematic sequence, not just stagger:**
+
+| Step | Element | Effect | Timing |
+|------|---------|--------|--------|
+| 0ms | Black screen | Start dark | - |
+| 0-700ms | Background | Fade in with subtle scale (1.03→1.0) | 0.7s |
+| 200ms | Grain overlay | Fade in | 0.3s |
+| 400ms | Gradient scrim | Fade in | 0.5s |
+| 600ms | "LINE" | Clip reveal left-to-right | 0.6s |
+| 700ms | "OF" | Clip reveal left-to-right | 0.6s |
+| 800ms | "JUDAH" | Clip reveal left-to-right | 0.6s |
+| 1000ms | Divider line | Scale from center | 0.4s |
+| 1100ms | Nav links | Stagger up (50ms each) | 0.4s each |
+| 1500ms | Footer | Fade in | 0.4s |
+
+### 6. Visual Effects
+
+**Premium touches that separate world-class from template:**
+
+#### A. Film Grain
+Already have `hero-noise` class - will use it
+
+#### B. Edge Vignette
+```css
+/* Radial gradient for cinematic vignette */
+background: radial-gradient(
+  ellipse at center,
+  transparent 40%,
+  rgba(0,0,0,0.4) 100%
+);
+```
+
+#### C. Subtle Image Blur (background)
+```css
+/* Slight blur on image to push it back */
+filter: blur(1px);
+```
+
+#### D. Warm Color Wash
+```css
+/* Sepia/warm tone overlay */
+mix-blend-mode: overlay;
+background: linear-gradient(
+  to bottom,
+  rgba(180, 140, 100, 0.1),
+  rgba(0, 0, 0, 0.3)
+);
+```
+
+#### E. Horizontal Divider Line
+```css
+/* 032c-style divider */
+width: 60px;
+height: 1px;
+background: white;
 ```
 
 ---
 
-## Part 1: Visual Architecture
+## Technical Implementation
 
-### 1.1 Page Layout
+### Files to Modify
 
-```text
-┌─────────────────────────────────────────────────────────┐
-│                                                         │
-│  [Logo]                                                 │  Floating top-left
-│                                                         │
-│                                                         │
-│                                                         │
-│                                                         │
-│                                                         │
-│            S H O P                                      │
-│          L O O K B O O K                                │  Centered vertically
-│          C O M M U N I T Y                              │  Staggered entry
-│            A B O U T                                    │
-│          C O N T A C T                                  │
-│                                                         │
-│                                                         │
-│                                                         │
-│                                                         │
-│                   [Account]        [@instagram]         │  Floating bottom
-│                                                         │
-└─────────────────────────────────────────────────────────┘
-         Full viewport (100dvh)
-         Background: Cream hoodie with lion logo
-         Dark text (stone-900) for contrast
-         NO header/footer from Layout component
-         NO close button (this IS the page)
-```
-
-### 1.2 Key Differences from Navigation Overlay
-
-| Aspect | Navigation Overlay | Landing Page |
-|--------|-------------------|--------------|
-| Purpose | Menu that opens/closes | Actual page route |
-| URL | No URL change | Lives at `/` |
-| Close button | Has X button | No close button |
-| Header/Footer | None (overlay) | None (immersive) |
-| Body scroll | Locked when open | Normal page behavior |
-| Back button | Closes overlay | Normal browser history |
-
----
-
-## Part 2: Technical Implementation
-
-### 2.1 Files to Create
-
-| File | Purpose |
+| File | Changes |
 |------|---------|
-| `src/pages/LandingPage.tsx` | Full-screen editorial landing page |
+| `src/pages/LandingPage.tsx` | Complete rewrite with new layout + effects |
+| `src/index.css` | Add new CSS classes for vignette + effects |
 
-### 2.2 Files to Modify
+### New CSS Classes to Add
 
-| File | Change |
-|------|--------|
-| `src/App.tsx` | Update routing: `/` → `LandingPage`, `/home` → `Index` |
-
-### 2.3 Routing Changes
-
-**Before:**
-```typescript
-<Route path="/" element={<PageTransition><Index /></PageTransition>} />
-```
-
-**After:**
-```typescript
-<Route path="/" element={<PageTransition><LandingPage /></PageTransition>} />
-<Route path="/home" element={<PageTransition><Index /></PageTransition>} />
-```
-
----
-
-## Part 3: LandingPage Component Design
-
-### 3.1 Component Structure
-
-```typescript
-const LandingPage = () => {
-  return (
-    <div 
-      className="fixed inset-0 flex flex-col"
-      style={{
-        backgroundImage: `url('/nav-hero-hoodie.png')`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-      }}
-    >
-      {/* Subtle texture overlay */}
-      <div className="absolute inset-0 bg-stone-50/5 pointer-events-none" />
-      
-      {/* Header: Logo only (no close button) */}
-      <header>...</header>
-      
-      {/* Centered navigation links */}
-      <nav>...</nav>
-      
-      {/* Footer: Account + Social */}
-      <footer>...</footer>
-    </div>
+```css
+/* Landing page vignette effect */
+.landing-vignette::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse 80% 80% at center,
+    transparent 30%,
+    rgba(0,0,0,0.5) 100%
   );
-};
-```
+  pointer-events: none;
+}
 
-### 3.2 Navigation Links
+/* Landing page warm wash */
+.landing-warm-wash {
+  background: linear-gradient(
+    180deg,
+    rgba(180, 130, 90, 0.08) 0%,
+    rgba(0, 0, 0, 0.4) 100%
+  );
+  mix-blend-mode: overlay;
+}
 
-```typescript
-const NAV_LINKS = [
-  { label: "SHOP", href: "/category/shop" },
-  { label: "LOOKBOOK", href: "/lookbook" },
-  { label: "COMMUNITY", href: "/community" },
-  { label: "ABOUT", href: "/about/our-story" },
-  { label: "CONTACT", href: "/contact" },
-];
-```
+/* Landing brand typography */
+.text-brand-massive {
+  font-size: clamp(2.5rem, 12vw, 8rem);
+  font-weight: 200;
+  letter-spacing: -0.04em;
+  line-height: 0.9;
+}
 
-### 3.3 Key Visual Specs
+/* Clip reveal animation */
+@keyframes clip-reveal {
+  from { clip-path: inset(0 100% 0 0); }
+  to { clip-path: inset(0 0% 0 0); }
+}
 
-| Element | Specification |
-|---------|--------------|
-| Background | `/nav-hero-hoodie.png`, cover, center |
-| Primary text | `text-stone-900` (near-black for contrast) |
-| Nav links | `text-[14px] uppercase tracking-[0.25em] leading-[3.5]` |
-| Hover state | `text-amber-700` (warm brown) |
-| Logo | `brightness-0` filter (dark version) |
-| Footer text | `text-[11px] uppercase tracking-[0.15em]` |
-
----
-
-## Part 4: Animation Choreography
-
-### 4.1 Entry Animation (On Page Load)
-
-| Step | Element | Animation | Timing |
-|------|---------|-----------|--------|
-| 1 | Background | Fade in + subtle scale (1.02 → 1.0) | 0.7s, ease-out |
-| 2 | Logo | Fade in + slide down | 0.4s, 0.15s delay |
-| 3 | Link 1 | Fade in + slide up | 0.5s, 0.25s delay |
-| 4 | Link 2 | Fade in + slide up | 0.5s, 0.30s delay |
-| 5 | Link 3 | Fade in + slide up | 0.5s, 0.35s delay |
-| 6 | Link 4 | Fade in + slide up | 0.5s, 0.40s delay |
-| 7 | Link 5 | Fade in + slide up | 0.5s, 0.45s delay |
-| 8 | Footer | Fade in | 0.4s, 0.5s delay |
-
-### 4.2 Framer Motion Variants
-
-```typescript
-const pageVariants = {
-  initial: { opacity: 0 },
-  animate: { 
-    opacity: 1,
-    transition: { duration: 0.5, when: "beforeChildren" }
-  },
-  exit: { opacity: 0, transition: { duration: 0.3 } },
-};
-
-const linkVariants = {
-  initial: { opacity: 0, y: 20 },
-  animate: { 
-    opacity: 1, 
-    y: 0,
-    transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }
-  },
-};
-
-const staggerContainer = {
-  animate: {
-    transition: { staggerChildren: 0.05, delayChildren: 0.2 }
-  }
-};
-```
-
----
-
-## Part 5: Mobile Considerations
-
-### 5.1 Safe Area Handling
-
-```css
-/* Header */
-padding-top: max(env(safe-area-inset-top), 24px);
-
-/* Footer */
-padding-bottom: max(env(safe-area-inset-bottom), 24px);
-```
-
-### 5.2 Touch Targets
-
-| Element | Minimum Size |
-|---------|-------------|
-| Nav links | 48px touch height (via `py-3` + line-height) |
-| Logo | 44x44px tap area |
-| Footer links | 44px height minimum |
-
-### 5.3 Viewport Units
-
-```css
-/* Use dynamic viewport height for mobile */
-height: 100dvh;
-```
-
----
-
-## Part 6: Accessibility Requirements
-
-### 6.1 Semantic Structure
-
-```html
-<main>
-  <header>
-    <a href="/home">Logo</a>
-  </header>
-  <nav role="navigation" aria-label="Main navigation">
-    <ul>
-      <li><a href="/category/shop">SHOP</a></li>
-      ...
-    </ul>
-  </nav>
-  <footer>
-    <a href="/account">Account</a>
-    <a href="instagram.com/...">@lineofjudahwear</a>
-  </footer>
-</main>
-```
-
-### 6.2 Focus States
-
-```css
-.nav-link:focus-visible {
-  outline: none;
-  color: amber-700;
+.animate-clip-reveal {
+  animation: clip-reveal 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
 }
 ```
 
-### 6.3 Reduced Motion
-
-```typescript
-const prefersReducedMotion = useReducedMotion();
-const safeVariants = prefersReducedMotion ? simpleVariants : animatedVariants;
-```
-
----
-
-## Part 7: SEO Considerations
-
-### 7.1 Meta Tags
-
-The landing page should include proper meta tags:
+### Component Structure
 
 ```tsx
-<Helmet>
-  <title>Line of Judah | Premium Faith-Based Streetwear</title>
-  <meta name="description" content="For those who walk different. Premium streetwear that speaks to your faith without saying a word." />
-</Helmet>
+<main className="fixed inset-0 h-[100dvh] overflow-hidden">
+  {/* Layer 0: Background Image (with subtle blur) */}
+  <motion.div 
+    className="absolute inset-0"
+    style={{ filter: 'blur(1px)' }}
+  >
+    <img src="/nav-hero-hoodie.png" className="w-full h-full object-cover" />
+  </motion.div>
+  
+  {/* Layer 1: Gradient Scrim (dark bottom) */}
+  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-black/20" />
+  
+  {/* Layer 2: Warm Color Wash */}
+  <div className="absolute inset-0 landing-warm-wash" />
+  
+  {/* Layer 3: Film Grain */}
+  <div className="absolute inset-0 hero-noise" />
+  
+  {/* Layer 4: Vignette */}
+  <div className="absolute inset-0 landing-vignette" />
+  
+  {/* Content Layer */}
+  <div className="relative z-10 h-full flex flex-col justify-between">
+    {/* Main Content Area */}
+    <div className="flex-1 flex flex-col lg:flex-row items-end lg:items-center justify-center lg:justify-between px-6 md:px-12 lg:px-16">
+      
+      {/* Left: Brand Lockup */}
+      <div className="text-left">
+        <motion.h1 className="text-brand-massive text-white uppercase">
+          <span className="block">Line</span>
+          <span className="block">Of</span>
+          <span className="block text-amber-400">Judah</span>
+        </motion.h1>
+        
+        {/* Divider */}
+        <motion.div className="w-16 h-px bg-white/40 mt-6 mb-4" />
+        
+        {/* Tagline */}
+        <motion.p className="text-xs uppercase tracking-[0.3em] text-white/60">
+          For those who walk different
+        </motion.p>
+      </div>
+      
+      {/* Right: Navigation */}
+      <nav className="lg:text-right mt-12 lg:mt-0">
+        <motion.ul className="space-y-1">
+          {NAV_LINKS.map((link) => (
+            <motion.li key={link.label}>
+              <Link 
+                to={link.href}
+                className="block py-2 text-[11px] md:text-[12px] font-light uppercase tracking-[0.3em] text-white/80 hover:text-white transition-colors"
+              >
+                {link.label}
+              </Link>
+            </motion.li>
+          ))}
+        </motion.ul>
+      </nav>
+    </div>
+    
+    {/* Footer */}
+    <footer className="flex justify-between px-6 md:px-12 lg:px-16 pb-8">
+      <Link className="text-[10px] uppercase tracking-[0.2em] text-white/50">
+        {user ? 'My Account' : 'Sign In'}
+      </Link>
+      <a className="text-[10px] uppercase tracking-[0.2em] text-white/50">
+        @lineofjudahwear
+      </a>
+    </footer>
+  </div>
+</main>
 ```
 
-### 7.2 Internal Linking
+---
 
-The landing page provides clear navigation to:
-- `/category/shop` - Shop
-- `/lookbook` - Lookbook  
-- `/community` - Community
-- `/about/our-story` - About
-- `/contact` - Contact
+## Before/After Comparison
+
+| Aspect | Before (Cheap) | After (World-Class) |
+|--------|----------------|---------------------|
+| Background | Flat image, no treatment | Blur + grain + vignette + warm wash |
+| Brand | Small logo, top-left | Massive "LINE OF JUDAH" typography |
+| Layout | Centered, symmetric | Asymmetric, editorial tension |
+| Color | Stone on cream | White/gold on dark scrim |
+| Typography | 14px nav links | 12vw brand, 11px links |
+| Animation | Basic fade/stagger | Cinematic sequence with clip reveals |
+| Atmosphere | Template vibes | Moody, LA streetwear editorial |
 
 ---
 
-## Part 8: Implementation Steps
+## Mobile-Specific Optimizations
 
-### Step 1: Create LandingPage.tsx
-
-Create new page component at `src/pages/LandingPage.tsx` with:
-- Full-viewport layout (`100dvh`, `fixed inset-0`)
-- Background image styling
-- Centered navigation stack
-- Header with logo (no close button)
-- Footer with account/social
-- Staggered entry animations
-- Reduced motion support
-- Mobile safe-area handling
-
-### Step 2: Update App.tsx Routing
-
-Modify routes to:
-- `/` → `LandingPage` (new landing experience)
-- `/home` → `Index` (current homepage content)
-
-### Step 3: Update Internal Links
-
-Ensure the logo in `LandingPage` links to `/home` (the full homepage with products).
+| Element | Mobile Treatment |
+|---------|------------------|
+| Brand typography | `text-[15vw]` for impact |
+| Layout | Stacked (brand top, nav center, footer bottom) |
+| Spacing | More vertical rhythm between elements |
+| Touch targets | 48px minimum for all links |
+| Safe areas | `env(safe-area-inset-*)` on header/footer |
 
 ---
 
-## Part 9: Quality Checklist
+## Quality Checklist
 
 ### Visual Quality
-- [ ] Background image covers viewport without distortion
-- [ ] Lion logo visible through navigation links
-- [ ] Text contrast meets WCAG AA (4.5:1 minimum)
-- [ ] Consistent spacing across viewports
-- [ ] Safe areas respected on iOS
+- [ ] Vignette creates depth without obscuring image
+- [ ] Film grain adds texture without being distracting
+- [ ] Warm wash feels authentic, not artificial
+- [ ] Typography creates visual tension (not just "big text")
+- [ ] Asymmetric layout feels intentional, not broken
 
-### Animation Quality  
-- [ ] Entry animation feels editorial, not jarring
-- [ ] Stagger timing creates visual rhythm
-- [ ] Reduced motion preference respected
-- [ ] No layout shift during animation
+### Animation Quality
+- [ ] Entrance feels cinematic (2-3 seconds total)
+- [ ] Each element has purpose in the sequence
+- [ ] Reduced motion falls back gracefully
+- [ ] No jank or layout shift during animation
 
 ### Accessibility
-- [ ] All links keyboard navigable
-- [ ] Focus states visible
-- [ ] Semantic heading structure
-- [ ] Screen reader announces navigation
+- [ ] Contrast ratio ≥ 4.5:1 for all text
+- [ ] Focus states visible on dark background
+- [ ] All links keyboard accessible
+- [ ] Screen reader announces navigation correctly
 
 ### Performance
-- [ ] Background image optimized (WebP, srcset)
-- [ ] No layout shift (CLS = 0)
-- [ ] First paint under 1.5s
-- [ ] Total page weight under 500KB
+- [ ] No additional image assets (use existing nav-hero-hoodie.png)
+- [ ] CSS-only effects (no heavy JS)
+- [ ] Blur applied via CSS, not image processing
+- [ ] Total JS impact minimal (<5KB)
 
 ---
 
-## Part 10: Success Criteria
+## Success Criteria
 
 After implementation, the landing page must:
 
-1. **Be the first thing visitors see** at the root URL
-2. **Feel like a brand statement** - immersive, editorial, premium
-3. **Provide clear navigation** to all site sections
-4. **Work flawlessly on mobile** - safe-area aware, touch-friendly
-5. **Load instantly** - optimized assets, minimal JS
-6. **Follow Swedish restraint** - minimal elements, maximum impact
+1. **Feel like a brand manifesto** - Not a navigation page, but a statement
+2. **Create immediate visual tension** - 032c/DAZED asymmetry
+3. **Establish luxury through restraint** - Swedish design principles
+4. **Work as a magazine spread** - Editorial pacing and hierarchy
+5. **Feel like LA streetwear** - Moody, confident, slightly raw
+6. **Load instantly** - All effects are CSS/SVG, no heavy assets
 
