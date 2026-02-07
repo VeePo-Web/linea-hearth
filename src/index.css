@@ -515,78 +515,127 @@
   }
 
   /* ============================================
-     EDITORIAL LANDING PAGE EFFECTS
-     World-Class LA Streetwear Aesthetic
+     HIGH-STATUS LANDING PAGE EFFECTS
+     Fear of God / Travis Scott / 032c Tier
      ============================================ */
 
-  /* Landing page vignette effect */
-  .landing-vignette::before {
+  /* Deep black abyss background */
+  .landing-abyss {
+    background: linear-gradient(
+      180deg,
+      hsl(0 0% 0%) 0%,
+      hsl(0 0% 2%) 50%,
+      hsl(0 0% 4%) 100%
+    );
+  }
+
+  /* Center glow effect - Kanye/Travis style */
+  .landing-glow {
+    position: relative;
+  }
+
+  .landing-glow::before {
     content: '';
     position: absolute;
-    inset: 0;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80vw;
+    height: 80vh;
     background: radial-gradient(
-      ellipse 80% 80% at center,
-      transparent 30%,
-      rgba(0, 0, 0, 0.5) 100%
+      ellipse at center,
+      hsla(0 0% 100% / 0.02) 0%,
+      transparent 50%
     );
     pointer-events: none;
   }
 
-  /* Landing page warm wash overlay */
-  .landing-warm-wash {
-    background: linear-gradient(
-      180deg,
-      rgba(180, 130, 90, 0.08) 0%,
-      rgba(0, 0, 0, 0.4) 100%
+  /* Extreme edge vignette - Travis Scott style */
+  .landing-extreme-vignette {
+    position: relative;
+  }
+
+  .landing-extreme-vignette::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      ellipse 60% 60% at center,
+      transparent 20%,
+      hsla(0 0% 0% / 0.5) 60%,
+      hsla(0 0% 0% / 0.9) 100%
     );
+    pointer-events: none;
+  }
+
+  /* Heavy grain overlay - intensified film texture */
+  .hero-noise-heavy::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    opacity: 0.06;
+    pointer-events: none;
     mix-blend-mode: overlay;
   }
 
-  /* Landing brand massive typography */
-  .text-brand-massive {
-    font-size: clamp(3rem, 15vw, 10rem);
-    font-weight: 200;
-    letter-spacing: -0.04em;
-    line-height: 0.88;
+  /* Ultra-thin massive horizontal statement typography */
+  .text-brand-statement {
+    font-size: clamp(0.875rem, 4vw, 2.5rem);
+    font-weight: 100;
+    letter-spacing: 0.4em;
+    line-height: 1;
+    text-transform: uppercase;
   }
 
-  @media (min-width: 1024px) {
-    .text-brand-massive {
-      font-size: clamp(4rem, 10vw, 8rem);
+  @media (max-width: 639px) {
+    .text-brand-statement {
+      font-size: clamp(0.75rem, 5vw, 1.25rem);
+      letter-spacing: 0.25em;
     }
   }
 
-  /* Clip reveal animation for text */
-  @keyframes clip-reveal {
+  /* Breathing animation - near-imperceptible */
+  @keyframes breathe {
+    0%, 100% { opacity: 0.85; }
+    50% { opacity: 1; }
+  }
+
+  .animate-breathe {
+    animation: breathe 4s ease-in-out infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animate-breathe {
+      animation: none;
+      opacity: 0.9;
+    }
+  }
+
+  /* Letter-by-letter reveal animation */
+  @keyframes letter-reveal {
     from { 
-      clip-path: inset(0 100% 0 0);
       opacity: 0;
+      transform: translateY(10px);
     }
     to { 
-      clip-path: inset(0 0% 0 0);
       opacity: 1;
+      transform: translateY(0);
     }
   }
 
-  .animate-clip-reveal {
-    animation: clip-reveal 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  .animate-letter-reveal {
+    animation: letter-reveal 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
   }
 
-  /* Divider scale animation */
-  @keyframes scale-x-in {
-    from { 
-      transform: scaleX(0);
-      opacity: 0;
-    }
-    to { 
-      transform: scaleX(1);
-      opacity: 1;
-    }
+  /* Minimal CTA fade */
+  @keyframes cta-fade {
+    from { opacity: 0; }
+    to { opacity: 0.3; }
   }
 
-  .animate-scale-x-in {
-    animation: scale-x-in 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-    transform-origin: left center;
+  .animate-cta-fade {
+    animation: cta-fade 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
   }
 }
 
