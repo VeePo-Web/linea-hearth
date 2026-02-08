@@ -108,7 +108,7 @@ const LandingPage = () => {
             className="w-full h-full object-cover"
             style={{
               filter: "grayscale(85%) contrast(1.25) brightness(0.85)",
-              objectPosition: "center 65%",
+              objectPosition: "center 35%",
             }}
           />
         </motion.div>
