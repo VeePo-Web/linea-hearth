@@ -767,6 +767,304 @@
   .animate-cta-fade {
     animation: cta-fade 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
   }
+
+  /* ===== CHROME HEARTS × TRAVIS SCOTT × SEVENTH HEAVEN FUSION ===== */
+
+  /* Chrome/Metallic Text Treatment - Chrome Hearts signature */
+  .text-chrome {
+    background: linear-gradient(
+      180deg,
+      hsla(0 0% 100% / 0.95) 0%,
+      hsla(0 0% 80% / 0.9) 35%,
+      hsla(0 0% 55% / 0.8) 50%,
+      hsla(0 0% 80% / 0.9) 65%,
+      hsla(0 0% 100% / 0.95) 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: none;
+    filter: drop-shadow(0 1px 0 hsla(0 0% 100% / 0.15));
+  }
+
+  /* Chrome underline accent - subtle silver gradient */
+  .chrome-underline {
+    width: 50%;
+    height: 1px;
+    margin: 16px auto 0;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      hsla(0 0% 50% / 0.2) 15%,
+      hsla(0 0% 85% / 0.5) 50%,
+      hsla(0 0% 50% / 0.2) 85%,
+      transparent 100%
+    );
+  }
+
+  /* Smoke/Mist Layer - Travis Scott Astroworld atmosphere */
+  @keyframes smoke-drift {
+    0% { 
+      transform: translateX(-8%) translateY(0) scale(1); 
+      opacity: 0.35; 
+    }
+    50% { 
+      transform: translateX(8%) translateY(-3%) scale(1.02); 
+      opacity: 0.5; 
+    }
+    100% { 
+      transform: translateX(-8%) translateY(0) scale(1); 
+      opacity: 0.35; 
+    }
+  }
+
+  .smoke-layer {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      ellipse 130% 90% at 50% 55%,
+      transparent 25%,
+      hsla(35 25% 8% / 0.25) 55%,
+      hsla(25 30% 5% / 0.45) 100%
+    );
+    animation: smoke-drift 25s ease-in-out infinite;
+    mix-blend-mode: multiply;
+    pointer-events: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .smoke-layer {
+      animation: none;
+      opacity: 0.4;
+    }
+  }
+
+  /* Floating Gothic Cross Watermark - Chrome Hearts reverence */
+  @keyframes float-rotate {
+    0% { 
+      transform: translateY(0) rotate(0deg); 
+      opacity: 0.025;
+    }
+    25% { 
+      transform: translateY(-8px) rotate(2deg); 
+      opacity: 0.035;
+    }
+    50% { 
+      transform: translateY(-4px) rotate(0deg); 
+      opacity: 0.03;
+    }
+    75% { 
+      transform: translateY(-10px) rotate(-2deg); 
+      opacity: 0.025;
+    }
+    100% { 
+      transform: translateY(0) rotate(0deg); 
+      opacity: 0.025;
+    }
+  }
+
+  .floating-cross {
+    position: absolute;
+    top: 12%;
+    right: 12%;
+    width: 70px;
+    height: 110px;
+    opacity: 0.025;
+    background: linear-gradient(
+      180deg,
+      hsla(0 0% 100% / 0.8) 0%,
+      hsla(0 0% 65% / 0.6) 100%
+    );
+    clip-path: polygon(
+      40% 0%, 60% 0%, 60% 35%, 100% 35%, 100% 50%, 
+      60% 50%, 60% 100%, 40% 100%, 40% 50%, 0% 50%, 
+      0% 35%, 40% 35%
+    );
+    animation: float-rotate 35s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  .floating-cross-left {
+    right: auto;
+    left: 10%;
+    top: 18%;
+    width: 50px;
+    height: 80px;
+    animation-delay: -15s;
+    animation-duration: 40s;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .floating-cross {
+      animation: none;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .floating-cross {
+      width: 45px;
+      height: 70px;
+      top: 8%;
+      right: 8%;
+    }
+    .floating-cross-left {
+      display: none;
+    }
+  }
+
+  /* Gothic Corner Ornaments - Restrained Chrome Hearts flourish */
+  .gothic-corner {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    opacity: 0.03;
+    pointer-events: none;
+  }
+
+  .gothic-corner::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border: 1px solid hsla(0 0% 100% / 0.25);
+    border-radius: 50%;
+  }
+
+  .gothic-corner::after {
+    content: '✝';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 12px;
+    color: hsla(0 0% 100% / 0.35);
+    font-weight: 100;
+  }
+
+  .gothic-corner-tl {
+    top: 24px;
+    left: 24px;
+  }
+
+  .gothic-corner-br {
+    bottom: 24px;
+    right: 24px;
+  }
+
+  @media (max-width: 768px) {
+    .gothic-corner {
+      width: 35px;
+      height: 35px;
+    }
+    .gothic-corner::after {
+      font-size: 9px;
+    }
+    .gothic-corner-tl {
+      top: 16px;
+      left: 16px;
+    }
+    .gothic-corner-br {
+      bottom: 16px;
+      right: 16px;
+    }
+  }
+
+  /* Chrome Hearts Luxury Enter Portal */
+  @keyframes chrome-shimmer {
+    0% { left: -100%; }
+    50% { left: 100%; }
+    100% { left: 100%; }
+  }
+
+  .enter-portal-chrome {
+    border: 1px solid hsla(0 0% 55% / 0.25);
+    padding: 18px 56px;
+    position: relative;
+    overflow: hidden;
+    background: transparent;
+    transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  .enter-portal-chrome::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      hsla(0 0% 100% / 0.06),
+      transparent
+    );
+    animation: chrome-shimmer 5s ease-in-out infinite;
+  }
+
+  .enter-portal-chrome:hover {
+    border-color: hsla(0 0% 70% / 0.4);
+    background: hsla(0 0% 100% / 0.03);
+  }
+
+  .enter-portal-chrome:focus-visible {
+    outline: 2px solid hsla(0 0% 100% / 0.3);
+    outline-offset: 4px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .enter-portal-chrome::before {
+      animation: none;
+      display: none;
+    }
+  }
+
+  /* Glitch/Split Layer - Travis Scott distortion (desktop only) */
+  .glitch-layer {
+    display: none;
+  }
+
+  @media (min-width: 1024px) {
+    .glitch-layer {
+      display: block;
+      position: absolute;
+      inset: 0;
+      clip-path: polygon(0 0, 100% 0, 100% 48%, 0 52%);
+      transform: translateX(1px);
+      opacity: 0.15;
+      mix-blend-mode: screen;
+      pointer-events: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .glitch-layer {
+      display: none;
+    }
+  }
+
+  /* Verse Archival Treatment - Seventh Heaven LA vintage */
+  .verse-archival {
+    font-family: 'Times New Roman', Georgia, serif;
+    font-style: italic;
+    font-weight: 300;
+    letter-spacing: 0.1em;
+    color: hsla(38 25% 75% / 0.55);
+    text-shadow: 0 0 25px hsla(38 30% 50% / 0.08);
+  }
+
+  .verse-reference-archival {
+    font-family: inherit;
+    font-style: normal;
+    font-weight: 400;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    font-size: 0.5rem;
+    color: hsla(38 20% 65% / 0.4);
+  }
+
+  /* Sepia-warm Ken Burns - Seventh Heaven LA vintage warmth */
+  .ken-burns-sepia {
+    filter: sepia(12%) grayscale(65%) contrast(1.12) brightness(1.02);
+  }
 }
 
 /* Print Stylesheet - Premium Legal Document Output */
