@@ -835,10 +835,35 @@
      EXODUS 28:2 - Interactive Revelation
      ====================================== */
 
-  /* Container for positioning context */
+  /* ======================================
+     CHROME UNDERLINE - Restored, Refined
+     ====================================== */
+  .chrome-underline {
+    width: 40%;
+    height: 1px;
+    margin: 8px auto 0;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      hsla(0 0% 70% / 0.25) 25%,
+      hsla(0 0% 90% / 0.5) 50%,
+      hsla(0 0% 70% / 0.25) 75%,
+      transparent 100%
+    );
+    opacity: 0.6;
+  }
+
+  /* ======================================
+     EXODUS 28:2 - Inline Revelation
+     Fantasy.co-Level Text Expansion
+     ====================================== */
+
+  /* Container positions the inline revelation */
   .verse-reference-container {
     position: relative;
-    display: inline-block;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
 
   /* Interactive reference text */
@@ -859,90 +884,81 @@
     transform: scale(1.05);
   }
 
-  /* Tooltip - Hidden by default */
-  .verse-tooltip {
-    position: absolute;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%) translateY(12px);
-    width: max-content;
-    max-width: 280px;
-    padding: 16px 20px;
-    background: hsla(30 20% 5% / 0.95);
-    border: 1px solid hsla(45 40% 50% / 0.2);
+  /* Full verse - starts hidden */
+  .full-verse-revelation {
+    max-height: 0;
     opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    margin-bottom: 12px;
-    z-index: 50;
-  }
-
-  /* Tooltip arrow */
-  .verse-tooltip::after {
-    content: '';
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    border: 6px solid transparent;
-    border-top-color: hsla(45 40% 50% / 0.2);
-  }
-
-  /* Tooltip visible on hover/focus */
-  .verse-reference-container:hover .verse-tooltip,
-  .verse-reference-container:focus-within .verse-tooltip {
-    opacity: 1;
-    visibility: visible;
-    transform: translateX(-50%) translateY(0);
-  }
-
-  /* Tooltip text styling */
-  .verse-tooltip-text {
-    font-family: 'Times New Roman', 'Georgia', serif;
-    font-style: italic;
-    font-size: 0.75rem;
-    line-height: 1.6;
-    color: hsla(38 30% 80% / 0.85);
-    letter-spacing: 0.04em;
+    overflow: hidden;
+    transition: 
+      max-height 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+      opacity 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     text-align: center;
-    margin: 0;
+    margin-bottom: 0;
+    transform-origin: center bottom;
   }
 
-  /* ASV attribution */
-  .verse-tooltip-attribution {
+  /* Full verse text - matches existing verse-archival exactly */
+  .full-verse-text {
+    font-size: 0.7rem;
+    line-height: 1.7;
+    max-width: 280px;
+    margin: 0 auto;
+  }
+
+  /* ASV Attribution - minimal */
+  .verse-attribution {
     display: block;
-    text-align: right;
-    margin-top: 8px;
     font-family: inherit;
     font-style: normal;
-    font-size: 0.55rem;
+    font-size: 0.5rem;
     letter-spacing: 0.2em;
     text-transform: uppercase;
-    color: hsla(38 20% 60% / 0.5);
+    color: hsla(38 20% 65% / 0.35);
+    margin-top: 6px;
+    margin-bottom: 12px;
   }
 
-  /* Desktop: wider tooltip */
+  /* Hover/Focus: Reveal the full verse */
+  .verse-reference-container:hover .full-verse-revelation,
+  .verse-reference-container:focus-within .full-verse-revelation {
+    max-height: 120px;
+    opacity: 1;
+  }
+
+  /* Glory/Beauty words in full verse also glow */
+  .verse-reference-container:hover .full-verse-revelation .glory-word,
+  .verse-reference-container:hover .full-verse-revelation .beauty-word,
+  .verse-reference-container:focus-within .full-verse-revelation .glory-word,
+  .verse-reference-container:focus-within .full-verse-revelation .beauty-word {
+    color: hsla(45 55% 82% / 0.95);
+    text-shadow: 
+      0 0 15px hsla(45 70% 65% / 0.35),
+      0 0 30px hsla(45 60% 55% / 0.15);
+  }
+
+  /* Desktop: wider text */
   @media (min-width: 768px) {
-    .verse-tooltip {
+    .full-verse-text {
+      font-size: 0.8rem;
       max-width: 360px;
-      padding: 20px 24px;
-    }
-    
-    .verse-tooltip-text {
-      font-size: 0.85rem;
     }
   }
 
-  /* Reduced motion: instant transitions, no transform */
+  /* Reduced motion: instant reveal */
   @media (prefers-reduced-motion: reduce) {
     .verse-ref-interactive {
       transition: none;
     }
     
-    .verse-tooltip {
+    .full-verse-revelation {
       transition: opacity 0.2s ease;
-      transform: translateX(-50%) translateY(0);
+      max-height: none;
+      height: auto;
+    }
+    
+    .verse-reference-container:hover .full-verse-revelation,
+    .verse-reference-container:focus-within .full-verse-revelation {
+      max-height: none;
     }
     
     .verse-reference-container:hover .verse-ref-interactive,
