@@ -171,52 +171,43 @@ const LandingPage = () => {
               <div className="chrome-underline" aria-hidden="true" />
             </motion.div>
 
-            {/* Verse Block - Interactive Sacred Words */}
+            {/* Unified Verse Block - Zero-Shift Expansion */}
             <motion.div
-              className="mt-10 md:mt-12 text-center verse-container"
+              className="verse-unified-block mt-10 md:mt-12"
               variants={v.verse}
               initial="initial"
               animate="animate"
             >
-              <p className="verse-archival text-[0.75rem] md:text-[0.85rem] max-w-xs md:max-w-sm mx-auto">
-                "For{' '}
+              {/* Prepend - The context that fades in ABOVE */}
+              <div className="verse-prepend" aria-hidden="true">
+                <p className="verse-archival verse-prepend-text">
+                  "And thou shalt make holy garments<br />
+                  for Aaron thy brother,
+                </p>
+              </div>
+
+              {/* Core Quote - Always visible */}
+              <p className="verse-archival verse-core text-[0.75rem] md:text-[0.85rem]">
+                for{' '}
                 <span className="glory-word">glory</span>
                 {' '}and for{' '}
                 <span className="beauty-word">beauty</span>
                 ."
               </p>
-            </motion.div>
 
-            <motion.div
-              className="verse-reference-container mt-3"
-              variants={v.verseRef}
-              initial="initial"
-              animate="animate"
-            >
-              {/* Full Verse - Inline Revelation (appears above) */}
-              <div 
-                className="full-verse-revelation"
-                role="tooltip" 
-                id="exodus-tooltip"
-              >
-                <p className="verse-archival full-verse-text">
-                  "And thou shalt make holy garments for Aaron thy brother, for{' '}
-                  <span className="glory-word">glory</span>
-                  {' '}and for{' '}
-                  <span className="beauty-word">beauty</span>
-                  ."
-                </p>
-                <span className="verse-attribution">— ASV</span>
-              </div>
-              
-              {/* Reference text */}
-              <span 
-                className="verse-reference-archival verse-ref-interactive"
+              {/* ASV Attribution - Fades in */}
+              <span className="verse-asv-attribution">— ASV</span>
+
+              {/* Reference - Never moves */}
+              <motion.span 
+                className="verse-reference-archival verse-ref-fixed mt-3"
+                variants={v.verseRef}
+                initial="initial"
+                animate="animate"
                 tabIndex={0}
-                aria-describedby="exodus-tooltip"
               >
                 Exodus 28:2
-              </span>
+              </motion.span>
             </motion.div>
 
             {/* Enter Portal - Chrome Hearts Luxury CTA */}
