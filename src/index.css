@@ -788,54 +788,6 @@
   }
 
   /* ======================================
-     GLORY & BEAUTY - Divine Illumination
-     ====================================== */
-  
-  .verse-container {
-    cursor: default;
-  }
-
-  .glory-word,
-  .beauty-word {
-    display: inline-block;
-    transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    color: inherit;
-  }
-
-  .verse-container:hover .glory-word,
-  .verse-container:hover .beauty-word {
-    color: hsla(45 55% 82% / 0.95);
-    text-shadow: 
-      0 0 15px hsla(45 70% 65% / 0.35),
-      0 0 30px hsla(45 60% 55% / 0.15);
-    letter-spacing: 0.14em;
-    transform: scale(1.02);
-  }
-
-  .verse-container:hover .beauty-word {
-    transition-delay: 0.08s;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .glory-word,
-    .beauty-word {
-      transition: none;
-    }
-    
-    .verse-container:hover .glory-word,
-    .verse-container:hover .beauty-word {
-      text-shadow: none;
-      letter-spacing: inherit;
-      transform: none;
-      color: hsla(45 50% 80% / 0.9);
-    }
-  }
-
-  /* ======================================
-     EXODUS 28:2 - Interactive Revelation
-     ====================================== */
-
-  /* ======================================
      CHROME UNDERLINE - Restored, Refined
      ====================================== */
   .chrome-underline {
@@ -854,118 +806,169 @@
   }
 
   /* ======================================
-     EXODUS 28:2 - Inline Revelation
-     Fantasy.co-Level Text Expansion
+     VERSE UNIFIED BLOCK - Zero-Shift Expansion
+     Fantasy.co-Level Choreography
      ====================================== */
 
-  /* Container positions the inline revelation */
-  .verse-reference-container {
+  .verse-unified-block {
     position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
-  }
-
-  /* Interactive reference text */
-  .verse-ref-interactive {
-    cursor: pointer;
-    display: inline-block;
-    transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  }
-
-  /* Hover state - Divine Illumination (matching glory/beauty) */
-  .verse-reference-container:hover .verse-ref-interactive,
-  .verse-reference-container:focus-within .verse-ref-interactive {
-    color: hsla(45 55% 82% / 0.95);
-    text-shadow: 
-      0 0 15px hsla(45 70% 65% / 0.35),
-      0 0 30px hsla(45 60% 55% / 0.15);
-    letter-spacing: 0.4em;
-    transform: scale(1.05);
-  }
-
-  /* Full verse - starts hidden */
-  .full-verse-revelation {
-    max-height: 0;
-    opacity: 0;
-    overflow: hidden;
-    transition: 
-      max-height 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-      opacity 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     text-align: center;
-    margin-bottom: 0;
-    transform-origin: center bottom;
+    min-height: 100px;
   }
 
-  /* Full verse text - matches existing verse-archival exactly */
-  .full-verse-text {
+  /* Prepend - Absolutely positioned, fades in ABOVE */
+  .verse-prepend {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 300px;
+    margin-bottom: 8px;
+    opacity: 0;
+    visibility: hidden;
+    transition: 
+      opacity 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+      visibility 0s 0.6s;
+    pointer-events: none;
+  }
+
+  .verse-prepend-text {
     font-size: 0.7rem;
     line-height: 1.7;
+    color: hsla(38 25% 75% / 0.6);
+  }
+
+  /* Core quote - Always visible */
+  .verse-core {
     max-width: 280px;
     margin: 0 auto;
   }
 
-  /* ASV Attribution - minimal */
-  .verse-attribution {
+  /* Glory/Beauty words base styling */
+  .glory-word,
+  .beauty-word {
+    display: inline-block;
+    transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    color: inherit;
+  }
+
+  /* ASV Attribution - Hidden by default */
+  .verse-asv-attribution {
     display: block;
-    font-family: inherit;
+    opacity: 0;
+    visibility: hidden;
+    font-family: 'Times New Roman', Georgia, serif;
     font-style: normal;
     font-size: 0.5rem;
     letter-spacing: 0.2em;
     text-transform: uppercase;
     color: hsla(38 20% 65% / 0.35);
-    margin-top: 6px;
-    margin-bottom: 12px;
+    margin-top: 8px;
+    margin-bottom: 4px;
+    transition: 
+      opacity 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.15s,
+      visibility 0s 0.5s;
   }
 
-  /* Hover/Focus: Reveal the full verse */
-  .verse-reference-container:hover .full-verse-revelation,
-  .verse-reference-container:focus-within .full-verse-revelation {
-    max-height: 120px;
+  /* Reference - Fixed, never moves */
+  .verse-ref-fixed {
+    display: block;
+    cursor: pointer;
+    transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  /* ======================================
+     HOVER STATE - The Revelation
+     ====================================== */
+
+  .verse-unified-block:hover .verse-prepend,
+  .verse-unified-block:focus-within .verse-prepend {
     opacity: 1;
+    visibility: visible;
+    transition: 
+      opacity 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+      visibility 0s;
   }
 
-  /* Glory/Beauty words in full verse also glow */
-  .verse-reference-container:hover .full-verse-revelation .glory-word,
-  .verse-reference-container:hover .full-verse-revelation .beauty-word,
-  .verse-reference-container:focus-within .full-verse-revelation .glory-word,
-  .verse-reference-container:focus-within .full-verse-revelation .beauty-word {
+  .verse-unified-block:hover .verse-asv-attribution,
+  .verse-unified-block:focus-within .verse-asv-attribution {
+    opacity: 1;
+    visibility: visible;
+    transition: 
+      opacity 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.15s,
+      visibility 0s;
+  }
+
+  /* Reference glows on hover */
+  .verse-unified-block:hover .verse-ref-fixed,
+  .verse-unified-block:focus-within .verse-ref-fixed {
     color: hsla(45 55% 82% / 0.95);
     text-shadow: 
       0 0 15px hsla(45 70% 65% / 0.35),
       0 0 30px hsla(45 60% 55% / 0.15);
+    letter-spacing: 0.4em;
+  }
+
+  /* Glory/Beauty words illuminate on hover */
+  .verse-unified-block:hover .glory-word,
+  .verse-unified-block:hover .beauty-word,
+  .verse-unified-block:focus-within .glory-word,
+  .verse-unified-block:focus-within .beauty-word {
+    color: hsla(45 55% 82% / 0.95);
+    text-shadow: 
+      0 0 15px hsla(45 70% 65% / 0.35),
+      0 0 30px hsla(45 60% 55% / 0.15);
+    letter-spacing: 0.14em;
+    transform: scale(1.02);
+  }
+
+  .verse-unified-block:hover .beauty-word,
+  .verse-unified-block:focus-within .beauty-word {
+    transition-delay: 0.08s;
   }
 
   /* Desktop: wider text */
   @media (min-width: 768px) {
-    .full-verse-text {
-      font-size: 0.8rem;
+    .verse-prepend {
       max-width: 360px;
+    }
+    
+    .verse-prepend-text {
+      font-size: 0.8rem;
+    }
+    
+    .verse-core {
+      max-width: 340px;
     }
   }
 
-  /* Reduced motion: instant reveal */
+  /* Reduced motion */
   @media (prefers-reduced-motion: reduce) {
-    .verse-ref-interactive {
+    .verse-prepend,
+    .verse-asv-attribution,
+    .verse-ref-fixed,
+    .glory-word,
+    .beauty-word {
       transition: none;
     }
     
-    .full-verse-revelation {
-      transition: opacity 0.2s ease;
-      max-height: none;
-      height: auto;
+    .verse-unified-block:hover .verse-ref-fixed,
+    .verse-unified-block:focus-within .verse-ref-fixed {
+      text-shadow: none;
+      letter-spacing: 0.35em;
     }
     
-    .verse-reference-container:hover .full-verse-revelation,
-    .verse-reference-container:focus-within .full-verse-revelation {
-      max-height: none;
-    }
-    
-    .verse-reference-container:hover .verse-ref-interactive,
-    .verse-reference-container:focus-within .verse-ref-interactive {
+    .verse-unified-block:hover .glory-word,
+    .verse-unified-block:hover .beauty-word,
+    .verse-unified-block:focus-within .glory-word,
+    .verse-unified-block:focus-within .beauty-word {
       text-shadow: none;
       transform: none;
-      letter-spacing: 0.35em;
+      letter-spacing: inherit;
       color: hsla(45 50% 80% / 0.9);
     }
   }
