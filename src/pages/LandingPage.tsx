@@ -185,14 +185,30 @@ const LandingPage = () => {
               </p>
             </motion.div>
 
-            <motion.p
-              className="verse-reference-archival mt-3"
+            <motion.div
+              className="verse-reference-container mt-3"
               variants={v.verseRef}
               initial="initial"
               animate="animate"
             >
-              Exodus 28:2
-            </motion.p>
+              <span 
+                className="verse-reference-archival verse-ref-interactive"
+                tabIndex={0}
+                aria-describedby="exodus-tooltip"
+              >
+                Exodus 28:2
+              </span>
+              <div 
+                className="verse-tooltip" 
+                role="tooltip" 
+                id="exodus-tooltip"
+              >
+                <p className="verse-tooltip-text">
+                  "And thou shalt make holy garments for Aaron thy brother, for glory and for beauty."
+                </p>
+                <span className="verse-tooltip-attribution">— ASV</span>
+              </div>
+            </motion.div>
 
             {/* Enter Portal - Chrome Hearts Luxury CTA */}
             <motion.div
