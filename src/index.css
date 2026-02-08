@@ -516,6 +516,7 @@
 
   /* ============================================
      HIGH-STATUS LANDING PAGE EFFECTS
+     Fantasy.co-Level Detail with Biblical Foundation
      Fear of God / Travis Scott / 032c Tier
      ============================================ */
 
@@ -529,7 +530,34 @@
     );
   }
 
-  /* Center glow effect - Kanye/Travis style */
+  /* Ken Burns slow zoom - cinematic background */
+  @keyframes ken-burns {
+    0% { transform: scale(1); }
+    100% { transform: scale(1.03); }
+  }
+
+  .ken-burns-slow {
+    animation: ken-burns 25s ease-in-out infinite alternate;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ken-burns-slow {
+      animation: none;
+    }
+  }
+
+  /* Center glow effect - Kanye/Travis style with pulsing */
+  @keyframes glow-pulse {
+    0%, 100% { 
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+    50% { 
+      opacity: 1.2;
+      transform: translate(-50%, -50%) scale(1.05);
+    }
+  }
+
   .landing-glow {
     position: relative;
   }
@@ -544,10 +572,18 @@
     height: 80vh;
     background: radial-gradient(
       ellipse at center,
-      hsla(0 0% 100% / 0.02) 0%,
-      transparent 50%
+      hsla(0 0% 100% / 0.025) 0%,
+      hsla(0 0% 100% / 0.01) 30%,
+      transparent 60%
     );
     pointer-events: none;
+    animation: glow-pulse 6s ease-in-out infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .landing-glow::before {
+      animation: none;
+    }
   }
 
   /* Extreme edge vignette - Travis Scott style */
@@ -560,10 +596,10 @@
     position: absolute;
     inset: 0;
     background: radial-gradient(
-      ellipse 60% 60% at center,
-      transparent 20%,
-      hsla(0 0% 0% / 0.5) 60%,
-      hsla(0 0% 0% / 0.9) 100%
+      ellipse 55% 55% at center,
+      transparent 15%,
+      hsla(0 0% 0% / 0.6) 55%,
+      hsla(0 0% 0% / 0.95) 100%
     );
     pointer-events: none;
   }
@@ -579,36 +615,131 @@
     mix-blend-mode: overlay;
   }
 
+  /* Animated grain flicker - cinematic texture */
+  @keyframes grain-flicker {
+    0%, 100% { opacity: 0.05; }
+    25% { opacity: 0.06; }
+    50% { opacity: 0.07; }
+    75% { opacity: 0.055; }
+  }
+
+  .hero-noise-animated::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    opacity: 0.06;
+    pointer-events: none;
+    mix-blend-mode: overlay;
+    animation: grain-flicker 0.12s steps(1) infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-noise-animated::after {
+      animation: none;
+    }
+  }
+
+  /* Optional scan lines - 032c Industrial */
+  .scan-lines::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      hsla(0 0% 0% / 0.015) 2px,
+      hsla(0 0% 0% / 0.015) 4px
+    );
+    pointer-events: none;
+  }
+
   /* Ultra-thin massive horizontal statement typography */
   .text-brand-statement {
-    font-size: clamp(0.875rem, 4vw, 2.5rem);
+    font-size: clamp(0.9rem, 4.5vw, 2.75rem);
     font-weight: 100;
-    letter-spacing: 0.4em;
+    letter-spacing: 0.5em;
     line-height: 1;
     text-transform: uppercase;
   }
 
   @media (max-width: 639px) {
     .text-brand-statement {
-      font-size: clamp(0.75rem, 5vw, 1.25rem);
-      letter-spacing: 0.25em;
+      font-size: clamp(0.7rem, 5.5vw, 1.35rem);
+      letter-spacing: 0.3em;
+    }
+  }
+
+  /* Text glow effect - emanating brand presence */
+  .text-brand-glow {
+    text-shadow: 
+      0 0 120px hsla(0 0% 100% / 0.08),
+      0 0 60px hsla(0 0% 100% / 0.04),
+      0 0 30px hsla(0 0% 100% / 0.02);
+  }
+
+  /* Verse typography - inscribed, sacred feel */
+  .verse-inscribed {
+    font-style: italic;
+    font-weight: 200;
+    letter-spacing: 0.08em;
+    color: hsla(0 0% 100% / 0.5);
+  }
+
+  .verse-reference {
+    font-style: normal;
+    font-weight: 400;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    font-size: 0.55rem;
+    color: hsla(0 0% 100% / 0.32);
+  }
+
+  /* Enter portal animation - cinematic CTA */
+  @keyframes border-pulse {
+    0%, 100% { 
+      border-color: hsla(0 0% 100% / 0.08);
+      box-shadow: 0 0 0 0 hsla(0 0% 100% / 0);
+    }
+    50% { 
+      border-color: hsla(0 0% 100% / 0.18);
+      box-shadow: 0 0 40px 0 hsla(0 0% 100% / 0.04);
+    }
+  }
+
+  .enter-portal {
+    border: 1px solid hsla(0 0% 100% / 0.1);
+    padding: 18px 48px;
+    animation: border-pulse 4s ease-in-out infinite;
+    transition: all 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  .enter-portal:hover {
+    background-color: hsla(0 0% 100% / 0.05);
+    border-color: hsla(0 0% 100% / 0.25);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .enter-portal {
+      animation: none;
     }
   }
 
   /* Breathing animation - near-imperceptible */
   @keyframes breathe {
-    0%, 100% { opacity: 0.85; }
+    0%, 100% { opacity: 0.88; }
     50% { opacity: 1; }
   }
 
   .animate-breathe {
-    animation: breathe 4s ease-in-out infinite;
+    animation: breathe 5s ease-in-out infinite;
   }
 
   @media (prefers-reduced-motion: reduce) {
     .animate-breathe {
       animation: none;
-      opacity: 0.9;
+      opacity: 0.95;
     }
   }
 

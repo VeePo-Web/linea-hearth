@@ -9,12 +9,13 @@ const editorialEase = [0.25, 0.46, 0.45, 0.94] as const;
 const LandingPage = () => {
   const prefersReducedMotion = useReducedMotion();
 
-  // Full animation variants
+  // Full animation variants - cinematic choreography
   const backgroundVariants = {
-    initial: { opacity: 0 },
+    initial: { opacity: 0, scale: 1 },
     animate: {
-      opacity: 0.15,
-      transition: { duration: 1.2, delay: 0.3, ease: editorialEase },
+      opacity: 0.1,
+      scale: 1,
+      transition: { duration: 1.4, delay: 0.5, ease: editorialEase },
     },
   };
 
@@ -22,7 +23,7 @@ const LandingPage = () => {
     initial: { opacity: 0 },
     animate: {
       opacity: 1,
-      transition: { duration: 0.8, delay: 0.6, ease: editorialEase },
+      transition: { duration: 1, delay: 1, ease: editorialEase },
     },
   };
 
@@ -30,15 +31,32 @@ const LandingPage = () => {
     initial: { opacity: 0 },
     animate: {
       opacity: 1,
-      transition: { duration: 1.5, delay: 0.8, ease: editorialEase },
+      transition: { duration: 1.8, delay: 1.4, ease: editorialEase },
+    },
+  };
+
+  const verseVariants = {
+    initial: { opacity: 0, y: 12 },
+    animate: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 1.2, delay: 2.4, ease: editorialEase },
+    },
+  };
+
+  const verseRefVariants = {
+    initial: { opacity: 0 },
+    animate: {
+      opacity: 1,
+      transition: { duration: 0.8, delay: 2.8, ease: editorialEase },
     },
   };
 
   const ctaVariants = {
     initial: { opacity: 0 },
     animate: {
-      opacity: 0.3,
-      transition: { duration: 0.5, delay: 2.5, ease: editorialEase },
+      opacity: 1,
+      transition: { duration: 0.6, delay: 3.2, ease: editorialEase },
     },
   };
 
@@ -48,22 +66,21 @@ const LandingPage = () => {
     animate: { opacity: 1, transition: { duration: 0.3 } },
   };
 
-  const simpleCtaVariants = {
-    initial: { opacity: 0 },
-    animate: { opacity: 0.3, transition: { duration: 0.3 } },
-  };
-
   const v = prefersReducedMotion
     ? {
-        background: { ...simpleVariants, animate: { ...simpleVariants.animate, opacity: 0.15 } },
+        background: { ...simpleVariants, animate: { ...simpleVariants.animate, opacity: 0.1 } },
         glow: simpleVariants,
         brand: simpleVariants,
-        cta: simpleCtaVariants,
+        verse: simpleVariants,
+        verseRef: simpleVariants,
+        cta: simpleVariants,
       }
     : {
         background: backgroundVariants,
         glow: glowVariants,
         brand: brandVariants,
+        verse: verseVariants,
+        verseRef: verseRefVariants,
         cta: ctaVariants,
       };
 
@@ -73,14 +90,14 @@ const LandingPage = () => {
         <title>Line of Judah | Premium Faith-Based Streetwear</title>
         <meta
           name="description"
-          content="Premium streetwear for those set apart. Enter the world of Line of Judah."
+          content="Premium streetwear for those set apart. Holy garments for glory and for beauty. Enter the world of Line of Judah."
         />
       </Helmet>
 
       <main className="fixed inset-0 h-[100dvh] overflow-hidden landing-abyss">
-        {/* Layer 0: Background Image (heavily desaturated, low opacity) */}
+        {/* Layer 0: Ken Burns Background Image */}
         <motion.div
-          className="absolute inset-0"
+          className="absolute inset-0 ken-burns-slow overflow-hidden"
           variants={v.background}
           initial="initial"
           animate="animate"
@@ -90,12 +107,15 @@ const LandingPage = () => {
             alt=""
             className="w-full h-full object-cover"
             style={{
-              filter: "grayscale(100%) contrast(1.2)",
+              filter: "grayscale(85%) contrast(1.25) brightness(0.85)",
             }}
           />
         </motion.div>
 
-        {/* Layer 1: Center Glow */}
+        {/* Layer 1: Extreme Vignette */}
+        <div className="absolute inset-0 landing-extreme-vignette" />
+
+        {/* Layer 2: Center Glow with Pulse */}
         <motion.div
           className="absolute inset-0 landing-glow"
           variants={v.glow}
@@ -103,11 +123,11 @@ const LandingPage = () => {
           animate="animate"
         />
 
-        {/* Layer 2: Extreme Vignette */}
-        <div className="absolute inset-0 landing-extreme-vignette" />
+        {/* Layer 3: Animated Film Grain */}
+        <div className="absolute inset-0 hero-noise-animated" />
 
-        {/* Layer 3: Heavy Film Grain */}
-        <div className="absolute inset-0 hero-noise-heavy" />
+        {/* Layer 4: Subtle Scan Lines (032c Industrial) */}
+        <div className="absolute inset-0 scan-lines" />
 
         {/* Content Layer - Dead Center */}
         <div className="relative z-10 h-full flex flex-col items-center justify-center">
@@ -117,10 +137,11 @@ const LandingPage = () => {
             style={{ height: "max(env(safe-area-inset-top), 24px)" }}
           />
 
-          {/* Centered Brand Statement */}
+          {/* Centered Brand Statement + Verse */}
           <div className="flex-1 flex flex-col items-center justify-center px-6">
+            {/* Brand Statement */}
             <motion.h1
-              className="text-brand-statement text-white/90 animate-breathe text-center select-none"
+              className="text-brand-statement text-brand-glow text-white/95 animate-breathe text-center select-none"
               variants={v.brand}
               initial="initial"
               animate="animate"
@@ -128,16 +149,37 @@ const LandingPage = () => {
               LINE OF JUDAH
             </motion.h1>
 
-            {/* Minimal CTA */}
+            {/* Verse Block - Exodus 28:2 ASV */}
             <motion.div
-              className="mt-16 md:mt-20"
+              className="mt-10 md:mt-12 text-center"
+              variants={v.verse}
+              initial="initial"
+              animate="animate"
+            >
+              <p className="verse-inscribed text-[0.7rem] md:text-[0.8rem] max-w-xs md:max-w-sm mx-auto">
+                "For glory and for beauty."
+              </p>
+            </motion.div>
+
+            <motion.p
+              className="verse-reference mt-3"
+              variants={v.verseRef}
+              initial="initial"
+              animate="animate"
+            >
+              Exodus 28:2
+            </motion.p>
+
+            {/* Enter Portal - Cinematic CTA */}
+            <motion.div
+              className="mt-14 md:mt-16"
               variants={v.cta}
               initial="initial"
               animate="animate"
             >
               <Link
                 to="/home"
-                className="block py-4 px-8 text-[10px] md:text-[11px] uppercase tracking-[0.4em] text-white/30 hover:text-white/60 transition-colors duration-700 focus-visible:outline-none focus-visible:text-white/60"
+                className="enter-portal block text-[10px] md:text-[11px] uppercase tracking-[0.4em] text-white/55 hover:text-white/90 focus-visible:outline-none focus-visible:text-white/90"
               >
                 Enter
               </Link>
