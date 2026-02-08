@@ -13,7 +13,7 @@ const LandingPage = () => {
   const backgroundVariants = {
     initial: { opacity: 0, scale: 1 },
     animate: {
-      opacity: 0.1,
+      opacity: 0.08,
       scale: 1,
       transition: { duration: 1.4, delay: 0.5, ease: editorialEase },
     },
@@ -108,6 +108,7 @@ const LandingPage = () => {
             className="w-full h-full object-cover"
             style={{
               filter: "grayscale(85%) contrast(1.25) brightness(0.85)",
+              objectPosition: "center 65%",
             }}
           />
         </motion.div>
@@ -179,7 +180,7 @@ const LandingPage = () => {
             >
               <Link
                 to="/home"
-                className="enter-portal block text-[10px] md:text-[11px] uppercase tracking-[0.4em] text-white/55 hover:text-white/90 focus-visible:outline-none focus-visible:text-white/90"
+                className="enter-portal block text-[10px] md:text-[11px] uppercase tracking-[0.4em] text-white/60 hover:text-white/90 focus-visible:outline-none focus-visible:text-white/90"
               >
                 Enter
               </Link>

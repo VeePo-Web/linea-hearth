@@ -657,9 +657,9 @@
 
   /* Ultra-thin massive horizontal statement typography */
   .text-brand-statement {
-    font-size: clamp(0.9rem, 4.5vw, 2.75rem);
+    font-size: clamp(0.9rem, 4.5vw, 3rem);
     font-weight: 100;
-    letter-spacing: 0.5em;
+    letter-spacing: 0.55em;
     line-height: 1;
     text-transform: uppercase;
   }
@@ -674,9 +674,9 @@
   /* Text glow effect - emanating brand presence */
   .text-brand-glow {
     text-shadow: 
-      0 0 120px hsla(0 0% 100% / 0.08),
-      0 0 60px hsla(0 0% 100% / 0.04),
-      0 0 30px hsla(0 0% 100% / 0.02);
+      0 0 150px hsla(0 0% 100% / 0.08),
+      0 0 80px hsla(0 0% 100% / 0.05),
+      0 0 40px hsla(0 0% 100% / 0.03);
   }
 
   /* Verse typography - inscribed, sacred feel */
@@ -704,13 +704,13 @@
     }
     50% { 
       border-color: hsla(0 0% 100% / 0.18);
-      box-shadow: 0 0 40px 0 hsla(0 0% 100% / 0.04);
+      box-shadow: 0 0 50px 0 hsla(0 0% 100% / 0.05);
     }
   }
 
   .enter-portal {
     border: 1px solid hsla(0 0% 100% / 0.1);
-    padding: 18px 48px;
+    padding: 20px 56px;
     animation: border-pulse 4s ease-in-out infinite;
     transition: all 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   }
