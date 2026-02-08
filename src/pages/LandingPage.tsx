@@ -13,7 +13,7 @@ const LandingPage = () => {
   const backgroundVariants = {
     initial: { opacity: 0, scale: 1 },
     animate: {
-      opacity: 0.08,
+      opacity: 0.15,
       scale: 1,
       transition: { duration: 1.4, delay: 0.5, ease: editorialEase },
     },
@@ -68,7 +68,7 @@ const LandingPage = () => {
 
   const v = prefersReducedMotion
     ? {
-        background: { ...simpleVariants, animate: { ...simpleVariants.animate, opacity: 0.1 } },
+        background: { ...simpleVariants, animate: { ...simpleVariants.animate, opacity: 0.18 } },
         glow: simpleVariants,
         brand: simpleVariants,
         verse: simpleVariants,
@@ -107,8 +107,8 @@ const LandingPage = () => {
             alt=""
             className="w-full h-full object-cover"
             style={{
-              filter: "grayscale(85%) contrast(1.25) brightness(0.85)",
-              objectPosition: "center 35%",
+              filter: "grayscale(70%) contrast(1.15) brightness(1.0)",
+              objectPosition: "center 40%",
             }}
           />
         </motion.div>
