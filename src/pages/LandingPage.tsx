@@ -167,6 +167,8 @@ const LandingPage = () => {
               >
                 LINE OF JUDAH
               </h1>
+              {/* Chrome Underline - Restored */}
+              <div className="chrome-underline" aria-hidden="true" />
             </motion.div>
 
             {/* Verse Block - Interactive Sacred Words */}
@@ -191,6 +193,23 @@ const LandingPage = () => {
               initial="initial"
               animate="animate"
             >
+              {/* Full Verse - Inline Revelation (appears above) */}
+              <div 
+                className="full-verse-revelation"
+                role="tooltip" 
+                id="exodus-tooltip"
+              >
+                <p className="verse-archival full-verse-text">
+                  "And thou shalt make holy garments for Aaron thy brother, for{' '}
+                  <span className="glory-word">glory</span>
+                  {' '}and for{' '}
+                  <span className="beauty-word">beauty</span>
+                  ."
+                </p>
+                <span className="verse-attribution">— ASV</span>
+              </div>
+              
+              {/* Reference text */}
               <span 
                 className="verse-reference-archival verse-ref-interactive"
                 tabIndex={0}
@@ -198,16 +217,6 @@ const LandingPage = () => {
               >
                 Exodus 28:2
               </span>
-              <div 
-                className="verse-tooltip" 
-                role="tooltip" 
-                id="exodus-tooltip"
-              >
-                <p className="verse-tooltip-text">
-                  "And thou shalt make holy garments for Aaron thy brother, for glory and for beauty."
-                </p>
-                <span className="verse-tooltip-attribution">— ASV</span>
-              </div>
             </motion.div>
 
             {/* Enter Portal - Chrome Hearts Luxury CTA */}
