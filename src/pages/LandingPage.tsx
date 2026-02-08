@@ -144,17 +144,6 @@ const LandingPage = () => {
         {/* Layer 6: Subtle Scan Lines (032c Industrial) */}
         <div className="absolute inset-0 scan-lines" />
 
-        {/* Layer 7: Floating Gothic Cross Watermarks - Chrome Hearts reverence */}
-        {!prefersReducedMotion && (
-          <>
-            <div className="floating-cross" aria-hidden="true" />
-            <div className="floating-cross floating-cross-left" aria-hidden="true" />
-          </>
-        )}
-
-        {/* Layer 8: Gothic Corner Ornaments - Chrome Hearts flourish */}
-        <div className="gothic-corner gothic-corner-tl" aria-hidden="true" />
-        <div className="gothic-corner gothic-corner-br" aria-hidden="true" />
 
         {/* Content Layer - Dead Center */}
         <div className="relative z-10 h-full flex flex-col items-center justify-center">
@@ -178,19 +167,21 @@ const LandingPage = () => {
               >
                 LINE OF JUDAH
               </h1>
-              {/* Chrome Underline Accent */}
-              <div className="chrome-underline" />
             </motion.div>
 
-            {/* Verse Block - Archival Seventh Heaven LA treatment */}
+            {/* Verse Block - Interactive Sacred Words */}
             <motion.div
-              className="mt-10 md:mt-12 text-center"
+              className="mt-10 md:mt-12 text-center verse-container"
               variants={v.verse}
               initial="initial"
               animate="animate"
             >
               <p className="verse-archival text-[0.75rem] md:text-[0.85rem] max-w-xs md:max-w-sm mx-auto">
-                "For glory and for beauty."
+                "For{' '}
+                <span className="glory-word">glory</span>
+                {' '}and for{' '}
+                <span className="beauty-word">beauty</span>
+                ."
               </p>
             </motion.div>
 

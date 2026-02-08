@@ -787,19 +787,48 @@
     filter: drop-shadow(0 1px 0 hsla(0 0% 100% / 0.15));
   }
 
-  /* Chrome underline accent - subtle silver gradient */
-  .chrome-underline {
-    width: 50%;
-    height: 1px;
-    margin: 16px auto 0;
-    background: linear-gradient(
-      90deg,
-      transparent 0%,
-      hsla(0 0% 50% / 0.2) 15%,
-      hsla(0 0% 85% / 0.5) 50%,
-      hsla(0 0% 50% / 0.2) 85%,
-      transparent 100%
-    );
+  /* ======================================
+     GLORY & BEAUTY - Divine Illumination
+     ====================================== */
+  
+  .verse-container {
+    cursor: default;
+  }
+
+  .glory-word,
+  .beauty-word {
+    display: inline-block;
+    transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    color: inherit;
+  }
+
+  .verse-container:hover .glory-word,
+  .verse-container:hover .beauty-word {
+    color: hsla(45 55% 82% / 0.95);
+    text-shadow: 
+      0 0 15px hsla(45 70% 65% / 0.35),
+      0 0 30px hsla(45 60% 55% / 0.15);
+    letter-spacing: 0.14em;
+    transform: scale(1.02);
+  }
+
+  .verse-container:hover .beauty-word {
+    transition-delay: 0.08s;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .glory-word,
+    .beauty-word {
+      transition: none;
+    }
+    
+    .verse-container:hover .glory-word,
+    .verse-container:hover .beauty-word {
+      text-shadow: none;
+      letter-spacing: inherit;
+      transform: none;
+      color: hsla(45 50% 80% / 0.9);
+    }
   }
 
   /* Smoke/Mist Layer - Travis Scott Astroworld atmosphere */
