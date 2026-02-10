@@ -187,7 +187,7 @@ const LandingPage = () => {
               </div>
 
               {/* Core Quote - Always visible */}
-              <p className="verse-archival verse-core text-[0.75rem] md:text-[0.85rem]">
+              <p className="verse-archival verse-core text-[0.8rem] md:text-[0.9rem]">
                 for{' '}
                 <span className="glory-word">glory</span>
                 {' '}and for{' '}
