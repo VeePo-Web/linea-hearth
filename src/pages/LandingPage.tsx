@@ -173,7 +173,7 @@ const LandingPage = () => {
 
             {/* Unified Verse Block - Zero-Shift Expansion */}
             <motion.div
-              className="verse-unified-block mt-10 md:mt-12"
+              className="verse-unified-block mt-20 md:mt-32"
               variants={v.verse}
               initial="initial"
               animate="animate"
@@ -212,7 +212,7 @@ const LandingPage = () => {
 
             {/* Enter Portal - Chrome Hearts Luxury CTA */}
             <motion.div
-              className="mt-14 md:mt-16"
+              className="mt-20 md:mt-24"
               variants={v.cta}
               initial="initial"
               animate="animate"
