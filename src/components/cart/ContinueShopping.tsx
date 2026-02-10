@@ -70,7 +70,7 @@ const MiniProductCard = ({ product, onAdd }: MiniProductCardProps) => {
         onClick={(e) => quickAdd.handleQuickAdd(e)}
         disabled={quickAdd.isAdding || quickAdd.isAdded}
         className={cn(
-          "flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-all",
+          "flex-shrink-0 w-8 h-8 rounded-none flex items-center justify-center transition-all",
           "border border-border hover:border-foreground hover:bg-foreground hover:text-background",
           quickAdd.isAdded && "bg-emerald-500 border-emerald-500 text-white"
         )}

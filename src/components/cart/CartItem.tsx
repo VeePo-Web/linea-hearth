@@ -87,7 +87,7 @@ const CartItem = ({ item }: CartItemProps) => {
       className={cn(
         "relative flex gap-4 py-4 transition-all duration-200",
         isRemoving && "opacity-0 -translate-x-4",
-        isJustAdded && "animate-pulse bg-emerald-50/50 -mx-2 px-2 rounded"
+        isJustAdded && "border-l-2 border-emerald-500"
       )}
     >
       {/* Main content */}

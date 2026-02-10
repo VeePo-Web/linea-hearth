@@ -71,7 +71,7 @@ const ThresholdUpsellCard = ({
               exit={{ opacity: 0, height: 0 }}
               className="w-full overflow-hidden"
             >
-              <div className="bg-muted/50 p-1.5 rounded text-center">
+              <div className="bg-muted/50 p-1.5 rounded-none text-center">
                 <div className="flex flex-wrap gap-1 justify-center">
                   {quickAdd.availableSizes.map(size => {
                     const stock = quickAdd.getStockForVariant(size);

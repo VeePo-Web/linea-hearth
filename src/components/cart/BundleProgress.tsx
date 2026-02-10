@@ -81,7 +81,7 @@ const BundleProgress = ({ bundle, variant = "drawer" }: BundleProgressProps) => 
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
       className={cn(
-        "relative border rounded-lg overflow-hidden",
+        "relative border rounded-none overflow-hidden",
         isComplete
           ? "border-emerald-500/40 bg-emerald-50/50 dark:bg-emerald-950/20"
           : hasDiscount 
@@ -92,7 +92,7 @@ const BundleProgress = ({ bundle, variant = "drawer" }: BundleProgressProps) => 
       {/* Close-to-completion pulse effect */}
       {isCloseToCompletion && !isComplete && !prefersReducedMotion && (
         <motion.div
-          className="absolute inset-0 rounded-lg pointer-events-none"
+          className="absolute inset-0 rounded-none pointer-events-none"
           animate={{ 
             boxShadow: [
               '0 0 0 1px rgba(245, 158, 11, 0.15)',
@@ -112,7 +112,7 @@ const BundleProgress = ({ bundle, variant = "drawer" }: BundleProgressProps) => 
             animate={{ opacity: [0, 0.3, 0] }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.6 }}
-            className="absolute inset-0 bg-emerald-400 rounded-lg pointer-events-none"
+            className="absolute inset-0 bg-emerald-400 rounded-none pointer-events-none"
           />
         )}
       </AnimatePresence>
