@@ -78,9 +78,9 @@ const FreeShippingBar = () => {
   };
 
   return (
-    <div className="px-6 py-4 border-b border-border bg-muted/30">
+    <div className="px-6 py-3 border-b border-border bg-muted/30">
       {/* Progress bar container with milestone markers */}
-      <div className="relative h-2 bg-muted rounded-full overflow-hidden mb-3">
+      <div className="relative h-2 bg-muted rounded-full overflow-hidden mb-2">
         {/* Milestone markers at 50% and 90% */}
         <div 
           className="absolute top-1/2 -translate-y-1/2 left-[50%] w-1 h-1 rounded-full bg-border/60 z-10" 

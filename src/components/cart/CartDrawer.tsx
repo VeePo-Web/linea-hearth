@@ -172,7 +172,7 @@ const CartDrawer = ({ onViewFavorites }: CartDrawerProps) => {
             exit="exit"
           >
             {/* Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-border">
+            <div className="flex items-center justify-between px-6 py-3 border-b border-border">
               <motion.h2 
                 id="cart-title" 
                 className="text-lg font-light text-foreground"

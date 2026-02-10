@@ -189,10 +189,10 @@ const MissingProductCard = ({
       initial={prefersReducedMotion ? {} : { opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -8 }}
-      className="flex items-center gap-2.5 p-2 bg-muted/30 rounded-lg border border-border/50"
+      className="flex items-center gap-2.5 p-2 bg-muted/30 rounded-none border border-border/50"
     >
       {/* Thumbnail */}
-      <div className="relative w-10 h-10 flex-shrink-0 rounded overflow-hidden bg-muted">
+      <div className="relative w-10 h-10 flex-shrink-0 rounded-none overflow-hidden bg-muted">
         <img 
           src={product.imageUrl || '/placeholder.svg'} 
           alt={product.name}
@@ -308,7 +308,7 @@ const MissingProductCard = ({
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -4, scale: 0.95 }}
               transition={{ duration: 0.15 }}
-              className="absolute right-0 top-full mt-1 z-50 bg-background border border-border rounded-lg shadow-lg p-2 min-w-[120px]"
+              className="absolute right-0 top-full mt-1 z-50 bg-background border border-border rounded-none shadow-md p-2 min-w-[120px]"
             >
               <p className="text-[9px] uppercase tracking-wide text-muted-foreground mb-1.5 px-1">
                 Select Size
