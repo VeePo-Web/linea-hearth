@@ -14,7 +14,7 @@ import RecentlyViewed from "../components/homepage/RecentlyViewed";
 
 const Index = () => {
   return (
-    <Layout>
+    <Layout immersiveHero>
       {/* Editorial Hero - Asymmetric split layout */}
       <EditorialHero />
       
