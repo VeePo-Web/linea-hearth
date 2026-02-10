@@ -1215,7 +1215,8 @@
       display: block;
       position: absolute;
       inset: 0;
-      clip-path: polygon(0 0, 100% 0, 100% 48%, 0 52%);
+      mask-image: linear-gradient(to bottom, black 0%, black 40%, transparent 55%);
+      -webkit-mask-image: linear-gradient(to bottom, black 0%, black 40%, transparent 55%);
       transform: translateX(1px);
       opacity: 0.15;
       mix-blend-mode: screen;
