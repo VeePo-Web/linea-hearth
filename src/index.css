@@ -1283,7 +1283,7 @@
     font-style: italic;
     font-weight: 300;
     letter-spacing: 0.1em;
-    color: hsla(38 25% 75% / 0.55);
+    color: hsla(38 25% 78% / 0.62);
     text-shadow: 0 0 25px hsla(38 30% 50% / 0.08);
   }
 
@@ -1293,8 +1293,8 @@
     font-weight: 400;
     letter-spacing: 0.35em;
     text-transform: uppercase;
-    font-size: 0.5rem;
-    color: hsla(38 20% 65% / 0.4);
+    font-size: 0.55rem;
+    color: hsla(38 20% 68% / 0.48);
   }
 
   /* Sepia-warm Ken Burns - Seventh Heaven LA vintage warmth */
