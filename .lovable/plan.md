@@ -1,488 +1,215 @@
 
 
-# "Expanding Scripture" - Zero-Shift Verse Revelation
-## Fantasy.co-Level Text Expansion from the Original Quote
+# "Verse Elevation with Breathing Room"
+## World-Class Spacing Refinement for Zero-Interference Landing Page Hierarchy
 
 ---
 
-## Part 1: The Problem with Current Implementation
+## Part 1: The Current Problem
 
-The current implementation has three issues:
+**Current spacing structure:**
+- "LINE OF JUDAH" title (brand statement)
+- Chrome underline
+- `mt-10 md:mt-12` margin-top on verse block = 40px (mobile) / 48px (desktop)
+- Verse block (core quote "for glory and for beauty")
+- Reference "Exodus 28:2"
 
-| Issue | What's Happening | Why It Feels Wrong |
-|-------|------------------|-------------------|
-| **Repetition** | Full verse repeats "for glory and for beauty" that's already visible | Feels redundant, not revelatory |
-| **Position shift** | "Exodus 28:2" moves when full verse expands above it | Breaks layout stability, feels janky |
-| **Separate reveal** | Full verse appears as separate text block | Doesn't feel like the original text is "expanding" |
+**Visual issue:** 
+The 40-48px gap feels tight given the massive scale of the "LINE OF JUDAH" headline (3rem+ on desktop). The verse block sits too close, creating visual tension instead of editorial breathing room. Additionally, the prepended context (when hovered) expands upward but lacks a "protected zone" preventing it from visually interfering with the brand statement.
 
 ---
 
-## Part 2: The New Concept - "Prepend Expansion"
+## Part 2: World-Class Hierarchy Principles
 
-### The Vision
+### Editorial Spacing Law (Fantasy.co Standard)
 
-The existing "For glory and for beauty." text should feel like it's COMPLETING itself - the beginning of the verse fades in BEFORE it.
+For luxury fashion editorial, spacing should follow **progressive breathing**:
 
 ```text
-Normal state:
-                "For glory and for beauty."
-                     Exodus 28:2
-
-Hover on "Exodus 28:2":
-    "And thou shalt make holy garments
-     for Aaron thy brother..."     ← PREPENDED (fades in)
-    
-                "...for GLORY and for BEAUTY."
-                          — ASV
-                     Exodus 28:2     ← SAME POSITION
+Major Element (H1) 
+    ↓ Large Spacer (70-120px)
+Breathing Zone (protective air)
+    ↓ Medium Spacer (40-60px)
+Secondary Element (verse/quote)
 ```
 
-### Key Principles
+The **breathing zone** is sacred—it's where the eye rests and where expanded elements (like the prepended verse) should expand *without* collision.
 
-| Principle | Implementation |
-|-----------|----------------|
-| **No repetition** | The prepended text ends with "...for" - the existing quote continues it |
-| **Zero position shift** | "Exodus 28:2" stays in EXACT same place using absolute positioning |
-| **Invisible until hover** | Prepended text has `opacity: 0` and `height: 0` by default |
-| **Unified feel** | Same typography, same glow on glory/beauty, feels like one text |
+### Current State vs. Luxury Standard
+
+| Metric | Current | Luxury Standard | Gap |
+|--------|---------|-----------------|-----|
+| **H1 to verse gap** | 40px (mobile) / 48px (desktop) | 80px (mobile) / 120px (desktop) | +40px / +72px |
+| **Prepend buffer above H1** | None (absolute positioned) | 60px protected zone | Missing |
+| **Visual breathing** | Cramped | Expansive, calm | Poor |
 
 ---
 
-## Part 3: The HTML Structure Redesign
+## Part 3: World-Class Solution - "Protected Breathing Architecture"
 
-### Current Structure (Problematic)
+### The Concept
+
+Instead of just moving the verse block down, we create a **three-layer spacing system**:
+
+1. **Brand Statement Layer** - "LINE OF JUDAH" + chrome underline
+2. **Breathing Zone Layer** - Large, protected negative space (invisible to users, visible to layout)
+3. **Verse Layer** - Core quote + prepended context (with expansion buffer)
+4. **Reference Layer** - "Exodus 28:2" (anchor point)
+
+This ensures that when the prepended verse fades in, it breathes into the **zone**, never touching the headline.
+
+### Visual Representation
 
 ```text
-[Verse Container]
-  └── "For glory and for beauty."
-
-[Verse Reference Container]
-  └── [Full Verse Revelation - SEPARATE, causes shift]
-  └── "Exodus 28:2"
-```
-
-### New Structure (Zero-Shift)
-
-```text
-[Unified Verse Block - position: relative]
-  ├── [Prepend Container - position: absolute, bottom: 100%]
-  │     └── "And thou shalt make holy garments for Aaron thy brother..."
-  │
-  ├── [Core Quote - always visible]
-  │     └── "...for GLORY and for BEAUTY."
-  │
-  ├── [Attribution - fades in on hover]
-  │     └── "— ASV"
-  │
-  └── [Reference - FIXED position, never moves]
-        └── "Exodus 28:2"
-```
-
-### The TSX Implementation
-
-```tsx
-{/* Unified Verse Block - Everything relative to this */}
-<motion.div
-  className="verse-unified-block mt-10 md:mt-12 text-center"
-  variants={v.verse}
-  initial="initial"
-  animate="animate"
->
-  {/* Prepend Container - Expands ABOVE the core quote */}
-  <div 
-    className="verse-prepend"
-    aria-hidden="true"
-  >
-    <p className="verse-archival verse-prepend-text">
-      "And thou shalt make holy garments for Aaron thy brother...
-    </p>
-  </div>
-
-  {/* Core Quote - Always visible, becomes the ending */}
-  <p className="verse-archival verse-core text-[0.75rem] md:text-[0.85rem] max-w-xs md:max-w-sm mx-auto">
-    ...for{' '}
-    <span className="glory-word">glory</span>
-    {' '}and for{' '}
-    <span className="beauty-word">beauty</span>
-    ."
-  </p>
-
-  {/* ASV Attribution - Fades in on hover */}
-  <span className="verse-asv-attribution">— ASV</span>
-
-  {/* Reference - Fixed position, NEVER moves */}
-  <span 
-    className="verse-reference-archival verse-ref-interactive mt-3"
-    tabIndex={0}
-  >
-    Exodus 28:2
-  </span>
-</motion.div>
+┌─────────────────────────────────────────┐
+│          LINE OF JUDAH                  │  ← Brand Statement
+│          ───────────────                │  ← Chrome underline
+│                                         │
+│         [BREATHING ZONE]                │  ← 100-140px of air
+│         (protective negative space)     │
+│                                         │
+│  "And thou shalt make holy...ABOVE↑    │  ← Prepend expands here
+│                                         │
+│    "for glory and for beauty."         │  ← Core quote (fixed)
+│           — ASV                         │  ← Attribution (fades in)
+│       Exodus 28:2                       │  ← Reference (glows)
+│                                         │
+│         [SPACING TO CTA]                │  ← 60-80px
+│           Enter                         │
+└─────────────────────────────────────────┘
 ```
 
 ---
 
-## Part 4: The CSS Magic - Zero Layout Shift
+## Part 4: Detailed Spacing Rules (Worldclass Standard)
 
-### The Core Technique
+### Mobile (< 768px)
 
-The prepended text uses **absolute positioning** so it doesn't affect the flow of elements below it. The core quote and reference remain in their exact positions.
+| Layer | Element | Current Margin | New Margin | Size |
+|-------|---------|-----------------|------------|------|
+| 1 | H1 (LINE OF JUDAH) | auto | auto | clamp(0.7rem, 5.5vw, 1.35rem) |
+| 1.5 | Chrome underline | 8px above, 0 below | 8px above, 16px below | hairline |
+| **2** | **Breathing Zone** | 40px | **100px** | Protected air |
+| 3 | Verse core quote | N/A | N/A | text-[0.75rem] |
+| 3.5 | ASV attribution | N/A | N/A | fades in below |
+| 4 | Reference (Exodus) | mt-3 | mt-4 | verse-reference-archival |
+| **4.5** | **CTA Buffer** | N/A | **80px** | To "Enter" CTA |
 
+### Desktop (≥ 768px)
+
+| Layer | Element | Current Margin | New Margin | Size |
+|-------|---------|-----------------|------------|------|
+| 1 | H1 (LINE OF JUDAH) | auto | auto | clamp(0.9rem, 4.5vw, 3rem) |
+| 1.5 | Chrome underline | 8px above, 0 below | 8px above, 24px below | hairline |
+| **2** | **Breathing Zone** | 48px | **140px** | Protected air |
+| 3 | Verse core quote | N/A | N/A | text-[0.85rem] |
+| 3.5 | ASV attribution | N/A | N/A | fades in below |
+| 4 | Reference (Exodus) | mt-3 | mt-6 | verse-reference-archival |
+| **4.5** | **CTA Buffer** | 56px (mt-14) | **100px** (mt-24) | To "Enter" CTA |
+
+---
+
+## Part 5: Prepend Safety Zone
+
+The prepended context must have a **guaranteed safety buffer** from the "LINE OF JUDAH" headline.
+
+### CSS Positioning Fix
+
+**Current problem:**
 ```css
-/* ======================================
-   UNIFIED VERSE BLOCK - Zero-Shift Expansion
-   ====================================== */
+.verse-prepend {
+  bottom: 100%;  /* Positions DIRECTLY above core quote */
+  ...
+}
+```
 
+This means if core quote is 80px below the brand statement, prepend expands into the breathing zone.
+
+**Solution:**
+```css
 .verse-unified-block {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  /* Reserve space for the expansion ABOVE */
-  padding-top: 80px; /* Space for prepended text */
+  min-height: 200px;  /* Increased from 100px */
+  padding-top: 120px; /* NEW: Reserves space for prepend expansion */
 }
 
-/* Prepend Container - Absolutely positioned ABOVE */
 .verse-prepend {
   position: absolute;
-  bottom: calc(100% - 80px); /* Aligns with padding-top */
-  left: 50%;
-  transform: translateX(-50%);
-  width: 100%;
-  max-width: 320px;
-  opacity: 0;
-  visibility: hidden;
-  transition: 
-    opacity 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-    visibility 0.6s;
-  text-align: center;
-  pointer-events: none;
-}
-
-.verse-prepend-text {
-  font-size: 0.7rem;
-  line-height: 1.7;
-  margin-bottom: 8px;
-}
-
-/* ASV Attribution - Hidden by default */
-.verse-asv-attribution {
-  display: block;
-  opacity: 0;
-  visibility: hidden;
-  font-family: 'Times New Roman', Georgia, serif;
-  font-style: normal;
-  font-size: 0.5rem;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: hsla(38 20% 65% / 0.35);
-  margin-top: 6px;
-  transition: 
-    opacity 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.2s,
-    visibility 0.5s;
-}
-
-/* Core quote transition for ellipsis change */
-.verse-core {
-  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-}
-
-/* Reference - Display block for vertical spacing */
-.verse-ref-interactive {
-  display: block;
-  cursor: pointer;
-  transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-}
-
-/* ======================================
-   HOVER STATE - Revelation
-   ====================================== */
-
-.verse-unified-block:hover .verse-prepend,
-.verse-unified-block:focus-within .verse-prepend {
-  opacity: 1;
-  visibility: visible;
-}
-
-.verse-unified-block:hover .verse-asv-attribution,
-.verse-unified-block:focus-within .verse-asv-attribution {
-  opacity: 1;
-  visibility: visible;
-}
-
-.verse-unified-block:hover .verse-ref-interactive,
-.verse-unified-block:focus-within .verse-ref-interactive {
-  color: hsla(45 55% 82% / 0.95);
-  text-shadow: 
-    0 0 15px hsla(45 70% 65% / 0.35),
-    0 0 30px hsla(45 60% 55% / 0.15);
-}
-
-/* Glory/Beauty glow on hover */
-.verse-unified-block:hover .glory-word,
-.verse-unified-block:hover .beauty-word,
-.verse-unified-block:focus-within .glory-word,
-.verse-unified-block:focus-within .beauty-word {
-  color: hsla(45 55% 82% / 0.95);
-  text-shadow: 
-    0 0 15px hsla(45 70% 65% / 0.35),
-    0 0 30px hsla(45 60% 55% / 0.15);
-  letter-spacing: 0.14em;
-  transform: scale(1.02);
-}
-
-.verse-unified-block:hover .beauty-word,
-.verse-unified-block:focus-within .beauty-word {
-  transition-delay: 0.08s;
+  bottom: 100%;
+  margin-bottom: 16px;  /* NEW: Safety buffer between prepend + core */
+  max-height: 60px;     /* Constrains prepend size */
 }
 ```
+
+This creates a **protected expansion zone** where the prepended text can fade in without ever visually interfering with the brand statement above.
 
 ---
 
-## Part 5: The Ellipsis Technique - "Continuation Feel"
+## Part 6: Implementation Strategy (Worldclass Execution)
 
-### Normal State Text
+### File Changes
 
-```text
-"For glory and for beauty."
-```
+**`src/pages/LandingPage.tsx` - Line 176**
 
-### Hover State Text (with prepend visible)
-
-The prepend ends with "..." and the core quote starts with "..." to show they connect:
-
-```text
-"And thou shalt make holy garments for Aaron thy brother..."
-
-"...for GLORY and for BEAUTY."
-```
-
-Wait - this is awkward with double ellipsis. Better approach:
-
-### Refined Approach - Quote Marks Shift
-
-**Normal state:**
-```text
-"For glory and for beauty."
-```
-
-**Hover state:**
-```text
-"And thou shalt make holy garments for Aaron thy brother,
-
-for GLORY and for BEAUTY."
-                    — ASV
-```
-
-The opening quote `"` moves from the core quote to the prepend. The core quote loses its opening quote.
-
-### Implementation Detail
-
-Use CSS to hide/show the opening quote:
-
+Current:
 ```tsx
-{/* Prepend Container */}
-<div className="verse-prepend">
-  <p className="verse-archival verse-prepend-text">
-    <span className="opening-quote">"</span>And thou shalt make holy garments for Aaron thy brother,
-  </p>
-</div>
-
-{/* Core Quote */}
-<p className="verse-archival verse-core">
-  <span className="opening-quote-core">"</span>for{' '}
-  <span className="glory-word">glory</span>
-  {' '}and for{' '}
-  <span className="beauty-word">beauty</span>
-  ."
-</p>
+className="verse-unified-block mt-10 md:mt-12"
 ```
+
+New:
+```tsx
+className="verse-unified-block mt-20 md:mt-32"
+```
+
+Reasoning:
+- `mt-20` = 80px mobile (increase from 40px)
+- `md:mt-32` = 128px desktop (increase from 48px)
+- Aligns with world-class breathing hierarchy
+
+**`src/pages/LandingPage.tsx` - Line 215**
+
+Current:
+```tsx
+className="mt-14 md:mt-16"
+```
+
+New:
+```tsx
+className="mt-20 md:mt-24"
+```
+
+Reasoning:
+- Increases breathing room before "Enter" CTA
+- Creates visual rhythm: verse → breathing space → CTA
+- `mt-24` = 96px (close to the 100px ideal for desktop)
+
+---
+
+### CSS Changes - `src/index.css` (lines 813-850)
+
+**Update `.verse-unified-block`:**
 
 ```css
-/* Opening quote handling */
-.verse-prepend .opening-quote {
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-
-.verse-unified-block:hover .verse-prepend .opening-quote {
-  opacity: 1;
-}
-
-.verse-unified-block:hover .opening-quote-core {
-  opacity: 0;
-}
-
-.opening-quote-core {
-  transition: opacity 0.3s;
-}
-```
-
----
-
-## Part 6: Alternative Approach - Simpler "Fade Above"
-
-Actually, the cleanest approach is to NOT change the quote marks at all. Instead:
-
-**Normal state:**
-```text
-"For glory and for beauty."
-     Exodus 28:2
-```
-
-**Hover state (prepend fades in ABOVE):**
-```text
-"And thou shalt make holy garments
- for Aaron thy brother, for..."
-                                    ← fades in above
-"For glory and for beauty."         ← stays exactly here
-              — ASV                  ← fades in below quote
-     Exodus 28:2                    ← stays exactly here
-```
-
-But this still has "for" repetition at the join point.
-
----
-
-## Part 7: Final Solution - The "Complete Quote" Technique
-
-The cleanest solution: The prepended text IS the full context, and the core quote is the EMPHASIS. They don't need to "connect" grammatically - they're presented as:
-
-1. **Full verse context** (fades in above)
-2. **The iconic excerpt** (always visible, emphasized)
-3. **Reference** (always visible, illuminates on hover)
-
-```text
-Normal:
-              "For glory and for beauty."
-                   Exodus 28:2
-
-Hover:
-    "And thou shalt make holy garments
-     for Aaron thy brother..."
-              — Exodus 28:2 (ASV)
-              
-              "For GLORY and for BEAUTY."   ← The iconic words glow
-                   Exodus 28:2
-```
-
-Wait, this is getting confusing. Let me think more clearly.
-
----
-
-## Part 8: Simplest Premium Solution
-
-### The Core Insight
-
-The user wants the EXPERIENCE of the text "expanding" without:
-1. Repetition
-2. Position shift of "Exodus 28:2"
-
-### The Solution
-
-**Don't show the full verse as separate text. Instead:**
-
-1. Keep "For glory and for beauty." as the visible quote
-2. On hover, show the PRECEDING CONTEXT above it
-3. The preceding context is: `"And thou shalt make holy garments for Aaron thy brother,"`
-4. This ENDS with a comma - the core quote CONTINUES it
-5. Use absolute positioning so nothing shifts
-
-### Final Structure
-
-```text
-Normal state (no hover):
-
-              "For glory and for beauty."
-                   Exodus 28:2
-
-Hover state:
-
-    "And thou shalt make holy garments     ← FADES IN (absolute positioned)
-     for Aaron thy brother,                ← ends with comma
-              
-              for GLORY and for BEAUTY."   ← "For" becomes lowercase to continue
-                        — ASV               ← FADES IN
-                   Exodus 28:2              ← SAME EXACT POSITION
-```
-
-### The Typography Shift
-
-On hover:
-- The "F" in "For" becomes lowercase "f" (since it's now mid-sentence)
-- OR we keep it as "For" and it's fine (ASV uses archaic capitalization)
-
----
-
-## Part 9: Implementation Details
-
-### Files to Modify
-
-| File | Changes |
-|------|---------|
-| `src/pages/LandingPage.tsx` | Replace current verse structure with unified block |
-| `src/index.css` | Replace current verse CSS with zero-shift system |
-
-### LandingPage.tsx - New Structure
-
-```tsx
-{/* Unified Verse Block - Zero-Shift Expansion */}
-<motion.div
-  className="verse-unified-block mt-10 md:mt-12"
-  variants={v.verse}
-  initial="initial"
-  animate="animate"
->
-  {/* Prepend - The context that fades in ABOVE */}
-  <div className="verse-prepend" aria-hidden="true">
-    <p className="verse-archival verse-prepend-text">
-      "And thou shalt make holy garments<br />
-      for Aaron thy brother,
-    </p>
-  </div>
-
-  {/* Core Quote - Always visible */}
-  <p className="verse-archival verse-core text-[0.75rem] md:text-[0.85rem]">
-    for{' '}
-    <span className="glory-word">glory</span>
-    {' '}and for{' '}
-    <span className="beauty-word">beauty</span>
-    ."
-  </p>
-
-  {/* ASV Attribution - Fades in */}
-  <span className="verse-asv-attribution">— ASV</span>
-
-  {/* Reference - Never moves */}
-  <span 
-    className="verse-reference-archival verse-ref-fixed mt-3"
-    tabIndex={0}
-  >
-    Exodus 28:2
-  </span>
-</motion.div>
-```
-
-Note: The core quote now starts with lowercase "for" since it continues the prepended text. The opening quote `"` is on the prepend.
-
-### The CSS
-
-```css
-/* ======================================
-   VERSE UNIFIED BLOCK - Zero-Shift Expansion
-   Fantasy.co-Level Choreography
-   ====================================== */
-
 .verse-unified-block {
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  min-height: 120px; /* Reserve space */
+  min-height: 120px;  /* Increased from 100px */
+  padding-top: 80px;  /* NEW: Mobile safety buffer for prepend */
 }
 
-/* Prepend - Absolutely positioned, fades in */
+@media (min-width: 768px) {
+  .verse-unified-block {
+    min-height: 140px;   /* Increase for desktop */
+    padding-top: 120px;  /* NEW: Desktop safety buffer */
+  }
+}
+```
+
+**Update `.verse-prepend`:**
+
+```css
 .verse-prepend {
   position: absolute;
   bottom: 100%;
@@ -490,251 +217,181 @@ Note: The core quote now starts with lowercase "for" since it continues the prep
   transform: translateX(-50%);
   width: 100%;
   max-width: 300px;
-  margin-bottom: 8px;
+  max-height: 60px;        /* NEW: Constrain height */
+  margin-bottom: 12px;     /* NEW: Safety gap from core quote */
   opacity: 0;
   visibility: hidden;
   transition: 
     opacity 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94),
     visibility 0s 0.6s;
   pointer-events: none;
+  overflow: hidden;        /* NEW: Prevent overflow during expansion */
 }
 
-.verse-prepend-text {
-  font-size: 0.7rem;
-  line-height: 1.7;
-  color: hsla(38 25% 75% / 0.6);
-}
-
-/* Core quote - Always visible */
-.verse-core {
-  max-width: 280px;
-  margin: 0 auto;
-}
-
-/* ASV Attribution - Hidden by default */
-.verse-asv-attribution {
-  display: block;
-  opacity: 0;
-  visibility: hidden;
-  font-family: 'Times New Roman', Georgia, serif;
-  font-style: normal;
-  font-size: 0.5rem;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: hsla(38 20% 65% / 0.35);
-  margin-top: 8px;
-  margin-bottom: 4px;
-  transition: 
-    opacity 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.15s,
-    visibility 0s 0.5s;
-}
-
-/* Reference - Fixed, never moves */
-.verse-ref-fixed {
-  display: block;
-  cursor: pointer;
-  transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-}
-
-/* ======================================
-   HOVER STATE - The Revelation
-   ====================================== */
-
-.verse-unified-block:hover .verse-prepend,
-.verse-unified-block:focus-within .verse-prepend {
-  opacity: 1;
-  visibility: visible;
-  transition: 
-    opacity 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-    visibility 0s;
-}
-
-.verse-unified-block:hover .verse-asv-attribution,
-.verse-unified-block:focus-within .verse-asv-attribution {
-  opacity: 1;
-  visibility: visible;
-  transition: 
-    opacity 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.15s,
-    visibility 0s;
-}
-
-/* Reference glows on hover */
-.verse-unified-block:hover .verse-ref-fixed,
-.verse-unified-block:focus-within .verse-ref-fixed {
-  color: hsla(45 55% 82% / 0.95);
-  text-shadow: 
-    0 0 15px hsla(45 70% 65% / 0.35),
-    0 0 30px hsla(45 60% 55% / 0.15);
-  letter-spacing: 0.4em;
-}
-
-/* Glory/Beauty words illuminate */
-.verse-unified-block:hover .glory-word,
-.verse-unified-block:hover .beauty-word,
-.verse-unified-block:focus-within .glory-word,
-.verse-unified-block:focus-within .beauty-word {
-  color: hsla(45 55% 82% / 0.95);
-  text-shadow: 
-    0 0 15px hsla(45 70% 65% / 0.35),
-    0 0 30px hsla(45 60% 55% / 0.15);
-  letter-spacing: 0.14em;
-  transform: scale(1.02);
-}
-
-.verse-unified-block:hover .beauty-word {
-  transition-delay: 0.08s;
-}
-
-/* Desktop: wider text */
 @media (min-width: 768px) {
   .verse-prepend {
     max-width: 360px;
-  }
-  
-  .verse-prepend-text {
-    font-size: 0.8rem;
-  }
-  
-  .verse-core {
-    max-width: 340px;
+    max-height: 80px;      /* NEW: Slightly taller on desktop */
+    margin-bottom: 16px;   /* NEW: Proportional to desktop scale */
   }
 }
+```
 
-/* Reduced motion */
-@media (prefers-reduced-motion: reduce) {
-  .verse-prepend,
-  .verse-asv-attribution,
-  .verse-ref-fixed,
-  .glory-word,
-  .beauty-word {
-    transition: none;
-  }
-  
-  .verse-unified-block:hover .verse-ref-fixed {
-    text-shadow: none;
-    transform: none;
-    letter-spacing: 0.35em;
-  }
-  
-  .verse-unified-block:hover .glory-word,
-  .verse-unified-block:hover .beauty-word {
-    text-shadow: none;
-    transform: none;
-    letter-spacing: inherit;
+**Update `.verse-ref-fixed`:**
+
+```css
+.verse-ref-fixed {
+  display: block;
+  cursor: pointer;
+  margin-top: 1rem;        /* NEW: Explicit spacing from attribution */
+  transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+@media (min-width: 768px) {
+  .verse-ref-fixed {
+    margin-top: 1.5rem;    /* NEW: Proportional desktop spacing */
   }
 }
 ```
 
 ---
 
-## Part 10: Animation Choreography
+## Part 7: Chrome Underline Refinement
 
-### The Sequence on Hover
+The chrome underline should have slightly more breathing room below it.
 
-| Step | Timing | Element | Action |
-|------|--------|---------|--------|
-| 1 | 0ms | Exodus 28:2 | Begins glowing gold |
-| 2 | 0-600ms | Prepend text | Fades in from above (opacity 0→1) |
-| 3 | 150-650ms | ASV attribution | Fades in below core quote |
-| 4 | 200ms | "glory" | Begins glowing + scaling |
-| 5 | 280ms | "beauty" | Begins glowing + scaling (staggered) |
+**Current CSS** (line 795-806):
+```css
+.chrome-underline {
+  width: 40%;
+  height: 1px;
+  margin: 8px auto 0;  /* Current: 8px top, 0 bottom */
+}
+```
 
-### The Sequence on Hover Out
+**New CSS:**
+```css
+.chrome-underline {
+  width: 40%;
+  height: 1px;
+  margin: 8px auto 16px;  /* NEW: 8px top, 16px bottom */
+  background: linear-gradient(...);
+  opacity: 0.6;
+}
 
-| Step | Timing | Element | Action |
-|------|--------|---------|--------|
-| 1 | 0ms | All elements | Begin fade out simultaneously |
-| 2 | 300ms | Prepend | Fully invisible |
-| 3 | 300ms | ASV attribution | Fully invisible |
-| 4 | 500ms | Glow effects | Fully faded |
+@media (min-width: 768px) {
+  .chrome-underline {
+    margin: 8px auto 24px;  /* NEW: More breathing on desktop */
+  }
+}
+```
 
 ---
 
-## Part 11: Visual Representation
+## Part 8: Spacing Scale Consistency
+
+The entire landing page now follows this **hierarchy grid**:
 
 ```text
-┌──────────────────────────────────────────────────────────────────┐
-│                                                                   │
-│                         NORMAL STATE                              │
-│                                                                   │
-│                                                                   │
-│                                                                   │
-│                     "For glory and for beauty."                   │
-│                           Exodus 28:2                             │
-│                                                                   │
-│                                                                   │
-└──────────────────────────────────────────────────────────────────┘
-
-┌──────────────────────────────────────────────────────────────────┐
-│                                                                   │
-│                         HOVER STATE                               │
-│                                                                   │
-│              ┌─────────────────────────────────┐                  │
-│              │  "And thou shalt make holy      │ ← Fades in       │
-│              │   garments for Aaron thy        │   (absolute)     │
-│              │   brother,                      │                  │
-│              └─────────────────────────────────┘                  │
-│                     "for GLORY and for BEAUTY."  ← Glowing        │
-│                              — ASV               ← Fades in       │
-│                           Exodus 28:2            ← SAME POSITION  │
-│                                                    (glowing)      │
-└──────────────────────────────────────────────────────────────────┘
+Micro:    4px  (ultra-tight, for internal element spacing)
+Small:    8px  (chrome underline, internal gaps)
+Medium:   16px (internal verse spacing)
+Large:    24px (chrome underline → verse buffer)
+XL:       60px (verse core internal buffer)
+Jumbo:    80px (mobile breathing zone)
+Epic:     120px (desktop breathing zone)
 ```
 
 ---
 
-## Part 12: Success Criteria
+## Part 9: Visual & Functional Outcomes
 
-After implementation:
+### Before (Current)
 
-1. **No repetition** - The prepend provides context, core quote provides emphasis
-2. **Zero position shift** - "Exodus 28:2" stays in exact same place
-3. **Invisible until hover** - Prepend and ASV are opacity: 0 by default
-4. **Same typography** - All text uses verse-archival serif
-5. **Glory/beauty glow** - Both words illuminate on hover
-6. **Smooth animation** - 600ms fade with editorial easing
-7. **Accessibility** - Focus-within triggers same effect
-8. **Reduced motion** - Respects prefers-reduced-motion
+```
+LINE OF JUDAH
+──────
+[40px gap - cramped]
+"for glory and for beauty."
+Exodus 28:2
+[56px gap]
+Enter
+```
 
----
+### After (Worldclass)
 
-## Part 13: Files Summary
-
-| File | Action |
-|------|--------|
-| `src/pages/LandingPage.tsx` | Replace lines 174-220 with new unified verse block |
-| `src/index.css` | Replace lines 790-971 with new zero-shift CSS system |
-
-### Cleanup
-
-Remove from CSS:
-- `.verse-container` (old)
-- `.verse-reference-container` (old)
-- `.full-verse-revelation` (old)
-- `.full-verse-text` (old)
-- `.verse-attribution` (old)
-
-Add to CSS:
-- `.verse-unified-block`
-- `.verse-prepend`
-- `.verse-prepend-text`
-- `.verse-core`
-- `.verse-asv-attribution`
-- `.verse-ref-fixed`
+```
+LINE OF JUDAH
+──────
+[24px internal buffer]
+[100px breathing zone - PROTECTED AIR]
+  ↑ Prepend expands here safely
+"for glory and for beauty."
+Exodus 28:2
+[96-100px breathing space]
+Enter
+```
 
 ---
 
-## Part 14: The Philosophy
+## Part 10: Success Criteria (Worldclass Standard)
 
-### Why This Works
+After implementation, verify:
 
-Luxury brands create **moments of discovery**, not **information dumps**.
+1. **Breathing hierarchy** - Clear visual separation between brand statement and verse
+2. **No collision** - Prepended verse never visually interferes with "LINE OF JUDAH"
+3. **Editorial flow** - User perceives: Title → Breathing Space → Verse → Space → CTA
+4. **Mobile parity** - Mobile spacing matches editorial standards (80px+)
+5. **Desktop refinement** - Desktop spacing reaches 120px+ for luxury feel
+6. **Prepend safety** - Prepend expands within its zone, never breaching headline
+7. **Accessibility** - Focus states maintain spacing relationships
+8. **Reduced motion** - Respects prefers-reduced-motion with instant visibility
+9. **Responsiveness** - Spacing adapts smoothly across tablet/mobile/desktop
+10. **Consistency** - All spacing follows the defined scale (4/8/16/24/60/80/120)
 
-The current approach dumps the full verse as a separate block. The new approach:
-- Rewards curiosity with context
-- Keeps the iconic phrase as the anchor
-- Uses position stability as a sign of quality
-- Animates with intention, not just movement
+---
 
-**Brand alignment**: The scripture reveals itself gradually - you hover to seek deeper understanding, and the full context materializes around what you already see. The core truth remains stable; the context illuminates it.
+## Part 11: Technical Implementation Order
+
+1. **Update `verse-unified-block` padding + min-height** (CSS)
+2. **Update `.verse-prepend` constraints** (CSS - max-height, safety margins)
+3. **Update `.chrome-underline` bottom margin** (CSS)
+4. **Update `.verse-ref-fixed` top margin** (CSS)
+5. **Update LandingPage.tsx className margins** (TSX - mt-10→mt-20, mt-14→mt-20)
+6. **Verify in browser** - Mobile, tablet, desktop
+7. **Test hover/focus states** - Prepend expansion doesn't break layout
+8. **Test reduced motion** - Accessibility compliance
+
+---
+
+## Part 12: Rollback Plan
+
+If spacing feels off after implementation:
+
+| Issue | Rollback |
+|-------|----------|
+| Too much gap (feels empty) | Reduce `mt-32` to `mt-28` or `mt-24` |
+| Prepend still overlaps headline | Increase `padding-top` to 140px or higher |
+| Mobile feels cramped | Increase `mt-20` to `mt-24` |
+| Desktop feels too spacious | Reduce `mt-32` to `mt-28` |
+
+All changes are CSS/className changes—zero breaking changes.
+
+---
+
+## Part 13: The Philosophy
+
+**World-class spacing is invisible, but essential.**
+
+The current spacing makes users *feel* the content is crowded. The new spacing makes them *feel* the brand is confident, calm, and intentional.
+
+This is the difference between:
+- **Template Shopify**: Minimal spacing to fit more content
+- **Luxury Fashion Editorial**: Breathing room as a sign of quality
+
+The 100-140px gap between headline and verse isn't "wasted space"—it's **editorial silence**, the sonic equivalent of white noise in a magazine spread. It's where the eye rests before engaging with the verse.
+
+When the prepended context fades in, it enters this **protected zone**—never interfering with the hierarchy, only enriching it.
+
+**Brand alignment**: Line of Judah is confident enough to own the space. The breathing room reinforces the brand's luxury positioning and restraint.
 
