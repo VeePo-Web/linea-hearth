@@ -1301,6 +1301,57 @@
   .ken-burns-sepia {
     filter: sepia(12%) grayscale(65%) contrast(1.12) brightness(1.02);
   }
+
+  /* Editorial Nav Link — sliding underline on hover */
+  .nav-link-editorial {
+    position: relative;
+  }
+
+  .nav-link-editorial::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: hsla(30 10% 30% / 0.6);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  .nav-link-editorial:hover::after,
+  .nav-link-editorial:focus-visible::after {
+    transform: scaleX(1);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .nav-link-editorial::after {
+      transition: none;
+    }
+  }
+
+  /* Breathing ambient glow behind nav links */
+  @keyframes nav-ambient-breathe {
+    0%, 100% { opacity: 0.02; }
+    50% { opacity: 0.05; }
+  }
+
+  .nav-ambient-glow {
+    position: absolute;
+    inset: -20%;
+    border-radius: 50%;
+    background: radial-gradient(ellipse at center, hsla(35 40% 60% / 0.15) 0%, transparent 70%);
+    animation: nav-ambient-breathe 8s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .nav-ambient-glow {
+      animation: none;
+      opacity: 0.035;
+    }
+  }
 }
 
 /* Print Stylesheet - Premium Legal Document Output */
