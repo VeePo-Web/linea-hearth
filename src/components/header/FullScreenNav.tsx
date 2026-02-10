@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { X, User } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { useAuth } from "@/hooks/useAuth";
@@ -45,11 +45,10 @@ const containerVariants = {
 };
 
 const backgroundVariants = {
-  hidden: { opacity: 0, scale: 1.02, filter: 'blur(4px)' },
+  hidden: { opacity: 0, scale: 1.02 },
   visible: {
     opacity: 1,
     scale: 1,
-    filter: 'blur(0px)',
     transition: {
       duration: 0.7,
       ease: editorialEase,
@@ -57,7 +56,6 @@ const backgroundVariants = {
   },
   exit: {
     opacity: 0,
-    filter: 'blur(2px)',
     transition: { duration: 0.25 },
   },
 };
@@ -105,22 +103,17 @@ const FullScreenNav = ({
 }: FullScreenNavProps) => {
   const { user } = useAuth();
   const { profile } = useProfile();
-  const location = useLocation();
   const prefersReducedMotion = useReducedMotion();
   const firstLinkRef = useRef<HTMLAnchorElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
 
   const firstName = profile?.full_name?.split(' ')[0] || user?.email?.split('@')[0] || 'Account';
 
-  // Check if a nav link is the current active route
-  const isActiveRoute = (href: string) => {
-    return location.pathname === href || location.pathname.startsWith(href + '/');
-  };
-
   // Body scroll lock
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
+      // Focus first link after animation
       const timer = setTimeout(() => {
         firstLinkRef.current?.focus();
       }, 300);
@@ -179,18 +172,8 @@ const FullScreenNav = ({
             backgroundRepeat: 'no-repeat',
           }}
         >
-          {/* Subtle scrim for text legibility */}
+          {/* Subtle scrim for text legibility on varied backgrounds */}
           <div className="absolute inset-0 bg-stone-50/5 pointer-events-none" />
-
-          {/* Film grain overlay — cinematic texture */}
-          <div className="absolute inset-0 hero-noise-animated pointer-events-none" aria-hidden="true" />
-
-          {/* Soft vignette — edge darkening for depth + focus */}
-          <div
-            className="absolute inset-0 pointer-events-none"
-            style={{ background: 'radial-gradient(ellipse at center, transparent 30%, hsla(30 10% 20% / 0.12) 100%)' }}
-            aria-hidden="true"
-          />
 
           {/* Header: Logo + Close */}
           <motion.header
@@ -226,59 +209,32 @@ const FullScreenNav = ({
 
           {/* Centered link stack */}
           <nav
-            className="flex-1 flex items-center justify-center relative"
+            className="flex-1 flex items-center justify-center"
             role="navigation"
             aria-label="Main navigation"
           >
-            {/* Breathing ambient glow */}
-            <div className="nav-ambient-glow" aria-hidden="true" />
-
             <motion.ul
-              className="text-center relative z-[1]"
+              className="text-center"
               variants={safeContainerVariants}
               initial="hidden"
               animate="visible"
             >
-              {NAV_LINKS.map((link, index) => {
-                const active = isActiveRoute(link.href);
-                return (
-                  <motion.li key={link.label} variants={safeLinkVariants}>
-                    <Link
-                      ref={index === 0 ? firstLinkRef : undefined}
-                      to={link.href}
-                      onClick={onClose}
-                      data-nav-link
-                      className={`nav-link-editorial block py-3 md:py-4 text-[14px] md:text-[15px] font-light uppercase tracking-[0.25em] transition-colors duration-300 focus:outline-none focus-visible:text-amber-700 ${
-                        active
-                          ? 'text-stone-900/50'
-                          : 'text-stone-900 hover:text-amber-700'
-                      }`}
-                      style={{ lineHeight: '3.5' }}
-                      aria-current={active ? 'page' : undefined}
-                    >
-                      {active && (
-                        <span className="inline-block mr-2 text-stone-900/30 text-[12px]" aria-hidden="true">—</span>
-                      )}
-                      {link.label}
-                    </Link>
-                  </motion.li>
-                );
-              })}
+              {NAV_LINKS.map((link, index) => (
+                <motion.li key={link.label} variants={safeLinkVariants}>
+                  <Link
+                    ref={index === 0 ? firstLinkRef : undefined}
+                    to={link.href}
+                    onClick={onClose}
+                    data-nav-link
+                    className="block py-3 md:py-4 text-[14px] md:text-[15px] font-light uppercase tracking-[0.25em] text-stone-900 hover:text-amber-700 transition-colors duration-300 focus:outline-none focus-visible:text-amber-700"
+                    style={{ lineHeight: '3.5' }}
+                  >
+                    {link.label}
+                  </Link>
+                </motion.li>
+              ))}
             </motion.ul>
           </nav>
-
-          {/* Chrome hairline separator */}
-          <div
-            className="relative z-10 mx-auto"
-            style={{
-              width: '40%',
-              height: '1px',
-              background: 'linear-gradient(90deg, transparent, hsla(0 0% 90% / 0.5), transparent)',
-              opacity: 0.6,
-              marginBottom: '16px',
-            }}
-            aria-hidden="true"
-          />
 
           {/* Footer: Account + Social */}
           <motion.footer
