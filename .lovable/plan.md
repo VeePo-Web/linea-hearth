@@ -1,127 +1,124 @@
 
 
-# Clean Hero Entry: Header Hidden Until Scroll-Up
+# Forensic Audit + Search Fix: Stress Test Findings
 
-## The Problem
+## Issues Discovered
 
-When you click "Enter" on the Brand Gate and arrive at `/home`, the header (StatusBar + Navigation) and the SecondaryCTAStrip are immediately visible at the top. This breaks the immersive editorial flow -- you just experienced a cinematic portal transition, and then you land with a standard e-commerce chrome bar sitting on top of the hero.
+### Critical: Search Does Not Work
 
-The hero section (`EditorialHero`) is a full-viewport cinematic spread with massive "WEAR YOUR FAITH." typography, brave-cropped model imagery, and parallax depth. It deserves to breathe without UI chrome competing for attention.
+The `SearchOverlay` component has a fully styled search input that accepts user typing, but **no search query is ever executed**. The `searchValue` state updates but never triggers any database query. The component only shows:
+- Static hardcoded "Popular Searches" (Stay Holy, Heavenly Crewneck, etc.)
+- Trending products fetched from the `products` table filtered by `is_featured = true`
 
-## The Fix
+When a user types "hoodie" and hits enter, nothing happens. No results. No filtering. No feedback. This is a broken core feature.
 
-**Start the header off-screen when arriving at `/home`, then reveal it only when the user scrolls up** -- exactly like luxury fashion sites (Fear of God, Rick Owens, Acne Studios) where the hero is full-bleed and the nav slides in once you start browsing.
+### Secondary Issues Found
 
-### How It Works
+1. **`fetchPriority` React warning** -- `EditorialHero.tsx` line 62 uses `fetchPriority="high"` on an `<img>` tag. React doesn't recognize this as a standard prop and throws a console warning. Should be `fetchpriority` (lowercase) or handled differently.
 
-The `Header` component already has scroll-direction logic via `useScrollDirection` -- it hides on scroll-down and shows on scroll-up. We just need to add one behavior: **start hidden when the page is at the top** (i.e., on initial load), then reveal on the first scroll-up.
+2. **Navigation auto-adds cart items on every mount** -- `Navigation.tsx` lines 34-53 auto-add "Stay Holy Hoodie" and "Heavenly Crewneck" to the cart every time the component mounts and items are empty. This is demo/dev code that will confuse real users.
 
-### Architecture
-
-```text
-Current behavior:
-  Page loads -> Header visible at y:0 -> Hides on scroll down -> Shows on scroll up
-
-New behavior:  
-  Page loads -> Header starts at y:-100 (off-screen) -> User scrolls down (stays hidden) -> User scrolls up -> Header slides in -> Normal behavior resumes
-```
-
-The SecondaryCTAStrip already only shows after 600px scroll, so it naturally stays out of the way. No changes needed there.
+3. **Search overlay query missing `slug` in categories join** -- The SearchOverlay trending products query fetches `categories:category_id(name, slug)` but the `TrendingProduct` component maps `category_slug: product.categories?.slug`. However, the response shows the category object only has `name` since the query alias uses `categories` not the FK hint. This means `category_slug` is always undefined for trending products, breaking size memory category resolution.
 
 ---
 
-## Implementation
+## Fix Plan
 
-### File 1: `src/components/header/Header.tsx`
+### Fix 1: Implement Actual Product Search (Primary)
 
-**What changes:**
+**File: `src/components/header/SearchOverlay.tsx`**
 
-1. Detect if the user is on the `/home` route using `useLocation()`
-2. Track whether the header has been "revealed" yet with a `hasRevealed` state
-3. On `/home`: start with `y: -100` (hidden), only set `hasRevealed = true` when `direction === "up"` and `isScrolled`
-4. On all other routes: behave exactly as today (always start visible)
+Add a debounced search query that fires when `searchValue` has 2+ characters:
 
-**Logic:**
+1. Add a new `useQuery` that searches products by name using Supabase's `ilike` filter
+2. Debounce the search input by 300ms to avoid hammering the database
+3. Show search results when typing, show trending products when search is empty
+4. Include product variants in search results for quick-add functionality
+5. Add "No results found" state with suggestion to browse collections
+6. Add loading skeleton while search is in progress
 
-```text
-const isHomePage = location.pathname === '/home'
-const [hasRevealed, setHasRevealed] = useState(!isHomePage)
-
-// When direction is "up" and we've scrolled, reveal
-useEffect: if (direction === 'up' && isScrolled) -> setHasRevealed(true)
-
-// Reset when navigating to /home
-useEffect: if (isHomePage) -> setHasRevealed(false)
-
-// Determine visibility:
-if (!hasRevealed) -> y: -100 (hidden)
-else if (shouldHide) -> y: -100 (existing scroll-down hide)  
-else -> y: 0 (visible)
+**Search query structure:**
+```
+supabase
+  .from('products')
+  .select(`id, name, slug, price, sale_price, is_on_sale,
+    categories:category_id(name, slug),
+    product_images(image_url, is_primary),
+    product_variants(size, color, stock_quantity)`)
+  .eq('status', 'active')
+  .ilike('name', `%${searchValue}%`)
+  .limit(6)
 ```
 
-This preserves ALL existing scroll-hide behavior. The only addition is the initial hidden state on `/home`.
+**UI behavior:**
+- Empty input: show Popular Searches + Trending Now (current behavior)
+- 1 character: still show default state (too broad)
+- 2+ characters: show search results with quick-add buttons
+- No results: "No products found for [query]" + "Browse all" link
+- Loading: skeleton placeholders
 
-### File 2: `src/components/layout/Layout.tsx`
+### Fix 2: Fix `fetchPriority` Warning
 
-**What changes:**
+**File: `src/components/homepage/EditorialHero.tsx` (line 62)**
 
-On the `/home` route, the `main` element currently has `pt-[var(--header-height)]` which reserves space for the fixed header. Since the header starts hidden on `/home`, we need the hero to go full-bleed (no top padding) initially, then add the padding back once the header reveals.
+Change `fetchPriority="high"` to use the correct lowercase attribute. Since this is an HTML attribute not a React prop, we can suppress the warning or use a different approach.
 
-Two options:
-- **Option A (simpler):** Remove the top padding on `/home` entirely. The `EditorialHero` is already a `min-h-dvh` full-viewport section, so it fills the screen regardless. The header overlays on top when it slides in. This is the luxury fashion standard -- the nav overlays the hero, it doesn't push it down.
-- **Option B:** Conditionally apply padding based on header reveal state.
+### Fix 3: Remove Demo Cart Auto-Add
 
-**Recommended: Option A.** The hero is full-bleed by design. The header should overlay, not push content. We pass a prop like `immersiveHero` to Layout that removes the top padding.
+**File: `src/components/header/Navigation.tsx` (lines 34-53)**
 
-### File 3: `src/pages/Index.tsx`
+Remove the `useEffect` that auto-adds products to cart. This is development scaffolding that should not be in production.
 
-**What changes:**
+### Fix 4: Fix Category Slug Resolution in Search
 
-Pass `immersiveHero={true}` (or similar prop) to `<Layout>` so it knows to skip the header top-padding on this page.
-
-```text
-<Layout immersiveHero>
-  <EditorialHero />
-  ...
-</Layout>
-```
+Ensure the trending products query properly passes `category_slug` through the FK hint so size memory works correctly for quick-add in search results.
 
 ---
 
-## Technical Details
+## Technical Implementation Details
 
-### Header Reveal Logic (Header.tsx)
+### Debounce Hook for Search
 
-| State | `hasRevealed` | Scroll Direction | Result |
-|-------|--------------|-----------------|--------|
-| Initial load on `/home` | `false` | n/a | Header at `y: -100` (hidden) |
-| User scrolls down | `false` | down | Header stays at `y: -100` |
-| User scrolls up | `true` (set now) | up | Header slides to `y: 0` |
-| Continues browsing | `true` | down | Header hides (existing behavior) |
-| Continues browsing | `true` | up | Header shows (existing behavior) |
-| Navigate to another page | `true` | n/a | Header visible normally |
-| Navigate back to `/home` | reset to `false` | n/a | Header hidden again |
+Create a simple `useDebouncedValue` inline (no new file needed -- just a `useEffect` + `setTimeout` pattern within SearchOverlay):
 
-### Layout padding (Layout.tsx)
+```text
+const [debouncedSearch, setDebouncedSearch] = useState('')
 
-| Prop | `pt-[var(--header-height)]` applied? |
-|------|--------------------------------------|
-| `immersiveHero={false}` (default) | Yes -- normal pages |
-| `immersiveHero={true}` | No -- hero goes full-bleed, header overlays |
+useEffect(() => {
+  const timer = setTimeout(() => setDebouncedSearch(searchValue), 300)
+  return () => clearTimeout(timer)
+}, [searchValue])
+```
 
-### Header transparency on hero
+### Search Results Query
 
-When the header reveals over the full-bleed hero, the Navigation component already has `backgroundColor: 'rgba(255, 255, 255, 0.97)'` and `backdropFilter: 'blur(12px)'`. This will look clean overlaying the dark hero. No changes needed.
+Add alongside the existing trending products query:
 
----
+```text
+const { data: searchResults, isLoading: isSearching } = useQuery({
+  queryKey: ['product-search', debouncedSearch],
+  queryFn: async () => { /* ilike query */ },
+  enabled: isOpen && debouncedSearch.length >= 2,
+  staleTime: 30 * 1000,
+})
+```
 
-## Summary of Changes
+### Conditional Rendering Logic
+
+```text
+if searchValue.length >= 2:
+  if isSearching: show skeleton
+  if searchResults.length > 0: show results with SearchQuickAdd
+  if searchResults.length === 0: show "No results" + browse link
+else:
+  show Popular Searches + Trending Now (existing)
+```
+
+### Files Changed
 
 | File | Change | Risk |
 |------|--------|------|
-| `src/components/header/Header.tsx` | Add `hasRevealed` state, start hidden on `/home`, reveal on first scroll-up | Low -- additive logic, existing behavior preserved |
-| `src/components/layout/Layout.tsx` | Add `immersiveHero` prop, conditionally remove `pt-[var(--header-height)]` | Low -- only affects pages that opt in |
-| `src/pages/Index.tsx` | Pass `immersiveHero` to Layout | Trivial |
-
-Three files. Zero new dependencies. The hero breathes. The header earns its entrance.
+| `src/components/header/SearchOverlay.tsx` | Add search query, debounce, results UI, no-results state | Medium -- new feature, well-contained |
+| `src/components/homepage/EditorialHero.tsx` | Fix `fetchPriority` casing | Trivial |
+| `src/components/header/Navigation.tsx` | Remove auto-add cart items effect | Low -- removes dev code |
 
