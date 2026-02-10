@@ -1,200 +1,127 @@
 
 
-# Fantasy.co "What If" Micro-Interactions: Landing Page Portal Transition
+# Clean Hero Entry: Header Hidden Until Scroll-Up
 
-## The Fantasy.co "What If" Principle
+## The Problem
 
-Fantasy.co's methodology starts with "What if this moment felt like ___?" -- turning functional interactions into emotional signatures. Applied here: **What if clicking "Enter" didn't just navigate -- it felt like stepping through a threshold into a sacred space?**
+When you click "Enter" on the Brand Gate and arrive at `/home`, the header (StatusBar + Navigation) and the SecondaryCTAStrip are immediately visible at the top. This breaks the immersive editorial flow -- you just experienced a cinematic portal transition, and then you land with a standard e-commerce chrome bar sitting on top of the hero.
 
-The landing page already has world-class atmosphere. But the moment of clicking "Enter" is currently just... a React Router navigation with a generic `PageTransition` opacity fade. That's the gap. The portal moment should be the single most memorable micro-interaction on the entire site.
+The hero section (`EditorialHero`) is a full-viewport cinematic spread with massive "WEAR YOUR FAITH." typography, brave-cropped model imagery, and parallax depth. It deserves to breathe without UI chrome competing for attention.
 
----
+## The Fix
 
-## Current State: What Happens When You Click "Enter"
+**Start the header off-screen when arriving at `/home`, then reveal it only when the user scrolls up** -- exactly like luxury fashion sites (Fear of God, Rick Owens, Acne Studios) where the hero is full-bleed and the nav slides in once you start browsing.
 
-1. User clicks the `<Link to="/home">` element
-2. React Router navigates to `/home`
-3. `AnimatePresence mode="wait"` triggers `PageTransition` exit animation (opacity 1 to 0, y: 0 to -10, 200ms)
-4. Landing page unmounts
-5. Home page mounts with entrance animation (opacity 0 to 1, y: 20 to 0, 400ms)
+### How It Works
 
-**The problem:** This is the same generic transition every page uses. The Brand Gate -- the single most atmospheric page on the site -- deserves its own exit choreography.
+The `Header` component already has scroll-direction logic via `useScrollDirection` -- it hides on scroll-down and shows on scroll-up. We just need to add one behavior: **start hidden when the page is at the top** (i.e., on initial load), then reveal on the first scroll-up.
 
----
-
-## The "What If" Ideas (Ranked by Impact vs. Complexity)
-
-### Idea 1: "The Veil Parts" -- Vertical Wipe Exit (HIGH IMPACT, LOW COMPLEXITY)
-
-**What if:** Clicking Enter causes the entire landing page to split vertically from center and slide apart like curtains being drawn, revealing the store behind.
-
-**How it works:**
-- On click, add a CSS class to the `<main>` element that triggers a `clip-path` animation
-- The content fades to white/black as two halves slide apart
-- After 800ms, navigate to `/home`
-- Uses `useNavigate` with a manual delay instead of `<Link>` for choreographed timing
-
-**Technical approach:**
-- Replace `<Link to="/home">` with an `<button>` that calls a `handleEnter()` function
-- `handleEnter()` sets a `isExiting` state, waits 800ms, then calls `navigate('/home')`
-- When `isExiting` is true, apply exit animation classes/variants to the landing page layers
-- Each layer animates differently: background zooms slightly, content fades up, vignette intensifies
-
-### Idea 2: "Divine Illumination Burst" -- Light Bloom Exit (HIGH IMPACT, MEDIUM COMPLEXITY)
-
-**What if:** Clicking Enter causes the center glow to intensify dramatically -- as if the Lion of Judah graphic is emanating divine light -- washing the screen to warm white before the store appears.
-
-**How it works:**
-- The existing `landing-glow` layer scales up and increases opacity to 1
-- The brand text gets a bloom effect (text-shadow intensifies)
-- Grain and scan lines fade out (the "film" burns away)
-- Background image opacity increases briefly (the image "develops")
-- Everything washes to warm off-white over 1.2s
-- Home page fades in from that warm white
-
-**Technical approach:**
-- `isExiting` state triggers Framer Motion animate changes on each layer
-- The glow layer: `scale: 3, opacity: 0.8` over 1s
-- Text: `opacity: 0, y: -20, filter: blur(8px)` over 0.6s
-- Background: `opacity: 0.4, scale: 1.05` over 0.8s then `opacity: 0` over 0.4s
-- Final 200ms: everything to white/transparent
-
-### Idea 3: "The Text Dissolves" -- Character Scatter (MEDIUM IMPACT, MEDIUM COMPLEXITY)
-
-**What if:** When you click Enter, the "LINE OF JUDAH" letters individually drift apart and fade, as if the name itself is breaking into particles of light -- and the verse below fades last like an afterimage.
-
-**How it works:**
-- Split "LINE OF JUDAH" into individual `<span>` characters
-- On exit, each character gets a random small offset (x: random(-30, 30), y: random(-20, 20)) and fades to 0
-- Staggered by 0.02s per character
-- The verse fades 0.3s after the title starts dissolving
-- The "Enter" button itself fades first (it served its purpose)
-
-### Idea 4: "Film Reel End" -- The Projector Stops (MEDIUM IMPACT, LOW COMPLEXITY)
-
-**What if:** Clicking Enter makes the page feel like a film projector stopping -- the grain intensifies dramatically, the image stutters/flickers, then cuts to black before the store appears. Like the end of a 35mm reel.
-
-**How it works:**
-- Grain opacity ramps from 0.10 to 0.35 over 0.5s
-- Scan lines opacity ramps from 0.04 to 0.15
-- Background image flickers (opacity oscillates rapidly 3 times)
-- Hard cut to black (100ms)
-- Home page fades in from black
-
-### Idea 5: "Zoom Through" -- Perspective Portal (HIGH IMPACT, LOW COMPLEXITY)
-
-**What if:** Clicking Enter makes everything zoom toward you as if you're being pulled through the screen -- the vignette closes in, the background image scales up, and you "pass through" into the store.
-
-**How it works:**
-- Background: `scale: 1 to 1.8` over 1s with `filter: blur(4px)`
-- Vignette: intensifies to near-black
-- Content: `scale: 1.5, opacity: 0` (zooms past you)
-- After 900ms, navigate to `/home`
-
----
-
-## Recommended Combination: Ideas 2 + 5 (Hybrid)
-
-The strongest approach fuses "Divine Illumination Burst" with "Zoom Through" -- the glow intensifies as the background pulls toward you, creating the sensation of stepping into light. This is the most on-brand for a faith-based luxury store: you're not just navigating, you're crossing a threshold into something sacred.
-
-### Implementation Plan
-
-#### File: `src/pages/LandingPage.tsx`
-
-**Changes:**
-
-1. Replace `<Link to="/home">` with a `<button>` that triggers a choreographed exit sequence
-2. Add `isExiting` state and `handleEnter` function with `useNavigate`
-3. Add conditional Framer Motion `animate` props that respond to `isExiting`
-4. Each atmospheric layer gets its own exit choreography:
+### Architecture
 
 ```text
-Timeline (1.2s total):
+Current behavior:
+  Page loads -> Header visible at y:0 -> Hides on scroll down -> Shows on scroll up
 
-0ms     -- "Enter" button fades out instantly
-0ms     -- Glow layer begins scaling (1 -> 2.5) and brightening
-0ms     -- Background begins zooming (1 -> 1.3) with slight blur
-100ms   -- Brand text begins floating up and blurring out
-200ms   -- Verse text fades out
-300ms   -- Grain + scan lines fade out (the "film" dissolves)
-600ms   -- Vignette intensifies to near-solid
-800ms   -- Everything reaches near-white/near-black
-1000ms  -- Navigate to /home
-1200ms  -- Home page entrance animation begins (standard PageTransition)
+New behavior:  
+  Page loads -> Header starts at y:-100 (off-screen) -> User scrolls down (stays hidden) -> User scrolls up -> Header slides in -> Normal behavior resumes
 ```
 
-5. The "Enter" button gets a subtle `scale: 0.97` press feedback on click before the exit begins (tactile confirmation)
+The SecondaryCTAStrip already only shows after 600px scroll, so it naturally stays out of the way. No changes needed there.
 
-#### File: `src/index.css`
+---
 
-**Changes:**
+## Implementation
 
-1. Add `.landing-exit-glow` class with transition properties for the illumination burst
-2. Add `.landing-exit-zoom` class for the background zoom + blur
-3. Add `.landing-exit-text` class for the text float-up + blur dissolution
-4. All exit animations use `cubic-bezier(0.4, 0, 0.2, 1)` (smooth deceleration) -- different from the entrance `editorialEase` to feel like "release" rather than "arrival"
+### File 1: `src/components/header/Header.tsx`
 
-#### File: `src/components/motion/PageTransition.tsx`
+**What changes:**
 
-**No changes needed.** The landing page handles its own exit choreography before navigating. The home page still uses the standard `PageTransition` entrance, which creates a clean handoff.
+1. Detect if the user is on the `/home` route using `useLocation()`
+2. Track whether the header has been "revealed" yet with a `hasRevealed` state
+3. On `/home`: start with `y: -100` (hidden), only set `hasRevealed = true` when `direction === "up"` and `isScrolled`
+4. On all other routes: behave exactly as today (always start visible)
+
+**Logic:**
+
+```text
+const isHomePage = location.pathname === '/home'
+const [hasRevealed, setHasRevealed] = useState(!isHomePage)
+
+// When direction is "up" and we've scrolled, reveal
+useEffect: if (direction === 'up' && isScrolled) -> setHasRevealed(true)
+
+// Reset when navigating to /home
+useEffect: if (isHomePage) -> setHasRevealed(false)
+
+// Determine visibility:
+if (!hasRevealed) -> y: -100 (hidden)
+else if (shouldHide) -> y: -100 (existing scroll-down hide)  
+else -> y: 0 (visible)
+```
+
+This preserves ALL existing scroll-hide behavior. The only addition is the initial hidden state on `/home`.
+
+### File 2: `src/components/layout/Layout.tsx`
+
+**What changes:**
+
+On the `/home` route, the `main` element currently has `pt-[var(--header-height)]` which reserves space for the fixed header. Since the header starts hidden on `/home`, we need the hero to go full-bleed (no top padding) initially, then add the padding back once the header reveals.
+
+Two options:
+- **Option A (simpler):** Remove the top padding on `/home` entirely. The `EditorialHero` is already a `min-h-dvh` full-viewport section, so it fills the screen regardless. The header overlays on top when it slides in. This is the luxury fashion standard -- the nav overlays the hero, it doesn't push it down.
+- **Option B:** Conditionally apply padding based on header reveal state.
+
+**Recommended: Option A.** The hero is full-bleed by design. The header should overlay, not push content. We pass a prop like `immersiveHero` to Layout that removes the top padding.
+
+### File 3: `src/pages/Index.tsx`
+
+**What changes:**
+
+Pass `immersiveHero={true}` (or similar prop) to `<Layout>` so it knows to skip the header top-padding on this page.
+
+```text
+<Layout immersiveHero>
+  <EditorialHero />
+  ...
+</Layout>
+```
 
 ---
 
 ## Technical Details
 
-### State Management
+### Header Reveal Logic (Header.tsx)
 
-```text
-LandingPage component:
-  - const [isExiting, setIsExiting] = useState(false)
-  - const navigate = useNavigate()
-  - handleEnter():
-      1. setIsExiting(true)
-      2. setTimeout(() => navigate('/home'), 1000)
-```
+| State | `hasRevealed` | Scroll Direction | Result |
+|-------|--------------|-----------------|--------|
+| Initial load on `/home` | `false` | n/a | Header at `y: -100` (hidden) |
+| User scrolls down | `false` | down | Header stays at `y: -100` |
+| User scrolls up | `true` (set now) | up | Header slides to `y: 0` |
+| Continues browsing | `true` | down | Header hides (existing behavior) |
+| Continues browsing | `true` | up | Header shows (existing behavior) |
+| Navigate to another page | `true` | n/a | Header visible normally |
+| Navigate back to `/home` | reset to `false` | n/a | Header hidden again |
 
-### Layer-by-Layer Exit Choreography
+### Layout padding (Layout.tsx)
 
-| Layer | Exit Animation | Duration | Delay | Easing |
-|-------|---------------|----------|-------|--------|
-| Enter button | opacity: 0, scale: 0.95 | 200ms | 0ms | ease-out |
-| Center glow | scale: 2.5, opacity: 0.9 | 1000ms | 0ms | ease-in-out |
-| Background image | scale: 1.3, opacity: 0.25, filter: blur(3px) | 900ms | 0ms | ease-in |
-| Brand text "LINE OF JUDAH" | y: -30, opacity: 0, filter: blur(8px) | 600ms | 100ms | ease-in |
-| Chrome underline | scaleX: 0, opacity: 0 | 400ms | 50ms | ease-in |
-| Verse block | opacity: 0, y: -15 | 500ms | 200ms | ease-in |
-| Grain layers | opacity: 0 | 400ms | 300ms | linear |
-| Scan lines | opacity: 0 | 300ms | 300ms | linear |
-| Smoke layer | opacity: 0 | 500ms | 200ms | ease-in |
-| Vignette | opacity intensifies to 0.95 | 800ms | 200ms | ease-in |
-| Glitch layer | opacity: 0 | 200ms | 0ms | linear |
+| Prop | `pt-[var(--header-height)]` applied? |
+|------|--------------------------------------|
+| `immersiveHero={false}` (default) | Yes -- normal pages |
+| `immersiveHero={true}` | No -- hero goes full-bleed, header overlays |
 
-### Accessibility
+### Header transparency on hero
 
-- Reduced motion users: `isExiting` triggers a simple 300ms opacity fade to 0, then navigates
-- The button remains keyboard-focusable and has proper `aria-label`
-- The exit sequence does not exceed 3Hz flash threshold (no rapid flickering)
-- Navigation still occurs for all users -- the animation is purely decorative enhancement
-
-### Performance
-
-- Zero new dependencies
-- All animations use `transform`, `opacity`, and `filter` (GPU-composited properties)
-- No layout shifts during exit (everything is absolutely positioned)
-- The `setTimeout` for navigation is the only JS overhead -- everything else is Framer Motion variants reacting to state
+When the header reveals over the full-bleed hero, the Navigation component already has `backgroundColor: 'rgba(255, 255, 255, 0.97)'` and `backdropFilter: 'blur(12px)'`. This will look clean overlaying the dark hero. No changes needed.
 
 ---
 
-## Summary
+## Summary of Changes
 
-| What | How |
-|------|-----|
-| **Trigger** | Click "Enter" button (replaces `<Link>`) |
-| **Duration** | 1.0s choreographed exit, then navigate |
-| **Effect** | Divine light bloom + perspective zoom = "stepping through a threshold" |
-| **Files changed** | `src/pages/LandingPage.tsx` (state + exit logic + animated props) |
-| **CSS changes** | None required -- all Framer Motion inline |
-| **New dependencies** | None |
-| **Reduced motion** | Simple 300ms fade |
-| **Keyboard** | Full support (button with aria-label) |
+| File | Change | Risk |
+|------|--------|------|
+| `src/components/header/Header.tsx` | Add `hasRevealed` state, start hidden on `/home`, reveal on first scroll-up | Low -- additive logic, existing behavior preserved |
+| `src/components/layout/Layout.tsx` | Add `immersiveHero` prop, conditionally remove `pt-[var(--header-height)]` | Low -- only affects pages that opt in |
+| `src/pages/Index.tsx` | Pass `immersiveHero` to Layout | Trivial |
+
+Three files. Zero new dependencies. The hero breathes. The header earns its entrance.
 
