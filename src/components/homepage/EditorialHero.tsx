@@ -59,7 +59,8 @@ const EditorialHero = () => {
             alt="Stay Holy Hoodie - Male Model"
             className="w-full h-full object-cover object-top hero-image-grayscale"
             loading="eager"
-            fetchPriority="high"
+            /* @ts-ignore — valid HTML attribute, not a React prop */
+            fetchpriority="high"
           />
           {/* Gradient overlays for text readability */}
           <div className="absolute inset-0 bg-gradient-to-r from-foreground via-foreground/70 to-transparent" />

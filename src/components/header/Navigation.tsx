@@ -31,26 +31,7 @@ const Navigation = () => {
   const { savedCount } = useSavedForLater();
   const prefersReducedMotion = useReducedMotion();
 
-  useEffect(() => {
-    if (items.length === 0) {
-      addItem({
-        id: 1,
-        name: "Stay Holy Hoodie",
-        price: 79.99,
-        priceFormatted: "$79.99",
-        image: "/products/stay-holy-hoodie/flat-front.png",
-        category: "Hoodies"
-      });
-      addItem({
-        id: 2,
-        name: "Heavenly Crewneck",
-        price: 49.99,
-        priceFormatted: "$49.99",
-        image: "/products/heavenly-crewneck/flat-lay.png",
-        category: "Tees"
-      });
-    }
-  }, []);
+  // Demo auto-add removed — cart starts empty for real users
 
   useEffect(() => {
     const imagesToPreload = [
