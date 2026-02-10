@@ -8,6 +8,7 @@ interface LayoutProps {
   showFooter?: boolean;
   showNewsletter?: boolean;
   showWelcomeBanner?: boolean;
+  immersiveHero?: boolean;
   className?: string;
 }
 
@@ -20,6 +21,7 @@ const Layout = ({
   showFooter = true, 
   showNewsletter = true,
   showWelcomeBanner = true,
+  immersiveHero = false,
   className = "" 
 }: LayoutProps) => {
   return (
@@ -35,7 +37,7 @@ const Layout = ({
       <Header />
       
       {/* Main content with header offset */}
-      <main id="main-content" className="pt-[var(--header-height)] scroll-mt-[var(--header-height)]">
+      <main id="main-content" className={immersiveHero ? "scroll-mt-[var(--header-height)]" : "pt-[var(--header-height)] scroll-mt-[var(--header-height)]"}>
         {/* Return customer greeting */}
         {showWelcomeBanner && <WelcomeBackBanner />}
         
