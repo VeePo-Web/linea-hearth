@@ -1,124 +1,107 @@
 
+# Cart Drawer Design Cleanup: Editorial Polish Pass
 
-# Forensic Audit + Search Fix: Stress Test Findings
+## Objective
 
-## Issues Discovered
+Make the cart drawer design "super clean" -- a surgical visual polish pass. Zero feature changes. Zero logic changes. Every hook, state machine, and interaction stays identical. Only the visual presentation gets refined to match the site's editorial aesthetic.
 
-### Critical: Search Does Not Work
+## What Changes
 
-The `SearchOverlay` component has a fully styled search input that accepts user typing, but **no search query is ever executed**. The `searchValue` state updates but never triggers any database query. The component only shows:
-- Static hardcoded "Popular Searches" (Stay Holy, Heavenly Crewneck, etc.)
-- Trending products fetched from the `products` table filtered by `is_featured = true`
+### 1. Remove Diamond (Gem) Icon from AffirmationStrip
 
-When a user types "hoodie" and hits enter, nothing happens. No results. No filtering. No feedback. This is a broken core feature.
+**File: `src/components/cart/AffirmationStrip.tsx`**
 
-### Secondary Issues Found
+The `Gem` icon from lucide-react is the diamond icon the user wants removed. The affirmation strip currently has a dark background bar with a gold diamond icon and italic text.
 
-1. **`fetchPriority` React warning** -- `EditorialHero.tsx` line 62 uses `fetchPriority="high"` on an `<img>` tag. React doesn't recognize this as a standard prop and throws a console warning. Should be `fetchpriority` (lowercase) or handled differently.
+**Changes:**
+- Remove the `Gem` import and icon element entirely
+- Keep the strip and its text -- just cleaner without the decorative icon
+- The text "Every piece is crafted with intention and purpose" remains, centered, with the same dark background and styling
 
-2. **Navigation auto-adds cart items on every mount** -- `Navigation.tsx` lines 34-53 auto-add "Stay Holy Hoodie" and "Heavenly Crewneck" to the cart every time the component mounts and items are empty. This is demo/dev code that will confuse real users.
+### 2. Tighten CartDrawer Header Spacing
 
-3. **Search overlay query missing `slug` in categories join** -- The SearchOverlay trending products query fetches `categories:category_id(name, slug)` but the `TrendingProduct` component maps `category_slug: product.categories?.slug`. However, the response shows the category object only has `name` since the query alias uses `categories` not the FK hint. This means `category_slug` is always undefined for trending products, breaking size memory category resolution.
+**File: `src/components/cart/CartDrawer.tsx`**
+
+Minor spacing refinements for a cleaner look:
+- Reduce header padding from `px-6 py-4` to `px-6 py-3` for a tighter, more editorial header
+- Ensure the "Your Bag (X)" title and close button feel more intentionally spaced
+
+### 3. Clean Up CartItem Presentation
+
+**File: `src/components/cart/CartItem.tsx`**
+
+- Tighten the "just added" highlight -- change from `animate-pulse bg-emerald-50/50` to a subtler left-border accent (`border-l-2 border-emerald-500`) instead of a pulsing background. More editorial, less "notification."
+- This is purely a CSS class change on line 91
+
+### 4. Refine TrustRow Spacing
+
+**File: `src/components/cart/TrustRow.tsx`**
+
+- Reduce vertical padding from `py-3` to `py-2.5` for a slightly tighter trust row
+- This keeps the footer compact and clean
+
+### 5. Clean Up FreeShippingBar
+
+**File: `src/components/cart/FreeShippingBar.tsx`**
+
+- Reduce outer padding from `px-6 py-4` to `px-6 py-3` for tighter fit
+- Reduce margin below progress bar from `mb-3` to `mb-2`
+- This makes the shipping bar feel more integrated rather than being a standalone section
+
+### 6. Clean Up BundleProgress Card
+
+**File: `src/components/cart/BundleProgress.tsx`**
+
+- Change `rounded-lg` to `rounded-none` on the outer container (line 84) to match the site's sharp-edge editorial standard (`rounded-none` is the site-wide radius standard per the UI styling memory)
+- Change inner `rounded-lg` on pulse effect (line 96) to `rounded-none` to match
+- Change inner `rounded-lg` on celebration flash (line 115) to `rounded-none`
+
+### 7. Clean Up MissingProductCard
+
+**File: `src/components/cart/MissingProductCard.tsx`**
+
+- Change outer container from `rounded-lg` to `rounded-none` (line 192) to match site standard
+- Change thumbnail from `rounded` to `rounded-none` (line 195)
+- Change size picker dropdown from `rounded-lg` to `rounded-none` and shadow from `shadow-lg` to `shadow-md` (line 311)
+
+### 8. Clean Up ThresholdUpsellCard
+
+**File: `src/components/cart/ThresholdUpsellCard.tsx`**
+
+- Change compact size picker background from `rounded` to `rounded-none` (line 74)
+
+### 9. Clean Up ContinueShopping MiniProductCard
+
+**File: `src/components/cart/ContinueShopping.tsx`**
+
+- Change the quick-add button from `rounded-full` to `rounded-none` (line 73) to match the site's editorial standard
 
 ---
 
-## Fix Plan
+## Summary of All Files Changed
 
-### Fix 1: Implement Actual Product Search (Primary)
-
-**File: `src/components/header/SearchOverlay.tsx`**
-
-Add a debounced search query that fires when `searchValue` has 2+ characters:
-
-1. Add a new `useQuery` that searches products by name using Supabase's `ilike` filter
-2. Debounce the search input by 300ms to avoid hammering the database
-3. Show search results when typing, show trending products when search is empty
-4. Include product variants in search results for quick-add functionality
-5. Add "No results found" state with suggestion to browse collections
-6. Add loading skeleton while search is in progress
-
-**Search query structure:**
-```
-supabase
-  .from('products')
-  .select(`id, name, slug, price, sale_price, is_on_sale,
-    categories:category_id(name, slug),
-    product_images(image_url, is_primary),
-    product_variants(size, color, stock_quantity)`)
-  .eq('status', 'active')
-  .ilike('name', `%${searchValue}%`)
-  .limit(6)
-```
-
-**UI behavior:**
-- Empty input: show Popular Searches + Trending Now (current behavior)
-- 1 character: still show default state (too broad)
-- 2+ characters: show search results with quick-add buttons
-- No results: "No products found for [query]" + "Browse all" link
-- Loading: skeleton placeholders
-
-### Fix 2: Fix `fetchPriority` Warning
-
-**File: `src/components/homepage/EditorialHero.tsx` (line 62)**
-
-Change `fetchPriority="high"` to use the correct lowercase attribute. Since this is an HTML attribute not a React prop, we can suppress the warning or use a different approach.
-
-### Fix 3: Remove Demo Cart Auto-Add
-
-**File: `src/components/header/Navigation.tsx` (lines 34-53)**
-
-Remove the `useEffect` that auto-adds products to cart. This is development scaffolding that should not be in production.
-
-### Fix 4: Fix Category Slug Resolution in Search
-
-Ensure the trending products query properly passes `category_slug` through the FK hint so size memory works correctly for quick-add in search results.
-
----
-
-## Technical Implementation Details
-
-### Debounce Hook for Search
-
-Create a simple `useDebouncedValue` inline (no new file needed -- just a `useEffect` + `setTimeout` pattern within SearchOverlay):
-
-```text
-const [debouncedSearch, setDebouncedSearch] = useState('')
-
-useEffect(() => {
-  const timer = setTimeout(() => setDebouncedSearch(searchValue), 300)
-  return () => clearTimeout(timer)
-}, [searchValue])
-```
-
-### Search Results Query
-
-Add alongside the existing trending products query:
-
-```text
-const { data: searchResults, isLoading: isSearching } = useQuery({
-  queryKey: ['product-search', debouncedSearch],
-  queryFn: async () => { /* ilike query */ },
-  enabled: isOpen && debouncedSearch.length >= 2,
-  staleTime: 30 * 1000,
-})
-```
-
-### Conditional Rendering Logic
-
-```text
-if searchValue.length >= 2:
-  if isSearching: show skeleton
-  if searchResults.length > 0: show results with SearchQuickAdd
-  if searchResults.length === 0: show "No results" + browse link
-else:
-  show Popular Searches + Trending Now (existing)
-```
-
-### Files Changed
-
-| File | Change | Risk |
+| File | Change | Type |
 |------|--------|------|
-| `src/components/header/SearchOverlay.tsx` | Add search query, debounce, results UI, no-results state | Medium -- new feature, well-contained |
-| `src/components/homepage/EditorialHero.tsx` | Fix `fetchPriority` casing | Trivial |
-| `src/components/header/Navigation.tsx` | Remove auto-add cart items effect | Low -- removes dev code |
+| `AffirmationStrip.tsx` | Remove Gem (diamond) icon | Icon removal |
+| `CartDrawer.tsx` | Tighten header padding | Spacing |
+| `CartItem.tsx` | Replace pulse highlight with subtle border accent | Visual refinement |
+| `FreeShippingBar.tsx` | Tighten padding and margins | Spacing |
+| `TrustRow.tsx` | Tighten vertical padding | Spacing |
+| `BundleProgress.tsx` | `rounded-lg` to `rounded-none` (3 instances) | Radius consistency |
+| `MissingProductCard.tsx` | `rounded-lg` to `rounded-none` (3 instances) | Radius consistency |
+| `ThresholdUpsellCard.tsx` | `rounded` to `rounded-none` (1 instance) | Radius consistency |
+| `ContinueShopping.tsx` | `rounded-full` to `rounded-none` (1 instance) | Radius consistency |
 
+## What Does NOT Change
+
+- All cart features (add, remove, save for later, bundles, upsells, email capture)
+- All animations and micro-interactions
+- All state management and hooks
+- All accessibility labels and keyboard support
+- All Framer Motion variants and transitions
+- Free shipping bar milestones and celebrations
+- Bundle discount engine and progress tracking
+- Saved for Later shelf functionality
+- Express checkout placement
+- Continue Shopping / Recently Viewed section
+- All haptic feedback patterns
