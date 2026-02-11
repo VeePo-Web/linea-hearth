@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { motion, useAnimation } from "framer-motion";
 import { Helmet } from "react-helmet-async";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 
 const editorialEase = [0.25, 0.46, 0.45, 0.94] as const;
 const exitEase = [0.4, 0, 0.2, 1] as const;
@@ -12,9 +12,47 @@ const LandingPage = () => {
   const navigate = useNavigate();
   const [isExiting, setIsExiting] = useState(false);
 
+  // --- PARALLAX REFS ---
+  const bgRef = useRef<HTMLDivElement>(null);
+  const glitchRef = useRef<HTMLDivElement>(null);
+  const smokeRef = useRef<HTMLDivElement>(null);
+  const glowRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const mouse = useRef({ x: 0, y: 0, cx: 0, cy: 0 });
+  const rafId = useRef<number>(0);
+
+  const handleMouseMove = useCallback((e: React.MouseEvent) => {
+    const mx = (e.clientX - window.innerWidth / 2) / (window.innerWidth / 2);
+    const my = (e.clientY - window.innerHeight / 2) / (window.innerHeight / 2);
+    mouse.current.x = mx;
+    mouse.current.y = my;
+  }, []);
+
+  useEffect(() => {
+    if (prefersReducedMotion || isExiting) return;
+    let active = true;
+    const tick = () => {
+      if (!active) return;
+      const m = mouse.current;
+      m.cx += (m.x - m.cx) * 0.08;
+      m.cy += (m.y - m.cy) * 0.08;
+      const x = m.cx;
+      const y = m.cy;
+      if (bgRef.current) bgRef.current.style.transform = `translate3d(${x * 10}px, ${y * 8}px, 0)`;
+      if (glitchRef.current) glitchRef.current.style.transform = `translate3d(${x * 12}px, ${y * 10}px, 0)`;
+      if (smokeRef.current) smokeRef.current.style.transform = `translate3d(${x * -18}px, ${y * -15}px, 0)`;
+      if (glowRef.current) glowRef.current.style.transform = `translate3d(${x * 5}px, ${y * 4}px, 0)`;
+      if (contentRef.current) contentRef.current.style.transform = `translate3d(${x * -2}px, ${y * -2}px, 0)`;
+      rafId.current = requestAnimationFrame(tick);
+    };
+    rafId.current = requestAnimationFrame(tick);
+    return () => { active = false; cancelAnimationFrame(rafId.current); };
+  }, [prefersReducedMotion, isExiting]);
+
   const handleEnter = useCallback(() => {
     if (isExiting) return;
     setIsExiting(true);
+    cancelAnimationFrame(rafId.current);
     const delay = prefersReducedMotion ? 300 : 1000;
     setTimeout(() => navigate('/home'), delay);
   }, [isExiting, navigate, prefersReducedMotion]);
@@ -119,10 +157,11 @@ const LandingPage = () => {
         />
       </Helmet>
 
-      <main className="fixed inset-0 h-[100dvh] overflow-hidden landing-abyss cursor-pointer" onClick={handleEnter}>
+      <main className="fixed inset-0 h-[100dvh] overflow-hidden landing-abyss cursor-pointer" onClick={handleEnter} onMouseMove={!prefersReducedMotion ? handleMouseMove : undefined}>
         {/* Layer 0: Ken Burns Background */}
         <motion.div
-          className="absolute inset-0 ken-burns-slow overflow-hidden"
+          ref={bgRef}
+          className="absolute inset-0 ken-burns-slow overflow-hidden will-change-transform"
           variants={v.background}
           initial="initial"
           animate={isExiting ? getExitAnimate('background') : "animate"}
@@ -138,7 +177,8 @@ const LandingPage = () => {
         {/* Layer 1: Glitch Split Layer */}
         {!prefersReducedMotion && (
           <motion.div
-            className="glitch-layer"
+            ref={glitchRef}
+            className="glitch-layer will-change-transform"
             animate={isExiting ? getExitAnimate('glitch') : undefined}
           >
             <img
@@ -153,7 +193,8 @@ const LandingPage = () => {
         {/* Layer 2: Smoke/Mist */}
         {!prefersReducedMotion && (
           <motion.div
-            className="smoke-layer"
+            ref={smokeRef}
+            className="smoke-layer will-change-transform"
             animate={isExiting ? getExitAnimate('smoke') : undefined}
           />
         )}
@@ -166,7 +207,8 @@ const LandingPage = () => {
 
         {/* Layer 4: Center Glow */}
         <motion.div
-          className="absolute inset-0 landing-glow"
+          ref={glowRef}
+          className="absolute inset-0 landing-glow will-change-transform"
           variants={v.glow}
           initial="initial"
           animate={isExiting ? getExitAnimate('glow') : "animate"}
@@ -185,7 +227,7 @@ const LandingPage = () => {
         />
 
         {/* Content Layer */}
-        <div className="relative z-10 h-full flex flex-col items-center justify-center">
+        <div ref={contentRef} className="relative z-10 h-full flex flex-col items-center justify-center will-change-transform">
           <div
             className="shrink-0"
             style={{ height: "max(env(safe-area-inset-top), 24px)" }}
