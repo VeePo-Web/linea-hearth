@@ -981,6 +981,28 @@
     }
   }
 
+  /* Mobile: always show full verse + glow (no hover available) */
+  @media (max-width: 767px) {
+    .verse-prepend {
+      opacity: 1;
+      visibility: visible;
+      transition-delay: 0s;
+    }
+
+    .verse-asv-attribution {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .glory-word,
+    .beauty-word {
+      color: hsla(45 55% 82% / 0.95);
+      text-shadow: 
+        0 0 12px hsla(45 60% 70% / 0.4),
+        0 0 30px hsla(45 50% 60% / 0.15);
+    }
+  }
+
   /* Reduced motion */
   @media (prefers-reduced-motion: reduce) {
     .verse-prepend,

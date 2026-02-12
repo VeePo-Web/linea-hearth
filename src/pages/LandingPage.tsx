@@ -292,7 +292,7 @@ const LandingPage = () => {
               animate={isExiting ? getExitAnimate('cta') : "animate"}
             >
               <button
-                onClick={(e) => e.stopPropagation()}
+onClick={(e) => { e.stopPropagation(); handleEnter(); }}
                 disabled={isExiting}
                 aria-label="Enter the Line of Judah store"
                 className="enter-portal-chrome block text-[10px] md:text-[11px] uppercase tracking-[0.4em] text-white/55 hover:text-white/85 focus-visible:outline-none active:scale-[0.97] transition-transform duration-100 cursor-pointer disabled:cursor-default"
