@@ -40,6 +40,7 @@ interface Category {
   description: string | null;
   display_order: number;
   created_at: string;
+  products?: { id: string }[];
 }
 
 const generateSlug = (name: string) =>
@@ -64,7 +65,7 @@ const AdminCategories = () => {
     try {
       const { data, error } = await supabase
         .from('categories')
-        .select('*')
+        .select('*, products(id)')
         .order('display_order', { ascending: true });
       if (error) throw error;
       setCategories(data || []);
@@ -168,6 +169,7 @@ const AdminCategories = () => {
               <TableRow>
                 <TableHead className="text-xs uppercase tracking-wider">Name</TableHead>
                 <TableHead className="text-xs uppercase tracking-wider">Slug</TableHead>
+                <TableHead className="text-xs uppercase tracking-wider text-center">Products</TableHead>
                 <TableHead className="text-xs uppercase tracking-wider">Description</TableHead>
                 <TableHead className="text-xs uppercase tracking-wider text-right">Actions</TableHead>
               </TableRow>
@@ -175,13 +177,13 @@ const AdminCategories = () => {
             <TableBody>
               {loading ? (
                 <TableRow>
-                  <TableCell colSpan={4} className="text-center py-8">
+                  <TableCell colSpan={5} className="text-center py-8">
                     <Loader2 className="h-6 w-6 animate-spin mx-auto text-muted-foreground" />
                   </TableCell>
                 </TableRow>
               ) : categories.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
+                  <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
                     No categories yet. Add your first category!
                   </TableCell>
                 </TableRow>
@@ -190,6 +192,7 @@ const AdminCategories = () => {
                   <TableRow key={category.id}>
                     <TableCell className="font-medium">{category.name}</TableCell>
                     <TableCell className="text-muted-foreground">{category.slug}</TableCell>
+                    <TableCell className="text-center text-muted-foreground">{category.products?.length || 0}</TableCell>
                     <TableCell className="text-muted-foreground max-w-xs truncate">{category.description || '—'}</TableCell>
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-2">

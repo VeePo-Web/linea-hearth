@@ -119,6 +119,7 @@ const AdminOrderDetail = () => {
   if (!order) return null;
 
   const shipping = typeof order.shipping_address === 'object' ? order.shipping_address : {};
+  const addr = (obj: any, ...keys: string[]) => keys.map(k => obj?.[k]).find(v => v);
 
   return (
     <AdminLayout>
@@ -251,10 +252,10 @@ const AdminOrderDetail = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="text-sm text-muted-foreground space-y-1">
-                {shipping.line1 && <p>{shipping.line1}</p>}
-                {shipping.line2 && <p>{shipping.line2}</p>}
-                <p>{[shipping.city, shipping.state, shipping.postal_code].filter(Boolean).join(', ')}</p>
-                {shipping.country && <p>{shipping.country}</p>}
+                {addr(shipping, 'line1', 'address_line_1') && <p>{addr(shipping, 'line1', 'address_line_1')}</p>}
+                {addr(shipping, 'line2', 'address_line_2') && <p>{addr(shipping, 'line2', 'address_line_2')}</p>}
+                <p>{[addr(shipping, 'city'), addr(shipping, 'state', 'province', 'region'), addr(shipping, 'postal_code', 'zip', 'zipcode')].filter(Boolean).join(', ')}</p>
+                {addr(shipping, 'country') && <p>{addr(shipping, 'country')}</p>}
               </CardContent>
             </Card>
 
