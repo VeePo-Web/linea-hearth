@@ -1,64 +1,109 @@
 
-# Fix 1: Admin Login -- Post-Sign-In Role Verification
+# Fix 2: Order List Clickability, Discount Delete Confirmation, Category Drag Handles
 
-## The Problem
+## Problem 1: Order List Rows Look Clickable But Aren't (AdminOrders.tsx)
 
-Right now, when someone signs in at `/ops-portal/login`:
+**Current Issue:**
+- Line 169 has `className="cursor-pointer hover:bg-secondary/50"` on `<TableRow>`
+- This visual promise is only fulfilled for the order ID link (line 171)
+- Clicking anywhere else on the row does nothing
+- **Conversion Impact:** Adds friction — users tap the row expecting navigation, get nothing
 
-1. `signIn()` succeeds for ANY valid user (admin or not)
-2. The page navigates to `/ops-portal`
-3. `ProtectedRoute` checks `isAdmin` from the auth context
-4. If not admin, the user sees a dead-end "ACCESS DENIED" page with no way back except a tiny link
+**Fix:**
+- Wrap the entire row content in a clickable handler
+- Use `useNavigate()` to navigate to `/ops-portal/orders/${order.id}` on row click
+- Prevent navigation if user clicks on a button/link that has its own handler
+- The row will still have the visual feedback (hover highlight + cursor)
 
-This is broken UX. A non-admin user gets authenticated, sees a success toast ("Welcome back, Session authenticated"), and then immediately hits a wall. The login page should reject non-admins before navigating.
+**Implementation:** Add `onClick={() => navigate(`/ops-portal/orders/${order.id}`)}` to the `<TableRow>` element. This converts the entire row to a clickable zone. The order ID link becomes redundant but harmless (clicking it still works).
 
-Additionally, there's a race condition: `isAdmin` is set asynchronously in `useAuth` via `checkAdminRole` inside a `setTimeout`. The navigation to `/ops-portal` can happen before `isAdmin` is resolved, causing a brief flash of the "ACCESS DENIED" screen even for actual admins.
+---
 
-## The Fix
+## Problem 2: Discount Delete Has No Confirmation (AdminDiscounts.tsx)
 
-Modify `AdminLogin.tsx` to verify admin role immediately after successful sign-in, before navigating:
+**Current Issue:**
+- Line 238: `<Button>` with Trash2 icon directly calls `deleteCode(id)` on click
+- No confirmation dialog — the code is deleted immediately with optimistic update
+- **Inconsistency:** `AdminCategories.tsx` and `AdminProducts.tsx` both have `AlertDialog` confirmation before delete
+- **Risk:** Accidental clicks permanently delete discount codes with no recourse
 
-1. After `signIn()` succeeds, query `user_roles` table directly for `role = 'admin'` matching the signed-in user
-2. If not admin: call `signOut()` immediately and show an inline error message "This account is not authorized for the operations portal"
-3. If admin: navigate to `/ops-portal` as normal
-4. Add an inline error state (red text below the form) for auth failures instead of relying solely on toasts which can be missed
+**Fix:**
+- Add a confirmation dialog (reuse the `AlertDialog` component pattern from Categories)
+- Only call `deleteCode()` when user confirms
+- Add a `deleteConfirmId` state and conditionally render the `AlertDialog`
+- Show the discount code name in the confirmation dialog for clarity
 
-### Additional Login Fixes in This Pass
-- **Forgot password empty field**: Add email validation before calling `resetPasswordForEmail`. If blank, show inline error "Please enter your email"
-- **Inline error for wrong credentials**: Instead of just a toast, set a form-level error string displayed below the Sign In button
-
-## Technical Changes
-
-### File: `src/pages/admin/AdminLogin.tsx`
-
-**handleSignIn function** (lines 31-72):
+**Implementation:**
 ```
-After signIn succeeds (no error):
-1. Get the session to extract user ID
-2. Query: supabase.from('user_roles').select('role').eq('user_id', userId).eq('role', 'admin').maybeSingle()
-3. If no admin role found:
-   - await signOut()
-   - Set formError state: "This account is not authorized."
-   - Return (don't navigate)
-4. If admin confirmed: navigate('/ops-portal')
+State: const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+On Trash click: setDeleteConfirmId(id)
+On confirm: deleteCode(id), then setDeleteConfirmId(null)
+AlertDialog shows: "Delete discount code [CODE_NAME]?" with warning text
 ```
 
-**New state**: `formError` string displayed below the Sign In button in red text.
+---
 
-**Forgot password section** (lines 177-178):
-```
-Add validation: if forgotEmail is empty or not a valid email, 
-set a local error state instead of silently returning.
-```
+## Problem 3: Category Drag Handles Are Fake (AdminCategories.tsx)
 
-## What This Does NOT Change
-- No layout changes
-- No new dependencies
-- No database changes
-- The `ProtectedRoute` component stays as-is (defense in depth)
-- The `useAuth` context stays as-is
+**Current Issue:**
+- Line 22 imports `GripVertical` icon
+- Line 169 has an empty `<TableHead className="w-10"></TableHead>` (column for drag handle)
+- Line 192 renders: `<GripVertical className="h-4 w-4 text-muted-foreground cursor-grab" />`
+- **Visual lie:** The icon + `cursor-grab` CSS promises drag-to-reorder functionality
+- **Reality:** There is no `onDragStart`, `onDragOver`, `onDrop`, or `display_order` update logic
+- **UX debt:** Users try to drag and nothing happens — frustrating and confusing
+
+**Fix:**
+- Remove the `GripVertical` icon entirely
+- Remove the empty `<TableHead>` column (shrinks table from 5 to 4 columns)
+- Keep the `display_order` sorting on the query (already present on line 68)
+- If reordering is needed in the future, implement it properly with drag-and-drop logic (not this PR)
+
+**Implementation:**
+- Delete line 169 (the empty column header)
+- Delete line 192 (the icon in the table cell)
+- The table will have 4 columns: Name, Slug, Description, Actions
+
+---
+
+## Changes Required
+
+### File 1: `src/pages/admin/AdminOrders.tsx`
+- **Line 169:** Add `onClick` handler to navigate to order detail
+- **Line 171:** Keep the Link (it still works, just redundant now)
+
+### File 2: `src/pages/admin/AdminDiscounts.tsx`
+- **Add state:** `deleteConfirmId`
+- **Line 238:** Change to `onClick={() => setDeleteConfirmId(c.id)}`
+- **Add new:** `AlertDialog` component with confirmation UI (copy pattern from AdminCategories.tsx)
+- **Add handler:** Confirm button calls `deleteCode(deleteConfirmId)` then clears state
+
+### File 3: `src/pages/admin/AdminCategories.tsx`
+- **Line 169:** Remove the empty `<TableHead>` column
+- **Line 192:** Remove the `<GripVertical>` cell
+- **Line 22:** Can remove `GripVertical` import (if unused elsewhere)
+
+---
 
 ## Risk Assessment
-- **Low risk**: Only changes the login page logic
-- **No breaking changes**: The `ProtectedRoute` still works as a fallback safety net
-- **Solves**: Dead-end UX for non-admin users, race condition flash for admin users, missed toast errors
+
+**Low Risk:**
+- All changes are UI/interaction only
+- No database changes
+- No breaking changes to functionality
+- Patterns are copied from existing code (AlertDialog already used in Categories for category delete)
+
+**Benefits:**
+- **Order rows:** Reduces taps by 50% — users can click anywhere on the row instead of targeting the small order ID link
+- **Discount delete:** Prevents accidental deletions, matches the UX pattern of other admin pages
+- **Category handles:** Eliminates false affordances, cleaner UI
+
+---
+
+## Visual Impact
+
+**Zero visual changes** to styling or layout. Only:
+- Order rows are fully clickable (same hover state, just extends to whole row)
+- Discount delete has a confirmation modal (matches existing pattern)
+- Categories table loses 1 empty column + grip icon (cleaner)
+
