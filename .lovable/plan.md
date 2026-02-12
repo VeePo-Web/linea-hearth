@@ -1,124 +1,64 @@
 
-# Admin Dashboard and Portal -- Functional Improvements
+# Fix 1: Admin Login -- Post-Sign-In Role Verification
 
-## Current State
+## The Problem
 
-The admin portal has 5 pages: Dashboard, Orders, Products, Product Form, and Categories. All are functional but missing several practical features an operator would need day-to-day.
+Right now, when someone signs in at `/ops-portal/login`:
 
-## What's Missing (Prioritized by Impact)
+1. `signIn()` succeeds for ANY valid user (admin or not)
+2. The page navigates to `/ops-portal`
+3. `ProtectedRoute` checks `isAdmin` from the auth context
+4. If not admin, the user sees a dead-end "ACCESS DENIED" page with no way back except a tiny link
 
-### 1. Revenue Stats on Dashboard
-**Problem:** The dashboard shows product/category counts but zero financial data. An admin's first question is always "how much money did we make?"
-**Fix:** Add a revenue card row: Today's Revenue, This Week, This Month, Total Revenue. Calculated from the `orders` table where `payment_status = 'paid'`.
+This is broken UX. A non-admin user gets authenticated, sees a success toast ("Welcome back, Session authenticated"), and then immediately hits a wall. The login page should reject non-admins before navigating.
 
-### 2. Unfulfilled Orders Counter
-**Problem:** No at-a-glance indicator of orders needing attention.
-**Fix:** Add an "Needs Fulfillment" stat card showing count of orders where `payment_status = 'paid'` AND `fulfillment_status = 'unfulfilled'`. Make it clickable -- links to orders page pre-filtered.
+Additionally, there's a race condition: `isAdmin` is set asynchronously in `useAuth` via `checkAdminRole` inside a `setTimeout`. The navigation to `/ops-portal` can happen before `isAdmin` is resolved, causing a brief flash of the "ACCESS DENIED" screen even for actual admins.
 
-### 3. Inline Stock Editing on Variants
-**Problem:** To update stock on a variant, the admin must navigate to Products, find the product, click Edit, go to the Pricing tab, and then... there's no inline edit. Stock quantity is read-only in the variant table.
-**Fix:** Make the stock quantity field editable inline in the VariantManager. On blur or Enter, save to database.
+## The Fix
 
-### 4. Order Fulfillment Status Badge on Dashboard Recent Orders
-**Problem:** Recent orders on dashboard show payment status but not fulfillment status, which is the actionable info.
-**Fix:** Show fulfillment badge alongside payment badge.
+Modify `AdminLogin.tsx` to verify admin role immediately after successful sign-in, before navigating:
 
-### 5. Refresh / Last Updated Indicator
-**Problem:** Dashboard data is fetched once on mount with no way to refresh without a full page reload.
-**Fix:** Add a "Refresh" button and a "Last updated X ago" timestamp.
+1. After `signIn()` succeeds, query `user_roles` table directly for `role = 'admin'` matching the signed-in user
+2. If not admin: call `signOut()` immediately and show an inline error message "This account is not authorized for the operations portal"
+3. If admin: navigate to `/ops-portal` as normal
+4. Add an inline error state (red text below the form) for auth failures instead of relying solely on toasts which can be missed
 
-### 6. Newsletter Subscriber Count on Dashboard
-**Problem:** No visibility into marketing metrics.
-**Fix:** Add subscriber count as a stat card or in a small "Marketing" section.
+### Additional Login Fixes in This Pass
+- **Forgot password empty field**: Add email validation before calling `resetPasswordForEmail`. If blank, show inline error "Please enter your email"
+- **Inline error for wrong credentials**: Instead of just a toast, set a form-level error string displayed below the Sign In button
 
-### 7. Ambassador Application Count
-**Problem:** No way to see pending ambassador applications from the dashboard (or any admin page).
-**Fix:** Show pending application count on dashboard. Link to a future management page or at minimum show count.
+## Technical Changes
 
-### 8. Empty State Guidance on Dashboard
-**Problem:** When the store is new (like now with 2 products, 0 orders), the dashboard is mostly empty cards with "No orders yet" and dashes. Doesn't guide the admin on what to do next.
-**Fix:** Show a "Getting Started" checklist when store has < 5 products and 0 orders: "Add your first product", "Set up categories", "Configure Stripe", etc.
+### File: `src/pages/admin/AdminLogin.tsx`
 
-### 9. Admin Login -- No "Forgot Password" Link
-**Problem:** If the admin forgets their password, there's no recovery path on the login page.
-**Fix:** Add a "Forgot password?" link that triggers `supabase.auth.resetPasswordForEmail`.
-
-### 10. Discount Code Management (Missing Page)
-**Problem:** Discount codes exist in the database but there's no admin UI to create/edit/view them. Currently requires direct database access.
-**Fix:** Add a new admin page at `/ops-portal/discounts` for CRUD on `discount_codes` table.
-
----
-
-## Implementation Plan
-
-### Phase 1: Dashboard Enhancements (Low Risk, High Impact)
-
-**File: `src/pages/admin/AdminDashboard.tsx`**
-- Add revenue calculation queries (sum of `total_cents` from paid orders, grouped by day/week/month)
-- Add unfulfilled order count query
-- Add newsletter subscriber count query  
-- Add ambassador application (pending) count query
-- Add fulfillment badge to recent orders list
-- Add refresh button with "last updated" timestamp
-- Add getting-started checklist (conditional on low product/order counts)
-
-**File: `src/components/admin/AdminLayout.tsx`**
-- Add "Discounts" nav item to sidebar (icon: `Percent`)
-
-### Phase 2: Variant Inline Editing (Medium Risk)
-
-**File: `src/components/admin/VariantManager.tsx`**
-- Make stock_quantity cells editable (click to edit, blur/Enter to save)
-- Add optimistic update with rollback on error
-- Debounced save to prevent rapid-fire API calls
-
-### Phase 3: Admin Login Forgot Password
-
-**File: `src/pages/admin/AdminLogin.tsx`**
-- Add "Forgot password?" button below the form
-- On click: prompt for email, call `supabase.auth.resetPasswordForEmail`
-- Show success toast with "Check your email"
-
-### Phase 4: Discount Code Management Page
-
-**New file: `src/pages/admin/AdminDiscounts.tsx`**
-- Table listing all discount codes with columns: Code, Name, Type, Value, Usage, Status, Expires
-- Create/edit dialog with fields matching the `discount_codes` table schema
-- Toggle active/inactive
-- Show redemption count from `discount_code_redemptions`
-
-**File: `src/App.tsx`**
-- Add route: `/ops-portal/discounts` with ProtectedRoute wrapper
-
----
-
-## Technical Details
-
-### Revenue Query Approach
-```sql
--- Total revenue from paid orders
-SELECT COALESCE(SUM(total_cents), 0) as total
-FROM orders
-WHERE payment_status = 'paid'
+**handleSignIn function** (lines 31-72):
 ```
-Filtered by date ranges for today/week/month using `created_at >= date`.
+After signIn succeeds (no error):
+1. Get the session to extract user ID
+2. Query: supabase.from('user_roles').select('role').eq('user_id', userId).eq('role', 'admin').maybeSingle()
+3. If no admin role found:
+   - await signOut()
+   - Set formError state: "This account is not authorized."
+   - Return (don't navigate)
+4. If admin confirmed: navigate('/ops-portal')
+```
 
-### Getting Started Checklist Logic
-Show when `totalProducts < 5` AND `totalOrders === 0`:
-- "Add your first product" (link to /ops-portal/products/new)
-- "Create product categories" (link to /ops-portal/categories)  
-- "Upload product images" (contextual tip)
+**New state**: `formError` string displayed below the Sign In button in red text.
 
-Dismiss permanently via localStorage key.
+**Forgot password section** (lines 177-178):
+```
+Add validation: if forgotEmail is empty or not a valid email, 
+set a local error state instead of silently returning.
+```
 
-### Inline Stock Edit
-- Replace static text with an Input on click
-- `onBlur` or `onKeyDown Enter` triggers `supabase.from('product_variants').update({ stock_quantity }).eq('id', variantId)`
-- Show toast on success/error
-- Optimistic: update local state immediately, rollback on error
+## What This Does NOT Change
+- No layout changes
+- No new dependencies
+- No database changes
+- The `ProtectedRoute` component stays as-is (defense in depth)
+- The `useAuth` context stays as-is
 
-### No Database Changes Required
-All features use existing tables. No migrations needed.
-
-### No New Dependencies
-All implementations use existing UI components (Card, Badge, Input, Button, Dialog, Table) and existing libraries (date-fns, lucide-react, supabase client).
+## Risk Assessment
+- **Low risk**: Only changes the login page logic
+- **No breaking changes**: The `ProtectedRoute` still works as a fallback safety net
+- **Solves**: Dead-end UX for non-admin users, race condition flash for admin users, missed toast errors
