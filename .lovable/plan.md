@@ -1,66 +1,110 @@
 
 
-# Make parker@veepo.ca a Permanent Admin
+# Tighten Permissive RLS Policies
 
-## What Needs to Happen
+## The Problem
 
-Your account (`parker@veepo.ca`) exists in the authentication system but has no entry in the `user_roles` table. We need to:
+13 RLS policies across 8 tables use `USING (true)` or `WITH CHECK (true)` with role `{public}` (meaning everyone -- anon and authenticated). Several of these are labeled "Service can..." but since the Supabase service role key **bypasses RLS entirely**, these policies are redundant for edge functions and **dangerously open** to any browser user.
 
-1. **Insert your admin role** into `user_roles` with your user ID (`dee51bd2-8ad5-45f4-ac5f-b369bd2fc23b`)
-2. **Create a database trigger** that automatically re-assigns your admin role if it is ever accidentally deleted -- ensuring you are always an admin
+## Risk Assessment
 
-## Technical Steps
+| Table | Policy | Risk Level | Issue |
+|-------|--------|-----------|-------|
+| `orders` | Service can insert orders (INSERT true) | **CRITICAL** | Any user can create fake orders |
+| `orders` | Service can update orders (UPDATE true) | **CRITICAL** | Any user can change any order status/totals |
+| `order_items` | Service can manage order items (ALL true) | **CRITICAL** | Any user can read/write/delete all order line items |
+| `discount_code_redemptions` | Service can manage redemptions (ALL true) | **HIGH** | Any user can fabricate redemption records |
+| `abandoned_carts` | Service role can update carts (UPDATE true) | **HIGH** | Any user can modify any abandoned cart |
+| `abandoned_carts` | Anyone can select by recovery token (SELECT true) | **MEDIUM** | Any user can read ALL abandoned carts (emails, items, totals) |
+| `saved_outfits` | Users can view their outfits (SELECT true) | **LOW** | Any user can see all saved outfits |
 
-### Step 1: Insert Admin Role (Database)
+## Policies That Are Fine (Intentionally Public)
 
-Run a SQL migration to insert your role:
+These are correctly permissive and should NOT change:
+
+- `categories` SELECT true -- public catalog data
+- `newsletter_subscribers` INSERT true -- public signup
+- `ambassador_applications` INSERT true -- public form
+- `community_stories` INSERT true -- public submission
+- `abandoned_carts` INSERT true -- guest cart sync (no auth required)
+- `saved_outfits` INSERT true -- guest outfit saving
+
+## The Fix
+
+**Core principle:** Drop every "Service can..." policy. The service role key (used by edge functions) bypasses RLS automatically -- these policies serve no purpose except to open holes.
+
+### Migration SQL
+
+**Step 1 -- Drop dangerous policies:**
 
 ```sql
-INSERT INTO public.user_roles (user_id, role)
-VALUES ('dee51bd2-8ad5-45f4-ac5f-b369bd2fc23b', 'admin')
-ON CONFLICT (user_id, role) DO NOTHING;
+-- orders
+DROP POLICY "Service can insert orders" ON public.orders;
+DROP POLICY "Service can update orders" ON public.orders;
+
+-- order_items
+DROP POLICY "Service can manage order items" ON public.order_items;
+
+-- discount_code_redemptions
+DROP POLICY "Service can manage redemptions" ON public.discount_code_redemptions;
+
+-- abandoned_carts
+DROP POLICY "Service role can update carts" ON public.abandoned_carts;
+DROP POLICY "Anyone can select by recovery token" ON public.abandoned_carts;
 ```
 
-### Step 2: Create a Safety-Net Trigger (Database)
-
-A trigger function that fires on DELETE from `user_roles`. If someone removes your admin row, it immediately re-inserts it. This guarantees permanent admin access.
+**Step 2 -- Replace with scoped policies:**
 
 ```sql
-CREATE OR REPLACE FUNCTION public.protect_owner_admin()
-RETURNS trigger
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = public
-AS $$
-BEGIN
-  IF OLD.user_id = 'dee51bd2-8ad5-45f4-ac5f-b369bd2fc23b'
-     AND OLD.role = 'admin' THEN
-    INSERT INTO public.user_roles (user_id, role)
-    VALUES (OLD.user_id, OLD.role)
-    ON CONFLICT (user_id, role) DO NOTHING;
-  END IF;
-  RETURN OLD;
-END;
-$$;
+-- abandoned_carts: SELECT only your own cart by email match
+-- (edge functions use service_role and bypass this)
+CREATE POLICY "Admins can view all carts"
+ON public.abandoned_carts FOR SELECT
+USING (has_role(auth.uid(), 'admin'));
 
-CREATE TRIGGER protect_owner_admin_trigger
-AFTER DELETE ON public.user_roles
-FOR EACH ROW EXECUTE FUNCTION public.protect_owner_admin();
+-- saved_outfits: SELECT scoped to owner or shared
+DROP POLICY "Users can view their outfits" ON public.saved_outfits;
+
+CREATE POLICY "Users can view own or shared outfits"
+ON public.saved_outfits FOR SELECT
+USING (
+  user_id = auth.uid()
+  OR user_id IS NULL
+  OR share_id IS NOT NULL
+);
+
+-- discount_code_redemptions: admin-only management
+CREATE POLICY "Admins can manage redemptions"
+ON public.discount_code_redemptions FOR ALL
+USING (has_role(auth.uid(), 'admin'));
 ```
 
-### Step 3: No Code Changes
+**Step 3 -- Verify edge functions still work:**
 
-The existing `useAuth` hook already checks `user_roles` via `checkAdminRole()`. Once the database row exists, logging in with `parker@veepo.ca` at `/ops-portal/login` will automatically grant admin access. No frontend changes needed.
+All edge functions (`create-checkout-session`, `stripe-webhook`, `process-abandoned-carts`, `recover-cart`, `sync-abandoned-cart`) use `SUPABASE_SERVICE_ROLE_KEY` to create their Supabase client. The service role key bypasses RLS entirely, so removing these policies has zero impact on edge function behavior.
 
-## Important Note on "Always Logged In"
+### What Changes
 
-Keeping you permanently logged in is not recommended from a security standpoint -- if someone accesses your browser, they'd have full admin access. Instead, the 30-minute session timeout stays active, but logging back in is fast (email + password at `/ops-portal/login`). Your admin role is permanent and cannot be revoked.
+| Table | Before | After |
+|-------|--------|-------|
+| `orders` | Anyone can INSERT/UPDATE | Only admins + service role (edge functions) |
+| `order_items` | Anyone can do anything | Only admins + service role; users can SELECT own |
+| `discount_code_redemptions` | Anyone can do anything | Only admins + service role |
+| `abandoned_carts` | Anyone can read all / update all | Admins can read; service role handles updates |
+| `saved_outfits` | Anyone can read all | Owner, anonymous (null user_id), or shared only |
 
-## Summary
+### No Code Changes Required
 
-| Action | Method |
-|--------|--------|
-| Grant admin role | SQL insert into `user_roles` |
-| Protect against accidental removal | Database trigger on DELETE |
-| Frontend changes | None required |
+All frontend code accesses these tables through either:
+- Edge functions (service role -- unaffected by RLS)
+- Authenticated queries that already scope to `user_id = auth.uid()` via existing safe policies
+
+### Verification Steps
+
+After migration, verify:
+1. Checkout flow still works (edge function creates order via service role)
+2. Stripe webhook still updates orders (service role)
+3. Cart recovery still works (edge function reads/updates via service role)
+4. Admin orders page still loads (has_role policy)
+5. User can still see their own orders (existing "Users can view own orders" policy unchanged)
 
