@@ -40,7 +40,7 @@ interface LowStockVariant {
   size: string | null;
   color: string | null;
   stock_quantity: number;
-  product: { name: string } | null;
+  product: { name: string; id: string } | null;
 }
 
 const AdminDashboard = () => {
@@ -76,7 +76,7 @@ const AdminDashboard = () => {
         supabase.from('categories').select('id', { count: 'exact', head: true }),
         supabase.from('products').select('id', { count: 'exact', head: true }).eq('is_featured', true),
         supabase.from('orders').select('id, customer_email, total_cents, payment_status, fulfillment_status, created_at').order('created_at', { ascending: false }).limit(5),
-        supabase.from('product_variants').select('id, size, color, stock_quantity, product:products(name)').lt('stock_quantity', 5).order('stock_quantity', { ascending: true }).limit(10),
+        supabase.from('product_variants').select('id, size, color, stock_quantity, product:products(name, id)').lt('stock_quantity', 5).order('stock_quantity', { ascending: true }).limit(10),
         // Revenue queries
         supabase.from('orders').select('total_cents').eq('payment_status', 'paid'),
         supabase.from('orders').select('total_cents').eq('payment_status', 'paid').gte('created_at', todayStart),
@@ -328,7 +328,11 @@ const AdminDashboard = () => {
               ) : (
                 <div className="space-y-2">
                   {lowStock.map((v) => (
-                    <div key={v.id} className="flex items-center justify-between py-1.5 text-sm">
+                    <Link
+                      key={v.id}
+                      to={v.product?.id ? `/ops-portal/products/${v.product.id}/edit` : '#'}
+                      className="flex items-center justify-between py-1.5 text-sm hover:bg-secondary/30 rounded px-2 -mx-2 transition-colors"
+                    >
                       <div>
                         <span className="font-medium">{v.product?.name || 'Unknown'}</span>
                         <span className="text-muted-foreground ml-2">
@@ -338,7 +342,7 @@ const AdminDashboard = () => {
                       <Badge variant={v.stock_quantity === 0 ? 'destructive' : 'secondary'} className="text-xs">
                         {v.stock_quantity} left
                       </Badge>
-                    </div>
+                    </Link>
                   ))}
                 </div>
               )}

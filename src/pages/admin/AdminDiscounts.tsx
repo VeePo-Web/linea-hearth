@@ -91,14 +91,15 @@ const AdminDiscounts = () => {
 
   const openEdit = (code: DiscountCode) => {
     setEditingId(code.id);
+    const isFixed = code.discount_type === 'fixed';
     setForm({
       code: code.code,
       name: code.name,
       description: code.description || '',
       discount_type: code.discount_type,
-      discount_value: code.discount_value,
-      minimum_order_cents: code.minimum_order_cents || 0,
-      maximum_discount_cents: code.maximum_discount_cents || 0,
+      discount_value: isFixed ? code.discount_value / 100 : code.discount_value,
+      minimum_order_cents: code.minimum_order_cents ? code.minimum_order_cents / 100 : 0,
+      maximum_discount_cents: code.maximum_discount_cents ? code.maximum_discount_cents / 100 : 0,
       usage_limit: code.usage_limit || 0,
       per_user_limit: code.per_user_limit || 1,
       starts_at: code.starts_at ? code.starts_at.slice(0, 16) : '',
@@ -114,14 +115,15 @@ const AdminDiscounts = () => {
       return;
     }
     setSaving(true);
+    const isFixed = form.discount_type === 'fixed';
     const payload = {
       code: form.code.toUpperCase().trim(),
       name: form.name,
       description: form.description || null,
       discount_type: form.discount_type,
-      discount_value: form.discount_value,
-      minimum_order_cents: form.minimum_order_cents || null,
-      maximum_discount_cents: form.maximum_discount_cents || null,
+      discount_value: isFixed ? Math.round(form.discount_value * 100) : form.discount_value,
+      minimum_order_cents: form.minimum_order_cents ? Math.round(form.minimum_order_cents * 100) : null,
+      maximum_discount_cents: form.maximum_discount_cents ? Math.round(form.maximum_discount_cents * 100) : null,
       usage_limit: form.usage_limit || null,
       per_user_limit: form.per_user_limit || null,
       starts_at: form.starts_at ? new Date(form.starts_at).toISOString() : null,
@@ -291,19 +293,19 @@ const AdminDiscounts = () => {
               </div>
               <div className="space-y-2">
                 <Label className="text-xs uppercase tracking-wider">
-                  Value {form.discount_type === 'percentage' ? '(%)' : '(cents)'}
+                  Value {form.discount_type === 'percentage' ? '(%)' : '($)'}
                 </Label>
                 <Input type="number" value={form.discount_value} onChange={(e) => setForm({ ...form, discount_value: parseFloat(e.target.value) || 0 })} />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label className="text-xs uppercase tracking-wider">Min Order (cents)</Label>
-                <Input type="number" value={form.minimum_order_cents} onChange={(e) => setForm({ ...form, minimum_order_cents: parseInt(e.target.value) || 0 })} />
+                <Label className="text-xs uppercase tracking-wider">Min Order ($)</Label>
+                <Input type="number" step="0.01" value={form.minimum_order_cents} onChange={(e) => setForm({ ...form, minimum_order_cents: parseFloat(e.target.value) || 0 })} />
               </div>
               <div className="space-y-2">
-                <Label className="text-xs uppercase tracking-wider">Max Discount (cents)</Label>
-                <Input type="number" value={form.maximum_discount_cents} onChange={(e) => setForm({ ...form, maximum_discount_cents: parseInt(e.target.value) || 0 })} />
+                <Label className="text-xs uppercase tracking-wider">Max Discount ($)</Label>
+                <Input type="number" step="0.01" value={form.maximum_discount_cents} onChange={(e) => setForm({ ...form, maximum_discount_cents: parseFloat(e.target.value) || 0 })} />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
