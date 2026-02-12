@@ -45,6 +45,7 @@ import AdminProductForm from "./pages/admin/AdminProductForm";
 import AdminOrders from "./pages/admin/AdminOrders";
 import AdminOrderDetail from "./pages/admin/AdminOrderDetail";
 import AdminCategories from "./pages/admin/AdminCategories";
+import AdminDiscounts from "./pages/admin/AdminDiscounts";
 import ProtectedRoute from "./components/admin/ProtectedRoute";
 import AccountLayout from "./pages/account/AccountLayout";
 import AccountDashboard from "./pages/account/AccountDashboard";
@@ -104,6 +105,7 @@ const AnimatedRoutes = () => {
         <Route path="/ops-portal/products/new" element={<ProtectedRoute requireAdmin><PageTransition><AdminProductForm /></PageTransition></ProtectedRoute>} />
         <Route path="/ops-portal/products/:productId/edit" element={<ProtectedRoute requireAdmin><PageTransition><AdminProductForm /></PageTransition></ProtectedRoute>} />
         <Route path="/ops-portal/categories" element={<ProtectedRoute requireAdmin><PageTransition><AdminCategories /></PageTransition></ProtectedRoute>} />
+        <Route path="/ops-portal/discounts" element={<ProtectedRoute requireAdmin><PageTransition><AdminDiscounts /></PageTransition></ProtectedRoute>} />
         <Route path="/ops-portal/orders" element={<ProtectedRoute requireAdmin><PageTransition><AdminOrders /></PageTransition></ProtectedRoute>} />
         <Route path="/ops-portal/orders/:orderId" element={<ProtectedRoute requireAdmin><PageTransition><AdminOrderDetail /></PageTransition></ProtectedRoute>} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

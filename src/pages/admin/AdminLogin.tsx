@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { Eye, EyeOff, Loader2, Shield } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 import { z } from 'zod';
 
 const loginSchema = z.object({
@@ -19,6 +20,9 @@ const AdminLogin = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+  const [showForgot, setShowForgot] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState('');
+  const [forgotLoading, setForgotLoading] = useState(false);
 
   const { signIn } = useAuth();
   const navigate = useNavigate();
@@ -146,6 +150,50 @@ const AdminLogin = () => {
             )}
           </Button>
         </form>
+
+        <div className="mt-4 text-center">
+          <button
+            type="button"
+            onClick={() => { setShowForgot(!showForgot); setForgotEmail(email); }}
+            className="text-xs text-muted-foreground hover:text-foreground transition-colors tracking-wider"
+          >
+            Forgot password?
+          </button>
+        </div>
+
+        {showForgot && (
+          <div className="mt-4 space-y-3">
+            <Input
+              type="email"
+              value={forgotEmail}
+              onChange={(e) => setForgotEmail(e.target.value)}
+              placeholder="Enter your email"
+              className="h-10 bg-secondary border-border"
+            />
+            <Button
+              variant="outline"
+              className="w-full h-10 text-xs uppercase tracking-wider"
+              disabled={forgotLoading}
+              onClick={async () => {
+                if (!forgotEmail) return;
+                setForgotLoading(true);
+                const { error } = await supabase.auth.resetPasswordForEmail(forgotEmail, {
+                  redirectTo: `${window.location.origin}/reset-password`,
+                });
+                setForgotLoading(false);
+                if (error) {
+                  toast({ title: 'Error', description: error.message, variant: 'destructive' });
+                } else {
+                  toast({ title: 'Check your email', description: 'A password reset link has been sent.' });
+                  setShowForgot(false);
+                }
+              }}
+            >
+              {forgotLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+              Send Reset Link
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );
