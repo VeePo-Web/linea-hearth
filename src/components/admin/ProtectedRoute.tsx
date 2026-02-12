@@ -20,7 +20,7 @@ const ProtectedRoute = ({ children, requireAdmin = false }: ProtectedRouteProps)
   }
 
   if (!user) {
-    return <Navigate to="/admin/login" state={{ from: location }} replace />;
+    return <Navigate to="/ops-portal/login" state={{ from: location }} replace />;
   }
 
   if (requireAdmin && !isAdmin) {

@@ -41,6 +41,9 @@ import ResetPassword from "./pages/ResetPassword";
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminProducts from "./pages/admin/AdminProducts";
+import AdminProductForm from "./pages/admin/AdminProductForm";
+import AdminOrders from "./pages/admin/AdminOrders";
+import AdminOrderDetail from "./pages/admin/AdminOrderDetail";
 import AdminCategories from "./pages/admin/AdminCategories";
 import ProtectedRoute from "./components/admin/ProtectedRoute";
 import AccountLayout from "./pages/account/AccountLayout";
@@ -94,11 +97,15 @@ const AnimatedRoutes = () => {
           <Route path="profile" element={<AccountProfile />} />
           <Route path="addresses" element={<AccountAddresses />} />
         </Route>
-        {/* Admin Routes */}
-        <Route path="/admin/login" element={<PageTransition><AdminLogin /></PageTransition>} />
-        <Route path="/admin" element={<ProtectedRoute requireAdmin><PageTransition><AdminDashboard /></PageTransition></ProtectedRoute>} />
-        <Route path="/admin/products" element={<ProtectedRoute requireAdmin><PageTransition><AdminProducts /></PageTransition></ProtectedRoute>} />
-        <Route path="/admin/categories" element={<ProtectedRoute requireAdmin><PageTransition><AdminCategories /></PageTransition></ProtectedRoute>} />
+        {/* Admin Routes — obscured path */}
+        <Route path="/ops-portal/login" element={<PageTransition><AdminLogin /></PageTransition>} />
+        <Route path="/ops-portal" element={<ProtectedRoute requireAdmin><PageTransition><AdminDashboard /></PageTransition></ProtectedRoute>} />
+        <Route path="/ops-portal/products" element={<ProtectedRoute requireAdmin><PageTransition><AdminProducts /></PageTransition></ProtectedRoute>} />
+        <Route path="/ops-portal/products/new" element={<ProtectedRoute requireAdmin><PageTransition><AdminProductForm /></PageTransition></ProtectedRoute>} />
+        <Route path="/ops-portal/products/:productId/edit" element={<ProtectedRoute requireAdmin><PageTransition><AdminProductForm /></PageTransition></ProtectedRoute>} />
+        <Route path="/ops-portal/categories" element={<ProtectedRoute requireAdmin><PageTransition><AdminCategories /></PageTransition></ProtectedRoute>} />
+        <Route path="/ops-portal/orders" element={<ProtectedRoute requireAdmin><PageTransition><AdminOrders /></PageTransition></ProtectedRoute>} />
+        <Route path="/ops-portal/orders/:orderId" element={<ProtectedRoute requireAdmin><PageTransition><AdminOrderDetail /></PageTransition></ProtectedRoute>} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
       </Routes>
