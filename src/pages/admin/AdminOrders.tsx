@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -42,6 +42,7 @@ const AdminOrders = () => {
   const [statusFilter, setStatusFilter] = useState('all');
   const [fulfillmentFilter, setFulfillmentFilter] = useState('all');
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -166,7 +167,7 @@ const AdminOrders = () => {
                 </TableRow>
               ) : (
                 filtered.map((order) => (
-                  <TableRow key={order.id} className="cursor-pointer hover:bg-secondary/50">
+                  <TableRow key={order.id} className="cursor-pointer hover:bg-secondary/50" onClick={() => navigate(`/ops-portal/orders/${order.id}`)}>
                     <TableCell>
                       <Link to={`/ops-portal/orders/${order.id}`} className="font-mono text-xs text-primary hover:underline">
                         {order.id.slice(0, 8)}…
