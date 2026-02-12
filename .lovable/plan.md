@@ -1,109 +1,91 @@
 
-# Fix 2: Order List Clickability, Discount Delete Confirmation, Category Drag Handles
 
-## Problem 1: Order List Rows Look Clickable But Aren't (AdminOrders.tsx)
+# Fix 3: Dashboard Low Stock Links, Category Product Counts, Shipping Address Fallbacks, Discount Dollar Input
 
-**Current Issue:**
-- Line 169 has `className="cursor-pointer hover:bg-secondary/50"` on `<TableRow>`
-- This visual promise is only fulfilled for the order ID link (line 171)
-- Clicking anywhere else on the row does nothing
-- **Conversion Impact:** Adds friction — users tap the row expecting navigation, get nothing
-
-**Fix:**
-- Wrap the entire row content in a clickable handler
-- Use `useNavigate()` to navigate to `/ops-portal/orders/${order.id}` on row click
-- Prevent navigation if user clicks on a button/link that has its own handler
-- The row will still have the visual feedback (hover highlight + cursor)
-
-**Implementation:** Add `onClick={() => navigate(`/ops-portal/orders/${order.id}`)}` to the `<TableRow>` element. This converts the entire row to a clickable zone. The order ID link becomes redundant but harmless (clicking it still works).
+Four targeted fixes for the remaining admin friction points. All frontend-only, no database changes.
 
 ---
 
-## Problem 2: Discount Delete Has No Confirmation (AdminDiscounts.tsx)
+## Fix 3A: Low Stock Items Link to Product Edit
 
-**Current Issue:**
-- Line 238: `<Button>` with Trash2 icon directly calls `deleteCode(id)` on click
-- No confirmation dialog — the code is deleted immediately with optimistic update
-- **Inconsistency:** `AdminCategories.tsx` and `AdminProducts.tsx` both have `AlertDialog` confirmation before delete
-- **Risk:** Accidental clicks permanently delete discount codes with no recourse
+**File:** `src/pages/admin/AdminDashboard.tsx`
+
+**Problem:** Low stock variants show product name and stock count but are not clickable. Admin sees "Heavenly Crewneck - M / 2 left" but can't navigate to restock it.
 
 **Fix:**
-- Add a confirmation dialog (reuse the `AlertDialog` component pattern from Categories)
-- Only call `deleteCode()` when user confirms
-- Add a `deleteConfirmId` state and conditionally render the `AlertDialog`
-- Show the discount code name in the confirmation dialog for clarity
-
-**Implementation:**
-```
-State: const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
-On Trash click: setDeleteConfirmId(id)
-On confirm: deleteCode(id), then setDeleteConfirmId(null)
-AlertDialog shows: "Delete discount code [CODE_NAME]?" with warning text
-```
+- Update the `LowStockVariant` interface to include `product_id` via the joined product relation (change `product: { name: string } | null` to `product: { name: string; id: string } | null`)
+- Update the query on line 79 to select `product:products(name, id)` instead of `product:products(name)`
+- Wrap each low stock item (lines 331-341) in a `Link` to `/ops-portal/products/${v.product?.id}/edit`
+- Add hover styling to match the recent orders pattern
 
 ---
 
-## Problem 3: Category Drag Handles Are Fake (AdminCategories.tsx)
+## Fix 3B: Category Product Counts
 
-**Current Issue:**
-- Line 22 imports `GripVertical` icon
-- Line 169 has an empty `<TableHead className="w-10"></TableHead>` (column for drag handle)
-- Line 192 renders: `<GripVertical className="h-4 w-4 text-muted-foreground cursor-grab" />`
-- **Visual lie:** The icon + `cursor-grab` CSS promises drag-to-reorder functionality
-- **Reality:** There is no `onDragStart`, `onDragOver`, `onDrop`, or `display_order` update logic
-- **UX debt:** Users try to drag and nothing happens — frustrating and confusing
+**File:** `src/pages/admin/AdminCategories.tsx`
+
+**Problem:** Admin can't see how many products belong to each category, making it risky to delete a category that may have products assigned.
 
 **Fix:**
-- Remove the `GripVertical` icon entirely
-- Remove the empty `<TableHead>` column (shrinks table from 5 to 4 columns)
-- Keep the `display_order` sorting on the query (already present on line 68)
-- If reordering is needed in the future, implement it properly with drag-and-drop logic (not this PR)
-
-**Implementation:**
-- Delete line 169 (the empty column header)
-- Delete line 192 (the icon in the table cell)
-- The table will have 4 columns: Name, Slug, Description, Actions
+- Update the `Category` interface to include `products: { id: string }[]`
+- Change the fetch query from `.select('*')` to `.select('*, products(id)')` -- this joins the products table and returns an array of product IDs per category
+- Add a "Products" column to the table header (between Slug and Description)
+- Display the count: `{category.products?.length || 0}` in that column
+- Update `colSpan` values for loading/empty states from 4 to 5
 
 ---
 
-## Changes Required
+## Fix 3C: Shipping Address Field Fallbacks
 
-### File 1: `src/pages/admin/AdminOrders.tsx`
-- **Line 169:** Add `onClick` handler to navigate to order detail
-- **Line 171:** Keep the Link (it still works, just redundant now)
+**File:** `src/pages/admin/AdminOrderDetail.tsx`
 
-### File 2: `src/pages/admin/AdminDiscounts.tsx`
-- **Add state:** `deleteConfirmId`
-- **Line 238:** Change to `onClick={() => setDeleteConfirmId(c.id)}`
-- **Add new:** `AlertDialog` component with confirmation UI (copy pattern from AdminCategories.tsx)
-- **Add handler:** Confirm button calls `deleteCode(deleteConfirmId)` then clears state
+**Problem:** The shipping address display (lines 254-258) only checks `shipping.line1`, `shipping.line2`, etc. But depending on whether the order came from the checkout form or Stripe webhook, the field names may differ (`address_line_1` vs `line1`, `zip` vs `postal_code`).
 
-### File 3: `src/pages/admin/AdminCategories.tsx`
-- **Line 169:** Remove the empty `<TableHead>` column
-- **Line 192:** Remove the `<GripVertical>` cell
-- **Line 22:** Can remove `GripVertical` import (if unused elsewhere)
+**Fix:**
+- Create a helper that checks multiple field name variants:
+  ```
+  const addr = (obj, ...keys) => keys.map(k => obj[k]).find(v => v);
+  ```
+- Replace hardcoded field access with fallback lookups:
+  - `line1` -> also check `address_line_1`
+  - `line2` -> also check `address_line_2`
+  - `postal_code` -> also check `zip`, `zipcode`
+  - `state` -> also check `province`, `region`
+- This ensures addresses display correctly regardless of which system stored them
+
+---
+
+## Fix 3D: Discount Fixed Amount -- Dollars Instead of Cents
+
+**File:** `src/pages/admin/AdminDiscounts.tsx`
+
+**Problem:** When creating a fixed-amount discount, the label says "Value (cents)" (line 294). Admin must mentally convert dollars to cents (e.g., type "500" for a $5 discount). This is confusing and error-prone.
+
+**Fix:**
+- Change the label from "Value (cents)" to "Value ($)" when type is "fixed"
+- On save: multiply the entered dollar value by 100 to store as cents in the database
+- On edit/load: divide the stored cents value by 100 to display as dollars in the form
+- Same pattern for "Min Order" and "Max Discount" fields -- change labels to dollars and convert on save/load
+- The `formatValue` display function (line 172) already divides by 100 for display, so the table view is already correct
+
+**Implementation detail:**
+- In `openEdit`: when loading a fixed discount, convert cents fields to dollars for form display
+- In `handleSave`: when saving, convert dollar fields back to cents for database storage
+- For percentage discounts: no conversion needed (values stay as-is)
 
 ---
 
 ## Risk Assessment
 
-**Low Risk:**
-- All changes are UI/interaction only
-- No database changes
-- No breaking changes to functionality
-- Patterns are copied from existing code (AlertDialog already used in Categories for category delete)
+- **Low risk**: All changes are UI/display logic only
+- **No database changes**: Just query adjustments and field mapping
+- **No new dependencies**: Uses existing components and patterns
+- **Backward compatible**: Address fallbacks handle both old and new field formats
 
-**Benefits:**
-- **Order rows:** Reduces taps by 50% — users can click anywhere on the row instead of targeting the small order ID link
-- **Discount delete:** Prevents accidental deletions, matches the UX pattern of other admin pages
-- **Category handles:** Eliminates false affordances, cleaner UI
+## Files Changed
 
----
-
-## Visual Impact
-
-**Zero visual changes** to styling or layout. Only:
-- Order rows are fully clickable (same hover state, just extends to whole row)
-- Discount delete has a confirmation modal (matches existing pattern)
-- Categories table loses 1 empty column + grip icon (cleaner)
+1. `src/pages/admin/AdminDashboard.tsx` -- low stock links + product_id in query
+2. `src/pages/admin/AdminCategories.tsx` -- product count column
+3. `src/pages/admin/AdminOrderDetail.tsx` -- shipping address field fallbacks
+4. `src/pages/admin/AdminDiscounts.tsx` -- dollar input for fixed amounts
 
