@@ -9,6 +9,7 @@ import {
   ShoppingBag,
   LogOut,
   ChevronRight,
+  Percent,
 } from 'lucide-react';
 
 interface AdminLayoutProps {
@@ -22,6 +23,7 @@ const navItems = [
   { href: '/ops-portal/orders', label: 'Orders', icon: ShoppingBag },
   { href: '/ops-portal/products', label: 'Products', icon: Package },
   { href: '/ops-portal/categories', label: 'Categories', icon: Tags },
+  { href: '/ops-portal/discounts', label: 'Discounts', icon: Percent },
 ];
 
 const AdminLayout = ({ children }: AdminLayoutProps) => {

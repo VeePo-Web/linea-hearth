@@ -13,6 +13,53 @@ import { Plus, Trash2, Loader2, Wand2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
+// Inline stock editor component
+const InlineStockEdit = ({ variantId, value, onSave }: { variantId: string; value: number; onSave: (v: number) => void }) => {
+  const [editing, setEditing] = useState(false);
+  const [qty, setQty] = useState(value);
+  const [saving, setSaving] = useState(false);
+  const { toast } = useToast();
+
+  const save = async () => {
+    if (qty === value) { setEditing(false); return; }
+    setSaving(true);
+    const { error } = await supabase.from('product_variants').update({ stock_quantity: qty }).eq('id', variantId);
+    setSaving(false);
+    if (error) {
+      toast({ title: 'Error', description: 'Failed to update stock', variant: 'destructive' });
+      setQty(value);
+    } else {
+      onSave(qty);
+    }
+    setEditing(false);
+  };
+
+  if (editing) {
+    return (
+      <Input
+        type="number"
+        value={qty}
+        onChange={(e) => setQty(parseInt(e.target.value) || 0)}
+        onBlur={save}
+        onKeyDown={(e) => { if (e.key === 'Enter') save(); if (e.key === 'Escape') { setQty(value); setEditing(false); } }}
+        className="h-7 w-16 text-xs"
+        autoFocus
+        disabled={saving}
+      />
+    );
+  }
+
+  return (
+    <button
+      onClick={() => setEditing(true)}
+      className="text-sm hover:bg-secondary px-2 py-0.5 rounded cursor-pointer transition-colors"
+      title="Click to edit stock"
+    >
+      {value}
+    </button>
+  );
+};
+
 interface Variant {
   id: string;
   size: string | null;
@@ -211,7 +258,15 @@ const VariantManager = ({ productId, productSlug }: VariantManagerProps) => {
                   <TableCell>{v.color || '—'}</TableCell>
                   <TableCell>{v.style || '—'}</TableCell>
                   <TableCell className="text-muted-foreground font-mono text-xs">{v.sku || '—'}</TableCell>
-                  <TableCell>{v.stock_quantity}</TableCell>
+                  <TableCell>
+                    <InlineStockEdit
+                      variantId={v.id}
+                      value={v.stock_quantity}
+                      onSave={(newQty) => {
+                        setVariants((prev) => prev.map((x) => x.id === v.id ? { ...x, stock_quantity: newQty } : x));
+                      }}
+                    />
+                  </TableCell>
                   <TableCell>{v.price_adjustment ? `+$${v.price_adjustment}` : '—'}</TableCell>
                   <TableCell>
                     <Button
