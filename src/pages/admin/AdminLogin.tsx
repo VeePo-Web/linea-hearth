@@ -20,17 +20,20 @@ const AdminLogin = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+  const [formError, setFormError] = useState('');
   const [showForgot, setShowForgot] = useState(false);
   const [forgotEmail, setForgotEmail] = useState('');
   const [forgotLoading, setForgotLoading] = useState(false);
+  const [forgotError, setForgotError] = useState('');
 
-  const { signIn } = useAuth();
+  const { signIn, signOut } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
+    setFormError('');
 
     const result = loginSchema.safeParse({ email, password });
     if (!result.success) {
@@ -49,24 +52,37 @@ const AdminLogin = () => {
       const { error } = await signIn(email, password);
 
       if (error) {
-        toast({
-          title: 'Authentication Failed',
-          description: 'Invalid credentials.',
-          variant: 'destructive',
-        });
-      } else {
-        toast({
-          title: 'Welcome back',
-          description: 'Session authenticated.',
-        });
-        navigate('/ops-portal');
+        setFormError('Invalid email or password.');
+        return;
       }
-    } catch {
+
+      // Verify admin role before navigating
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) {
+        setFormError('Authentication failed. Please try again.');
+        return;
+      }
+
+      const { data: roleData } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', session.user.id)
+        .eq('role', 'admin')
+        .maybeSingle();
+
+      if (!roleData) {
+        await signOut();
+        setFormError('This account is not authorized for the operations portal.');
+        return;
+      }
+
       toast({
-        title: 'Error',
-        description: 'An unexpected error occurred.',
-        variant: 'destructive',
+        title: 'Welcome back',
+        description: 'Session authenticated.',
       });
+      navigate('/ops-portal');
+    } catch {
+      setFormError('An unexpected error occurred.');
     } finally {
       setIsLoading(false);
     }
@@ -149,6 +165,10 @@ const AdminLogin = () => {
               'Sign In'
             )}
           </Button>
+
+          {formError && (
+            <p className="text-sm text-destructive text-center mt-2">{formError}</p>
+          )}
         </form>
 
         <div className="mt-4 text-center">
@@ -175,7 +195,12 @@ const AdminLogin = () => {
               className="w-full h-10 text-xs uppercase tracking-wider"
               disabled={forgotLoading}
               onClick={async () => {
-                if (!forgotEmail) return;
+                setForgotError('');
+                const emailCheck = z.string().email();
+                if (!emailCheck.safeParse(forgotEmail).success) {
+                  setForgotError('Please enter a valid email address.');
+                  return;
+                }
                 setForgotLoading(true);
                 const { error } = await supabase.auth.resetPasswordForEmail(forgotEmail, {
                   redirectTo: `${window.location.origin}/reset-password`,
@@ -192,6 +217,9 @@ const AdminLogin = () => {
               {forgotLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
               Send Reset Link
             </Button>
+            {forgotError && (
+              <p className="text-xs text-destructive">{forgotError}</p>
+            )}
           </div>
         )}
       </div>
