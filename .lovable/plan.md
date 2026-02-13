@@ -1,91 +1,107 @@
 
+# Fix 4: Product Row Clickability, Variant Delete Confirmation, Dashboard Stat Cards as Links, Unsaved Changes Indicator
 
-# Fix 3: Dashboard Low Stock Links, Category Product Counts, Shipping Address Fallbacks, Discount Dollar Input
-
-Four targeted fixes for the remaining admin friction points. All frontend-only, no database changes.
+Four more targeted fixes to eliminate remaining admin friction. All frontend-only, no database changes.
 
 ---
 
-## Fix 3A: Low Stock Items Link to Product Edit
+## Fix 4A: Product List Rows Fully Clickable
+
+**File:** `src/pages/admin/AdminProducts.tsx`
+
+**Problem:** Product table rows (line 200) have no `onClick` handler. The only way to edit a product is the small pencil icon (line 229-232). This is inconsistent with the Orders page where entire rows are now clickable.
+
+**Fix:**
+- Add `onClick={() => navigate(...)}` to the `<TableRow>` on line 200
+- Add `cursor-pointer hover:bg-secondary/50` class (matching orders pattern)
+- Import and use `useNavigate`
+- The delete button click must stop propagation so it doesn't trigger row navigation
+
+---
+
+## Fix 4B: Variant Delete Confirmation
+
+**File:** `src/components/admin/VariantManager.tsx`
+
+**Problem:** Line 272-279: The variant delete button directly calls `deleteVariant(v.id)` with no confirmation dialog. Accidentally deleting a variant loses its SKU, stock count, and price adjustment -- data that must be re-entered manually. Every other delete action in the admin portal (products, categories, discounts) has an AlertDialog confirmation.
+
+**Fix:**
+- Add `deleteConfirmId` state
+- Change delete button to `setDeleteConfirmId(v.id)` instead of direct deletion
+- Add an AlertDialog at the bottom (copy the pattern from AdminCategories)
+- Show the variant details (size/color) in the confirmation message for clarity
+
+---
+
+## Fix 4C: Dashboard Stat Cards Link to Pages
 
 **File:** `src/pages/admin/AdminDashboard.tsx`
 
-**Problem:** Low stock variants show product name and stock count but are not clickable. Admin sees "Heavenly Crewneck - M / 2 left" but can't navigate to restock it.
+**Problem:** The four stat cards (Total Products, Active, Categories, Featured) on lines 224-240 show counts but are not clickable. An admin seeing "3 Categories" should be able to click to go manage categories. The "Needs Fulfillment" card (line 244) is already a Link -- these should match.
 
 **Fix:**
-- Update the `LowStockVariant` interface to include `product_id` via the joined product relation (change `product: { name: string } | null` to `product: { name: string; id: string } | null`)
-- Update the query on line 79 to select `product:products(name, id)` instead of `product:products(name)`
-- Wrap each low stock item (lines 331-341) in a `Link` to `/ops-portal/products/${v.product?.id}/edit`
-- Add hover styling to match the recent orders pattern
+- Wrap each stat card in a `<Link>` to the appropriate admin page:
+  - Total Products -> `/ops-portal/products`
+  - Active -> `/ops-portal/products` (with active tab hint)
+  - Categories -> `/ops-portal/categories`
+  - Featured -> `/ops-portal/products` (with featured filter hint)
+- Add `cursor-pointer hover:border-primary/50 transition-colors` to match the fulfillment card pattern
 
 ---
 
-## Fix 3B: Category Product Counts
-
-**File:** `src/pages/admin/AdminCategories.tsx`
-
-**Problem:** Admin can't see how many products belong to each category, making it risky to delete a category that may have products assigned.
-
-**Fix:**
-- Update the `Category` interface to include `products: { id: string }[]`
-- Change the fetch query from `.select('*')` to `.select('*, products(id)')` -- this joins the products table and returns an array of product IDs per category
-- Add a "Products" column to the table header (between Slug and Description)
-- Display the count: `{category.products?.length || 0}` in that column
-- Update `colSpan` values for loading/empty states from 4 to 5
-
----
-
-## Fix 3C: Shipping Address Field Fallbacks
+## Fix 4D: Unsaved Changes Dot on Order Detail
 
 **File:** `src/pages/admin/AdminOrderDetail.tsx`
 
-**Problem:** The shipping address display (lines 254-258) only checks `shipping.line1`, `shipping.line2`, etc. But depending on whether the order came from the checkout form or Stripe webhook, the field names may differ (`address_line_1` vs `line1`, `zip` vs `postal_code`).
+**Problem:** An admin can change the fulfillment status, add tracking info, or write notes, then accidentally navigate away via the sidebar or back button -- losing all changes silently. There is no visual indicator that changes exist.
 
 **Fix:**
-- Create a helper that checks multiple field name variants:
-  ```
-  const addr = (obj, ...keys) => keys.map(k => obj[k]).find(v => v);
-  ```
-- Replace hardcoded field access with fallback lookups:
-  - `line1` -> also check `address_line_1`
-  - `line2` -> also check `address_line_2`
-  - `postal_code` -> also check `zip`, `zipcode`
-  - `state` -> also check `province`, `region`
-- This ensures addresses display correctly regardless of which system stored them
+- Track whether any field has been modified from its loaded state using a simple `isDirty` computed boolean
+- Compare current form values (fulfillmentStatus, trackingNumber, trackingUrl, notes) against the values loaded from `order`
+- Show a small colored dot on the "Save Changes" button when dirty (non-blocking, no modal)
+- This is a visual cue only -- no browser `beforeunload` prompt (those are annoying and often blocked)
 
 ---
 
-## Fix 3D: Discount Fixed Amount -- Dollars Instead of Cents
+## Summary of Changes
 
-**File:** `src/pages/admin/AdminDiscounts.tsx`
-
-**Problem:** When creating a fixed-amount discount, the label says "Value (cents)" (line 294). Admin must mentally convert dollars to cents (e.g., type "500" for a $5 discount). This is confusing and error-prone.
-
-**Fix:**
-- Change the label from "Value (cents)" to "Value ($)" when type is "fixed"
-- On save: multiply the entered dollar value by 100 to store as cents in the database
-- On edit/load: divide the stored cents value by 100 to display as dollars in the form
-- Same pattern for "Min Order" and "Max Discount" fields -- change labels to dollars and convert on save/load
-- The `formatValue` display function (line 172) already divides by 100 for display, so the table view is already correct
-
-**Implementation detail:**
-- In `openEdit`: when loading a fixed discount, convert cents fields to dollars for form display
-- In `handleSave`: when saving, convert dollar fields back to cents for database storage
-- For percentage discounts: no conversion needed (values stay as-is)
+| File | Change | Risk |
+|------|--------|------|
+| `AdminProducts.tsx` | Add row onClick + navigate, stopPropagation on delete | Low |
+| `VariantManager.tsx` | Add AlertDialog for variant delete | Low |
+| `AdminDashboard.tsx` | Wrap stat cards in Links | Low |
+| `AdminOrderDetail.tsx` | Add isDirty indicator on Save button | Low |
 
 ---
 
-## Risk Assessment
+## Technical Details
 
-- **Low risk**: All changes are UI/display logic only
-- **No database changes**: Just query adjustments and field mapping
-- **No new dependencies**: Uses existing components and patterns
-- **Backward compatible**: Address fallbacks handle both old and new field formats
+### AdminProducts.tsx
+- Import `useNavigate` (already imported via `Link` from react-router-dom, just need the hook)
+- Wait -- `useNavigate` is not currently imported. Need to add it.
+- Add to TableRow: `className="cursor-pointer hover:bg-secondary/50"` and `onClick={() => navigate(\`/ops-portal/products/${product.id}/edit\`)}`
+- On the delete Button (line 234): add `onClick={(e) => { e.stopPropagation(); setDeleteId(product.id); }}`
 
-## Files Changed
+### VariantManager.tsx
+- Import AlertDialog components from `@/components/ui/alert-dialog`
+- Add state: `const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null)`
+- Change line 276 onClick from `deleteVariant(v.id)` to `setDeleteConfirmId(v.id)`
+- Add AlertDialog component at end of return block
 
-1. `src/pages/admin/AdminDashboard.tsx` -- low stock links + product_id in query
-2. `src/pages/admin/AdminCategories.tsx` -- product count column
-3. `src/pages/admin/AdminOrderDetail.tsx` -- shipping address field fallbacks
-4. `src/pages/admin/AdminDiscounts.tsx` -- dollar input for fixed amounts
+### AdminDashboard.tsx
+- Update the `statCards` array to include a `href` property for each card
+- Wrap each Card in a `<Link>` with hover styling
+- Map: Total Products -> `/ops-portal/products`, Active -> `/ops-portal/products`, Categories -> `/ops-portal/categories`, Featured -> `/ops-portal/products`
 
+### AdminOrderDetail.tsx
+- Compute `isDirty` by comparing current state vs loaded order values:
+  ```
+  const isDirty = order && (
+    fulfillmentStatus !== (order.fulfillment_status || 'unfulfilled') ||
+    trackingNumber !== (order.tracking_number || '') ||
+    trackingUrl !== (order.tracking_url || '') ||
+    notes !== (order.notes || '')
+  );
+  ```
+- On the Save button, add a small indicator dot when `isDirty` is true
+- Change button text to show "Unsaved" state visually
