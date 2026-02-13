@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -49,6 +49,7 @@ const AdminProducts = () => {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const fetchProducts = async () => {
     try {
@@ -197,7 +198,7 @@ const AdminProducts = () => {
                 </TableRow>
               ) : (
                 filtered.map((product) => (
-                  <TableRow key={product.id}>
+                  <TableRow key={product.id} className="cursor-pointer hover:bg-secondary/50" onClick={() => navigate(`/ops-portal/products/${product.id}/edit`)}>
                     <TableCell>
                       {product.primary_image ? (
                         <img src={product.primary_image} alt="" className="w-10 h-10 rounded object-cover" />
@@ -231,7 +232,7 @@ const AdminProducts = () => {
                             <Pencil className="h-4 w-4" />
                           </Link>
                         </Button>
-                        <Button variant="ghost" size="icon" onClick={() => setDeleteId(product.id)}>
+                        <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); setDeleteId(product.id); }}>
                           <Trash2 className="h-4 w-4 text-destructive" />
                         </Button>
                       </div>

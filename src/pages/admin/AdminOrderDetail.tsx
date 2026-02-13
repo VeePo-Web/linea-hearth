@@ -121,6 +121,13 @@ const AdminOrderDetail = () => {
   const shipping = typeof order.shipping_address === 'object' ? order.shipping_address : {};
   const addr = (obj: any, ...keys: string[]) => keys.map(k => obj?.[k]).find(v => v);
 
+  const isDirty = order && (
+    fulfillmentStatus !== (order.fulfillment_status || 'unfulfilled') ||
+    trackingNumber !== (order.tracking_number || '') ||
+    trackingUrl !== (order.tracking_url || '') ||
+    notes !== (order.notes || '')
+  );
+
   return (
     <AdminLayout>
       <div className="space-y-6 max-w-4xl">
@@ -139,9 +146,12 @@ const AdminOrderDetail = () => {
               </p>
             </div>
           </div>
-          <Button size="sm" onClick={handleSave} disabled={saving} className="text-xs uppercase tracking-wider">
+          <Button size="sm" onClick={handleSave} disabled={saving} className="text-xs uppercase tracking-wider relative">
             {saving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
-            Save Changes
+            {isDirty ? 'Save Changes •' : 'Save Changes'}
+            {isDirty && (
+              <span className="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-amber-500" />
+            )}
           </Button>
         </div>
 
