@@ -10,6 +10,16 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Plus, Trash2, Loader2, Wand2 } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -82,6 +92,7 @@ const VariantManager = ({ productId, productSlug }: VariantManagerProps) => {
   const [variants, setVariants] = useState<Variant[]>([]);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [newVariant, setNewVariant] = useState({
     size: '',
     color: '',
@@ -273,7 +284,7 @@ const VariantManager = ({ productId, productSlug }: VariantManagerProps) => {
                       variant="ghost"
                       size="icon"
                       className="h-7 w-7"
-                      onClick={() => deleteVariant(v.id)}
+                      onClick={() => setDeleteConfirmId(v.id)}
                     >
                       <Trash2 className="h-3.5 w-3.5 text-destructive" />
                     </Button>
@@ -348,6 +359,30 @@ const VariantManager = ({ productId, productSlug }: VariantManagerProps) => {
           </Table>
         </div>
       )}
+
+      <AlertDialog open={!!deleteConfirmId} onOpenChange={() => setDeleteConfirmId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Variant</AlertDialogTitle>
+            <AlertDialogDescription>
+              {(() => {
+                const v = variants.find((x) => x.id === deleteConfirmId);
+                const label = v ? [v.size, v.color].filter(Boolean).join(' / ') || 'Default' : '';
+                return `Delete variant "${label}"? Its SKU, stock count, and price adjustment will be lost.`;
+              })()}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => { if (deleteConfirmId) deleteVariant(deleteConfirmId); setDeleteConfirmId(null); }}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

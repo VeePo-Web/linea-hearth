@@ -140,10 +140,10 @@ const AdminDashboard = () => {
   ];
 
   const statCards = [
-    { title: 'Total Products', value: stats.totalProducts, icon: Package, description: 'All products' },
-    { title: 'Active', value: stats.activeProducts, icon: Eye, description: 'Visible in store' },
-    { title: 'Categories', value: stats.totalCategories, icon: Tags, description: 'Product categories' },
-    { title: 'Featured', value: stats.featuredProducts, icon: TrendingUp, description: 'Featured items' },
+    { title: 'Total Products', value: stats.totalProducts, icon: Package, description: 'All products', href: '/ops-portal/products' },
+    { title: 'Active', value: stats.activeProducts, icon: Eye, description: 'Visible in store', href: '/ops-portal/products' },
+    { title: 'Categories', value: stats.totalCategories, icon: Tags, description: 'Product categories', href: '/ops-portal/categories' },
+    { title: 'Featured', value: stats.featuredProducts, icon: TrendingUp, description: 'Featured items', href: '/ops-portal/products' },
   ];
 
   const fulfillmentColor = (status: string | null) => {
@@ -225,16 +225,18 @@ const AdminDashboard = () => {
           {statCards.map((card) => {
             const Icon = card.icon;
             return (
-              <Card key={card.title}>
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{card.title}</CardTitle>
-                  <Icon className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-light">{loading ? '—' : card.value}</div>
-                  <p className="text-xs text-muted-foreground mt-1">{card.description}</p>
-                </CardContent>
-              </Card>
+              <Link key={card.title} to={card.href}>
+                <Card className="cursor-pointer hover:border-primary/50 transition-colors">
+                  <CardHeader className="flex flex-row items-center justify-between pb-2">
+                    <CardTitle className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{card.title}</CardTitle>
+                    <Icon className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-light">{loading ? '—' : card.value}</div>
+                    <p className="text-xs text-muted-foreground mt-1">{card.description}</p>
+                  </CardContent>
+                </Card>
+              </Link>
             );
           })}
         </div>
