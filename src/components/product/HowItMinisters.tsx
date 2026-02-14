@@ -23,7 +23,7 @@ const HowItMinisters = ({ ministryStatement, productName }: HowItMinistersProps)
   });
   const imageY = useTransform(scrollYProgress, [0, 1], [40, -40]);
 
-  const defaultStatement = `The ${productName} is more than fabric and thread—it's a daily declaration of your faith. Every time you put it on, you're choosing to walk boldly in purpose, carrying a message that speaks before you do.`;
+  const defaultStatement = `The ${productName} is more than a garment—it's a daily declaration of your faith. Every time you put it on, you're choosing to walk boldly in purpose, carrying a message that speaks before you do.`;
 
   const fadeUpVariants = {
     hidden: { opacity: 0, y: 30 },
@@ -56,12 +56,12 @@ const HowItMinisters = ({ ministryStatement, productName }: HowItMinistersProps)
             <div className="space-y-6 order-1 lg:order-2">
               <p className="text-xs font-light text-muted-foreground uppercase tracking-[0.2em]">The Purpose</p>
               <h2 className="text-2xl lg:text-3xl font-light text-foreground leading-tight">
-                More Than A Shirt.<br />A Daily Declaration.
+                More Than A Garment.<br />A Daily Declaration.
               </h2>
               <p className="text-sm font-light text-muted-foreground leading-relaxed">{ministryStatement || defaultStatement}</p>
               <p className="text-sm font-light text-muted-foreground leading-relaxed italic">
-                "Let your light shine before others, that they may see your good deeds and glorify your Father in heaven."
-                <span className="not-italic block mt-1 text-xs">— Matthew 5:16</span>
+                "And thou shalt make holy garments for Aaron thy brother, for glory and for beauty."
+                <span className="not-italic block mt-1 text-xs">— Exodus 28:2 (ASV)</span>
               </p>
               <Link to="/about/our-story" className="inline-block text-sm font-light text-foreground underline underline-offset-4 hover:text-muted-foreground transition-colors">
                 Read Our Story
@@ -127,7 +127,7 @@ const HowItMinisters = ({ ministryStatement, productName }: HowItMinistersProps)
             
             <div>
               <TextReveal 
-                text="More Than A Shirt."
+                text="More Than A Garment."
                 as="h2"
                 className="text-2xl lg:text-3xl font-light text-foreground leading-tight"
                 delay={0.1}
@@ -157,8 +157,8 @@ const HowItMinisters = ({ ministryStatement, productName }: HowItMinistersProps)
               animate={isInView ? "visible" : "hidden"}
               custom={0.6}
             >
-              "Let your light shine before others, that they may see your good deeds and glorify your Father in heaven."
-              <span className="not-italic block mt-1 text-xs text-muted-foreground">— Matthew 5:16</span>
+              "And thou shalt make holy garments for Aaron thy brother, for glory and for beauty."
+              <span className="not-italic block mt-1 text-xs text-muted-foreground">— Exodus 28:2 (ASV)</span>
             </motion.p>
             
             <motion.div
