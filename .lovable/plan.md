@@ -1,83 +1,80 @@
 
 
-# User Account Features Audit and Fix Plan
+# User Account System -- Complete Feature Audit and Fix Plan
 
-## Issues Found
+## Summary
 
-### Bug 1: Euro Symbol in Order History (Critical -- user-facing)
-
-**File:** `src/pages/account/AccountOrders.tsx`, line 130
-
-The order total displays `€` instead of `$`:
-```
-€{(order.total_cents / 100).toFixed(2)}
-```
-Should be `$`.
+After reviewing every file in the account system (admin + customer), the previous round of fixes landed correctly. However, a full scan reveals one **critical systemic issue** and a handful of **functional improvements** needed to make every account feature bulletproof.
 
 ---
 
-### Bug 2: Password Change Skips Current Password Verification
+## CRITICAL: 87 Euro Symbols Still in Codebase
 
-**File:** `src/pages/account/AccountProfile.tsx`
+The previous fix corrected `AccountOrders.tsx`, but **9 other files** still display prices with the Euro symbol instead of Dollar. This affects cart, checkout, lookbook, saved items, and bundle features -- all user-facing.
 
-The password form schema defines a `currentPassword` field (line 21), but:
-- There is no input field rendered for it in the UI
-- The submit handler (line 70) calls `supabase.auth.updateUser({ password })` directly, ignoring `currentPassword` entirely
+### Files Requiring Currency Fix
 
-This means anyone with an active session can change the password without knowing the current one. While Supabase's `updateUser` does allow this for authenticated users, it's a UX problem -- the form *looks* like it should ask for the current password but doesn't.
+| File | Occurrences |
+|------|-------------|
+| `src/components/cart/SavedItem.tsx` | 1 |
+| `src/components/cart/SavedForLaterShelf.tsx` | 1 |
+| `src/components/cart/TrustRow.tsx` | 1 |
+| `src/components/cart/BundleProgress.tsx` | 5 |
+| `src/components/checkout/SavingsSummary.tsx` | 4 |
+| `src/components/lookbook/ShopTheLook.tsx` | 3 |
+| `src/components/search/SearchQuickAdd.tsx` | 1+ |
+| `src/hooks/useSavedForLater.ts` | 2 |
+| `src/pages/CheckoutSuccess.tsx` | 1 |
 
-**Fix:** Remove `currentPassword` from the zod schema since Supabase doesn't support verifying the old password client-side anyway. The form already requires an active session, which is sufficient. This eliminates the dead validation rule that would always fail (required but no input).
-
----
-
-### Bug 3: N+1 Query in Order Fetching
-
-**File:** `src/hooks/useOrders.ts`, lines 33-45
-
-The hook fetches each order individually then loops through to fetch items one-by-one. For a user with 10 orders, this fires 11 database calls. This causes slow load times and unnecessary network traffic.
-
-**Fix:** Fetch orders with items in a single query using Supabase's relation syntax:
-```typescript
-.select('*, order_items(*)')
-```
+### Fix
+Simple find-and-replace: change every `€` to `$` in these files. No logic changes needed.
 
 ---
 
-## Features That Are Working Correctly
+## Account Features Status (Post-Previous Fixes)
 
-After reviewing every file, these features are solid and need no changes:
+### Working Correctly -- No Changes Needed
 
-| Feature | Status | Notes |
-|---------|--------|-------|
-| Auth Modal (sign in / sign up) | Working | Slide-in panel, tab switching, email typo detection all functional |
-| Google OAuth | Working | Just fixed -- uses Lovable Cloud managed module |
-| Forgot Password flow | Working | In-modal flow with email sending and success confirmation |
-| Reset Password page | Working | Token validation, password match checking, strength indicator |
-| Admin Login | Working | Role verification, unauthorized rejection with sign-out, forgot password |
-| Admin ProtectedRoute | Working | Redirects non-admins, loading states |
-| Account Dashboard | Working | Stats, recent order, quick actions |
-| Account Profile | Working (after fix) | Name editing, password change |
-| Account Addresses | Working | Full CRUD, default shipping/billing flags, form validation |
-| Account Favorites | Working | Grid view, remove, quick add to bag |
-| Account Order Detail | Working | Status timeline, item list, reorder buttons, shipping address |
-| ProtectedAccountRoute | Working | Redirects unauthenticated users to home with auth modal |
-| Sign Out | Working | Clears session and admin state |
+| Feature | File(s) | Notes |
+|---------|---------|-------|
+| Auth Modal slide-in panel | `AuthModal.tsx` | Tab switching, animations, backdrop click-to-close |
+| Email/password sign-in | `SignInForm.tsx` | Email typo detection, inline errors, password toggle |
+| Account creation | `CreateAccountForm.tsx` | Email typo detection, password strength, benefits list |
+| Google OAuth | `GoogleAuthButton.tsx`, `useAuth.tsx` | Fixed in previous session, uses Lovable Cloud module |
+| Forgot password (in-modal) | `SignInForm.tsx` | Pre-fills email, multi-step flow, success state |
+| Reset password page | `ResetPassword.tsx` | Token validation, strength indicator |
+| Admin login | `AdminLogin.tsx` | Post-auth role check, rejects + signs out non-admins |
+| Admin protected route | `ProtectedRoute.tsx` | Loading state, redirect to login, access denied screen |
+| Admin dashboard | `AdminDashboard.tsx` | Revenue cards, low stock, unfulfilled orders, refresh |
+| Account layout | `AccountLayout.tsx` | Desktop sidebar + mobile horizontal scroll tabs |
+| Account dropdown | `AccountDropdown.tsx` | Greeting, quick links, sign out |
+| Account dashboard | `AccountDashboard.tsx` | Stats, recent order preview, quick actions |
+| Account profile | `AccountProfile.tsx` | Name edit, password change (schema cleaned up) |
+| Account addresses | `AccountAddresses.tsx` | Full CRUD, default flags, form validation |
+| Account favorites | `AccountFavorites.tsx` | Grid with images, remove, quick add to bag |
+| Account orders list | `AccountOrders.tsx` | Currency fixed, reorder buttons |
+| Account order detail | `AccountOrderDetail.tsx` | Status timeline, shipping address, payment summary |
+| Order reorder button | `OrderReorderButton.tsx` | Single item + bulk reorder, haptic feedback, animations |
+| Protected account route | `ProtectedAccountRoute.tsx` | Redirects to home with auth modal |
+| Profile hook | `useProfile.ts` | Fetch + update with optimistic state |
+| Addresses hook | `useAddresses.ts` | CRUD with default flag management |
+| Orders hook | `useOrders.ts` | Single-query fetch (N+1 fixed) |
+| Favorites hook | `useFavorites.ts` | React Query with optimistic add/remove |
+| Size memory hook | `useSizeMemory.ts` | localStorage + database sync, confidence scoring |
 
 ---
 
 ## Implementation Steps
 
-### Step 1: Fix euro symbol in AccountOrders.tsx
-Change line 130 from `€` to `$`.
-
-### Step 2: Clean up password schema in AccountProfile.tsx
-Remove the unused `currentPassword` field from the zod schema and update the TypeScript type.
-
-### Step 3: Optimize order fetching in useOrders.ts
-Replace the N+1 loop with a single Supabase query using relation joins.
+### Step 1: Fix all remaining Euro symbols across 9 files
+Replace every `€` with `$` in the files listed above. This is a direct string replacement with no logic changes.
 
 ---
 
-## Risk Level
-All three fixes are low-risk, isolated changes with no side effects.
+## Technical Notes
+
+- All database tables have proper RLS policies scoped to `auth.uid()` or the `has_role` security function
+- The `size_confidence_stats` view has no RLS policies, which is acceptable since it only returns data for the querying user via the `user_id` filter in the hook
+- The admin owner protection trigger (`protect_owner_admin`) ensures the owner's admin role can never be permanently deleted
+- The 30-minute inactivity timer is handled by the `AdminLayout` component (not audited here as it's outside the account feature scope)
 
