@@ -1,58 +1,36 @@
 
 
-# Elevate the Nav Bar Logo — Premium Typographic Wordmark
+# Fix Nav Logo: Replace LINEA SVG with "LINE OF JUDAH" Text Wordmark
 
-## What We're Fixing
+## Problem
 
-The "LINE OF JUDAH" text in the center of the nav bar currently uses DM Sans at `font-light` with wide tracking. It's clean but reads as generic — it lacks the typographic authority of a true fashion wordmark. The goal is to make it feel like a Fear of God / 032c-level brand mark without changing anything else on the site.
+The SVG file at `/logo.svg` renders "LINEA" — the old brand name. The brand is now "Line of Judah." The SVG asset is outdated and does not match the current identity.
 
-## The Upgrade
+## Solution
 
-### 1. Use the SVG Logo Instead of Plain Text
+Replace the `<img src="/logo.svg">` in both header files with a styled text wordmark reading "LINE OF JUDAH" — the same Fear of God-style treatment that was working before, using DM Sans at light weight with wide editorial tracking.
 
-The project already has a high-quality SVG wordmark at `public/logo.svg` — a custom serif-style "LINE" rendering that looks far more premium than any web font. We will use this SVG inline as the nav logo, sized to fit the nav bar height.
-
-- Render the SVG as an `<img>` tag pointing to `/logo.svg` (not the broken `/logo.png`)
-- Height: `h-5` on mobile, `h-6` on desktop — compact, confident, proportional to the 64px nav
-- The SVG is black on transparent, which works perfectly against the white nav background
-- Add `alt="Line of Judah"` for accessibility
-
-### 2. Files Changed
+## Files Changed
 
 | File | Change |
 |------|--------|
-| `src/components/header/Navigation.tsx` | Replace the `<span>LINE OF JUDAH</span>` with `<img src="/logo.svg">` |
-| `src/components/header/CheckoutHeader.tsx` | Same swap for checkout consistency |
+| `src/components/header/Navigation.tsx` | Replace `<img>` with text `<span>` wordmark |
+| `src/components/header/CheckoutHeader.tsx` | Same swap |
 
-### 3. Exact Code Change (Navigation.tsx, lines 160-167)
+## Exact Code
 
-Replace the current text span:
+Both files get the same replacement — swap the `<img>` tag for:
+
 ```tsx
-{/* Center logo */}
-<div className="absolute left-1/2 transform -translate-x-1/2">
-  <Link to="/" className="block">
-    <img 
-      src="/logo.svg" 
-      alt="Line of Judah" 
-      className="h-5 sm:h-6 w-auto" 
-    />
-  </Link>
-</div>
+<span className="text-[0.7rem] sm:text-xs font-light tracking-[0.35em] text-foreground uppercase whitespace-nowrap">
+  LINE OF JUDAH
+</span>
 ```
 
-Same pattern for CheckoutHeader.tsx.
+## What Does NOT Change
 
-### 4. Why SVG Over Text
+- Homepage — zero changes
+- Nav structure — zero changes
+- Footer — unchanged
+- No new files or dependencies
 
-- The SVG has a custom serif letterform for "LINE" with intentional weight variation between "LINE," "OF," and "JUDAH" — this typographic contrast is what makes premium wordmarks feel designed rather than typed
-- Resolution-independent, crisp on all screens
-- No additional font download required
-- Already exists in the project — zero new assets
-
-### 5. What Does NOT Change
-
-- No homepage changes
-- No nav structure changes
-- No layout changes
-- No new dependencies
-- Footer logo stays as-is (different treatment is fine — footer uses the amber accent)
