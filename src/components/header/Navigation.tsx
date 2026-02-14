@@ -11,7 +11,7 @@ import CartDrawer from "@/components/cart/CartDrawer";
 import NavLink from "./NavLink";
 import MegaMenu from "./MegaMenu";
 import SearchOverlay from "./SearchOverlay";
-import FullScreenNav from "./FullScreenNav";
+import MobileMenu from "./MobileMenu";
 import AuthModal from "@/components/auth/AuthModal";
 import AccountDropdown from "@/components/auth/AccountDropdown";
 import FavoritesDrawer from "@/components/favorites/FavoritesDrawer";
@@ -300,8 +300,8 @@ const Navigation = () => {
       {/* Search Overlay */}
       <SearchOverlay isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
 
-      {/* Full-Screen Editorial Navigation */}
-      <FullScreenNav isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} onSearchOpen={() => setIsSearchOpen(true)} onFavoritesOpen={() => setOffCanvasType('favorites')} onAuthOpen={() => setIsAuthModalOpen(true)} />
+      {/* Mobile Slide-Out Menu */}
+      <MobileMenu isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} navItems={navItems} onSearchOpen={() => setIsSearchOpen(true)} onFavoritesOpen={() => setOffCanvasType('favorites')} onAuthOpen={() => setIsAuthModalOpen(true)} />
 
       {/* Cart Drawer */}
       <CartDrawer onViewFavorites={() => setOffCanvasType('favorites')} />
