@@ -137,7 +137,7 @@ const Navigation = () => {
         <div className="absolute left-1/2 transform -translate-x-1/2">
           <Link to="/" className="block">
             <motion.img 
-              src="/logo.svg" 
+              src="/logo.png" 
               alt="Line of Judah"
               className="h-6 w-auto"
               whileHover={{ scale: 1.02 }}

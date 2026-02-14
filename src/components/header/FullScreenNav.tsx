@@ -189,7 +189,7 @@ const FullScreenNav = ({
               className="focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-900 focus-visible:ring-offset-2 rounded"
             >
               <img 
-                src="/logo.svg" 
+                src="/logo.png" 
                 alt="Line of Judah" 
                 className="h-5 w-auto brightness-0" 
               />
