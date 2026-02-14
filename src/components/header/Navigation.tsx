@@ -66,12 +66,8 @@ const Navigation = () => {
     {
       name: "About",
       href: "/about/our-story",
-      submenuItems: [
-        { name: "Our Story", href: "/about/our-story", subcategories: [] },
-        { name: "Size Guide", href: "/about/size-guide", subcategories: [] },
-        { name: "Customer Care", href: "/about/customer-care", subcategories: [] }
-      ],
-      images: [{ src: "/founders.png", alt: "Company Founders", label: "Read our story" }]
+      submenuItems: [],
+      images: []
     }
   ];
 
@@ -129,6 +125,34 @@ const Navigation = () => {
               <NavLink href={item.href} isActive={isActiveRoute(item.href)}>
                 {item.name}
               </NavLink>
+              {/* Compact About dropdown */}
+              <AnimatePresence>
+                {item.name === "About" && activeDropdown === "About" && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -6 }}
+                    transition={{ duration: 0.2, ease: "easeOut" }}
+                    className="absolute top-full left-0 mt-0 w-[180px] bg-background border border-border shadow-sm rounded-sm py-4 px-5 z-50"
+                  >
+                    <div className="space-y-2.5">
+                      {[
+                        { name: "Our Story", href: "/about/our-story" },
+                        { name: "Size Guide", href: "/about/size-guide" },
+                        { name: "Customer Care", href: "/contact" },
+                      ].map((link) => (
+                        <Link
+                          key={link.href}
+                          to={link.href}
+                          className="block text-sm font-light text-muted-foreground hover:text-foreground hover:underline underline-offset-4 transition-colors duration-150"
+                        >
+                          {link.name}
+                        </Link>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           ))}
         </div>
