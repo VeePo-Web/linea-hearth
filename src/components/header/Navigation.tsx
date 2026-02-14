@@ -160,13 +160,9 @@ const Navigation = () => {
         {/* Center logo */}
         <div className="absolute left-1/2 transform -translate-x-1/2">
           <Link to="/" className="block">
-            <motion.img 
-              src="/logo.png" 
-              alt="Line of Judah"
-              className="h-6 w-auto"
-              whileHover={{ scale: 1.02 }}
-              transition={{ type: "spring" as const, stiffness: 400, damping: 25 }}
-            />
+            <span className="text-[0.7rem] sm:text-xs font-light tracking-[0.35em] text-foreground uppercase whitespace-nowrap">
+              LINE OF JUDAH
+            </span>
           </Link>
         </div>
 
