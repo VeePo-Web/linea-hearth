@@ -159,7 +159,7 @@ Deno.serve(async (req) => {
 
     // Calculate shipping
     let shippingCents = 0;
-    const FREE_SHIPPING_THRESHOLD = 15000; // €150
+    const FREE_SHIPPING_THRESHOLD = 9900; // $99 CAD
 
     if (subtotalCents < FREE_SHIPPING_THRESHOLD || shippingMethod !== "standard") {
       switch (shippingMethod) {

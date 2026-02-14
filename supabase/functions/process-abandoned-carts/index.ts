@@ -201,7 +201,7 @@ function getEmail1Html(cart: AbandonedCart, recoveryUrl: string, siteUrl: string
                     <tr>
                       <td style="border-top:2px solid #1C1917;padding-top:16px;text-align:right;">
                         <p style="margin:0;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;font-size:16px;color:#1C1917;">
-                          Total: <strong style="font-weight:600;">€${cart.cart_total.toLocaleString()}</strong>
+                          Total: <strong style="font-weight:600;">$${cart.cart_total.toLocaleString()}</strong>
                         </p>
                       </td>
                     </tr>
@@ -283,7 +283,7 @@ function getEmail2Html(cart: AbandonedCart, recoveryUrl: string, siteUrl: string
                           YOUR CART
                         </p>
                         <p style="margin:0 0 8px;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;font-size:32px;font-weight:300;color:#1C1917;">
-                          €${cart.cart_total.toLocaleString()}
+                          $${cart.cart_total.toLocaleString()}
                         </p>
                         <p style="margin:0;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;font-size:13px;color:#78716C;">
                           ${cart.cart_items.length} item${cart.cart_items.length > 1 ? 's' : ''} waiting
@@ -388,10 +388,10 @@ function getEmail3Html(cart: AbandonedCart, recoveryUrl: string, discountCode: s
               <tr>
                 <td style="padding:16px 40px;text-align:center;">
                   <p style="margin:0 0 4px;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;font-size:14px;color:#A8A29E;text-decoration:line-through;">
-                    €${cart.cart_total.toLocaleString()}
+                    $${cart.cart_total.toLocaleString()}
                   </p>
                   <p style="margin:0;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;font-size:32px;font-weight:300;color:#1C1917;">
-                    €${discountedTotal}
+                    $${discountedTotal}
                   </p>
                 </td>
               </tr>
