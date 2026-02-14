@@ -127,7 +127,7 @@ export default function AccountOrders() {
               {/* Footer */}
               <div className="flex items-center justify-between pt-4 border-t border-border">
                 <p className="text-sm font-medium text-foreground">
-                  €{(order.total_cents / 100).toFixed(2)}
+                  ${(order.total_cents / 100).toFixed(2)}
                 </p>
                 <div className="flex items-center gap-3">
                   {order.order_items && order.order_items.length > 0 && (

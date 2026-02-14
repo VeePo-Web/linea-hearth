@@ -18,33 +18,18 @@ export function useOrders() {
     const fetchOrders = async () => {
       setIsLoading(true);
       try {
-        const { data: ordersData, error: ordersError } = await supabase
+        const { data, error } = await supabase
           .from('orders')
-          .select('*')
+          .select('*, order_items(*)')
           .eq('user_id', user.id)
           .order('created_at', { ascending: false });
 
-        if (ordersError) {
-          console.error('Error fetching orders:', ordersError);
+        if (error) {
+          console.error('Error fetching orders:', error);
           return;
         }
 
-        // Fetch order items for each order
-        const ordersWithItems = await Promise.all(
-          (ordersData || []).map(async (order) => {
-            const { data: items } = await supabase
-              .from('order_items')
-              .select('*')
-              .eq('order_id', order.id);
-            
-            return {
-              ...order,
-              order_items: items || [],
-            } as Order;
-          })
-        );
-
-        setOrders(ordersWithItems);
+        setOrders((data || []) as Order[]);
       } catch (err) {
         console.error('Error fetching orders:', err);
       } finally {
