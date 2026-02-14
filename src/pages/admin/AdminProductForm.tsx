@@ -314,6 +314,9 @@ const AdminProductForm = () => {
                 <div className="space-y-2">
                   <Label className="text-xs uppercase tracking-wider">Ministry Statement</Label>
                   <Textarea value={ministryStatement} onChange={(e) => setMinistryStatement(e.target.value)} placeholder="The purpose behind this piece..." rows={3} />
+                  <p className="text-xs text-muted-foreground">
+                    Leave blank to use the default faith statement. Your custom text will appear in "The Purpose" section on the product page.
+                  </p>
                 </div>
 
                 <div className="space-y-2">
