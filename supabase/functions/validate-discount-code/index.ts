@@ -41,12 +41,12 @@ const ERROR_MESSAGES: Record<ErrorCode, string> = {
   CODE_EXPIRED: "This code has expired.",
   CODE_INACTIVE: "This code is no longer active.",
   CODE_NOT_YET_VALID: "This code isn't active yet.",
-  MINIMUM_NOT_MET: "This code requires a minimum order of €{amount}.",
+  MINIMUM_NOT_MET: "This code requires a minimum order of ${amount}.",
   USAGE_LIMIT_REACHED: "This code has reached its usage limit.",
   PER_USER_LIMIT_REACHED: "You've already used this code.",
 };
 
-function formatCentsToEuros(cents: number): string {
+function formatCentsToDollars(cents: number): string {
   return (cents / 100).toFixed(2);
 }
 
@@ -153,7 +153,7 @@ Deno.serve(async (req) => {
           error: "MINIMUM_NOT_MET" as ErrorCode,
           message: ERROR_MESSAGES.MINIMUM_NOT_MET.replace(
             "{amount}",
-            formatCentsToEuros(dc.minimum_order_cents)
+            formatCentsToDollars(dc.minimum_order_cents)
           ),
         }),
         { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
