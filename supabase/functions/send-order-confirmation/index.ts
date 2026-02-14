@@ -40,7 +40,7 @@ interface Order {
 }
 
 // Format cents to currency display
-function formatCurrency(cents: number, currency: string = "eur"): string {
+function formatCurrency(cents: number, currency: string = "cad"): string {
   const amount = cents / 100;
   const symbols: Record<string, string> = {
     eur: "€",

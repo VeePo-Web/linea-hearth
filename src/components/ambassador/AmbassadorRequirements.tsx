@@ -11,7 +11,7 @@ const requirements = [
 
 const notForYou = [
   "You just want free stuff",
-  "You're not comfortable sharing your faith publicly",
+  "You're not ready to share your faith publicly",
   "You can't commit to regular content creation",
   "You're looking for a quick cash grab",
 ];

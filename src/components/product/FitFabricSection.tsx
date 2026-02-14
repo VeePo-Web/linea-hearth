@@ -57,7 +57,7 @@ const FitFabricSection = ({
       icon: Shirt,
       label: "Fabric",
       value: fabricComposition || "100% Cotton",
-      description: "Soft, breathable, durable",
+      description: "Durable, breathable, built to last",
     },
     {
       icon: Scale,

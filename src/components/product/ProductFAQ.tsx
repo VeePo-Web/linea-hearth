@@ -27,8 +27,8 @@ const ProductFAQ = ({ commonQuestions, fitType, fabricComposition, careInstructi
     {
       question: "How does the fabric feel?",
       answer: fabricComposition 
-        ? `Made from ${fabricComposition.toLowerCase()}, this piece offers a premium hand-feel that's both comfortable and durable. It's been pre-washed for softness.`
-        : "Our signature cotton blend offers a soft, breathable feel that gets even better with each wash. It's designed for all-day comfort.",
+        ? `Made from ${fabricComposition.toLowerCase()}, this piece offers a premium hand-feel that's both durable and premium. It's been pre-washed for a broken-in feel.`
+        : "Our signature cotton blend offers a durable, breathable feel that gets even better with each wash. Built to last.",
     },
     {
       question: "Will this shrink?",

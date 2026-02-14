@@ -77,7 +77,7 @@ const heightOptions: { value: HeightRange; label: string; description: string }[
 
 const fitOptions: { value: FitPreference; label: string; description: string }[] = [
   { value: 'fitted', label: "Fitted", description: "Close to body, tailored look" },
-  { value: 'relaxed', label: "Relaxed", description: "Comfortable, slightly loose" },
+  { value: 'relaxed', label: "Relaxed", description: "Easy movement, slightly loose" },
   { value: 'oversized', label: "Oversized", description: "Extra roomy, streetwear vibe" },
 ];
 

@@ -86,7 +86,7 @@ const FitGuideSection = () => {
       waist_cm: 96,
       hip_cm: 109,
       photo_url: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=800',
-      fit_notes: 'Isaiah wears XL for comfortable layering.'
+      fit_notes: 'Isaiah wears XL for layered looks.'
     },
     {
       id: '4',
@@ -142,7 +142,7 @@ const FitGuideSection = () => {
       waist_cm: 76,
       hip_cm: 102,
       photo_url: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=800',
-      fit_notes: 'Ruth wears L for comfortable oversized styling.'
+      fit_notes: 'Ruth wears L for oversized styling.'
     },
     {
       id: '8',

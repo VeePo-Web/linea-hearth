@@ -32,7 +32,7 @@ const measurementSteps = [
   {
     icon: Ruler,
     title: "WAIST",
-    description: "Natural waist, not belt line. Snug but comfortable."
+    description: "Natural waist, not belt line. Snug but not restrictive."
   },
   {
     icon: Ruler,

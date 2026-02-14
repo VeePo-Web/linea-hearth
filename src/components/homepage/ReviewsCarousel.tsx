@@ -32,7 +32,7 @@ const ReviewsCarousel = () => {
       customer_name: 'Sarah M.',
       customer_location: 'Dallas, TX',
       rating: 5,
-      review_text: "Finally, a Christian brand that doesn't compromise on style. These pieces are modern, comfortable, and make a bold statement.",
+      review_text: "Finally, a Christian brand that doesn't compromise on style. These pieces are modern, built to last, and make a bold statement.",
       verified: true
     },
     {

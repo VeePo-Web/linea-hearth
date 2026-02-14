@@ -286,7 +286,7 @@ Deno.serve(async (req) => {
         shipping_cents: shippingCents,
         discount_cents: discountCents + bundleDiscountCents, // Include bundle discount
         total_cents: totalCents,
-        currency: "eur",
+        currency: "cad",
         discount_code: validatedDiscountCode,
         shipping_method: shippingMethod,
         metadata: { 
@@ -337,7 +337,7 @@ Deno.serve(async (req) => {
     // Create Stripe Checkout Session
     const lineItems = items.map((item) => ({
       price_data: {
-        currency: "eur",
+        currency: "cad",
         product_data: {
           name: item.name,
           images: item.image ? [item.image] : [],
@@ -357,7 +357,7 @@ Deno.serve(async (req) => {
     if (shippingCents > 0) {
       lineItems.push({
         price_data: {
-          currency: "eur",
+          currency: "cad",
           product_data: {
             name: `${shippingMethod.charAt(0).toUpperCase() + shippingMethod.slice(1)} Shipping`,
             images: [] as string[],
@@ -407,7 +407,7 @@ Deno.serve(async (req) => {
         },
         body: new URLSearchParams({
           amount_off: String(discountCents),
-          currency: "eur",
+          currency: "cad",
           duration: "once",
           name: discountCodeRecord.name || discountCodeRecord.code || "Discount",
         }),
@@ -444,7 +444,7 @@ Deno.serve(async (req) => {
         },
         body: new URLSearchParams({
           amount_off: String(bundleDiscountCents),
-          currency: "eur",
+          currency: "cad",
           duration: "once",
           name: "Complete Look Bundle Discount",
         }),

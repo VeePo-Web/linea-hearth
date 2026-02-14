@@ -45,12 +45,12 @@ const ProductDescription = () => {
             <p className="text-sm font-light text-muted-foreground leading-relaxed">
               This premium piece is designed to be worn as a statement of faith. 
               Crafted with intention, every detail reflects our commitment to quality 
-              and purpose. The relaxed fit offers all-day comfort while the bold design 
+              and purpose. Built to move with you and stand out. The bold design 
               sparks meaningful conversations.
             </p>
             <p className="text-sm font-light text-muted-foreground leading-relaxed">
-              Made from heavyweight cotton blend fabric that feels substantial yet 
-              comfortable. Pre-shrunk to maintain its perfect fit wash after wash. 
+              Made from heavyweight cotton blend fabric that feels substantial and 
+              durable. Pre-shrunk to maintain its perfect fit wash after wash.
               The print is designed to last, using premium techniques that won't 
               crack or fade over time.
             </p>
@@ -186,7 +186,7 @@ const ProductDescription = () => {
                   <span className="text-sm font-light text-muted-foreground">Sarah T.</span>
                 </div>
                 <p className="text-sm font-light text-muted-foreground leading-relaxed">
-                  "Super comfortable and the fit is perfect. I've gotten so many compliments and 
+                  "The quality is unmatched and the fit is perfect. I've gotten so many compliments and 
                   it's opened up some great conversations about faith."
                 </p>
               </div>
