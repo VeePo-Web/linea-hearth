@@ -21,7 +21,7 @@ const SavingsSummary = ({ discountAmount = 0 }: SavingsSummaryProps) => {
           <Sparkles className="h-3 w-3 text-white" />
         </div>
         <span className="text-sm font-medium text-emerald-700 dark:text-emerald-400">
-          You're saving €{totalSavings.toLocaleString()} on this order!
+          You're saving ${totalSavings.toLocaleString()} on this order!
         </span>
       </div>
       
@@ -30,13 +30,13 @@ const SavingsSummary = ({ discountAmount = 0 }: SavingsSummaryProps) => {
         {discountAmount > 0 && (
           <div className="flex justify-between">
             <span>Discount applied</span>
-            <span>-€{discountAmount.toLocaleString()}</span>
+            <span>-${discountAmount.toLocaleString()}</span>
           </div>
         )}
         {hasFreeShipping && (
           <div className="flex justify-between">
-            <span>Free shipping (orders over €{freeShippingThreshold})</span>
-            <span>-€{shippingValue}</span>
+            <span>Free shipping (orders over ${freeShippingThreshold})</span>
+            <span>-${shippingValue}</span>
           </div>
         )}
       </div>

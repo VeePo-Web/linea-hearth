@@ -155,7 +155,7 @@ const CheckoutSuccess = () => {
   };
 
   const formatCents = (cents: number) => {
-    return `€${(cents / 100).toFixed(2)}`;
+    return `$${(cents / 100).toFixed(2)}`;
   };
 
   if (loading) {
