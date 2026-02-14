@@ -1,29 +1,99 @@
 
 
-# Fix: Reset Admin Password (Trimmed)
+# Fix Plan: Language, Currency, and Date Updates
 
-## Problem
+## 3 Issues to Fix
 
-The previous password reset included leading whitespace characters from the original message formatting. The network logs confirm the password being sent starts with spaces:
+### Issue 1: Replace all "comfort" language with warfare/conviction language
 
-```
-"password":"  a!jaDIU(*102nK{}asdbhi1*(&A019283847599972"
-```
+The brand identity is spiritual warfare, not comfort. The following files need updates:
 
-This means the password was stored with leading spaces, causing a mismatch when typing it normally.
+**File: `src/components/content/FiftyFiftySection.tsx` (line 22)**
+- Current: "Premium comfort with bold faith statements"
+- Replace: "Premium armor for bold faith statements"
 
-## Solution
+**File: `src/components/product/ProductDescription.tsx` (lines 46-54)**
+- Current: "The relaxed fit offers all-day comfort while the bold design sparks meaningful conversations."
+- Replace: "Built to move with you and stand out. The bold design sparks meaningful conversations."
+- Current: "...feels substantial yet comfortable. Pre-shrunk..."
+- Replace: "...feels substantial and durable. Pre-shrunk..."
+- Current (line 189): "Super comfortable and the fit is perfect..."
+- Replace: "The quality is unmatched and the fit is perfect..."
 
-1. Create a temporary edge function (`reset-admin-password`) that sets the password to the **trimmed** value: `a!jaDIU(*102nK{}asdbhi1*(&A019283847599972` (no leading spaces or newlines)
-2. Deploy and call it once
-3. Verify login works
-4. Delete the function immediately
+**File: `src/components/product/ProductFAQ.tsx` (lines 28-31)**
+- Current: "...both comfortable and durable. It's been pre-washed for softness."
+- Replace: "...both durable and premium. It's been pre-washed for a broken-in feel."
+- Current: "...soft, breathable feel...It's designed for all-day comfort."
+- Replace: "...durable, breathable feel that gets even better with each wash. Built to last."
 
-## Technical Details
+**File: `src/components/product/FitFabricSection.tsx` (line 60)**
+- Current: "Soft, breathable, durable"
+- Replace: "Durable, breathable, built to last"
 
-- File: `supabase/functions/reset-admin-password/index.ts`
-- Hardcoded to only update `parker@veepo.ca` (user ID: `dee51bd2-8ad5-45f4-ac5f-b369bd2fc23b`)
-- Uses service role key to call `auth.admin.updateUserById`
-- Password will be exactly: `a!jaDIU(*102nK{}asdbhi1*(&A019283847599972` (no whitespace padding)
-- Function deleted immediately after successful use
+**File: `src/components/product/ProductReviews.tsx` (line 82)**
+- Current: "Comfortable fit"
+- Replace: "Built right"
+
+**File: `src/components/homepage/ReviewsCarousel.tsx` (line 35)**
+- Current: "...modern, comfortable, and make a bold statement."
+- Replace: "...modern, built to last, and make a bold statement."
+
+**File: `src/components/lookbook/FitGuideSection.tsx` (lines 89, 145)**
+- Current: "...for comfortable layering" / "...for comfortable oversized styling"
+- Replace: "...for layered looks" / "...for oversized styling"
+
+**File: `src/components/size-guide/SizeQuizModal.tsx` (line 80)**
+- Current: "Comfortable, slightly loose"
+- Replace: "Easy movement, slightly loose"
+
+**File: `src/pages/about/SizeGuide.tsx` (line 35)**
+- Current: "Natural waist, not belt line. Snug but comfortable."
+- Replace: "Natural waist, not belt line. Snug but not restrictive."
+
+**File: `src/components/ambassador/AmbassadorRequirements.tsx` (line 14)**
+- Current: "You're not comfortable sharing your faith publicly"
+- Replace: "You're not ready to share your faith publicly"
+
+---
+
+### Issue 2: Change all EUR currency references to CAD
+
+Despite the memory note saying CAD was implemented, 6 locations still use "eur":
+
+**File: `supabase/functions/create-checkout-session/index.ts`**
+- Lines 289, 340, 360, 410, 447: Change `"eur"` to `"cad"`
+
+**File: `supabase/functions/create-payment-intent/index.ts`**
+- Lines 282, 310: Change `"eur"` to `"cad"`
+
+**File: `supabase/functions/send-order-confirmation/index.ts`**
+- Line 43: Change default `"eur"` to `"cad"`
+
+**File: `src/hooks/useExpressPay.ts`**
+- Line 74: Change `"eur"` to `"cad"`, also change `country: "US"` to `country: "CA"` (line 73)
+
+---
+
+### Issue 3: "Summer 2024" reference
+
+No "Summer 2024" text was found in the codebase. The only "Summer" reference is in `AdminDiscounts.tsx` as a placeholder example ("Summer Sale") which is just form placeholder text -- not displayed to users.
+
+If you have a specific page where you saw "Summer 2024", let me know and I can track it down. It may be stored in the database (e.g., a product description or discount code name).
+
+---
+
+## Implementation Summary
+
+| Area | Files Changed | Risk Level |
+|------|--------------|------------|
+| Comfort language removal | 10 frontend files | Low -- copy changes only |
+| EUR to CAD | 3 edge functions + 1 hook | Medium -- affects payments |
+| Edge functions | Redeploy after changes | Required |
+
+## Deployment Order
+
+1. Update all comfort language across frontend files (parallel, no dependencies)
+2. Update all EUR to CAD in edge functions and hooks (parallel)
+3. Deploy edge functions: `create-checkout-session`, `create-payment-intent`, `send-order-confirmation`
+4. Test a checkout flow to verify CAD is applied correctly
 
