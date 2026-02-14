@@ -42,7 +42,7 @@ const SearchQuickAdd = ({ product, onNavigate }: SearchQuickAddProps) => {
           </p>
           <div className="flex items-center gap-2 mt-0.5">
             <span className="text-xs text-muted-foreground">
-              €{displayPrice.toLocaleString()}
+              ${displayPrice.toLocaleString()}
             </span>
             {quickAdd.canOneTap && (
               <span className="text-[10px] text-amber-600 font-medium px-1.5 py-0.5 bg-amber-500/10 rounded-sm">

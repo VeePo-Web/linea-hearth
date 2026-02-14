@@ -261,7 +261,7 @@ const ShopTheLook = ({ products, lookName, lookId }: ShopTheLookProps) => {
         id: cartId,
         name: product.name,
         price: price,
-        priceFormatted: `€${price}`,
+        priceFormatted: `$${price}`,
         image: primaryImage?.image_url || '',
         category: product.position || 'Lookbook',
         size: 'M',
@@ -364,8 +364,8 @@ const ShopTheLook = ({ products, lookName, lookId }: ShopTheLookProps) => {
               <span>Add Complete Look</span>
               {bundleDiscountPercent > 0 && (
                 <span className="ml-2 flex items-center gap-1.5">
-                  <span className="line-through text-white/50 text-sm">€{totalPrice.toFixed(0)}</span>
-                  <span className="text-white font-medium">€{discountedTotal.toFixed(0)}</span>
+                  <span className="line-through text-white/50 text-sm">${totalPrice.toFixed(0)}</span>
+                  <span className="text-white font-medium">${discountedTotal.toFixed(0)}</span>
                   <span className="text-[10px] bg-white/20 px-1.5 py-0.5 rounded">
                     -{bundleDiscountPercent}%
                   </span>
