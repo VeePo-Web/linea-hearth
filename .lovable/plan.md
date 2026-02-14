@@ -1,42 +1,45 @@
 
 
-# Fix Mobile/Tablet Menu: Use Slide-Out Drawer Instead of Full-Screen Nav
+# Fix Logo: Replace Broken Image with Fear of God-Style Text Wordmark
 
 ## Problem
 
-On mobile and tablet, tapping the hamburger icon opens the `FullScreenNav` component -- a full-screen overlay with a background image that behaves like a landing page, not a menu. Users expect a standard slide-out drawer menu (`MobileMenu`) that lets them browse categories, access account features, and navigate without losing context.
+The center logo uses `<img src="/logo.png">` which is not rendering correctly. Instead of debugging asset files, the superior editorial approach is a typographic wordmark — matching the Fear of God aesthetic of ultra-tracked, uppercase, light-weight lettering.
 
-## Change
+## Solution
 
-In `src/components/header/Navigation.tsx`:
+Replace the `<motion.img>` element with a styled `<span>` text wordmark reading "LINE OF JUDAH" in a Fear of God-inspired typographic treatment.
 
-1. **Replace the import** of `FullScreenNav` with `MobileMenu` (line 14)
-2. **Replace the component** at line 304: swap `<FullScreenNav>` for `<MobileMenu>`, passing the required props (`isOpen`, `onClose`, `navItems`, `onSearchOpen`, `onFavoritesOpen`, `onAuthOpen`)
+## Design Specifications
 
-## Exact edits
+- **Text:** "LINE OF JUDAH" (all caps)
+- **Font:** DM Sans (already the site font) at weight 300 (light)
+- **Letter-spacing:** `0.35em` — wide, confident, editorial tracking
+- **Font size:** `text-[0.7rem]` on mobile, `text-xs` on desktop — small but commanding
+- **Color:** `text-foreground` (black) — high contrast, no ambiguity
+- **No image dependency** — pure CSS text, resolution-independent, always renders
 
-**Line 14** -- change import:
+## Implementation
+
+### File: `src/components/header/Navigation.tsx`
+
+**Lines 160-171** — Replace the `<motion.img>` block with a text wordmark:
+
 ```tsx
-// FROM:
-import FullScreenNav from "./FullScreenNav";
-// TO:
-import MobileMenu from "./MobileMenu";
+{/* Center logo */}
+<div className="absolute left-1/2 transform -translate-x-1/2">
+  <Link to="/" className="block">
+    <span className="text-[0.7rem] sm:text-xs font-light tracking-[0.35em] text-foreground uppercase whitespace-nowrap">
+      LINE OF JUDAH
+    </span>
+  </Link>
+</div>
 ```
-
-**Line 303-304** -- swap component:
-```tsx
-// FROM:
-<FullScreenNav isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} onSearchOpen={() => setIsSearchOpen(true)} onFavoritesOpen={() => setOffCanvasType('favorites')} onAuthOpen={() => setIsAuthModalOpen(true)} />
-
-// TO:
-<MobileMenu isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} navItems={navItems} onSearchOpen={() => setIsSearchOpen(true)} onFavoritesOpen={() => setOffCanvasType('favorites')} onAuthOpen={() => setIsAuthModalOpen(true)} />
-```
-
-The key difference: `MobileMenu` requires the `navItems` array prop so it can render the expandable Shop categories with subcategories. `FullScreenNav` had its own hardcoded flat link list.
 
 ## Scope
 
 - **1 file** changed: `src/components/header/Navigation.tsx`
-- **2 lines** modified (import + component swap)
-- Zero new files, zero new dependencies
+- **3 lines** modified (swap img for span)
+- Zero new dependencies, zero new assets
+- Hover animation removed (text wordmarks don't scale on hover in premium fashion — it looks cheap)
 
