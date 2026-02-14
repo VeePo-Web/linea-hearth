@@ -1,45 +1,58 @@
 
 
-# Fix Logo: Replace Broken Image with Fear of God-Style Text Wordmark
+# Elevate the Nav Bar Logo — Premium Typographic Wordmark
 
-## Problem
+## What We're Fixing
 
-The center logo uses `<img src="/logo.png">` which is not rendering correctly. Instead of debugging asset files, the superior editorial approach is a typographic wordmark — matching the Fear of God aesthetic of ultra-tracked, uppercase, light-weight lettering.
+The "LINE OF JUDAH" text in the center of the nav bar currently uses DM Sans at `font-light` with wide tracking. It's clean but reads as generic — it lacks the typographic authority of a true fashion wordmark. The goal is to make it feel like a Fear of God / 032c-level brand mark without changing anything else on the site.
 
-## Solution
+## The Upgrade
 
-Replace the `<motion.img>` element with a styled `<span>` text wordmark reading "LINE OF JUDAH" in a Fear of God-inspired typographic treatment.
+### 1. Use the SVG Logo Instead of Plain Text
 
-## Design Specifications
+The project already has a high-quality SVG wordmark at `public/logo.svg` — a custom serif-style "LINE" rendering that looks far more premium than any web font. We will use this SVG inline as the nav logo, sized to fit the nav bar height.
 
-- **Text:** "LINE OF JUDAH" (all caps)
-- **Font:** DM Sans (already the site font) at weight 300 (light)
-- **Letter-spacing:** `0.35em` — wide, confident, editorial tracking
-- **Font size:** `text-[0.7rem]` on mobile, `text-xs` on desktop — small but commanding
-- **Color:** `text-foreground` (black) — high contrast, no ambiguity
-- **No image dependency** — pure CSS text, resolution-independent, always renders
+- Render the SVG as an `<img>` tag pointing to `/logo.svg` (not the broken `/logo.png`)
+- Height: `h-5` on mobile, `h-6` on desktop — compact, confident, proportional to the 64px nav
+- The SVG is black on transparent, which works perfectly against the white nav background
+- Add `alt="Line of Judah"` for accessibility
 
-## Implementation
+### 2. Files Changed
 
-### File: `src/components/header/Navigation.tsx`
+| File | Change |
+|------|--------|
+| `src/components/header/Navigation.tsx` | Replace the `<span>LINE OF JUDAH</span>` with `<img src="/logo.svg">` |
+| `src/components/header/CheckoutHeader.tsx` | Same swap for checkout consistency |
 
-**Lines 160-171** — Replace the `<motion.img>` block with a text wordmark:
+### 3. Exact Code Change (Navigation.tsx, lines 160-167)
 
+Replace the current text span:
 ```tsx
 {/* Center logo */}
 <div className="absolute left-1/2 transform -translate-x-1/2">
   <Link to="/" className="block">
-    <span className="text-[0.7rem] sm:text-xs font-light tracking-[0.35em] text-foreground uppercase whitespace-nowrap">
-      LINE OF JUDAH
-    </span>
+    <img 
+      src="/logo.svg" 
+      alt="Line of Judah" 
+      className="h-5 sm:h-6 w-auto" 
+    />
   </Link>
 </div>
 ```
 
-## Scope
+Same pattern for CheckoutHeader.tsx.
 
-- **1 file** changed: `src/components/header/Navigation.tsx`
-- **3 lines** modified (swap img for span)
-- Zero new dependencies, zero new assets
-- Hover animation removed (text wordmarks don't scale on hover in premium fashion — it looks cheap)
+### 4. Why SVG Over Text
 
+- The SVG has a custom serif letterform for "LINE" with intentional weight variation between "LINE," "OF," and "JUDAH" — this typographic contrast is what makes premium wordmarks feel designed rather than typed
+- Resolution-independent, crisp on all screens
+- No additional font download required
+- Already exists in the project — zero new assets
+
+### 5. What Does NOT Change
+
+- No homepage changes
+- No nav structure changes
+- No layout changes
+- No new dependencies
+- Footer logo stays as-is (different treatment is fine — footer uses the amber accent)
