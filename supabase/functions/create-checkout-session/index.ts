@@ -47,14 +47,14 @@ interface CheckoutRequest {
   bundleDiscounts?: BundleDiscountClaim[];
 }
 
-// Shipping costs in cents
+// Shipping costs in cents (CAD)
 const SHIPPING_COSTS = {
-  standard: 0, // Free standard shipping
-  express: 999, // €9.99
-  overnight: 1999, // €19.99
+  standard: 1000, // $10 CAD
+  express: 1500, // $15 CAD
+  overnight: 3500, // $35 CAD
 };
 
-const FREE_SHIPPING_THRESHOLD = 10000; // €100 in cents
+const FREE_SHIPPING_THRESHOLD = 9900; // $99 CAD in cents
 
 Deno.serve(async (req) => {
   // Handle CORS preflight
@@ -171,7 +171,7 @@ Deno.serve(async (req) => {
         return new Response(
           JSON.stringify({ 
             success: false, 
-            error: `Minimum order of €${(codeData.minimum_order_cents / 100).toFixed(2)} required for this code` 
+            error: `Minimum order of $${(codeData.minimum_order_cents / 100).toFixed(2)} CAD required for this code` 
           }),
           { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );

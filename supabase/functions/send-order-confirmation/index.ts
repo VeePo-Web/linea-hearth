@@ -48,7 +48,7 @@ function formatCurrency(cents: number, currency: string = "cad"): string {
     gbp: "£",
     cad: "C$",
   };
-  const symbol = symbols[currency.toLowerCase()] || "€";
+  const symbol = symbols[currency.toLowerCase()] || "$";
   return `${symbol}${amount.toFixed(2)}`;
 }
 
