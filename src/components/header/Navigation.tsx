@@ -160,9 +160,11 @@ const Navigation = () => {
         {/* Center logo */}
         <div className="absolute left-1/2 transform -translate-x-1/2">
           <Link to="/" className="block">
-            <span className="text-[0.7rem] sm:text-xs font-light tracking-[0.35em] text-foreground uppercase whitespace-nowrap">
-              LINE OF JUDAH
-            </span>
+            <img 
+              src="/logo.svg" 
+              alt="Line of Judah" 
+              className="h-5 sm:h-6 w-auto" 
+            />
           </Link>
         </div>
 
