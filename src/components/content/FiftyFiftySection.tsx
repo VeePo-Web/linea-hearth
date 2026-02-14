@@ -19,7 +19,7 @@ const FiftyFiftySection = () => {
               Hoodies
             </h3>
             <p className="text-sm font-light text-foreground">
-              Premium comfort with bold faith statements
+              Premium armor for bold faith statements
             </p>
           </div>
         </div>

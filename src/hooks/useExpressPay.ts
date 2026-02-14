@@ -70,8 +70,8 @@ export const useExpressPay = (): UseExpressPayReturn => {
 
         // Create a payment request to check availability
         const paymentRequest = stripe.paymentRequest({
-          country: "US",
-          currency: "eur",
+          country: "CA",
+          currency: "cad",
           total: {
             label: "Total",
             amount: 100, // Dummy amount for check

@@ -79,7 +79,7 @@ const ProductReviews = ({ productId }: ProductReviewsProps) => {
   const insights = reviews.length > 0 ? [
     { label: "Runs true to size", count: Math.floor(reviews.length * 0.8) },
     { label: "Great quality", count: Math.floor(reviews.length * 0.9) },
-    { label: "Comfortable fit", count: Math.floor(reviews.length * 0.7) },
+    { label: "Built right", count: Math.floor(reviews.length * 0.7) },
   ] : [];
 
   const containerVariants = {
