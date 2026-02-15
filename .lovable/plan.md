@@ -1,175 +1,101 @@
 
 
-# World-Class Lookbook Page Redesign
+# Lookbook Page -- World-Class Refinement Pass
 
-## Current State Audit
+## Current State (Post-Implementation Audit)
 
-### What's Working (Preserve)
-- Dark stone-900 palette with amber-500 accent creates strong brand identity
-- Snap-scroll vertical navigation is on-trend for editorial lookbooks
-- Desktop right-rail dot navigation with hover labels is clean
-- Mobile bottom pill nav with Instagram-style dots is intuitive
-- Swipe-to-add gesture on mobile is innovative (Tinder-pattern)
-- Clip-path image reveals and cinematic motion timing feel premium
-- Scripture references as editorial eyebrows are unique brand storytelling
-- "Shop the Look" product grid with quick-add is functional
+The previous plan successfully delivered:
+- Cinematic hero with background image, bottom-left 032c-style typography
+- Variable layout system (5 variants cycling per look index)
+- 65/35 mobile image/content split
+- Consistent `rounded-none` across all buttons and badges
+- Sharp-edged gender toggles and fit guide cards
 
-### What's Hurting Premium Perception
-1. **Hero feels flat** -- pure black with text only, no atmospheric imagery or editorial tension; compares poorly to DAZED/032c magazine openers that always lead with a striking visual
-2. **Look sections are repetitive** -- every look uses the identical 60/40 image-text split; no editorial pacing variation (quiet/loud/quiet rhythm)
-3. **Scroll indicator positioning conflicts** -- "SCROLL" text and the animated line overlap with "SS25" season tag on smaller desktops, creating visual clutter
-4. **Content side feels empty on desktop** -- the 40% text panel has too much negative space with no products visible (they're only in "Shop the Look" below the fold of each snap section)
-5. **Mobile look sections split 50/50** -- the image gets only half the viewport, losing the full-bleed impact that makes lookbooks compelling on mobile
-6. **No editorial transitions between looks** -- snap-scrolling from one look to the next is abrupt; no interstitial or visual breathing
-7. **FitGuide section breaks the dark editorial flow** -- it's functional but feels like a different page
-8. **"Swipe to Shop" button uses rounded-lg** -- violates the site's `rounded-none` design system standard
-9. **Gender badge uses rounded-full** -- same violation; should be sharp-edged
-10. **No video integration** -- VideoEmbed component exists but is never used in look sections despite `video_url` field existing
+### Remaining Issues Found Across Viewports
 
-### Highest-Impact Changes (Lowest Risk)
+**Mobile (390px)**
+1. Content area (35%) is too cramped -- the "Shop the Look" section with product grid, "Add Complete Look" button, and "Swipe to Shop" CTA all stack within that 35% slice, causing overflow and requiring internal scrolling that fights against the snap-scroll container
+2. The mobile bottom nav pill overlaps with the content area bottom edge on shorter viewports
+3. The "Swipe right to add look" hint floats over the image at an awkward position (bottom quarter)
 
-| Priority | Change | Impact |
-|----------|--------|--------|
-| 1 | Hero: add background image with overlay for editorial weight | Massive first-impression upgrade |
-| 2 | Vary look layouts (full-bleed, split, asymmetric) per index | Breaks monotony, creates magazine pacing |
-| 3 | Mobile: 70/30 image/content split instead of 50/50 | Products still visible, image dominates |
-| 4 | Add subtle interstitial dividers between looks | Smoother editorial rhythm |
-| 5 | Fix border-radius violations (rounded-lg/full to rounded-none) | Design system consistency |
-| 6 | Surface 2 product thumbnails in the content panel on desktop | Converts "browse" to "shop" without leaving the look |
+**Tablet (834px)**
+1. Tablet uses the mobile layout (hamburger + mobile nav dots) but has desktop-scale viewport -- it's a dead zone where neither mobile nor desktop layout shines
+2. The mobile nav dots container is oversized on tablet, taking too much visual weight
+3. Look sections use `lookbook-image-height` / `lookbook-content-height` on tablet (sub-1024px) which wastes the larger canvas
 
----
+**Desktop (1440px+)**
+4. Full-bleed layouts: the content overlay at bottom-left has no max-width on the description text, so it can run uncomfortably wide on ultra-wide displays
+5. The oversized look index watermark (`text-[20rem]`) is hidden below `lg` -- it should also show on tablet landscape
 
-## Luxury Upgrade Rules (Design System for Lookbook)
+**Cross-Viewport**
+6. The `lookbook-content-height` class sets `overflow-y: auto` which creates a nested scrollable area inside a snap-scroll container -- this causes scroll-fighting on iOS Safari where the inner scroll captures the gesture before the outer snap can take over
+7. No tablet-specific breakpoint in the CSS utilities -- the 1024px cutoff means iPads in portrait (834px / 820px) get the cramped mobile treatment
 
-### Spacing Scale
-- 4px (micro-gap between badges), 8px (card gaps), 16px (section inner padding), 24px (between content blocks), 48px (between major elements), 80px (section breathing on mobile), 120px (section breathing on desktop)
+## Plan
 
-### Typography Hierarchy
-- Look index: `text-[20rem]` font-extralight at 3% opacity (background watermark) -- already in place
-- Headline (faith statement): `text-4xl lg:text-5xl` font-extralight italic
-- Look name: `text-xl` font-light
-- Scripture reference: `text-xs` uppercase tracking-wide amber-500
-- Body: `text-sm` font-light white/60
-- Eyebrow labels: `text-[10px]` uppercase tracking-[0.25em]
+### 1. Fix Mobile Content Overflow (Highest Priority)
 
-### Button Hierarchy
-- Primary CTA: `bg-amber-600 text-white rounded-none` (Add Complete Look)
-- Secondary CTA: `bg-white/10 text-white rounded-none border border-white/20` (Swipe to Shop)
-- Ghost: `bg-transparent text-white/50 hover:text-white`
-- All buttons: `rounded-none` (NO rounded-lg or rounded-full)
+**Problem:** The 35% content area tries to fit too much: gender badge + scripture + headline + name + description + Shop the Look section (with product grid + buttons). This overflows and creates nested scrolling.
 
-### Border-Radius Discipline
-- **Zero radius everywhere** except: mobile bottom nav pill (keeps rounded-full for ergonomic thumb target), size picker buttons (keep rounded-lg for touch)
-- Gender badges: switch from `rounded-full` to `rounded-none` with border
+**Solution:** On mobile, simplify the content panel to show only the essential info (name, headline, scripture) and a single "Shop This Look" button that opens the existing SwipeLookbook drawer. The full product grid only shows on desktop within the split/full-bleed content panels.
 
-### Image Treatment
-- Aspect ratio: 3:4 for product cards, full-bleed for hero/look images
-- Hover: subtle 3% scale with editorial easing
-- Grayscale-to-color transition on hover (for product thumbnails)
-- Clip-path mask reveals on scroll-into-view (already in place)
+**File: `src/components/lookbook/LookSection.tsx`**
+- In the `LookContent` component, wrap the `ShopTheLook` component in a `hidden lg:block` so it only renders on desktop
+- Add a mobile-only compact CTA button that triggers the SwipeLookbook drawer directly
+- Remove `line-clamp-3` on description and replace with `hidden md:block` to hide it entirely on mobile (the headline + name are sufficient for the editorial snap)
 
-### Motion Rules
-- Respect `prefers-reduced-motion` throughout (already in place)
-- Cinematic timing (1.0s) for hero and image reveals
-- Slow timing (0.7s) for text reveals and content fade-ins
-- Spring config for interactive elements (buttons, cards)
-- No motion on scroll navigation dots (instant state change)
+### 2. Fix Scroll-Fighting on iOS
 
----
+**Problem:** `overflow-y: auto` on `.lookbook-content-height` creates a nested scroll trap inside the snap container.
 
-## Page-by-Page Premium Upgrade Plan
+**File: `src/index.css`**
+- Remove `overflow-y: auto` from `.lookbook-content-height`
+- Instead, add `overflow: hidden` so content that doesn't fit simply clips (which is acceptable since we're removing the product grid from mobile in step 1)
 
-### 1. LookbookHero.tsx -- "The Opening Spread"
+### 3. Tablet Breakpoint Optimization
 
-**Current:** Pure gradient black with text. Feels like a loading screen.
+**Problem:** Tablets (768px-1023px) get the cramped mobile layout but have enough space for a richer presentation.
 
-**Upgrade:**
-- Add a cinematic background image (the `/nav-hero-hoodie.png` or similar product shot) with heavy dark overlay (stone-950/80) and the existing noise grain texture
-- Shift layout to bottom-left aligned (032c magazine cover style) instead of vertically centered
-- Make "THE LOOKBOOK" text truly massive: `text-[12vw] lg:text-[10rem]`
-- Move season tag "SS25" to top-right corner as a discrete counter
-- Keep scroll indicator centered on mobile, bottom-left on desktop
-- Add a thin horizontal rule between title and subtitle for editorial structure
+**File: `src/index.css`**
+- Add a `@media (min-width: 768px)` breakpoint that changes the image/content split from 65/35 to 60/40 on tablets, giving more breathing room to content
+- At this breakpoint, content should also show a condensed 2-product grid (not the full ShopTheLook, but enough to create shoppability)
 
-### 2. LookSection.tsx -- "The Editorial Spread System"
+**File: `src/components/lookbook/LookSection.tsx`**
+- Use `md:` breakpoint classes to show a simplified product preview on tablet (2 product thumbnails inline) while keeping the full ShopTheLook hidden until `lg:`
 
-**Current:** Every look uses the same 60/40 split with alternating left/right.
+### 4. Cap Content Width on Ultra-Wide
 
-**Upgrade -- Variable Layouts by Index:**
+**File: `src/components/lookbook/LookSection.tsx`**
+- In full-bleed layouts, the content overlay `div` already has `lg:max-w-lg` -- this is correct but the description text inside has no max-width. Add `max-w-sm` to the description paragraph to keep line lengths readable.
 
-```text
-Look 0 (The Shepherd):  Full-bleed image, content overlaid bottom-left
-Look 1 (The Warrior):   40/60 split (text left, image right) -- reversed weight
-Look 2 (The Disciple):  Full-bleed image, content overlaid bottom-right
-Look 3 (The Vessel):    60/40 split (image left, text right) -- current style
-Look 4 (Street Evang.): Full-width image top 70%, content bar bottom 30%
-```
+### 5. Show Look Index Watermark on Tablet
 
-This creates the DAZED-style quiet-loud-quiet rhythm. Full-bleed looks feel like magazine covers; split looks feel like editorial spreads.
+**File: `src/components/lookbook/LookSection.tsx`**
+- Change the oversized index watermark from `hidden lg:block` to `hidden md:block` so it appears on tablets, reinforcing the editorial magazine feel at that viewport.
 
-**For each layout variant:**
-- Full-bleed: image covers 100% with heavy gradient overlay, text positioned over image
-- Split: current clip-path reveal + gradient overlay logic
-- Bottom bar: cinematic horizontal layout, products visible inline
+### 6. Mobile Content Panel Density
 
-**Mobile:**
-- All layouts collapse to 70/30 (image 70% / content 30%) instead of current 50/50
-- This gives the image the dominance it needs while keeping content scannable
-- Product thumbnails show as a horizontal scroll strip (max 2 visible)
+**File: `src/components/lookbook/LookSection.tsx`** (in LookContent)
+- Reduce `mb-4` gaps to `mb-2` on mobile using responsive classes: `mb-2 md:mb-4`
+- Scripture reference: `text-xs` on mobile (already good)
+- Headline: reduce from `text-xl` to `text-lg` on mobile to prevent wrapping
+- Hide look name on mobile (`hidden md:block`) since the headline already tells the story
+- Add a compact "Shop This Look" button (amber, full-width, 44px tall) visible only on mobile that opens the SwipeLookbook drawer
 
-### 3. ShopTheLook.tsx -- "The Product Strip"
+### Files Modified
 
-**Fixes:**
-- Replace `rounded-lg` on buttons with `rounded-none`
-- Replace `rounded-full` on gender badge in LookSection with sharp border
-- Mobile: keep 2-column product grid but make cards tighter (reduce aspect ratio padding)
-- "Swipe to Shop" button: `rounded-none` with amber border accent
-
-### 4. FitGuideSection.tsx -- "The Fit Story"
-
-**Fixes:**
-- Replace `rounded-lg` on model cards with `rounded-none`
-- Replace `rounded-full` on gender toggle with sharp pill alternative (border-bottom indicator instead)
-- "View Details" badge: `rounded-none`
-- Tighten overall section padding for editorial density
-
-### 5. LookNavigation.tsx + LookNavigationMobile.tsx
-
-**Keep as-is.** The desktop dot nav and mobile bottom pill are working well. The mobile rounded-full pill is an intentional ergonomic decision for thumb reach -- this is the one exception to the zero-radius rule.
-
-### 6. WearTheMissionCTA -- "The Closing Spread"
-
-**Already strong.** Minor fix: ensure it renders properly within the snap container.
-
----
-
-## Implementation Plan
-
-### Files to Modify
-
-| File | Changes |
-|------|---------|
-| `src/components/lookbook/LookbookHero.tsx` | Add background image, reposition layout to bottom-left, increase type scale, move SS25 to top-right |
-| `src/components/lookbook/LookSection.tsx` | Introduce layout variants by index (full-bleed, split, bottom-bar), change mobile split from 50/50 to 70/30 |
-| `src/components/lookbook/ShopTheLook.tsx` | Fix all `rounded-lg` to `rounded-none`, fix button styling |
-| `src/components/lookbook/FitGuideSection.tsx` | Fix `rounded-lg` and `rounded-full` to sharp edges, redesign gender toggle |
-| `src/components/lookbook/SwipeableLookCard.tsx` | Fix `rounded-xl` on buttons to `rounded-none` |
-| `src/components/lookbook/SwipeLookbook.tsx` | Fix `rounded-xl` and `rounded-full` on buttons |
-| `src/index.css` | Update `.lookbook-half-height` to support 70/30 mobile split with new utility classes |
+| File | Change |
+|------|--------|
+| `src/components/lookbook/LookSection.tsx` | Hide ShopTheLook on mobile, add compact mobile CTA, tighten mobile spacing, show watermark on md, cap description width |
+| `src/index.css` | Fix overflow-y on content-height, add tablet breakpoint at 768px for 60/40 split |
 
 ### What Does NOT Change
-- Desktop snap-scroll architecture
-- LookNavigation and LookNavigationMobile (dot nav)
-- Data fetching logic (useQuery + Supabase)
-- Demo looks data structure
-- Cart integration and quick-add logic
-- Swipe gesture physics
-- Animation timing system (lib/animations.ts)
+- Hero component (already polished)
+- Desktop layouts (working beautifully)
+- Navigation components (dot nav and mobile pill)
+- ShopTheLook component itself (only its visibility context changes)
+- FitGuideSection (already fixed)
+- SwipeLookbook/SwipeableLookCard (already fixed)
+- Data fetching, cart logic, animation system
 - No new dependencies
-
-### Safe Workflow
-1. All changes are CSS/layout-only within existing components
-2. No database changes, no new routes, no new components
-3. Each file change is isolated and testable independently
-4. Demo data continues to work as fallback
 
