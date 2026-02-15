@@ -33,6 +33,7 @@ export default function SwipeActions({
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: canUndo ? 1 : 0.3, scale: 1 }}
         transition={springConfig}
+        className="flex flex-col items-center gap-1"
       >
         <Button
           variant="ghost"
@@ -44,6 +45,7 @@ export default function SwipeActions({
         >
           <RotateCcw className="w-5 h-5" />
         </Button>
+        <span className="text-[10px] uppercase tracking-wider text-white/40 font-medium">Undo</span>
       </motion.div>
       
       {/* Skip Button */}
@@ -51,6 +53,7 @@ export default function SwipeActions({
         whileHover={prefersReducedMotion ? {} : { scale: 1.05 }}
         whileTap={prefersReducedMotion ? {} : { scale: 0.95 }}
         transition={springConfig}
+        className="flex flex-col items-center gap-1"
       >
         <Button
           variant="ghost"
@@ -62,6 +65,7 @@ export default function SwipeActions({
         >
           <X className="w-7 h-7" />
         </Button>
+        <span className="text-[10px] uppercase tracking-wider text-white/40 font-medium">Skip</span>
       </motion.div>
       
       {/* Add Button */}
@@ -69,6 +73,7 @@ export default function SwipeActions({
         whileHover={prefersReducedMotion ? {} : { scale: 1.05 }}
         whileTap={prefersReducedMotion ? {} : { scale: 0.95 }}
         transition={springConfig}
+        className="flex flex-col items-center gap-1"
       >
         <Button
           onClick={onAdd}
@@ -90,6 +95,7 @@ export default function SwipeActions({
             <span className="text-[10px] md:text-[9px] font-medium uppercase">{rememberedSize}</span>
           )}
         </Button>
+        <span className="text-[10px] uppercase tracking-wider text-white/40 font-medium">Add</span>
       </motion.div>
     </div>
   );

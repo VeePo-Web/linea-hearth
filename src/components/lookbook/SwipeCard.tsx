@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import { motion, useMotionValue, useTransform, PanInfo, AnimatePresence } from 'framer-motion';
-import { X, Heart, Check, ShoppingBag } from 'lucide-react';
+import { X, Heart, Check, ShoppingBag, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { SwipeLookProduct } from '@/hooks/useSwipeSession';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
@@ -18,6 +18,7 @@ interface SwipeCardProps {
   canOneTap: boolean;
   availableSizes: string[];
   getStockForSize: (size: string) => number;
+  isFirstCard?: boolean;
 }
 
 // Cap threshold at 100px for consistent feel across devices
@@ -47,6 +48,7 @@ export default function SwipeCard({
   canOneTap,
   availableSizes,
   getStockForSize,
+  isFirstCard = false,
 }: SwipeCardProps) {
   const prefersReducedMotion = useReducedMotion();
   const cardRef = useRef<HTMLDivElement>(null);
@@ -61,6 +63,7 @@ export default function SwipeCard({
   const rotate = useTransform(x, [-200, 200], [-MAX_ROTATION, MAX_ROTATION]);
   const addOpacity = useTransform(x, [0, 100], [0, 1]);
   const skipOpacity = useTransform(x, [-100, 0], [1, 0]);
+  const hintOpacity = useTransform(x, [-30, 0, 30], [0, 1, 0]);
   
   // Card stack transforms based on position
   const stackScale = 1 - stackIndex * 0.08;
@@ -254,6 +257,25 @@ export default function SwipeCard({
           
           {/* Product Info - Bottom */}
           <div className="absolute bottom-0 left-0 right-0 p-5 pb-6">
+            {/* Persistent "Swipe right to add" hint on first card */}
+            {isFirstCard && isTop && !isPickerOpen && !showSuccess && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="flex items-center justify-center gap-2 mb-4"
+                style={{ opacity: hintOpacity }}
+              >
+                <motion.div
+                  className="flex items-center gap-1.5 text-white/70 bg-white/10 backdrop-blur-sm px-3 py-1.5"
+                  animate={prefersReducedMotion ? {} : { x: [0, 8, 0] }}
+                  transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+                >
+                  <span className="text-xs font-medium uppercase tracking-wide">Swipe right to add</span>
+                  <ChevronRight className="w-4 h-4" />
+                </motion.div>
+              </motion.div>
+            )}
+            
             <Link to={`/product/${product.slug}`} className="block" onClick={(e) => e.stopPropagation()}>
               <h3 className="text-white text-lg md:text-xl font-light mb-1 truncate">
                 {product.name}
