@@ -92,7 +92,7 @@ function LookProductCard({
           
           {/* Position Tag */}
           {positionLabel && (
-            <span className="absolute top-2 left-2 text-[9px] uppercase tracking-wider bg-black/70 text-white/90 px-2 py-1 rounded font-light">
+            <span className="absolute top-2 left-2 text-[9px] uppercase tracking-wider bg-black/70 text-white/90 px-2 py-1 font-light">
               {positionLabel}
             </span>
           )}
@@ -307,23 +307,7 @@ const ShopTheLook = ({ products, lookName, lookId }: ShopTheLookProps) => {
         )}
       </div>
 
-      {/* Mobile: Swipe to Shop CTA */}
-      {isMobile && products.length > 0 && (
-        <motion.div
-          whileHover={prefersReducedMotion ? {} : { scale: 1.02 }}
-          whileTap={prefersReducedMotion ? {} : { scale: 0.98 }}
-          transition={springConfig}
-        >
-          <Button
-            onClick={() => setIsSwipeOpen(true)}
-            className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-white h-12 rounded-none font-light tracking-wide flex items-center justify-center gap-2"
-          >
-            <Sparkles className="w-4 h-4" />
-            Swipe to Shop
-            <span className="text-white/70 text-sm ml-1">({products.length} items)</span>
-          </Button>
-        </motion.div>
-      )}
+      {/* Mobile swipe CTA removed — mobile users access swipe via LookSection's compact CTA */}
 
       {/* Products Grid - Show 2 on mobile, 4 on desktop */}
       <StaggerContainer className="grid grid-cols-2 gap-3" staggerDelay={0.1} delayChildren={0}>

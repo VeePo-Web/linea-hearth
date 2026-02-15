@@ -297,7 +297,7 @@ const FitGuideSection = () => {
 
                       {/* Hover/Tap indicator - Always visible on mobile */}
                       <motion.div 
-                        className="absolute inset-0 flex items-center justify-center opacity-100 md:opacity-0 md:group-hover:opacity-100"
+                        className="absolute inset-0 hidden md:flex items-center justify-center opacity-0 group-hover:opacity-100"
                         transition={{ duration: 0.2 }}
                       >
                         <motion.span 
