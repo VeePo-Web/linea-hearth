@@ -1,7 +1,9 @@
+import { useState } from "react";
 import { motion, useInView, useReducedMotion } from "framer-motion";
 import { useRef } from "react";
 import ShopTheLook from "./ShopTheLook";
 import SwipeableLookCard from "./SwipeableLookCard";
+import SwipeLookbook from "./SwipeLookbook";
 import TextReveal from "@/components/motion/TextReveal";
 import { easing, timing } from "@/lib/animations";
 import { useCart } from "@/hooks/useCart";
@@ -49,6 +51,7 @@ const LookSection = ({ look, index }: LookSectionProps) => {
   const isInView = useInView(sectionRef, { once: true, amount: 0.3 });
   const prefersReducedMotion = useReducedMotion();
   const { openCart } = useCart();
+  const [bottomBarSwipeOpen, setBottomBarSwipeOpen] = useState(false);
 
   const layout = getLayoutVariant(index);
   const lookIndex = String(index + 1).padStart(2, '0');
@@ -75,7 +78,7 @@ const LookSection = ({ look, index }: LookSectionProps) => {
     >
       {/* Oversized Look Index - Background Element */}
       <motion.div
-        className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 pointer-events-none z-0 hidden lg:block"
+        className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 pointer-events-none z-0 hidden md:block"
         initial={prefersReducedMotion ? {} : { opacity: 0, scale: 0.8 }}
         animate={isInView ? { opacity: 0.03, scale: 1 } : {}}
         transition={{ duration: timing.cinematic, ease: easing.editorial, delay: 0.2 }}
@@ -278,11 +281,28 @@ const LookSection = ({ look, index }: LookSectionProps) => {
               </div>
 
               {/* Right: Shop the look */}
-              <div className="flex-shrink-0 lg:w-[400px]">
+              <div className="flex-shrink-0 lg:w-[400px] hidden lg:block">
                 <ShopTheLook products={look.products} lookName={look.name} lookId={look.id} />
+              </div>
+              {/* Mobile CTA for bottom-bar layout */}
+              <div className="lg:hidden flex-shrink-0">
+                <button
+                  onClick={() => setBottomBarSwipeOpen(true)}
+                  className="w-full h-11 bg-amber-600 text-white text-sm font-medium uppercase tracking-widest hover:bg-amber-700 transition-colors px-6"
+                >
+                  Shop This Look
+                </button>
               </div>
             </div>
           </div>
+          <SwipeLookbook
+            isOpen={bottomBarSwipeOpen}
+            onClose={() => setBottomBarSwipeOpen(false)}
+            onViewBag={openCart}
+            lookId={look.id}
+            lookName={look.name}
+            products={look.products}
+          />
         </div>
       )}
     </section>
@@ -305,7 +325,9 @@ function LookContent({
   prefersReducedMotion: boolean | null;
   align?: 'left' | 'right';
 }) {
-  
+  const [swipeOpen, setSwipeOpen] = useState(false);
+  const { openCart } = useCart();
+
   return (
     <>
       {/* Gender Badge */}
@@ -313,7 +335,7 @@ function LookContent({
         initial={prefersReducedMotion ? {} : { opacity: 0, y: 10 }}
         animate={isInView ? { opacity: 1, y: 0 } : {}}
         transition={{ duration: timing.slow, ease: easing.editorial, delay: 0.4 }}
-        className="mb-4"
+        className="mb-2 md:mb-4"
       >
         <span className="text-[10px] uppercase tracking-[0.25em] text-white/30 font-light border border-white/10 px-3 py-1">
           {genderLabel}
@@ -323,7 +345,7 @@ function LookContent({
       {/* Scripture Reference */}
       {look.scripture_reference && (
         <motion.p 
-          className="text-sm md:text-xs uppercase tracking-[0.25em] text-amber-500 mb-4 font-light"
+          className="text-xs uppercase tracking-[0.25em] text-amber-500 mb-2 md:mb-4 font-light"
           initial={prefersReducedMotion ? {} : { opacity: 0, y: 10 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: timing.slow, ease: easing.editorial, delay: 0.5 }}
@@ -333,18 +355,18 @@ function LookContent({
       )}
 
       {/* Headline */}
-      <div className="mb-3">
+      <div className="mb-2 md:mb-3">
         <TextReveal 
           text={`"${look.headline}"`}
           as="h2"
-          className="text-xl xs:text-2xl md:text-3xl lg:text-4xl font-extralight italic text-white leading-tight"
+          className="text-lg md:text-2xl lg:text-4xl font-extralight italic text-white leading-tight"
           delay={0.6}
         />
       </div>
 
-      {/* Look Name */}
+      {/* Look Name - hidden on mobile, headline is enough */}
       <motion.h3 
-        className="text-lg md:text-xl font-light text-white/80 mb-4"
+        className="hidden md:block text-xl font-light text-white/80 mb-4"
         initial={prefersReducedMotion ? {} : { opacity: 0, y: 15 }}
         animate={isInView ? { opacity: 1, y: 0 } : {}}
         transition={{ duration: timing.slow, ease: easing.editorial, delay: 0.8 }}
@@ -352,10 +374,10 @@ function LookContent({
         {look.name}
       </motion.h3>
 
-      {/* Description */}
+      {/* Description - hidden on mobile, shown on tablet+ with max-width */}
       {look.description && (
         <motion.p 
-          className="text-sm text-white/60 font-light leading-relaxed mb-6 md:mb-8 line-clamp-3 md:line-clamp-none"
+          className="hidden md:block text-sm text-white/60 font-light leading-relaxed mb-6 md:mb-8 max-w-sm"
           initial={prefersReducedMotion ? {} : { opacity: 0, y: 15 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: timing.slow, ease: easing.editorial, delay: 0.9 }}
@@ -364,14 +386,40 @@ function LookContent({
         </motion.p>
       )}
 
-      {/* Shop the Look */}
+      {/* Shop the Look - desktop only */}
       <motion.div
+        className="hidden lg:block"
         initial={prefersReducedMotion ? {} : { opacity: 0, y: 20 }}
         animate={isInView ? { opacity: 1, y: 0 } : {}}
         transition={{ duration: timing.slow, ease: easing.editorial, delay: 1.0 }}
       >
         <ShopTheLook products={look.products} lookName={look.name} lookId={look.id} />
       </motion.div>
+
+      {/* Mobile CTA - compact button that opens SwipeLookbook drawer */}
+      <motion.div
+        className="lg:hidden mt-3"
+        initial={prefersReducedMotion ? {} : { opacity: 0, y: 15 }}
+        animate={isInView ? { opacity: 1, y: 0 } : {}}
+        transition={{ duration: timing.slow, ease: easing.editorial, delay: 0.9 }}
+      >
+        <button
+          onClick={() => setSwipeOpen(true)}
+          className="w-full h-11 bg-amber-600 text-white text-sm font-medium uppercase tracking-widest hover:bg-amber-700 transition-colors"
+        >
+          Shop This Look
+        </button>
+      </motion.div>
+
+      {/* SwipeLookbook Drawer for mobile */}
+      <SwipeLookbook
+        isOpen={swipeOpen}
+        onClose={() => setSwipeOpen(false)}
+        onViewBag={openCart}
+        lookId={look.id}
+        lookName={look.name}
+        products={look.products}
+      />
     </>
   );
 }
