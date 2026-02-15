@@ -124,7 +124,7 @@ export function SwipeableLookCard({
         style={{ opacity: addOpacity }}
         className="absolute top-1/2 right-4 -translate-y-1/2 z-20 pointer-events-none"
       >
-        <div className="bg-green-600/95 backdrop-blur-sm text-white px-4 py-3 rounded-xl flex items-center gap-2 shadow-lg">
+        <div className="bg-green-600/95 backdrop-blur-sm text-white px-4 py-3 flex items-center gap-2 shadow-lg">
           <ShoppingBag className="w-5 h-5" />
           <span className="font-medium text-sm uppercase tracking-wide">Add Look</span>
         </div>
@@ -135,7 +135,7 @@ export function SwipeableLookCard({
         style={{ opacity: skipOpacity }}
         className="absolute top-1/2 left-4 -translate-y-1/2 z-20 pointer-events-none"
       >
-        <div className="bg-stone-700/90 backdrop-blur-sm text-white/80 px-4 py-3 rounded-xl flex items-center gap-2">
+        <div className="bg-stone-700/90 backdrop-blur-sm text-white/80 px-4 py-3 flex items-center gap-2">
           <X className="w-5 h-5" />
           <span className="font-medium text-sm uppercase tracking-wide">Skip</span>
         </div>
@@ -152,7 +152,7 @@ export function SwipeableLookCard({
             className="absolute bottom-1/4 left-1/2 -translate-x-1/2 z-20"
           >
             <motion.div 
-              className="flex items-center gap-2 text-white/70 bg-black/40 backdrop-blur-sm px-4 py-2 rounded-full"
+              className="flex items-center gap-2 text-white/70 bg-black/40 backdrop-blur-sm px-4 py-2"
               animate={prefersReducedMotion ? {} : { x: [0, 15, 0] }}
               transition={{ 
                 repeat: 3, 
@@ -223,7 +223,7 @@ export function SwipeableLookCard({
                   dismissSuccess();
                 }}
                 variant="outline"
-                className="flex-1 h-12 bg-transparent border-white/30 text-white hover:bg-white/10 rounded-xl"
+                className="flex-1 h-12 bg-transparent border-white/30 text-white hover:bg-white/10 rounded-none"
               >
                 Keep Browsing
               </Button>
@@ -233,7 +233,7 @@ export function SwipeableLookCard({
                   dismissSuccess();
                   onViewBag?.();
                 }}
-                className="flex-1 h-12 bg-white text-green-700 hover:bg-white/90 rounded-xl font-medium"
+                className="flex-1 h-12 bg-white text-green-700 hover:bg-white/90 rounded-none font-medium"
               >
                 View Bag
               </Button>
@@ -249,7 +249,7 @@ export function SwipeableLookCard({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
-            className="absolute inset-x-0 bottom-0 z-30 bg-stone-900/98 backdrop-blur-md rounded-t-2xl p-6 pb-safe"
+            className="absolute inset-x-0 bottom-0 z-30 bg-stone-900/98 backdrop-blur-md p-6 pb-safe"
           >
             <h3 className="text-center text-white font-light text-sm mb-4">
               Select your size for all items
@@ -281,7 +281,7 @@ export function SwipeableLookCard({
             
             <Button
               onClick={() => handleSizeSelect('M')}
-              className="w-full h-12 bg-amber-600 hover:bg-amber-500 text-white rounded-xl font-light"
+              className="w-full h-12 bg-amber-600 hover:bg-amber-500 text-white rounded-none font-light"
             >
               Apply to Look
             </Button>
