@@ -296,14 +296,14 @@
     }
   }
 
-  /* Lookbook 70/30 mobile split - image takes 70%, content 30% */
+  /* Lookbook mobile split - image dominates, content compact */
   .lookbook-image-height {
     height: calc((100vh - var(--header-height)) * 0.65);
   }
 
   .lookbook-content-height {
     height: calc((100vh - var(--header-height)) * 0.35);
-    overflow-y: auto;
+    overflow: hidden;
   }
 
   @supports (height: 100dvh) {
@@ -315,13 +315,23 @@
     }
   }
 
+  /* Tablet: 60/40 split gives content more breathing room */
+  @media (min-width: 768px) and (max-width: 1023px) {
+    .lookbook-image-height {
+      height: calc((100dvh - var(--header-height)) * 0.60);
+    }
+    .lookbook-content-height {
+      height: calc((100dvh - var(--header-height)) * 0.40);
+    }
+  }
+
   @media (min-width: 1024px) {
     .lookbook-image-height {
       height: auto;
     }
     .lookbook-content-height {
       height: auto;
-      overflow-y: visible;
+      overflow: visible;
     }
   }
 
