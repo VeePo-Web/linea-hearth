@@ -67,7 +67,7 @@ export default function SwipeLookbook({
   
   return (
     <Drawer open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DrawerContent className="h-[95vh] bg-stone-900 border-t-0 rounded-t-3xl">
+      <DrawerContent className="h-[95vh] bg-stone-900 border-t-0">
         {/* Header */}
         <DrawerHeader className="relative border-b border-white/10 pb-3">
           <div className="flex items-center justify-between">
@@ -143,7 +143,7 @@ export default function SwipeLookbook({
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
                         transition={{ type: 'spring', stiffness: 400, damping: 20, delay: 0.2 }}
-                        className="w-20 h-20 rounded-full bg-green-500/20 flex items-center justify-center mb-6"
+                        className="w-20 h-20 bg-green-500/20 flex items-center justify-center mb-6"
                       >
                         <PartyPopper className="w-10 h-10 text-green-400" />
                       </motion.div>
@@ -171,7 +171,7 @@ export default function SwipeLookbook({
                           initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: 0.5 }}
-                          className="flex items-center gap-2 bg-amber-500/20 text-amber-400 px-4 py-2 rounded-full mb-8"
+                          className="flex items-center gap-2 bg-amber-500/20 text-amber-400 px-4 py-2 mb-8"
                         >
                           <Sparkles className="w-4 h-4" />
                           <span className="text-sm font-medium">{bundleDiscountPercent}% bundle discount applied!</span>
@@ -186,7 +186,7 @@ export default function SwipeLookbook({
                       >
                         <Button
                           onClick={handleViewBag}
-                          className="bg-amber-500 hover:bg-amber-400 text-white h-12 rounded-xl font-medium"
+                          className="bg-amber-500 hover:bg-amber-400 text-white h-12 rounded-none font-medium"
                         >
                           <ShoppingBag className="w-5 h-5 mr-2" />
                           View Bag
@@ -195,7 +195,7 @@ export default function SwipeLookbook({
                         <Button
                           variant="ghost"
                           onClick={onClose}
-                          className="text-white/60 hover:text-white hover:bg-white/10 h-12 rounded-xl"
+                           className="text-white/60 hover:text-white hover:bg-white/10 h-12 rounded-none"
                         >
                           Continue Browsing
                         </Button>
@@ -207,7 +207,7 @@ export default function SwipeLookbook({
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
                         transition={{ type: 'spring', stiffness: 400, damping: 20 }}
-                        className="w-20 h-20 rounded-full bg-stone-800 flex items-center justify-center mb-6"
+                        className="w-20 h-20 bg-stone-800 flex items-center justify-center mb-6"
                       >
                         <RotateCcw className="w-10 h-10 text-white/40" />
                       </motion.div>
@@ -223,7 +223,7 @@ export default function SwipeLookbook({
                       <div className="flex flex-col gap-3 w-full max-w-xs">
                         <Button
                           onClick={session.reset}
-                          className="bg-white/10 hover:bg-white/20 text-white h-12 rounded-xl font-medium"
+                          className="bg-white/10 hover:bg-white/20 text-white h-12 rounded-none font-medium"
                         >
                           <RotateCcw className="w-5 h-5 mr-2" />
                           Start Over
@@ -232,7 +232,7 @@ export default function SwipeLookbook({
                         <Button
                           variant="ghost"
                           onClick={onClose}
-                          className="text-white/60 hover:text-white hover:bg-white/10 h-12 rounded-xl"
+                          className="text-white/60 hover:text-white hover:bg-white/10 h-12 rounded-none"
                         >
                           Close
                         </Button>

@@ -74,7 +74,7 @@ function LookProductCard({
     >
       <Link to={`/product/${product.slug}`}>
         <motion.div 
-          className="aspect-[3/4] bg-stone-800 rounded-lg overflow-hidden relative"
+          className="aspect-[3/4] bg-stone-800 overflow-hidden relative"
           whileHover={prefersReducedMotion ? {} : { 
             boxShadow: "0 10px 40px -10px rgba(0,0,0,0.5)" 
           }}
@@ -104,7 +104,7 @@ function LookProductCard({
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="absolute inset-0 bg-green-600/90 rounded-lg 
+               className="absolute inset-0 bg-green-600/90 
                            flex flex-col items-center justify-center gap-2"
               >
                 <DrawCheckIcon size="lg" color="white" animate delay={0.1} />
@@ -117,7 +117,7 @@ function LookProductCard({
 
           {/* In Cart Badge */}
           {isInCart && !quickAdd.isAdded && (
-            <div className="absolute top-2 right-2 bg-green-600 rounded-full p-1">
+            <div className="absolute top-2 right-2 bg-green-600 p-1">
               <Check className="w-3 h-3 text-white" />
             </div>
           )}
@@ -132,7 +132,7 @@ function LookProductCard({
               }}
               disabled={quickAdd.isAdding}
               className={`
-                absolute bottom-2 right-2 w-10 h-10 md:w-9 md:h-9 rounded-full 
+                absolute bottom-2 right-2 w-10 h-10 md:w-9 md:h-9 
                 flex items-center justify-center transition-colors
                 opacity-90 md:opacity-100
                 ${quickAdd.canOneTap 
@@ -316,7 +316,7 @@ const ShopTheLook = ({ products, lookName, lookId }: ShopTheLookProps) => {
         >
           <Button
             onClick={() => setIsSwipeOpen(true)}
-            className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-white h-12 rounded-lg font-light tracking-wide flex items-center justify-center gap-2"
+            className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-white h-12 rounded-none font-light tracking-wide flex items-center justify-center gap-2"
           >
             <Sparkles className="w-4 h-4" />
             Swipe to Shop
@@ -346,7 +346,7 @@ const ShopTheLook = ({ products, lookName, lookId }: ShopTheLookProps) => {
           onClick={handleAddAll}
           disabled={addedCount === products.length}
           className={`
-            w-full font-light tracking-wide h-12 rounded-lg transition-colors
+            w-full font-light tracking-wide h-12 rounded-none transition-colors
             ${addedCount === products.length 
               ? 'bg-green-600 hover:bg-green-600 text-white' 
               : 'bg-amber-600 hover:bg-amber-500 text-white'
@@ -366,7 +366,7 @@ const ShopTheLook = ({ products, lookName, lookId }: ShopTheLookProps) => {
                 <span className="ml-2 flex items-center gap-1.5">
                   <span className="line-through text-white/50 text-sm">${totalPrice.toFixed(0)}</span>
                   <span className="text-white font-medium">${discountedTotal.toFixed(0)}</span>
-                  <span className="text-[10px] bg-white/20 px-1.5 py-0.5 rounded">
+                  <span className="text-[10px] bg-white/20 px-1.5 py-0.5">
                     -{bundleDiscountPercent}%
                   </span>
                 </span>

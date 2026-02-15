@@ -195,10 +195,10 @@ const FitGuideSection = () => {
 
           {/* Gender Toggle - Pill Style with Spring Animation */}
           <ScrollReveal variant="fadeUp" delay={0.5} className="flex justify-center mb-12">
-            <div className="inline-flex bg-stone-800/50 rounded-full p-1 backdrop-blur-sm border border-white/5">
+            <div className="inline-flex bg-stone-800/50 p-1 backdrop-blur-sm border border-white/5">
               <motion.button
                 onClick={() => setSelectedGender('male')}
-                className={`relative px-6 py-3 md:px-8 md:py-2.5 min-h-[44px] rounded-full text-sm font-light transition-colors ${
+                className={`relative px-6 py-3 md:px-8 md:py-2.5 min-h-[44px] text-sm font-light transition-colors ${
                   selectedGender === 'male'
                     ? 'text-white'
                     : 'text-white/50 hover:text-white/70'
@@ -209,7 +209,7 @@ const FitGuideSection = () => {
               >
                 {selectedGender === 'male' && (
                   <motion.div
-                    className="absolute inset-0 bg-amber-600 rounded-full"
+                    className="absolute inset-0 bg-amber-600"
                     layoutId="genderToggle"
                     transition={springConfig}
                   />
@@ -218,7 +218,7 @@ const FitGuideSection = () => {
               </motion.button>
               <motion.button
                 onClick={() => setSelectedGender('female')}
-                className={`relative px-6 py-3 md:px-8 md:py-2.5 min-h-[44px] rounded-full text-sm font-light transition-colors ${
+                className={`relative px-6 py-3 md:px-8 md:py-2.5 min-h-[44px] text-sm font-light transition-colors ${
                   selectedGender === 'female'
                     ? 'text-white'
                     : 'text-white/50 hover:text-white/70'
@@ -229,7 +229,7 @@ const FitGuideSection = () => {
               >
                 {selectedGender === 'female' && (
                   <motion.div
-                    className="absolute inset-0 bg-amber-600 rounded-full"
+                    className="absolute inset-0 bg-amber-600"
                     layoutId="genderToggle"
                     transition={springConfig}
                   />
@@ -243,7 +243,7 @@ const FitGuideSection = () => {
           {isLoading ? (
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 lg:gap-6">
               {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="aspect-[3/4] bg-stone-800 rounded-lg animate-pulse" />
+                <div key={i} className="aspect-[3/4] bg-stone-800 animate-pulse" />
               ))}
             </div>
           ) : (
@@ -264,7 +264,7 @@ const FitGuideSection = () => {
                     <motion.button
                       key={model.id}
                       onClick={() => setSelectedModel(model)}
-                      className="group relative aspect-[3/4] overflow-hidden rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:ring-offset-stone-900 active:scale-[0.98] transition-transform"
+                      className="group relative aspect-[3/4] overflow-hidden focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:ring-offset-stone-900 active:scale-[0.98] transition-transform"
                       whileHover={prefersReducedMotion ? {} : { y: -6 }}
                       whileTap={prefersReducedMotion ? {} : { scale: 0.98 }}
                       transition={springConfig}
@@ -301,7 +301,7 @@ const FitGuideSection = () => {
                         transition={{ duration: 0.2 }}
                       >
                         <motion.span 
-                          className="text-[10px] uppercase tracking-wider text-white bg-amber-600 px-4 py-2 rounded-full"
+                          className="text-[10px] uppercase tracking-wider text-white bg-amber-600 px-4 py-2"
                           initial={{ scale: 0.8, opacity: 0 }}
                           animate={{ scale: 1, opacity: 1 }}
                           whileHover={{ scale: 1.05 }}

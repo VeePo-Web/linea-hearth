@@ -1,8 +1,5 @@
 import { motion, useReducedMotion } from "framer-motion";
-import { ChevronDown } from "lucide-react";
 import { easing, timing } from "@/lib/animations";
-import TextReveal from "@/components/motion/TextReveal";
-import ScrollReveal from "@/components/motion/ScrollReveal";
 
 const LookbookHero = () => {
   const prefersReducedMotion = useReducedMotion();
@@ -14,43 +11,58 @@ const LookbookHero = () => {
 
   return (
     <section 
-      className="lookbook-section-height w-full flex items-center justify-center relative bg-stone-900 snap-start overflow-hidden"
+      className="lookbook-section-height w-full flex items-end relative bg-stone-950 snap-start overflow-hidden"
     >
+      {/* Background Image with heavy overlay */}
+      <div className="absolute inset-0">
+        <img 
+          src="/nav-hero-hoodie.png" 
+          alt="" 
+          className="w-full h-full object-cover object-center opacity-40"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-stone-950 via-stone-950/70 to-stone-950/40" />
+        <div className="absolute inset-0 bg-gradient-to-r from-stone-950/60 to-transparent" />
+      </div>
+
       {/* Noise grain texture overlay */}
       <div 
-        className="absolute inset-0 opacity-[0.03] pointer-events-none"
+        className="absolute inset-0 opacity-[0.04] pointer-events-none mix-blend-overlay"
         style={{
           backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
         }}
       />
 
-      {/* Gradient background */}
-      <motion.div 
-        className="absolute inset-0 bg-gradient-to-br from-stone-950 via-stone-900 to-stone-950"
+      {/* Season Tag - Top Right */}
+      <motion.div
+        className="absolute top-8 right-6 md:right-12 z-10"
         initial={prefersReducedMotion ? {} : { opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: timing.cinematic, ease: easing.editorial }}
-      />
+        transition={{ duration: timing.slow, ease: easing.editorial, delay: 0.8 }}
+      >
+        <span className="text-[10px] uppercase tracking-[0.4em] text-white/30 font-light">
+          SS25
+        </span>
+      </motion.div>
 
-      {/* Content */}
-      <div className="relative z-10 px-6 w-full max-w-4xl mx-auto">
-        {/* Eyebrow - Brand */}
-        <motion.div
-          initial={prefersReducedMotion ? {} : { opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: timing.slow, ease: easing.editorial, delay: 0.2 }}
-          className="mb-12"
-        >
-          <p className="text-[10px] uppercase tracking-[0.4em] text-amber-500 font-light">
-            Line of Judah
-          </p>
-        </motion.div>
+      {/* Eyebrow - Brand - Top Left */}
+      <motion.div
+        className="absolute top-8 left-6 md:left-12 z-10"
+        initial={prefersReducedMotion ? {} : { opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: timing.slow, ease: easing.editorial, delay: 0.2 }}
+      >
+        <p className="text-[10px] uppercase tracking-[0.4em] text-amber-500 font-light">
+          Line of Judah
+        </p>
+      </motion.div>
 
-        {/* Main Title - Split with varying weights */}
-        <div className="mb-8">
+      {/* Content - Bottom Left aligned (032c cover style) */}
+      <div className="relative z-10 px-6 md:px-12 pb-16 md:pb-20 w-full max-w-7xl">
+        {/* Main Title - Massive editorial type */}
+        <div className="mb-6">
           <div className="overflow-hidden">
             <motion.span
-              className="block text-5xl xs:text-6xl md:text-8xl lg:text-[10rem] font-extralight text-white/90 leading-[0.85] tracking-tight"
+              className="block text-[15vw] md:text-[12vw] lg:text-[10rem] font-extralight text-white/90 leading-[0.85] tracking-[-0.02em]"
               initial={prefersReducedMotion ? {} : { y: "100%" }}
               animate={{ y: 0 }}
               transition={{ duration: timing.cinematic, ease: easing.editorial, delay: 0.4 }}
@@ -58,9 +70,9 @@ const LookbookHero = () => {
               THE
             </motion.span>
           </div>
-          <div className="overflow-hidden mt-2">
+          <div className="overflow-hidden">
             <motion.span
-              className="block text-5xl xs:text-6xl md:text-8xl lg:text-[10rem] font-extralight italic text-white leading-[0.85] tracking-tight"
+              className="block text-[15vw] md:text-[12vw] lg:text-[10rem] font-extralight italic text-white leading-[0.85] tracking-[-0.02em]"
               initial={prefersReducedMotion ? {} : { y: "100%" }}
               animate={{ y: 0 }}
               transition={{ duration: timing.cinematic, ease: easing.editorial, delay: 0.55 }}
@@ -70,22 +82,19 @@ const LookbookHero = () => {
           </div>
         </div>
 
-        {/* Season Tag */}
+        {/* Horizontal Rule */}
         <motion.div
-          initial={prefersReducedMotion ? {} : { opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: timing.slow, ease: easing.editorial, delay: 0.8 }}
-          className="mb-8"
-        >
-          <span className="text-xs uppercase tracking-[0.3em] text-white/40 font-light">
-            — SS25
-          </span>
-        </motion.div>
+          className="w-16 h-px bg-white/20 mb-6"
+          initial={prefersReducedMotion ? {} : { scaleX: 0 }}
+          animate={{ scaleX: 1 }}
+          transition={{ duration: timing.slow, ease: easing.editorial, delay: 0.75 }}
+          style={{ transformOrigin: 'left' }}
+        />
 
         {/* Subtitle */}
         <motion.p
-          className="text-base md:text-lg font-light text-white/50 max-w-md leading-relaxed"
-          initial={prefersReducedMotion ? {} : { opacity: 0, y: 20 }}
+          className="text-sm md:text-base font-light text-white/45 max-w-sm leading-relaxed"
+          initial={prefersReducedMotion ? {} : { opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: timing.slow, ease: easing.editorial, delay: 0.9 }}
         >
@@ -93,42 +102,42 @@ const LookbookHero = () => {
           Shop by design, not just category.
         </motion.p>
 
-        {/* Scroll Indicator - Centered on mobile, left on desktop */}
+        {/* Scroll Indicator */}
         <motion.button 
           onClick={scrollToNext}
-          className="absolute bottom-16 left-1/2 -translate-x-1/2 md:left-6 md:translate-x-0 flex flex-col items-center md:items-start gap-4 text-white/40 hover:text-white/70 transition-colors cursor-pointer group min-h-[48px] min-w-[48px] justify-center"
+          className="mt-12 flex items-center gap-4 text-white/30 hover:text-white/60 transition-colors cursor-pointer group min-h-[48px]"
           initial={prefersReducedMotion ? {} : { opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: timing.slow, ease: easing.editorial, delay: 1.2 }}
           aria-label="Scroll to explore looks"
         >
-          <span className="text-xs md:text-[10px] uppercase tracking-[0.3em] font-light">
+          <span className="text-[10px] uppercase tracking-[0.3em] font-light">
             Scroll
           </span>
           <motion.div
-            className="w-px h-12 bg-gradient-to-b from-white/40 to-transparent"
-            animate={prefersReducedMotion ? {} : { scaleY: [1, 0.5, 1] }}
+            className="w-12 h-px bg-gradient-to-r from-white/30 to-transparent"
+            animate={prefersReducedMotion ? {} : { scaleX: [1, 0.5, 1] }}
             transition={{ 
               duration: 2,
               repeat: Infinity,
               ease: "easeInOut"
             }}
-            style={{ transformOrigin: "top" }}
+            style={{ transformOrigin: "left" }}
           />
         </motion.button>
       </div>
 
-      {/* Look count indicator - Right side, hidden on tiny mobile */}
+      {/* Look count indicator - Right side */}
       <motion.div
-        className="hidden xs:block absolute right-6 bottom-16 text-right"
+        className="hidden md:block absolute right-6 md:right-12 bottom-16 md:bottom-20 text-right"
         initial={prefersReducedMotion ? {} : { opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: timing.slow, ease: easing.editorial, delay: 1.3 }}
       >
-        <p className="text-[10px] uppercase tracking-[0.3em] text-white/30 font-light mb-1">
+        <p className="text-[10px] uppercase tracking-[0.3em] text-white/25 font-light mb-1">
           Looks
         </p>
-        <p className="text-2xl font-extralight text-white/50">
+        <p className="text-2xl font-extralight text-white/40">
           05
         </p>
       </motion.div>

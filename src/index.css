@@ -285,7 +285,7 @@
     }
   }
 
-  /* Lookbook mobile half-section height */
+  /* Lookbook mobile half-section height (legacy) */
   .lookbook-half-height {
     height: calc((100vh - var(--header-height)) / 2);
   }
@@ -293,6 +293,35 @@
   @supports (height: 100dvh) {
     .lookbook-half-height {
       height: calc((100dvh - var(--header-height)) / 2);
+    }
+  }
+
+  /* Lookbook 70/30 mobile split - image takes 70%, content 30% */
+  .lookbook-image-height {
+    height: calc((100vh - var(--header-height)) * 0.65);
+  }
+
+  .lookbook-content-height {
+    height: calc((100vh - var(--header-height)) * 0.35);
+    overflow-y: auto;
+  }
+
+  @supports (height: 100dvh) {
+    .lookbook-image-height {
+      height: calc((100dvh - var(--header-height)) * 0.65);
+    }
+    .lookbook-content-height {
+      height: calc((100dvh - var(--header-height)) * 0.35);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .lookbook-image-height {
+      height: auto;
+    }
+    .lookbook-content-height {
+      height: auto;
+      overflow-y: visible;
     }
   }
 
