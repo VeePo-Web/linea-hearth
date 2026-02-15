@@ -35,6 +35,30 @@ interface Look {
   products: LookProduct[];
 }
 
+// Shared product definitions for demo fallback
+const DEMO_PRODUCTS = {
+  heavenlyCrewneck: {
+    id: 'bba1a982-f78e-4ec9-b5ed-91b5184e437c',
+    name: 'Heavenly Crewneck',
+    slug: 'heavenly-crewneck',
+    price: 69.99,
+    sale_price: null,
+    is_on_sale: false,
+    position: 'top' as const,
+    product_images: [{ image_url: '/products/heavenly-crewneck/front-model.png', is_primary: true }],
+  },
+  stayHolyHoodie: {
+    id: '1b4823be-119b-4834-89f1-bb2d872a8636',
+    name: 'Stay Holy Hoodie',
+    slug: 'stay-holy-hoodie',
+    price: 79.99,
+    sale_price: null,
+    is_on_sale: false,
+    position: 'top' as const,
+    product_images: [{ image_url: '/products/stay-holy-hoodie/flat-front.png', is_primary: true }],
+  },
+};
+
 // Demo looks for when database is empty
 const demoLooks: Look[] = [
   {
@@ -46,7 +70,7 @@ const demoLooks: Look[] = [
     image_url: 'https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?w=1200',
     video_url: null,
     gender: 'male',
-    products: []
+    products: [DEMO_PRODUCTS.heavenlyCrewneck, DEMO_PRODUCTS.stayHolyHoodie],
   },
   {
     id: '2',
@@ -57,7 +81,7 @@ const demoLooks: Look[] = [
     image_url: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=1200',
     video_url: null,
     gender: 'female',
-    products: []
+    products: [DEMO_PRODUCTS.stayHolyHoodie, DEMO_PRODUCTS.heavenlyCrewneck],
   },
   {
     id: '3',
@@ -68,7 +92,7 @@ const demoLooks: Look[] = [
     image_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=1200',
     video_url: null,
     gender: 'male',
-    products: []
+    products: [DEMO_PRODUCTS.heavenlyCrewneck],
   },
   {
     id: '4',
@@ -79,7 +103,7 @@ const demoLooks: Look[] = [
     image_url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=1200',
     video_url: null,
     gender: 'female',
-    products: []
+    products: [DEMO_PRODUCTS.stayHolyHoodie],
   },
   {
     id: '5',
@@ -90,8 +114,8 @@ const demoLooks: Look[] = [
     image_url: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=1200',
     video_url: null,
     gender: 'unisex',
-    products: []
-  }
+    products: [DEMO_PRODUCTS.heavenlyCrewneck, DEMO_PRODUCTS.stayHolyHoodie],
+  },
 ];
 
 const Lookbook = () => {
