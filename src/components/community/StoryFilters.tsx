@@ -69,12 +69,12 @@ export default function StoryFilters({
   };
 
   return (
-    <div className="sticky top-[var(--header-height)] z-30 bg-background border-b border-border">
+    <div className="sticky top-[var(--header-height)] z-30 bg-background/95 backdrop-blur-sm border-b border-border shadow-sm">
       <div className="container mx-auto px-4 lg:px-8">
         {/* Desktop: Magazine-style navigation */}
-        <div className="hidden md:flex items-center justify-between py-5">
+        <div className="hidden md:flex items-center justify-between py-3">
           {/* Story Type Tabs - Editorial text navigation */}
-          <div className="flex items-center gap-10">
+          <div className="flex items-center gap-8">
             {storyTypes.map((type) => (
               <button
                 key={type.value}
@@ -94,7 +94,7 @@ export default function StoryFilters({
                 {selectedType === type.value && (
                   <motion.div
                     layoutId="activeFilter"
-                    className="absolute -bottom-5 left-0 right-0 h-[2px] bg-amber-500"
+                    className="absolute -bottom-3 left-0 right-0 h-[2px] bg-amber-500"
                     transition={{ type: "spring", stiffness: 300, damping: 30 }}
                   />
                 )}
@@ -106,7 +106,7 @@ export default function StoryFilters({
           <div className="flex items-center gap-6">
             {/* Product Filter */}
             <Select value={selectedProduct} onValueChange={setSelectedProduct}>
-              <SelectTrigger className="w-[140px] bg-transparent border-0 shadow-none text-xs uppercase tracking-[0.15em] text-muted-foreground hover:text-foreground focus:ring-0">
+              <SelectTrigger className="w-[160px] bg-transparent border-0 shadow-none text-xs uppercase tracking-[0.15em] text-muted-foreground hover:text-foreground focus:ring-0">
                 <SelectValue placeholder="All Products" />
               </SelectTrigger>
               <SelectContent>
@@ -130,7 +130,7 @@ export default function StoryFilters({
 
             {/* Sort */}
             <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="w-[130px] bg-transparent border-0 shadow-none text-xs uppercase tracking-[0.15em] text-muted-foreground hover:text-foreground focus:ring-0">
+              <SelectTrigger className="w-[150px] bg-transparent border-0 shadow-none text-xs uppercase tracking-[0.15em] text-muted-foreground hover:text-foreground focus:ring-0">
                 <SelectValue placeholder="Sort by" />
               </SelectTrigger>
               <SelectContent>
