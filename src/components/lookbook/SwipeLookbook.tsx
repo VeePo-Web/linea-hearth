@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Share2, RotateCcw, ShoppingBag, Sparkles, ArrowLeft, ArrowRight } from 'lucide-react';
+import { X, Share2, RotateCcw, ShoppingBag, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
 import SwipeCard from './SwipeCard';
@@ -98,18 +98,9 @@ export default function SwipeLookbook({
           
           {/* Swipe Instructions */}
           {!session.isComplete && (
-            <motion.p
-              initial={{ opacity: 0, y: 5 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3, duration: 0.4 }}
-              className="text-center text-white/60 text-sm font-medium md:text-xs mt-2 flex items-center justify-center gap-2"
-            >
-              <ArrowLeft className="w-3.5 h-3.5 text-white/40" />
-              <span>Skip</span>
-              <span className="text-white/30">·</span>
-              <span>Add</span>
-              <ArrowRight className="w-3.5 h-3.5 text-white/40" />
-            </motion.p>
+            <p className="text-center text-white/30 text-xs mt-2">
+              Swipe or tap below
+            </p>
           )}
         </DrawerHeader>
         

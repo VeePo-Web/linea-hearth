@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { motion, useMotionValue, useTransform, PanInfo, AnimatePresence } from 'framer-motion';
 import { X, Heart, Check, ShoppingBag, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -57,6 +57,15 @@ export default function SwipeCard({
   const [isExiting, setIsExiting] = useState<'left' | 'right' | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
   const [hasHapticFired, setHasHapticFired] = useState(false);
+  const [showFirstCardHint, setShowFirstCardHint] = useState(true);
+  
+  // Auto-dismiss the first-card hint after 3 seconds
+  useEffect(() => {
+    if (isFirstCard && isTop) {
+      const timer = setTimeout(() => setShowFirstCardHint(false), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [isFirstCard, isTop]);
   
   // Motion values for drag
   const x = useMotionValue(0);
@@ -258,23 +267,26 @@ export default function SwipeCard({
           {/* Product Info - Bottom */}
           <div className="absolute bottom-0 left-0 right-0 p-5 pb-6">
             {/* Persistent "Swipe right to add" hint on first card */}
-            {isFirstCard && isTop && !isPickerOpen && !showSuccess && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="flex items-center justify-center gap-2 mb-4"
-                style={{ opacity: hintOpacity }}
-              >
+            <AnimatePresence>
+              {isFirstCard && isTop && !isPickerOpen && !showSuccess && showFirstCardHint && (
                 <motion.div
-                  className="flex items-center gap-1.5 text-white/70 bg-white/10 backdrop-blur-sm px-3 py-1.5"
-                  animate={prefersReducedMotion ? {} : { x: [0, 8, 0] }}
-                  transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="flex items-center justify-center gap-2 mb-4"
+                  style={{ opacity: hintOpacity }}
                 >
-                  <span className="text-xs font-medium uppercase tracking-wide">Swipe right to add</span>
-                  <ChevronRight className="w-4 h-4" />
+                  <motion.div
+                    className="flex items-center gap-1.5 text-white/70 bg-white/10 backdrop-blur-sm px-3 py-1.5"
+                    animate={prefersReducedMotion ? {} : { x: [0, 8, 0] }}
+                    transition={{ repeat: 1, duration: 1.5, ease: "easeInOut" }}
+                  >
+                    <span className="text-xs font-medium uppercase tracking-wide">Swipe right to add</span>
+                    <ChevronRight className="w-4 h-4" />
+                  </motion.div>
                 </motion.div>
-              </motion.div>
-            )}
+              )}
+            </AnimatePresence>
             
             <Link to={`/product/${product.slug}`} className="block" onClick={(e) => e.stopPropagation()}>
               <h3 className="text-white text-lg md:text-xl font-light mb-1 truncate">

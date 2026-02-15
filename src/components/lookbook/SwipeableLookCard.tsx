@@ -141,31 +141,7 @@ export function SwipeableLookCard({
         </div>
       </motion.div>
       
-      {/* First-time Swipe Hint - shows until user has swiped at least once */}
-      <AnimatePresence>
-        {showHint && (
-          <motion.button
-            onClick={dismissHint}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="absolute bottom-1/4 left-1/2 -translate-x-1/2 z-20"
-          >
-            <motion.div 
-              className="flex items-center gap-2 text-white/80 bg-black/50 backdrop-blur-sm px-5 py-2.5"
-              animate={prefersReducedMotion ? {} : { x: [0, 15, 0] }}
-              transition={{ 
-                repeat: 3, 
-                duration: 1.5,
-                ease: "easeInOut"
-              }}
-            >
-              <span className="text-sm font-medium tracking-wide">Swipe right to add</span>
-              <ShoppingBag className="w-4 h-4" />
-            </motion.div>
-          </motion.button>
-        )}
-      </AnimatePresence>
+      {/* Hint removed — taught inside the SwipeLookbook drawer instead */}
       
       {/* Success Overlay */}
       <AnimatePresence>
