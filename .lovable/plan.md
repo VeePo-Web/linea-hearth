@@ -1,101 +1,67 @@
 
 
-# Lookbook -- Final World-Class Polish Pass
+# Make "Swipe Right to Add to Cart" Unmistakably Clear
 
-## Current State Assessment
+## Problem
 
-The Lookbook has been through 4 refinement passes and is structurally excellent:
-- Hero: cinematic 032c-style with massive editorial type -- **strong**
-- Layout variants: 5-variant index-cycling system (full-bleed, split, bottom-bar) -- **strong**
-- Mobile: 65/35 split, compact CTA, SwipeLookbook drawer -- **functional**
-- Swipe-to-cart: products load correctly, card stack with haptic feedback -- **working**
-- Design system: rounded-none enforced across all non-dot elements -- **consistent**
-- Navigation: desktop dot rail + mobile pill -- **functional**
+The swipe-to-add mechanic works perfectly but users don't know it exists. Current discoverability cues are too subtle:
 
-### What's Missing for True World-Class
+- The header instruction ("Swipe right to add · Left to skip") is `text-white/40` — nearly invisible
+- The first-time hint on SwipeableLookCard only shows once, then hides permanently via localStorage
+- Direction indicators only appear mid-drag — users need to already be swiping to see them
+- The SwipeActions buttons (Skip / Add) have no text labels, just icons
 
-After thorough audit across desktop (1024px) and mobile (390px), these are the gaps between "very good Shopify lookbook" and "DAZED / 032c editorial experience":
+## Changes (4 Files)
 
----
+### 1. SwipeCard.tsx — Add persistent directional affordance on the first card
 
-## 1. VideoEmbed.tsx -- Remaining Design System Violations
+Add a subtle animated arrow + label at the bottom of the top card that pulses gently, showing users they can swipe right. This replaces the invisible-until-drag approach with an always-visible hint on the active card.
 
-`VideoEmbed.tsx` still has `rounded-lg` on the container and `rounded-full` on the play button and platform badge. While this component isn't actively rendered on the page (no demo looks have `video_url`), it's part of the lookbook component library and should match the system.
+**What changes:**
+- Add a bottom-center directional indicator below the product info: a right-pointing chevron with "Swipe right to add" text
+- Uses a gentle horizontal oscillation animation (like the existing hint in SwipeableLookCard)
+- Only shows on the top card (`isTop`) and only on the first card of the session (controlled by a new `isFirstCard` prop)
+- Fades out after the user starts dragging (tied to the `x` motion value)
+- Respects `prefers-reduced-motion`
 
-**File:** `src/components/lookbook/VideoEmbed.tsx`
-- Line 41: `rounded-lg` on container to `rounded-none`
-- Line 61: Play button `rounded-full` to `rounded-none` (square play button is more 032c)
-- Line 67: Platform badge `rounded-full` to sharp
+### 2. SwipeLookbook.tsx — Make header instruction bolder and more prominent
 
----
+**What changes:**
+- Increase the instruction text from `text-white/40 text-sm` to `text-white/60 text-sm font-medium`
+- Add left/right arrow icons flanking the text: `← Skip · Add →` with ShoppingBag icon
+- Add a subtle entrance animation so it draws the eye when the drawer opens
 
-## 2. ShopTheLook Position Tag -- Stray `rounded`
+### 3. SwipeActions.tsx — Add text labels under the Skip and Add buttons
 
-In `ShopTheLook.tsx`, the position tag on product cards (line 95) still uses `rounded` (default Tailwind border-radius). This is a subtle inconsistency.
+The Tinder-style buttons currently have no text — just X and ShoppingBag icons. First-time users cannot tell what these buttons do.
 
-**File:** `src/components/lookbook/ShopTheLook.tsx`
-- Line 95: Remove `rounded` from position tag class
+**What changes:**
+- Add a small `text-[10px] uppercase tracking-wider` label below each button: "SKIP" under the X button, "ADD" under the ShoppingBag button, "UNDO" under the RotateCcw button
+- Labels use `text-white/40` to stay subtle but informative
 
----
+### 4. SwipeableLookCard.tsx — Make the onboarding hint more persistent
 
-## 3. Mobile Swipe Drawer -- Drawer Handle Inconsistency
+The current hint shows once globally across all sessions. For a feature this novel, the hint should show on every new session until the user has successfully swiped at least once.
 
-The `SwipeLookbook` drawer uses the default Vaul drawer handle (the small gray pill at the top of the drawer). This rounded pill conflicts with the sharp-edged aesthetic. The drawer should either hide the handle or replace it with a sharp horizontal line.
+**What changes:**
+- Change localStorage key check: instead of hiding forever after first dismissal, show the hint on every new look until the user has completed at least one swipe action (track via a `hasSwipedBefore` flag that persists after first successful swipe)
+- Make the hint text slightly larger and add a right-arrow icon for stronger directional cueing
 
-**File:** `src/components/lookbook/SwipeLookbook.tsx`
-- Add a custom handle element or hide the default one via DrawerContent styling
-- Replace with a sharp `w-12 h-0.5 bg-white/20 mx-auto mt-3` line element
-
----
-
-## 4. Desktop ShopTheLook -- "Swipe to Shop" Button Showing on Desktop
-
-In `ShopTheLook.tsx`, the "Swipe to Shop" CTA (line 311-326) is gated by `isMobile` which uses `useIsMobile()`. However, this component is already wrapped in `hidden lg:block` in `LookSection.tsx`, so the mobile swipe CTA inside ShopTheLook is redundant when viewed on desktop. On tablet (768-1023px), where ShopTheLook might render, the "Swipe to Shop" button would still show. This is fine but the button text says "Swipe" which doesn't apply to tablet users who may not have the same swipe gesture.
-
-**File:** `src/components/lookbook/ShopTheLook.tsx`
-- Hide the "Swipe to Shop" button entirely inside ShopTheLook since mobile users access swipe via the LookSection's compact CTA button instead
-- Or rename to "Shop Items" on tablet
-
----
-
-## 5. Completion Screen Micropolish
-
-The SwipeLookbook completion screen (when all products are swiped through) has a `PartyPopper` icon in a square container. For a luxury editorial brand, the celebration should be more restrained -- the drawn check icon is already available and more on-brand.
-
-**File:** `src/components/lookbook/SwipeLookbook.tsx`
-- Replace `PartyPopper` icon with `DrawCheckIcon` for the success state (lines 142-149)
-- This aligns the completion celebration with the same visual language used in SwipeCard's individual success overlay
-
----
-
-## 6. FitGuideSection -- "View Details" Badge Always Visible on Mobile
-
-In `FitGuideSection.tsx` (line 299-312), the "View Details" badge is set to `opacity-100` on mobile and `opacity-0 md:group-hover:opacity-100` on desktop. On mobile this creates a persistent overlay on every model card, which clutters the clean photography. Since mobile users understand tapping on a card, the badge is unnecessary.
-
-**File:** `src/components/lookbook/FitGuideSection.tsx`
-- Change the "View Details" badge to `opacity-0 group-hover:opacity-100` on all viewports, or hide on mobile entirely with `hidden md:flex`
-- Mobile users will tap naturally; the card already has `active:scale-[0.98]` feedback
-
----
-
-## Files Modified Summary
+## Files Modified
 
 | File | Change | Impact |
 |------|--------|--------|
-| `src/components/lookbook/VideoEmbed.tsx` | Remove `rounded-lg`, `rounded-full` | Design system consistency |
-| `src/components/lookbook/ShopTheLook.tsx` | Remove stray `rounded` from position tag; clean up redundant mobile CTA | Visual consistency + cleaner logic |
-| `src/components/lookbook/SwipeLookbook.tsx` | Custom sharp drawer handle; swap PartyPopper for DrawCheckIcon | Brand coherence |
-| `src/components/lookbook/FitGuideSection.tsx` | Hide "View Details" overlay on mobile | Cleaner photography presentation |
+| `src/components/lookbook/SwipeCard.tsx` | Add persistent "swipe right" directional hint on first card | Primary discoverability fix |
+| `src/components/lookbook/SwipeLookbook.tsx` | Bold up header instruction with arrow icons | Drawer-level clarity |
+| `src/components/lookbook/SwipeActions.tsx` | Add text labels under action buttons | Button comprehension |
+| `src/components/lookbook/SwipeableLookCard.tsx` | More persistent onboarding hint | Repeat-visit clarity |
 
 ## What Does NOT Change
 
-- LookSection.tsx (polished)
-- LookbookHero.tsx (polished)
-- SwipeCard.tsx (polished)
-- SwipeActions.tsx (intentional circular buttons)
-- SwipeProgress.tsx (intentional dots)
-- LookNavigation.tsx / LookNavigationMobile.tsx (intentional dots)
-- FitGuideModal.tsx (polished)
-- SwipeableLookCard.tsx (polished)
-- No layout changes, no data changes, no new dependencies
+- No new dependencies
+- No layout or structural changes
+- No data changes
+- SwipeProgress, FitGuideSection, ShopTheLook, LookSection — untouched
+- All motion respects `prefers-reduced-motion`
+- All labels meet WCAG AA contrast requirements
 
