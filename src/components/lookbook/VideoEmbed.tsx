@@ -38,7 +38,7 @@ const VideoEmbed = ({ url, platform = 'tiktok', posterUrl, caption }: VideoEmbed
   };
 
   return (
-    <div className="relative aspect-[9/16] max-w-sm mx-auto rounded-lg overflow-hidden bg-stone-800">
+    <div className="relative aspect-[9/16] max-w-sm mx-auto overflow-hidden bg-stone-800">
       {!isLoaded ? (
         // Poster/Placeholder State
         <button
@@ -58,13 +58,13 @@ const VideoEmbed = ({ url, platform = 'tiktok', posterUrl, caption }: VideoEmbed
           
           {/* Play Button Overlay */}
           <div className="absolute inset-0 bg-black/40 flex items-center justify-center group-hover:bg-black/50 transition-colors">
-            <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center group-hover:scale-110 transition-transform">
+            <div className="w-16 h-16 bg-white/20 backdrop-blur-sm flex items-center justify-center group-hover:scale-110 transition-transform">
               <Play className="w-8 h-8 text-white ml-1" fill="white" />
             </div>
           </div>
 
           {/* Platform Badge */}
-          <span className="absolute bottom-4 left-4 text-xs uppercase tracking-wider text-white/80 bg-black/40 px-3 py-1 rounded-full">
+          <span className="absolute bottom-4 left-4 text-xs uppercase tracking-wider text-white/80 bg-black/40 px-3 py-1">
             {getPlatformLabel()}
           </span>
         </button>

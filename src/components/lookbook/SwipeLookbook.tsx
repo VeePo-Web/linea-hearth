@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Share2, RotateCcw, ShoppingBag, Sparkles, PartyPopper } from 'lucide-react';
+import { X, Share2, RotateCcw, ShoppingBag, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
 import SwipeCard from './SwipeCard';
@@ -67,7 +67,9 @@ export default function SwipeLookbook({
   
   return (
     <Drawer open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DrawerContent className="h-[95vh] bg-stone-900 border-t-0">
+      <DrawerContent className="h-[95vh] bg-stone-900 border-t-0 [&>[data-vaul-drawer-handle-wrapper]]:hidden">
+        {/* Custom sharp drawer handle */}
+        <div className="w-12 h-0.5 bg-white/20 mx-auto mt-3" />
         {/* Header */}
         <DrawerHeader className="relative border-b border-white/10 pb-3">
           <div className="flex items-center justify-between">
@@ -139,13 +141,13 @@ export default function SwipeLookbook({
                 >
                   {session.itemCount > 0 ? (
                     <>
-                      <motion.div
+                       <motion.div
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
                         transition={{ type: 'spring', stiffness: 400, damping: 20, delay: 0.2 }}
                         className="w-20 h-20 bg-green-500/20 flex items-center justify-center mb-6"
                       >
-                        <PartyPopper className="w-10 h-10 text-green-400" />
+                        <DrawCheckIcon size="xl" color="green" animate delay={0.3} />
                       </motion.div>
                       
                       <motion.h2
