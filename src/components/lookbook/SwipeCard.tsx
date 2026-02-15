@@ -174,7 +174,7 @@ export default function SwipeCard({
       animate={isExiting ? exitVariants[isExiting === 'left' ? 'exitLeft' : 'exitRight'] : {}}
     >
       <motion.div
-        className="w-full h-full bg-stone-800 rounded-3xl md:rounded-2xl overflow-hidden shadow-2xl touch-none will-change-transform"
+        className="w-full h-full bg-stone-800 rounded-none overflow-hidden shadow-2xl touch-none will-change-transform"
         style={{ x, rotate: isTop && !prefersReducedMotion ? rotate : 0 }}
         drag={isTop && !prefersReducedMotion ? 'x' : false}
         dragConstraints={{ left: 0, right: 0 }}
@@ -202,14 +202,14 @@ export default function SwipeCard({
           
           {/* Position Badge */}
           {positionLabel && (
-            <span className="absolute top-4 left-4 text-xs md:text-[10px] uppercase tracking-wider bg-black/60 text-white/90 px-3 py-2 md:py-1.5 rounded-full font-light backdrop-blur-sm">
+            <span className="absolute top-4 left-4 text-xs md:text-[10px] uppercase tracking-wider bg-black/60 text-white/90 px-3 py-2 md:py-1.5 font-light backdrop-blur-sm">
               {positionLabel}
             </span>
           )}
           
           {/* Remembered Size Badge */}
           {rememberedSize && canOneTap && (
-            <span className="absolute top-4 right-4 text-[10px] uppercase tracking-wider bg-amber-500 text-white px-3 py-1.5 rounded-full font-medium">
+            <span className="absolute top-4 right-4 text-[10px] uppercase tracking-wider bg-amber-500 text-white px-3 py-1.5 font-medium">
               Size {rememberedSize}
             </span>
           )}
@@ -219,7 +219,7 @@ export default function SwipeCard({
             <>
               {/* Skip indicator (left) */}
               <motion.div
-                className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-2 px-4 py-2 bg-red-500/90 rounded-full"
+                className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-2 px-4 py-2 bg-red-500/90"
                 style={{ opacity: skipOpacity }}
               >
                 <X className="w-5 h-5 text-white" />
@@ -228,7 +228,7 @@ export default function SwipeCard({
               
               {/* Add indicator (right) */}
               <motion.div
-                className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2 px-4 py-2 bg-green-500/90 rounded-full"
+                className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2 px-4 py-2 bg-green-500/90"
                 style={{ opacity: addOpacity }}
               >
                 <span className="text-white text-sm font-medium uppercase tracking-wide">Add</span>
