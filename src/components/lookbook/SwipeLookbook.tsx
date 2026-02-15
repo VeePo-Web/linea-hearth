@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Share2, RotateCcw, ShoppingBag, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription } from '@/components/ui/drawer';
 import SwipeCard from './SwipeCard';
 import SwipeActions from './SwipeActions';
 import SwipeProgress from './SwipeProgress';
@@ -77,6 +77,8 @@ export default function SwipeLookbook({
               variant="ghost"
               size="icon"
               onClick={onClose}
+              autoFocus
+              aria-label="Close swipe lookbook"
               className="text-white/70 hover:text-white hover:bg-white/10 min-w-[48px] min-h-[48px]"
             >
               <X className="w-5 h-5" />
@@ -96,6 +98,9 @@ export default function SwipeLookbook({
             </Button>
           </div>
           
+          <DrawerDescription className="sr-only">
+            Swipe through products to add them to your bag
+          </DrawerDescription>
           {/* Swipe Instructions */}
           {!session.isComplete && (
             <p className="text-center text-white/30 text-xs mt-2">

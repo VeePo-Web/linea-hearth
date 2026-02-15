@@ -287,7 +287,10 @@ const LookSection = ({ look, index }: LookSectionProps) => {
               {/* Mobile CTA for bottom-bar layout */}
               <div className="lg:hidden flex-shrink-0">
                 <button
-                  onClick={() => setBottomBarSwipeOpen(true)}
+                  onClick={(e) => {
+                    (e.currentTarget as HTMLElement).blur();
+                    setBottomBarSwipeOpen(true);
+                  }}
                   className="w-full h-11 bg-amber-600 text-white text-sm font-medium uppercase tracking-widest hover:bg-amber-700 transition-colors px-6"
                 >
                   Shop This Look
@@ -404,7 +407,10 @@ function LookContent({
         transition={{ duration: timing.slow, ease: easing.editorial, delay: 0.9 }}
       >
         <button
-          onClick={() => setSwipeOpen(true)}
+          onClick={(e) => {
+            (e.currentTarget as HTMLElement).blur();
+            setSwipeOpen(true);
+          }}
           className="w-full h-11 bg-amber-600 text-white text-sm font-medium uppercase tracking-widest hover:bg-amber-700 transition-colors"
         >
           Shop This Look
