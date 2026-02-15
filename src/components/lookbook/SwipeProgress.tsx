@@ -92,7 +92,7 @@ export default function SwipeProgress({
             <motion.span
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
-              className="flex items-center gap-1 text-[10px] bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded-full"
+              className="flex items-center gap-1 text-[10px] bg-amber-500/20 text-amber-400 px-2 py-0.5"
             >
               <Sparkles className="w-3 h-3" />
               {bundleDiscountPercent}% off

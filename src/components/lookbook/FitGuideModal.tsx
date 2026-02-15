@@ -68,12 +68,12 @@ const FitGuideModal = ({ model, onClose }: FitGuideModalProps) => {
   if (isMobile) {
     return (
       <Drawer open={!!model} onOpenChange={(open) => !open && onClose()}>
-        <DrawerContent className="max-h-[95vh] bg-stone-900 border-t-0 rounded-t-3xl">
+        <DrawerContent className="max-h-[95vh] bg-stone-900 border-t-0 rounded-t-none">
           <div className="overflow-y-auto max-h-[95vh]">
             {/* Close Button */}
             <button
               onClick={onClose}
-              className="absolute top-4 right-4 z-10 w-12 h-12 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center text-white transition-colors"
+              className="absolute top-4 right-4 z-10 w-12 h-12 bg-black/50 hover:bg-black/70 rounded-none flex items-center justify-center text-white transition-colors"
               aria-label="Close modal"
             >
               <X className="w-5 h-5" />
@@ -95,7 +95,7 @@ const FitGuideModal = ({ model, onClose }: FitGuideModalProps) => {
                 <h2 className="text-2xl font-extralight text-white">
                   {model.name}
                 </h2>
-                <span className="text-[10px] uppercase tracking-wider bg-amber-600 text-white px-3 py-1.5 rounded-full">
+                <span className="text-[10px] uppercase tracking-wider bg-amber-600 text-white px-3 py-1.5">
                   Size {model.size_worn}
                 </span>
               </div>
@@ -120,7 +120,7 @@ const FitGuideModal = ({ model, onClose }: FitGuideModalProps) => {
               </div>
 
               {/* Size Worn */}
-              <div className="mb-6 p-4 bg-stone-800/50 rounded-lg border border-white/5">
+              <div className="mb-6 p-4 bg-stone-800/50 rounded-none border border-white/5">
                 <p className="text-[10px] uppercase tracking-[0.2em] text-amber-500 mb-2">
                   Size Worn in Photo
                 </p>
@@ -188,7 +188,7 @@ const FitGuideModal = ({ model, onClose }: FitGuideModalProps) => {
 
       {/* Modal Content */}
       <motion.div 
-        className="relative w-full max-w-4xl max-h-[90vh] m-4 bg-stone-900 rounded-xl overflow-hidden flex flex-col lg:flex-row shadow-2xl"
+        className="relative w-full max-w-4xl max-h-[90vh] m-4 bg-stone-900 rounded-none overflow-hidden flex flex-col lg:flex-row shadow-2xl"
         initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.95, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.95, y: 20 }}
@@ -197,7 +197,7 @@ const FitGuideModal = ({ model, onClose }: FitGuideModalProps) => {
         {/* Close Button */}
         <motion.button
           onClick={onClose}
-          className="absolute top-4 right-4 z-10 w-12 h-12 md:w-10 md:h-10 bg-black/50 hover:bg-black/70 rounded-full flex items-center justify-center text-white transition-colors"
+          className="absolute top-4 right-4 z-10 w-12 h-12 md:w-10 md:h-10 bg-black/50 hover:bg-black/70 rounded-none flex items-center justify-center text-white transition-colors"
           aria-label="Close modal"
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
@@ -235,7 +235,7 @@ const FitGuideModal = ({ model, onClose }: FitGuideModalProps) => {
             <h2 id="fit-model-name" className="text-2xl lg:text-3xl font-extralight text-white">
               {model.name}
             </h2>
-            <span className="text-[10px] uppercase tracking-wider bg-amber-600 text-white px-3 py-1.5 rounded-full">
+            <span className="text-[10px] uppercase tracking-wider bg-amber-600 text-white px-3 py-1.5">
               Size {model.size_worn}
             </span>
           </motion.div>
@@ -273,7 +273,7 @@ const FitGuideModal = ({ model, onClose }: FitGuideModalProps) => {
 
           {/* Size Worn */}
           <motion.div 
-            className="mb-8 p-4 bg-stone-800/50 rounded-lg border border-white/5"
+            className="mb-8 p-4 bg-stone-800/50 rounded-none border border-white/5"
             initial={prefersReducedMotion ? {} : { opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: timing.slow, ease: easing.editorial, delay: 0.5 }}

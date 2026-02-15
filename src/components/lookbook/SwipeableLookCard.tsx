@@ -208,7 +208,7 @@ export function SwipeableLookCard({
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ delay: 0.3 }}
-                className="bg-amber-500/20 border border-amber-500/30 text-amber-400 px-4 py-2 rounded-full flex items-center gap-2"
+                className="bg-amber-500/20 border border-amber-500/30 text-amber-400 px-4 py-2 flex items-center gap-2"
               >
                 <Sparkles className="w-4 h-4" />
                 <span className="text-sm font-medium">{bundleDiscountPercent}% Bundle Saved</span>
@@ -261,7 +261,7 @@ export function SwipeableLookCard({
                   key={size}
                   onClick={() => handleSizeSelect(size)}
                   className={`
-                    h-12 rounded-lg font-medium text-sm transition-all
+                    h-12 rounded-none font-medium text-sm transition-all
                     ${rememberedSize === size 
                       ? 'bg-amber-500 text-white ring-2 ring-amber-400 ring-offset-2 ring-offset-stone-900' 
                       : 'bg-white/10 text-white hover:bg-white/20'
