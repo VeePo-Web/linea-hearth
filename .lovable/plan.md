@@ -1,50 +1,101 @@
 
-# Fix Mobile Swipe-to-Add: Make It Actually Work
 
-## The Core Problem
+# Lookbook -- Final World-Class Polish Pass
 
-The Tinder-style "swipe right to add to cart" feature is fully built but **completely non-functional** right now because:
+## Current State Assessment
 
-1. The `lookbook_looks` table in the database is empty
-2. The page falls back to `demoLooks` which all have `products: []` (empty arrays)
-3. When you tap "Shop This Look" on mobile, the SwipeLookbook drawer opens but immediately shows "Nothing Added -- Want to take another look?" because there are zero products to swipe through
-4. The `SwipeableLookCard` wrapping the look images also does nothing on swipe because `products` is empty
+The Lookbook has been through 4 refinement passes and is structurally excellent:
+- Hero: cinematic 032c-style with massive editorial type -- **strong**
+- Layout variants: 5-variant index-cycling system (full-bleed, split, bottom-bar) -- **strong**
+- Mobile: 65/35 split, compact CTA, SwipeLookbook drawer -- **functional**
+- Swipe-to-cart: products load correctly, card stack with haptic feedback -- **working**
+- Design system: rounded-none enforced across all non-dot elements -- **consistent**
+- Navigation: desktop dot rail + mobile pill -- **functional**
 
-The swipe gesture code, haptic feedback, card stack, size memory integration, and completion flow are all solid. The system just has no products to work with.
+### What's Missing for True World-Class
 
-## The Fix: Populate Demo Looks with Real Products
+After thorough audit across desktop (1024px) and mobile (390px), these are the gaps between "very good Shopify lookbook" and "DAZED / 032c editorial experience":
 
-Since there are 3 real products in the database (`Heavenly Crewneck`, `Stay Holy Hoodie`, `stay holy`), the demo looks need to reference them so the swipe experience works end-to-end.
+---
 
-### Changes
+## 1. VideoEmbed.tsx -- Remaining Design System Violations
 
-**File: `src/pages/Lookbook.tsx`**
+`VideoEmbed.tsx` still has `rounded-lg` on the container and `rounded-full` on the play button and platform badge. While this component isn't actively rendered on the page (no demo looks have `video_url`), it's part of the lookbook component library and should match the system.
 
-Update the `demoLooks` array so each look includes 2-3 products from the existing product catalog. Since the demo data is a frontend fallback (used when `lookbook_looks` table is empty), we'll embed the product data directly:
+**File:** `src/components/lookbook/VideoEmbed.tsx`
+- Line 41: `rounded-lg` on container to `rounded-none`
+- Line 61: Play button `rounded-full` to `rounded-none` (square play button is more 032c)
+- Line 67: Platform badge `rounded-full` to sharp
 
-```
-demoLooks[0] "The Shepherd" -> products: [Heavenly Crewneck, Stay Holy Hoodie]
-demoLooks[1] "The Warrior"  -> products: [Stay Holy Hoodie, Heavenly Crewneck]  
-demoLooks[2] "The Disciple" -> products: [Heavenly Crewneck]
-demoLooks[3] "The Vessel"   -> products: [Stay Holy Hoodie]
-demoLooks[4] "Street Evang" -> products: [Heavenly Crewneck, Stay Holy Hoodie]
-```
+---
 
-Each product entry will include `id`, `name`, `slug`, `price`, `sale_price`, `is_on_sale`, `position` (top/bottom/hat), and `product_images` with real image paths from the existing `/products/` directory.
+## 2. ShopTheLook Position Tag -- Stray `rounded`
 
-### What This Enables
+In `ShopTheLook.tsx`, the position tag on product cards (line 95) still uses `rounded` (default Tailwind border-radius). This is a subtle inconsistency.
 
-- **SwipeableLookCard**: Swiping right on the look image on mobile will trigger the "Add Look" flow with real products, show the size picker if no size is remembered, and add items to the cart
-- **SwipeLookbook drawer**: Tapping "Shop This Look" opens the card-stack with real product cards to swipe through individually
-- **ShopTheLook grid (desktop)**: The product thumbnails with Quick Add buttons will render with real images and prices
-- **Bundle discount logic**: With 2+ products per look, the 10%/15% bundle badges will actually appear
-- **Cart integration**: Products added via swipe will show up in the cart drawer with correct names, images, and prices
+**File:** `src/components/lookbook/ShopTheLook.tsx`
+- Line 95: Remove `rounded` from position tag class
 
-### Technical Details
+---
 
-- Only `src/pages/Lookbook.tsx` is modified (the `demoLooks` constant)
-- No database changes required -- this is frontend demo data
-- No new dependencies
-- No component logic changes -- the swipe/cart/haptic code is already correct
-- Real product IDs (`bba1a982-...`, `1b4823be-...`) are used so cart deduplication works properly
-- Real image paths (`/products/heavenly-crewneck/front-model.png`, etc.) are used so images load correctly
+## 3. Mobile Swipe Drawer -- Drawer Handle Inconsistency
+
+The `SwipeLookbook` drawer uses the default Vaul drawer handle (the small gray pill at the top of the drawer). This rounded pill conflicts with the sharp-edged aesthetic. The drawer should either hide the handle or replace it with a sharp horizontal line.
+
+**File:** `src/components/lookbook/SwipeLookbook.tsx`
+- Add a custom handle element or hide the default one via DrawerContent styling
+- Replace with a sharp `w-12 h-0.5 bg-white/20 mx-auto mt-3` line element
+
+---
+
+## 4. Desktop ShopTheLook -- "Swipe to Shop" Button Showing on Desktop
+
+In `ShopTheLook.tsx`, the "Swipe to Shop" CTA (line 311-326) is gated by `isMobile` which uses `useIsMobile()`. However, this component is already wrapped in `hidden lg:block` in `LookSection.tsx`, so the mobile swipe CTA inside ShopTheLook is redundant when viewed on desktop. On tablet (768-1023px), where ShopTheLook might render, the "Swipe to Shop" button would still show. This is fine but the button text says "Swipe" which doesn't apply to tablet users who may not have the same swipe gesture.
+
+**File:** `src/components/lookbook/ShopTheLook.tsx`
+- Hide the "Swipe to Shop" button entirely inside ShopTheLook since mobile users access swipe via the LookSection's compact CTA button instead
+- Or rename to "Shop Items" on tablet
+
+---
+
+## 5. Completion Screen Micropolish
+
+The SwipeLookbook completion screen (when all products are swiped through) has a `PartyPopper` icon in a square container. For a luxury editorial brand, the celebration should be more restrained -- the drawn check icon is already available and more on-brand.
+
+**File:** `src/components/lookbook/SwipeLookbook.tsx`
+- Replace `PartyPopper` icon with `DrawCheckIcon` for the success state (lines 142-149)
+- This aligns the completion celebration with the same visual language used in SwipeCard's individual success overlay
+
+---
+
+## 6. FitGuideSection -- "View Details" Badge Always Visible on Mobile
+
+In `FitGuideSection.tsx` (line 299-312), the "View Details" badge is set to `opacity-100` on mobile and `opacity-0 md:group-hover:opacity-100` on desktop. On mobile this creates a persistent overlay on every model card, which clutters the clean photography. Since mobile users understand tapping on a card, the badge is unnecessary.
+
+**File:** `src/components/lookbook/FitGuideSection.tsx`
+- Change the "View Details" badge to `opacity-0 group-hover:opacity-100` on all viewports, or hide on mobile entirely with `hidden md:flex`
+- Mobile users will tap naturally; the card already has `active:scale-[0.98]` feedback
+
+---
+
+## Files Modified Summary
+
+| File | Change | Impact |
+|------|--------|--------|
+| `src/components/lookbook/VideoEmbed.tsx` | Remove `rounded-lg`, `rounded-full` | Design system consistency |
+| `src/components/lookbook/ShopTheLook.tsx` | Remove stray `rounded` from position tag; clean up redundant mobile CTA | Visual consistency + cleaner logic |
+| `src/components/lookbook/SwipeLookbook.tsx` | Custom sharp drawer handle; swap PartyPopper for DrawCheckIcon | Brand coherence |
+| `src/components/lookbook/FitGuideSection.tsx` | Hide "View Details" overlay on mobile | Cleaner photography presentation |
+
+## What Does NOT Change
+
+- LookSection.tsx (polished)
+- LookbookHero.tsx (polished)
+- SwipeCard.tsx (polished)
+- SwipeActions.tsx (intentional circular buttons)
+- SwipeProgress.tsx (intentional dots)
+- LookNavigation.tsx / LookNavigationMobile.tsx (intentional dots)
+- FitGuideModal.tsx (polished)
+- SwipeableLookCard.tsx (polished)
+- No layout changes, no data changes, no new dependencies
+
