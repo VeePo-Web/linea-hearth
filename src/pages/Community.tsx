@@ -33,7 +33,7 @@ export default function Community() {
   const [sortBy, setSortBy] = useState("recent");
 
   return (
-    <Layout>
+    <Layout immersiveHero>
       <CommunityHero />
       <StatStrip />
       <StoryFilters
