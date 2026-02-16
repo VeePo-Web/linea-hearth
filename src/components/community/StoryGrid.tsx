@@ -188,8 +188,8 @@ export default function StoryGrid({
           </motion.p>
         </div>
 
-        {/* Bento Grid — 1 col mobile, 2 tablet, 3 desktop */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5 auto-rows-[320px] md:auto-rows-[260px] lg:auto-rows-[280px]">
+        {/* Bento Grid — adaptive columns based on item count */}
+        <div className={`grid grid-cols-1 md:grid-cols-2 ${displayStories.length <= 6 ? 'lg:grid-cols-2' : 'lg:grid-cols-3'} gap-4 lg:gap-5 auto-rows-[280px] md:auto-rows-[240px] lg:auto-rows-[260px]`}>
           {displayStories.map((story, index) => (
             <StoryCard
               key={story.id}
@@ -206,7 +206,7 @@ export default function StoryGrid({
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
-            className="flex justify-center mt-16"
+            className="flex justify-center mt-10"
           >
             <Button
               variant="outline"

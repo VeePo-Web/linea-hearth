@@ -46,7 +46,7 @@ export default function StoryModal({ story, onClose }: StoryModalProps) {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
-            className="md:col-span-3 relative aspect-[3/4] md:aspect-auto md:min-h-[600px] bg-muted"
+            className="md:col-span-3 relative aspect-[4/3] md:aspect-auto md:min-h-[600px] bg-muted"
           >
             {story.video_url ? (
               <iframe
@@ -84,7 +84,7 @@ export default function StoryModal({ story, onClose }: StoryModalProps) {
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.4, delay: 0.1, ease: [0.25, 0.46, 0.45, 0.94] }}
-            className="md:col-span-2 p-6 lg:p-10 flex flex-col relative"
+            className="md:col-span-2 p-6 lg:p-10 flex flex-col relative scroll-mt-4"
           >
             {/* Decorative quote marks */}
             <div className="absolute -top-4 -left-2 text-[100px] leading-none text-amber-500/10 font-serif select-none pointer-events-none hidden md:block">

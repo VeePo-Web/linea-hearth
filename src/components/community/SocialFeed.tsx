@@ -1,3 +1,4 @@
+import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Instagram, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
@@ -57,7 +58,7 @@ export default function SocialFeed() {
         className="container mx-auto px-4 lg:px-8 mb-12"
       >
         <div className="flex items-baseline gap-4 mb-6">
-          <motion.span variants={staggerItem} className="text-[10px] uppercase tracking-[0.2em] text-amber-500 font-medium">05</motion.span>
+          <motion.span variants={staggerItem} className="text-[10px] uppercase tracking-[0.2em] text-amber-500 font-medium">03</motion.span>
           <div className="h-px flex-1 bg-border" />
         </div>
         <motion.p 
@@ -82,16 +83,7 @@ export default function SocialFeed() {
 
       {/* Desktop: CSS Grid | Mobile: Horizontal scroll */}
       {/* Mobile horizontal scroll */}
-      <div className="lg:hidden relative">
-        <div 
-          className="flex gap-4 overflow-x-auto scrollbar-hide px-4 pb-4 snap-x snap-mandatory"
-        >
-          {placeholderPosts.map((post, index) => (
-            <SocialCard key={post.id} post={post} index={index} />
-          ))}
-        </div>
-        <div className="absolute right-0 top-0 bottom-4 w-16 bg-gradient-to-l from-muted/30 to-transparent pointer-events-none" />
-      </div>
+      <MobileScrollFeed posts={placeholderPosts} />
 
       {/* Desktop grid */}
       <div className="hidden lg:block container mx-auto px-4 lg:px-8">
@@ -121,6 +113,44 @@ export default function SocialFeed() {
         </Button>
       </motion.div>
     </section>
+  );
+}
+
+function MobileScrollFeed({ posts }: { posts: SocialPost[] }) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  const handleScroll = () => {
+    if (!scrollRef.current) return;
+    const { scrollLeft } = scrollRef.current;
+    const cardWidth = 260 + 16; // w-[260px] + gap-4
+    setActiveIndex(Math.round(scrollLeft / cardWidth));
+  };
+
+  return (
+    <div className="lg:hidden relative">
+      <div 
+        ref={scrollRef}
+        onScroll={handleScroll}
+        className="flex gap-4 overflow-x-auto scrollbar-hide pl-4 pr-8 pb-4 snap-x snap-mandatory"
+      >
+        {posts.map((post, index) => (
+          <SocialCard key={post.id} post={post} index={index} />
+        ))}
+      </div>
+      <div className="absolute right-0 top-0 bottom-4 w-16 bg-gradient-to-l from-muted/30 to-transparent pointer-events-none" />
+      {/* Scroll indicator dots */}
+      <div className="flex justify-center gap-1.5 pt-3 pb-1">
+        {posts.map((_, i) => (
+          <div
+            key={i}
+            className={`w-1.5 h-1.5 rounded-full transition-colors duration-200 ${
+              i === activeIndex ? 'bg-amber-500' : 'bg-foreground/15'
+            }`}
+          />
+        ))}
+      </div>
+    </div>
   );
 }
 
