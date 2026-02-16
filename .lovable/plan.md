@@ -1,112 +1,135 @@
 
 
-# About Page -- World-Class Elevation Plan
+# UI/UX Stress Test -- Bug Report and Fix Plan
 
-## Current State Assessment
+## Critical Findings
 
-The consolidation is complete and the 8-section flow is strong. The page already has solid editorial bones: character reveals, parallax, watermarks, dark/light rhythm. Here is what needs surgical elevation to reach Fantasy.co / DAZED / 032c tier.
-
----
-
-## Issues Identified
-
-### 1. FounderLetter reuses `/founders.png` (same as Hero)
-The same image appears in sections 01 and 04. This is the single biggest "template" tell -- seeing the same photo twice on one scroll kills premium perception. The FounderLetter section needs a different visual treatment (or the image should be replaced with a typographic-only layout).
-
-### 2. StoryWorldwideTribe also uses `/founders.png`
-The tribe gallery member at index 6 (`@lineofjudah`) uses the founders image a third time. Replace with a product shot already available in the project.
-
-### 3. Back-to-back dark sections (05 Values + 06 ImpactMap) lack visual separation
-Both use `bg-stone-950` with grid-pattern overlays. Without a clear transition element, they blur into one mega-section. A thin amber separator or a brief light-background interstitial stat would fix this.
-
-### 4. OriginStory lion SVG is primitive
-The Lion of Judah SVG is a simple oval shape with two circles for eyes. For a brand whose literal name is "Lion of Judah," this is the highest-impact visual upgrade available. Replace with a refined lion silhouette path.
-
-### 5. Mobile pacing needs tightening
-Sections 05-06-07 on mobile create an excessively long dark tunnel. The Values section numbers (`01`, `02`, `03`) at 120px on mobile push content down unnecessarily.
-
-### 6. No "sidebar navigation" or scroll progress
-Eight full-height sections with no indication of position. A minimal dot-nav or progress line on the side (desktop only) would add editorial sophistication.
-
-### 7. StoryJoinCTA image height on mobile
-The CTA section image is `h-64` on mobile -- too short to create impact. Should be at least `h-80` or `aspect-[4/3]`.
+### BUG 1: Mobile Nav -- Background Scroll Not Locked
+**Component:** `MobileMenu.tsx`
+**Severity:** High
+**Issue:** The MobileMenu does NOT set `document.body.style.overflow = 'hidden'` when open. The FullScreenNav does (line 115), the CartDrawer does (line 139), but MobileMenu has zero scroll lock. This means on mobile, when the hamburger menu slide-out is open, the user can scroll the page behind it -- the exact bug reported.
+**Fix:** Add a `useEffect` that sets `document.body.style.overflow = 'hidden'` when `isOpen` is true, and cleans up on close (identical to FullScreenNav lines 113-127).
 
 ---
 
-## Elevation Plan
-
-### Phase A: Image Deduplication (High Impact)
-
-**FounderLetter (Section 04)**
-- Replace the left image with `/products/heavenly-crewneck/lifestyle.png` or convert to a full-typography "letter" layout (no image, just the massive quote mark + text on a cream/stone-50 background with generous whitespace). This is more editorial and eliminates the repeat.
-
-**StoryWorldwideTribe (Section 07)**
-- Replace tribe member index 6 image from `/founders.png` to `/products/stay-holy-hoodie/flat-front.png` (product flat lay for variety).
-
-### Phase B: Section Transition Polish
-
-**Between Values (05) and ImpactMap (06)**
-- Add a 1px amber line separator (`w-24 h-px bg-amber-500/40 mx-auto`) as a `div` between the two sections in `OurStory.tsx`. This creates a visual breath without breaking the dark continuity.
-
-### Phase C: Lion SVG Upgrade (Section 03)
-
-Replace the primitive oval+circles SVG with a more detailed lion head silhouette path. The new SVG retains the same animated `pathLength` reveal but uses a properly crafted lion outline with mane detail. This is the brand's core symbol and deserves a premium execution.
-
-### Phase D: Mobile Refinements
-
-**StoryValuesGrid (05)**
-- Reduce mobile value index numbers from `text-[120px]` to `text-[80px]` to prevent excessive vertical push.
-
-**StoryJoinCTA (08)**
-- Increase mobile image from `h-64` to `h-80` for stronger visual impact.
-
-### Phase E: Scroll Progress Indicator (Desktop)
-
-Add a minimal vertical progress line on the left edge (desktop only, `hidden lg:block`). This is a thin amber line that fills as you scroll, placed at `left-6` with `fixed` positioning. Implemented as a small component in `OurStory.tsx` using `useScroll` from framer-motion.
+### BUG 2: MobileMenu Missing Escape Key Handler
+**Component:** `MobileMenu.tsx`
+**Severity:** Medium
+**Issue:** FullScreenNav has keyboard escape handling (line 133). CartDrawer has it (line 134). AuthModal relies on Radix. But MobileMenu has zero keyboard handling -- pressing Escape does nothing when the slide-out is open. This is both a UX gap and an accessibility violation.
+**Fix:** Add `useEffect` with `keydown` listener for Escape, calling `onClose()`.
 
 ---
 
-## File Changes Summary
-
-| File | Change | Impact |
-|------|--------|--------|
-| `src/components/about/FounderLetter.tsx` | Replace image with typography-only layout OR swap to different product image | Eliminates biggest "template" tell |
-| `src/components/about/StoryWorldwideTribe.tsx` | Swap index 6 image from `founders.png` to `flat-front.png` | Removes third image repeat |
-| `src/components/about/OriginStory.tsx` | Replace lion SVG path with refined lion head silhouette | Elevates brand centerpiece |
-| `src/components/about/StoryValuesGrid.tsx` | Reduce mobile number size from 120px to 80px | Better mobile pacing |
-| `src/components/about/StoryJoinCTA.tsx` | Increase mobile image height from h-64 to h-80 | Stronger mobile CTA |
-| `src/pages/about/OurStory.tsx` | Add amber separator div between StoryValuesGrid and ImpactMap; add scroll progress component | Visual separation + editorial nav |
+### BUG 3: FavoritesDrawer Missing Body Scroll Lock
+**Component:** `FavoritesDrawer.tsx`
+**Severity:** High
+**Issue:** Same as MobileMenu -- no `document.body.style.overflow = 'hidden'` when open. Background content is scrollable behind the drawer.
+**Fix:** Add the same scroll-lock `useEffect` pattern used by CartDrawer.
 
 ---
 
-## Technical Details
-
-### FounderLetter Typography-Only Variant
-Remove the left image column entirely. Make it a centered, full-width typographic section:
-- Giant quotation mark (200px) centered
-- Quote text centered at `max-w-3xl`
-- Signature centered below
-- Light background (`bg-stone-50`) with ample `py-32 md:py-48` padding
-- This creates a true "magazine letter page" feel -- no image needed
-
-### Scroll Progress Component
-A ~30 line component using `useScroll` targeting the page container:
-- Fixed position, `left-6 top-1/3 h-1/3`
-- 2px wide amber line that scales vertically with scroll
-- `hidden lg:block` for desktop only
-- Fades out near top and bottom of page
-
-### Lion SVG
-Replace the current path with a more detailed lion head outline (mane radiating outward, distinct jaw, noble profile). Keep the same gradient stroke and `pathLength` animation. The eyes remain as separate animated circles.
+### BUG 4: FavoritesDrawer Missing Escape Key Handler
+**Component:** `FavoritesDrawer.tsx`
+**Severity:** Medium
+**Issue:** No keyboard escape handling. User must click the X button or backdrop to close.
+**Fix:** Add `keydown` listener for Escape.
 
 ---
 
-## Risk Assessment
+### BUG 5: AuthModal Missing Body Scroll Lock
+**Component:** `AuthModal.tsx`
+**Severity:** High
+**Issue:** Same pattern -- no scroll lock. Background scrolls when the auth panel is open.
+**Fix:** Add scroll-lock `useEffect`.
 
-| Change | Risk | Mitigation |
-|--------|------|------------|
-| Removing FounderLetter image | Low | Typography-only is actually more editorial; the quote content is strong enough to stand alone |
-| Lion SVG replacement | Low | Same animation technique, just a better path |
-| Scroll progress bar | Low | Desktop-only, CSS-driven, no layout impact |
-| Mobile number size reduction | None | Pure cosmetic improvement |
+---
+
+### BUG 6: AuthModal Missing Escape Key Handler
+**Component:** `AuthModal.tsx`
+**Severity:** Medium
+**Issue:** No keyboard escape handling.
+**Fix:** Add `keydown` listener for Escape.
+
+---
+
+### BUG 7: SearchOverlay (Mobile) Missing Body Scroll Lock
+**Component:** `SearchOverlay.tsx`
+**Severity:** Medium
+**Issue:** The mobile full-screen search overlay does not lock body scroll. Since it covers the full screen visually, the impact is lower, but on iOS elastic scroll can pull the background content into view behind the overlay.
+**Fix:** Add scroll-lock `useEffect` when `isOpen`.
+
+---
+
+### BUG 8: Multiple Overlays Can Stack Without Cleanup
+**Component:** `Navigation.tsx`
+**Severity:** Medium
+**Issue:** It is possible to have the cart drawer open, then trigger the favorites drawer (via the "View Favorites" button inside CartDrawer), resulting in two overlays stacked. While the cart closes first via `closeCart()`, the timing with `setTimeout` can cause brief flash states. Similarly, opening auth from mobile menu uses `setTimeout(onAuthOpen, 300)` which can race.
+**Fix:** Add mutual exclusion logic in Navigation.tsx -- when any overlay opens, close all others first synchronously (not via setTimeout). Consider a single `activeOverlay` state enum instead of multiple booleans.
+
+---
+
+### BUG 9: MobileStickyATC and MobileStickyBar Z-Index Collision
+**Component:** `MobileStickyATC.tsx` (z-50), `MobileStickyBar.tsx` (z-40)
+**Severity:** Low
+**Issue:** On the homepage, `MobileStickyBar` appears at z-40. On PDP, `MobileStickyATC` appears at z-50. If a user navigates from homepage to PDP quickly, both can briefly render during page transition. The z-index difference prevents visual overlap, but the safe-area-bottom padding is only applied to MobileStickyBar (via `safe-area-bottom` class) and NOT to MobileStickyATC. On iPhones with home indicators, the MobileStickyATC "Add to Bag" button can overlap the home bar.
+**Fix:** Add `pb-[env(safe-area-inset-bottom)]` to MobileStickyATC's container.
+
+---
+
+### BUG 10: CartDrawer "Proceed to Checkout" Uses `asChild` with `onClick`
+**Component:** `CartDrawer.tsx` (line 462-471)
+**Severity:** Low
+**Issue:** The `Button` component uses `asChild` to render as a `Link`, but also has `onClick={closeCart}`. With Radix Slot (`asChild`), the `onClick` is on the `Button` wrapper, not the `Link`. This can cause the cart to close but navigation to not fire on some mobile browsers where the event propagation differs.
+**Fix:** Move `onClick={closeCart}` to the `Link` component directly, or remove `asChild` and use `useNavigate` instead.
+
+---
+
+### BUG 11: MegaMenu Image Label Hover Animation
+**Component:** `MegaMenu.tsx` (line 206-210)
+**Severity:** Low (cosmetic)
+**Issue:** The image label uses `whileHover` on a `motion.div` inside a `Link`, but the parent already has a `whileHover` for image scale. The label `initial={{ opacity: 0, y: 10 }}` means it starts invisible and only appears on hover -- but the `whileHover` is on the label div itself, not the parent Link. The label never becomes visible because the label div is too small to hover over when it starts at opacity 0.
+**Fix:** Move the label visibility logic to the parent Link's hover state using a CSS `group-hover` pattern (which is already partially there via `group-hover:opacity-100` on the gradient).
+
+---
+
+## Implementation Summary
+
+| File | Fixes | Lines Changed |
+|------|-------|---------------|
+| `MobileMenu.tsx` | Add scroll lock + escape handler | ~15 lines |
+| `FavoritesDrawer.tsx` | Add scroll lock + escape handler | ~15 lines |
+| `AuthModal.tsx` | Add scroll lock + escape handler | ~15 lines |
+| `SearchOverlay.tsx` | Add scroll lock | ~8 lines |
+| `MobileStickyATC.tsx` | Add safe-area-bottom padding | ~2 lines |
+| `CartDrawer.tsx` | Fix asChild onClick propagation | ~3 lines |
+| `MegaMenu.tsx` | Fix label hover visibility | ~5 lines |
+| `Navigation.tsx` | Consolidate overlay state management | ~20 lines |
+
+### Priority Order
+1. **MobileMenu scroll lock** (the exact reported bug)
+2. **FavoritesDrawer scroll lock**
+3. **AuthModal scroll lock**
+4. **Escape key handlers** (MobileMenu, FavoritesDrawer, AuthModal)
+5. **SearchOverlay scroll lock**
+6. **MobileStickyATC safe area**
+7. **CartDrawer onClick propagation**
+8. **MegaMenu label hover**
+9. **Navigation overlay state consolidation**
+
+### Implementation Pattern (Reusable)
+Each scroll-lock + escape fix follows this exact pattern:
+```typescript
+useEffect(() => {
+  if (!isOpen) return;
+  document.body.style.overflow = 'hidden';
+  const handleEscape = (e: KeyboardEvent) => {
+    if (e.key === 'Escape') onClose();
+  };
+  document.addEventListener('keydown', handleEscape);
+  return () => {
+    document.body.style.overflow = '';
+    document.removeEventListener('keydown', handleEscape);
+  };
+}, [isOpen, onClose]);
+```
 
