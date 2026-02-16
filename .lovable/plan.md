@@ -1,96 +1,57 @@
 
 
-# Community Page -- Phase 8: World-Class Polish and Final QA
+# Community Page -- Phase 9: Bento Grid Gap Fix
 
-## Current State
+## Issue Identified
 
-After 7 phases, the Community page delivers editorial-grade quality across all viewports. The immersive hero, featured story magazine spread, sticky filters, bento grid, social feed with CSS transforms, and industrial CTA all work correctly.
+On desktop (1920px), the 3-column bento grid with 6 cards has a layout gap. The `getCardSize` function marks index 5 as "wide" (`col-span-2`) because `5 % 5 === 0`. On a 3-column grid:
 
-## What's Working (Preserve Everything)
-- Immersive hero with THE TRIBE manifesto, word-reveal animation, noise texture, stats row
-- Featured Story 3/5 + 2/5 magazine spread with grayscale-to-color hover, "01 -- Featured Story" sidebar
-- StatStrip industrial divider (500+ Stories / 45 Cities / 10K Tribe)
-- Sticky filter bar: desktop editorial tabs + mobile pill navigation with sort pills
-- Bento StoryGrid: 3-col desktop, auto-rows-auto mobile, "End of stories" footnote, section index "02"
-- Social Feed: 4-col desktop grid, mobile snap-scroll with dots, CSS image transforms for variety, section index "03"
-- SubmitStoryCTA: 032c industrial treatment with word-reveal
-- StoryModal: 60/40 magazine layout, accessibility (DialogDescription), share + AMA actions
-- All animations use viewport once triggers with amount: 0
+- Row 1-2: Card 0 (large, 2x2) + Card 1 (1x1) + Card 2 (1x1) -- fills perfectly
+- Row 3: Card 3 (1x1) + Card 4 (1x1) + Card 5 (wide, needs 2 cols) -- Card 5 cannot fit in the remaining 1 column, so it wraps to Row 4, leaving a gap in Row 3 column 3
 
-## Issues Identified
+The fix is to make the `getCardSize` logic only apply spanning for larger datasets. With 6 or fewer items, only the hero card (index 0) should span. All others should be "regular" so the 3-column grid fills cleanly: hero (2x2) + 2 stacked right + 3 across the bottom row.
 
-### 1. Bento grid only shows 4 cards but uses lg:grid-cols-3 with hero spanning 2 cols + 2 rows
-With 4 placeholder items on a 3-column grid where card 0 spans 2x2, the layout leaves empty cells. Card 0 takes positions (1,1), (1,2), (2,1), (2,2). Card 1 takes (1,3). Card 2 takes (2,3). Card 3 drops to row 3, column 1 -- leaving columns 2 and 3 of row 3 empty. This creates a visible gap on the right side of the grid on desktop.
+## What's Working (No Changes)
 
-**Fix:** Add 2 more placeholder stories (total 6) so the grid fills naturally: hero (2x2), 2 cards stacked right, 3 cards on row 3.
+- Hero section with immersive header, `pt-20` mobile padding, `opacity-30` background -- verified on both desktop and mobile
+- Featured Story magazine spread
+- Sticky filter bar with mobile sort pills
+- Social feed with corrected gradient
+- StoryCard keyboard accessibility (`tabIndex`, `role`, `onKeyDown`, focus rings)
+- SubmitStoryCTA industrial treatment
+- StatStrip deduplication (removed from Community.tsx)
+- 6 placeholder stories present
 
-### 2. StatStrip is duplicated
-`Community.tsx` renders a `StatStrip` component (defined inline) AND `CommunityHero` has its own stats row at the bottom of the manifesto. The user sees stats twice: once at the bottom of the hero (500+ / 45 / 10K+) and again in the StatStrip (500+ Stories / 45 Cities / 10K Tribe). This is redundant.
+## Implementation
 
-**Fix:** Remove the inline `StatStrip` from `Community.tsx` since `CommunityHero` already has a built-in stats row with better styling.
+### File: `src/components/community/StoryGrid.tsx`
 
-### 3. Mobile hero doesn't feel immersive enough
-The background image on the right side (`/founders.png`) has `opacity-20` on mobile vs `lg:opacity-30` on desktop. On a 390px screen, the image is barely visible and the hero feels like plain dark text on black. The "NOT FOR EVERYONE" label starts immediately after the header with no breathing room.
+Change the `getCardSize` function to only apply `wide` and secondary `large` spans when there are enough items to fill the grid without gaps. For 6 or fewer items on a 3-column grid, only index 0 gets "large":
 
-**Fix:** Increase mobile background image opacity to `opacity-30` (matching desktop) and add `pt-24` padding to the hero content container for mobile to push the manifesto down and create a cinematic entry space.
+```typescript
+const getCardSize = (index: number): "regular" | "large" | "wide" => {
+  if (index === 0) return "large";
+  // Only apply spanning for larger datasets where grid can absorb it
+  if (displayStories.length > 9) {
+    if (index % 7 === 0) return "large";
+    if (index % 5 === 0) return "wide";
+  }
+  return "regular";
+};
+```
 
-### 4. Social feed right-fade gradient uses `from-background/80`
-On the mobile horizontal scroll, the right-fade gradient overlay uses `from-background/80`. In dark mode this works, but if the background is the muted section (`bg-muted/30`), the fade doesn't perfectly match. This creates a subtle color mismatch at the scroll edge.
+This ensures:
+- With 6 placeholders: hero (2x2) + 5 regular cards -- fills 3-col grid perfectly (2 rows for hero section + 1 full row of 3)
+- With 12+ real stories from the database: the bento variety kicks in with wide and large cards
+- No empty cells on desktop
 
-**Fix:** Change to `from-muted/80` to match the section background, or use `from-[hsl(var(--muted))]` for exact match.
-
-### 5. StoryModal close button overlaps content on mobile
-The default DialogContent close button sits in the top-right corner. On mobile (single column layout), when the image/placeholder takes `aspect-[4/3]`, the close X sits on top of the image. This is functional but could be more intentional.
-
-**Fix:** No code change needed -- this is standard Dialog behavior and works. Note for awareness only.
-
-### 6. No keyboard focus indicators on story cards
-The story cards use `cursor-pointer` and `onClick` but have no visible focus state for keyboard navigation. When tabbing through cards, there's no visual indicator of which card is focused.
-
-**Fix:** Add `focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 focus-visible:ring-offset-background` to the StoryCard motion.div, and add `tabIndex={0}` and `onKeyDown` handler for Enter/Space to trigger the modal.
-
----
-
-## Implementation Plan
-
-### File 1: `src/pages/Community.tsx`
-- Remove the inline `StatStrip` function and its render in the JSX (eliminates duplicate stats)
-- The CommunityHero already has its own stats row
-
-### File 2: `src/components/community/StoryGrid.tsx`
-- Add 2 more placeholder stories to bring total to 6, filling the 3-column bento grid without gaps
-- New placeholders should follow the same data structure with varied gradients, locations, and content types
-
-### File 3: `src/components/community/CommunityHero.tsx`
-- Increase mobile background image opacity from `opacity-20` to `opacity-30` (remove the responsive opacity split, just use `opacity-30` universally)
-- Add `pt-20 lg:pt-0` to the content container to create breathing room below the header on mobile
-
-### File 4: `src/components/community/StoryCard.tsx`
-- Add keyboard accessibility: `tabIndex={0}`, `role="button"`, `onKeyDown` handler for Enter/Space
-- Add `focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2` for visible focus state
-
-### File 5: `src/components/community/SocialFeed.tsx`
-- Fix mobile scroll fade gradient from `from-background/80` to `from-muted/80` to match section background
-
----
-
-## Files Modified
+## Technical Details
 
 | File | Change | Risk |
 |------|--------|------|
-| `src/pages/Community.tsx` | Remove duplicate StatStrip | Low -- removes dead code |
-| `src/components/community/StoryGrid.tsx` | Add 2 placeholder stories | Low -- additive data |
-| `src/components/community/CommunityHero.tsx` | Increase mobile opacity, add mobile top padding | Low -- CSS only |
-| `src/components/community/StoryCard.tsx` | Add keyboard accessibility + focus states | Low -- additive |
-| `src/components/community/SocialFeed.tsx` | Fix fade gradient color match | Low -- CSS only |
+| `src/components/community/StoryGrid.tsx` | Guard spanning logic for small datasets | Low -- logic only |
 
-## What Does NOT Change
-- StoryFilters.tsx -- mobile sort pills complete, working correctly
-- SubmitStoryCTA.tsx -- world-class, untouched
-- StoryModal.tsx -- accessibility intact, untouched
-- SubmitStoryModal.tsx -- untouched
-- No new dependencies
-- No database changes
-- Brand colors locked (amber-500, stone-950)
-- All existing animations preserved
+## No Other Changes
+
+All Phase 8 work is verified and correct. This is a single surgical fix.
 
