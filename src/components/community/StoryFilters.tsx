@@ -162,16 +162,6 @@ export default function StoryFilters({
         {/* Mobile: Horizontal scroll */}
         <div className="md:hidden py-4">
           <div className="flex items-center gap-3 overflow-x-auto scrollbar-hide pb-2 -mx-4 px-4">
-            {/* Filter toggle */}
-            <Button
-              variant="outline"
-              size="sm"
-              className="shrink-0 text-xs uppercase tracking-wider border-border"
-            >
-              <SlidersHorizontal className="w-3.5 h-3.5 mr-1.5" />
-              Filters
-            </Button>
-
             {/* Type pills - horizontal scroll */}
             {storyTypes.map((type) => (
               <button

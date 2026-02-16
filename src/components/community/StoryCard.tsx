@@ -56,7 +56,7 @@ export default function StoryCard({ story, onOpenStory, index, size = "regular" 
       className={`group relative cursor-pointer ${spanClass} transition-transform duration-500 hover:scale-[1.02]`}
       onClick={() => onOpenStory(story)}
     >
-      <div className={`${aspectClass} relative overflow-hidden bg-muted border border-white/5`}>
+      <div className={`${aspectClass} min-h-[240px] md:min-h-0 relative overflow-hidden bg-muted border border-white/5`}>
         {/* Background Image or Placeholder */}
         {story.customer_photo_url ? (
           <img
@@ -73,7 +73,7 @@ export default function StoryCard({ story, onOpenStory, index, size = "regular" 
               'bg-gradient-to-br from-stone-950 to-amber-950/40',
             ][index % 4]
           }`}>
-            <span className="absolute top-6 right-6 text-[60px] font-extralight text-white/[0.06] uppercase leading-none">
+            <span className="absolute top-6 right-6 text-[60px] font-extralight text-white/[0.06] uppercase leading-none group-hover:scale-110 group-hover:rotate-3 transition-transform duration-700">
               {story.customer_name.charAt(0)}
             </span>
             {index % 2 === 0 && (
@@ -88,7 +88,7 @@ export default function StoryCard({ story, onOpenStory, index, size = "regular" 
         )}
 
         {/* Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-stone-950 via-stone-950/30 to-transparent opacity-70 group-hover:opacity-85 transition-opacity duration-500" />
+        <div className="absolute inset-0 bg-gradient-to-t from-stone-950 via-stone-950/30 to-transparent opacity-70 group-hover:opacity-90 transition-opacity duration-500" />
 
         {/* Video Play Button */}
         {story.video_url && (
@@ -155,7 +155,7 @@ export default function StoryCard({ story, onOpenStory, index, size = "regular" 
           </p>
 
           {/* Customer Info */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 translate-y-1 group-hover:translate-y-0 transition-transform duration-500">
             <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center overflow-hidden">
               {story.customer_photo_url ? (
                 <img 

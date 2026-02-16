@@ -178,7 +178,13 @@ function SocialCard({ post, index, isGrid }: { post: SocialPost; index: number; 
       <img
         src={post.imageUrl}
         alt={`Post by @${post.username}`}
-        className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
+        className={`w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500 ${
+          index % 2 === 1 ? 'scale-x-[-1]' : ''
+        } ${
+          index === 2 || index === 5 ? 'scale-[1.3] object-top' : ''
+        } ${
+          index === 3 || index === 6 ? 'object-[80%_80%]' : ''
+        }`}
       />
       
       {/* Color tint overlay for variety */}
