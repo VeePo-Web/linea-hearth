@@ -463,9 +463,8 @@ const CartDrawer = ({ onViewFavorites }: CartDrawerProps) => {
                       asChild
                       className="w-full rounded-none h-12 text-sm uppercase tracking-wider"
                       size="lg"
-                      onClick={closeCart}
                     >
-                      <Link to="/checkout">
+                      <Link to="/checkout" onClick={closeCart}>
                         Proceed to Checkout
                       </Link>
                     </Button>
