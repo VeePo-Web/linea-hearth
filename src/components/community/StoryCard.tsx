@@ -38,7 +38,7 @@ export default function StoryCard({ story, onOpenStory, index, size = "regular" 
 
   // Hero card spans 2 cols + 2 rows on desktop
   const spanClass = size === "large" 
-    ? "row-span-2 md:col-span-2" 
+    ? "md:row-span-2 md:col-span-2" 
     : size === "wide" 
       ? "md:col-span-2" 
       : "";

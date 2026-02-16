@@ -48,14 +48,14 @@ const tintOverlays = [
 
 export default function SocialFeed() {
   return (
-    <section className="py-20 lg:py-28 bg-muted/30 overflow-hidden">
+    <section className="py-16 lg:py-24 bg-muted/30 overflow-hidden">
       {/* Header */}
       <motion.div 
         variants={staggerContainer}
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true }}
-        className="container mx-auto px-4 lg:px-8 mb-12"
+        className="container mx-auto px-4 lg:px-8 mb-8"
       >
         <div className="flex items-baseline gap-4 mb-6">
           <motion.span variants={staggerItem} className="text-[10px] uppercase tracking-[0.2em] text-amber-500 font-medium">03</motion.span>
@@ -138,7 +138,7 @@ function MobileScrollFeed({ posts }: { posts: SocialPost[] }) {
           <SocialCard key={post.id} post={post} index={index} />
         ))}
       </div>
-      <div className="absolute right-0 top-0 bottom-4 w-16 bg-gradient-to-l from-muted/30 to-transparent pointer-events-none" />
+      <div className="absolute right-0 top-0 bottom-4 w-24 bg-gradient-to-l from-background/80 via-background/40 to-transparent pointer-events-none" />
       {/* Scroll indicator dots */}
       <div className="flex justify-center gap-1.5 pt-3 pb-1">
         {posts.map((_, i) => (
