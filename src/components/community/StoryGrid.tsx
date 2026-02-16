@@ -189,7 +189,7 @@ export default function StoryGrid({
         </div>
 
         {/* Bento Grid — adaptive columns based on item count */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5 auto-rows-auto md:auto-rows-[240px] lg:auto-rows-[260px]">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5 auto-rows-auto md:auto-rows-[280px] lg:auto-rows-[300px]">
           {displayStories.map((story, index) => (
             <StoryCard
               key={story.id}
