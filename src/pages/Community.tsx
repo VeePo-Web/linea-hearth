@@ -35,7 +35,9 @@ export default function Community() {
         selectedGender="all"
         sortBy="recent"
       />
+      <div className="h-px bg-border" />
       <SocialFeed />
+      <div className="h-px bg-border" />
       <SubmitStoryCTA />
     </Layout>
   );

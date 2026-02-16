@@ -65,10 +65,25 @@ export default function StoryCard({ story, onOpenStory, index, size = "regular" 
             className="absolute inset-0 w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
           />
         ) : (
-          <div className="absolute inset-0 bg-gradient-to-br from-stone-200 to-stone-300 dark:from-stone-800 dark:to-stone-900 flex items-center justify-center">
-            <span className="text-[80px] font-extralight text-stone-400/40 dark:text-stone-600/40 uppercase">
+          <div className={`absolute inset-0 ${
+            [
+              'bg-gradient-to-br from-stone-900 to-stone-800',
+              'bg-gradient-to-br from-amber-950/80 to-stone-900',
+              'bg-gradient-to-br from-stone-800 to-stone-700',
+              'bg-gradient-to-br from-stone-950 to-amber-950/40',
+            ][index % 4]
+          }`}>
+            <span className="absolute top-6 right-6 text-[60px] font-extralight text-white/[0.06] uppercase leading-none">
               {story.customer_name.charAt(0)}
             </span>
+            {index % 2 === 0 && (
+              <div 
+                className="absolute inset-0 opacity-[0.02]"
+                style={{
+                  backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 10px, currentColor 10px, currentColor 11px)',
+                }}
+              />
+            )}
           </div>
         )}
 
