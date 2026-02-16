@@ -20,7 +20,7 @@ const StoryJoinCTA = () => {
         animate={isInView ? { opacity: 1 } : {}}
         transition={{ delay: 0.3, duration: 0.8 }}
       >
-        06
+        08
       </motion.span>
 
       <div className="grid lg:grid-cols-2 min-h-[80vh]">

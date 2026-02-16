@@ -112,7 +112,7 @@ const ImpactMap = () => {
         transition={{ duration: 1, delay: 0.3 }}
         className="absolute top-8 left-8 text-[20vw] font-light text-white leading-none select-none pointer-events-none z-0"
       >
-        05
+        06
       </motion.span>
 
       <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-12 lg:px-16">

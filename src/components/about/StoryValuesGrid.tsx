@@ -44,7 +44,7 @@ const StoryValuesGrid = () => {
         animate={isInView ? { opacity: 1 } : {}}
         transition={{ delay: 0.3, duration: 0.8 }}
       >
-        03
+        05
       </motion.span>
 
       <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-16 xl:px-20">
