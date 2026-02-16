@@ -1,5 +1,7 @@
+import { useState } from "react";
 import Layout from "@/components/layout/Layout";
 import CommunityHero from "@/components/community/CommunityHero";
+import StoryFilters from "@/components/community/StoryFilters";
 import StoryGrid from "@/components/community/StoryGrid";
 import SocialFeed from "@/components/community/SocialFeed";
 import SubmitStoryCTA from "@/components/community/SubmitStoryCTA";
@@ -25,15 +27,30 @@ function StatStrip() {
 }
 
 export default function Community() {
+  const [selectedProduct, setSelectedProduct] = useState("all");
+  const [selectedType, setSelectedType] = useState("all");
+  const [selectedGender, setSelectedGender] = useState("all");
+  const [sortBy, setSortBy] = useState("recent");
+
   return (
     <Layout>
       <CommunityHero />
       <StatStrip />
+      <StoryFilters
+        selectedProduct={selectedProduct}
+        setSelectedProduct={setSelectedProduct}
+        selectedType={selectedType}
+        setSelectedType={setSelectedType}
+        selectedGender={selectedGender}
+        setSelectedGender={setSelectedGender}
+        sortBy={sortBy}
+        setSortBy={setSortBy}
+      />
       <StoryGrid
-        selectedProduct="all"
-        selectedType="all"
-        selectedGender="all"
-        sortBy="recent"
+        selectedProduct={selectedProduct}
+        selectedType={selectedType}
+        selectedGender={selectedGender}
+        sortBy={sortBy}
       />
       <div className="h-px bg-border" />
       <SocialFeed />

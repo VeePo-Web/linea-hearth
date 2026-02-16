@@ -174,7 +174,7 @@ export default function CommunityHero() {
       <div className="h-px bg-border" />
 
       {/* SECTION 2: Featured Story - Tighter padding */}
-      <section className="relative bg-background py-16 lg:py-24">
+      <section className="relative bg-background pt-16 lg:pt-24 pb-10 lg:pb-16">
         <div className="absolute left-0 top-1/2 -translate-y-1/2 hidden lg:block">
           <p className="text-[10px] uppercase tracking-[0.4em] text-amber-500 font-medium -rotate-90 origin-left whitespace-nowrap">
             Featured Story
