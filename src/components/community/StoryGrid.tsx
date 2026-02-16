@@ -170,6 +170,24 @@ export default function StoryGrid({
       rating: 5,
       product_name: "Crown Tee",
     },
+    {
+      id: "placeholder-5",
+      type: "story" as const,
+      customer_name: "Destiny W.",
+      customer_location: "Los Angeles, CA",
+      headline: "Wore it to the studio",
+      story_text: "I'm a worship leader and I wore the Tribe hoodie to a recording session. The producer noticed it and we ended up talking about faith for an hour. Music hit different after that.",
+      is_contactable: true,
+    },
+    {
+      id: "placeholder-6",
+      type: "review" as const,
+      customer_name: "André F.",
+      customer_location: "Montreal, QC",
+      story_text: "Shipping was fast, fabric is heavyweight, and the embroidery is clean. This brand understands quality. Already ordered two more.",
+      rating: 5,
+      product_name: "Stay Holy Hoodie",
+    },
   ];
 
   return (

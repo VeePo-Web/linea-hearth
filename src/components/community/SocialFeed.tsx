@@ -138,7 +138,7 @@ function MobileScrollFeed({ posts }: { posts: SocialPost[] }) {
           <SocialCard key={post.id} post={post} index={index} />
         ))}
       </div>
-      <div className="absolute right-0 top-0 bottom-4 w-24 bg-gradient-to-l from-background/80 via-background/40 to-transparent pointer-events-none" />
+      <div className="absolute right-0 top-0 bottom-4 w-24 bg-gradient-to-l from-muted/80 via-muted/40 to-transparent pointer-events-none" />
       {/* Scroll indicator dots */}
       <div className="flex justify-center gap-1.5 pt-3 pb-1">
         {posts.map((_, i) => (
