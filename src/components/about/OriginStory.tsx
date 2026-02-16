@@ -5,7 +5,6 @@ const OriginStory = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
   const isInView = useInView(sectionRef, { once: true, amount: 0.2 });
   
-  // Parallax effect
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start end", "end start"]
@@ -53,51 +52,116 @@ const OriginStory = () => {
               {/* Gradient background */}
               <div className="absolute inset-0 bg-gradient-to-br from-amber-900/30 via-stone-900 to-stone-950" />
               
-              {/* Premium lion silhouette */}
+              {/* Refined lion head silhouette */}
               <svg 
-                viewBox="0 0 200 200" 
+                viewBox="0 0 400 400" 
                 className="absolute inset-0 w-full h-full p-8 md:p-12"
                 fill="none"
               >
-                {/* Stylized lion head */}
+                {/* Mane outer ring */}
                 <motion.path
                   initial={{ pathLength: 0, opacity: 0 }}
                   animate={isInView ? { pathLength: 1, opacity: 1 } : { pathLength: 0, opacity: 0 }}
-                  transition={{ duration: 2, delay: 0.5, ease: "easeOut" }}
-                  d="M100 20 C60 20 30 50 30 90 C30 110 40 125 40 140 C30 150 20 165 20 180 C20 195 35 200 55 200 L145 200 C165 200 180 195 180 180 C180 165 170 150 160 140 C160 125 170 110 170 90 C170 50 140 20 100 20"
+                  transition={{ duration: 2.5, delay: 0.5, ease: "easeOut" }}
+                  d="M200 40 C170 38 145 48 125 60 C105 72 88 90 78 105 C65 125 55 148 52 170 C48 195 50 218 55 240 C42 255 35 272 32 290 C28 310 32 328 42 342 C52 356 68 365 88 370 C105 374 125 375 145 374 L255 374 C275 375 295 374 312 370 C332 365 348 356 358 342 C368 328 372 310 368 290 C365 272 358 255 345 240 C350 218 352 195 348 170 C345 148 335 125 322 105 C312 90 295 72 275 60 C255 48 230 38 200 40"
                   stroke="url(#lionGradient)"
-                  strokeWidth="1"
+                  strokeWidth="1.5"
                   strokeLinecap="round"
                   className="drop-shadow-[0_0_20px_rgba(245,158,11,0.3)]"
                 />
+                {/* Inner face contour */}
+                <motion.path
+                  initial={{ pathLength: 0, opacity: 0 }}
+                  animate={isInView ? { pathLength: 1, opacity: 1 } : { pathLength: 0, opacity: 0 }}
+                  transition={{ duration: 2, delay: 0.8, ease: "easeOut" }}
+                  d="M200 80 C175 82 155 95 142 112 C130 128 122 150 120 172 C118 195 122 215 130 232 C120 245 115 260 112 275 C110 288 115 300 125 308 C135 316 150 320 168 322 L232 322 C250 320 265 316 275 308 C285 300 290 288 288 275 C285 260 280 245 270 232 C278 215 282 195 280 172 C278 150 270 128 258 112 C245 95 225 82 200 80"
+                  stroke="url(#lionGradientInner)"
+                  strokeWidth="0.8"
+                  strokeLinecap="round"
+                />
+                {/* Left ear */}
+                <motion.path
+                  initial={{ pathLength: 0, opacity: 0 }}
+                  animate={isInView ? { pathLength: 1, opacity: 1 } : { pathLength: 0, opacity: 0 }}
+                  transition={{ duration: 1, delay: 1.2, ease: "easeOut" }}
+                  d="M148 110 C138 95 125 88 118 92 C112 96 112 108 118 122 C124 135 135 142 148 138"
+                  stroke="url(#lionGradient)"
+                  strokeWidth="1"
+                  strokeLinecap="round"
+                />
+                {/* Right ear */}
+                <motion.path
+                  initial={{ pathLength: 0, opacity: 0 }}
+                  animate={isInView ? { pathLength: 1, opacity: 1 } : { pathLength: 0, opacity: 0 }}
+                  transition={{ duration: 1, delay: 1.3, ease: "easeOut" }}
+                  d="M252 110 C262 95 275 88 282 92 C288 96 288 108 282 122 C276 135 265 142 252 138"
+                  stroke="url(#lionGradient)"
+                  strokeWidth="1"
+                  strokeLinecap="round"
+                />
                 {/* Eyes */}
-                <motion.circle
+                <motion.ellipse
                   initial={{ opacity: 0 }}
                   animate={isInView ? { opacity: 1 } : { opacity: 0 }}
                   transition={{ duration: 0.5, delay: 2 }}
-                  cx="70" cy="90" r="8"
-                  className="fill-amber-500/60"
+                  cx="168" cy="175" rx="12" ry="8"
+                  className="fill-amber-500/50"
+                />
+                <motion.ellipse
+                  initial={{ opacity: 0 }}
+                  animate={isInView ? { opacity: 1 } : { opacity: 0 }}
+                  transition={{ duration: 0.5, delay: 2.1 }}
+                  cx="232" cy="175" rx="12" ry="8"
+                  className="fill-amber-500/50"
+                />
+                {/* Eye inner glow */}
+                <motion.circle
+                  initial={{ opacity: 0 }}
+                  animate={isInView ? { opacity: 1 } : { opacity: 0 }}
+                  transition={{ duration: 0.3, delay: 2.3 }}
+                  cx="172" cy="174" r="3"
+                  className="fill-amber-400/80"
                 />
                 <motion.circle
                   initial={{ opacity: 0 }}
                   animate={isInView ? { opacity: 1 } : { opacity: 0 }}
-                  transition={{ duration: 0.5, delay: 2.1 }}
-                  cx="130" cy="90" r="8"
-                  className="fill-amber-500/60"
+                  transition={{ duration: 0.3, delay: 2.4 }}
+                  cx="236" cy="174" r="3"
+                  className="fill-amber-400/80"
                 />
                 {/* Nose */}
                 <motion.path
                   initial={{ opacity: 0 }}
                   animate={isInView ? { opacity: 1 } : { opacity: 0 }}
                   transition={{ duration: 0.5, delay: 2.2 }}
-                  d="M100 120 L90 135 L100 145 L110 135 Z"
-                  className="fill-amber-500/40"
+                  d="M200 210 L188 228 C192 234 196 238 200 240 C204 238 208 234 212 228 Z"
+                  className="fill-amber-500/35"
                 />
+                {/* Mouth lines */}
+                <motion.path
+                  initial={{ pathLength: 0, opacity: 0 }}
+                  animate={isInView ? { pathLength: 1, opacity: 0.4 } : { pathLength: 0, opacity: 0 }}
+                  transition={{ duration: 0.8, delay: 2.5, ease: "easeOut" }}
+                  d="M200 240 L200 255 M188 248 C192 258 196 262 200 264 C204 262 208 258 212 248"
+                  stroke="#f59e0b"
+                  strokeWidth="0.8"
+                  strokeLinecap="round"
+                />
+                {/* Whisker dots */}
+                <motion.circle initial={{ opacity: 0 }} animate={isInView ? { opacity: 0.3 } : {}} transition={{ delay: 2.6 }} cx="160" cy="235" r="2" fill="#f59e0b" />
+                <motion.circle initial={{ opacity: 0 }} animate={isInView ? { opacity: 0.3 } : {}} transition={{ delay: 2.65 }} cx="152" cy="228" r="1.5" fill="#f59e0b" />
+                <motion.circle initial={{ opacity: 0 }} animate={isInView ? { opacity: 0.3 } : {}} transition={{ delay: 2.7 }} cx="240" cy="235" r="2" fill="#f59e0b" />
+                <motion.circle initial={{ opacity: 0 }} animate={isInView ? { opacity: 0.3 } : {}} transition={{ delay: 2.75 }} cx="248" cy="228" r="1.5" fill="#f59e0b" />
+                
                 <defs>
                   <linearGradient id="lionGradient" x1="0%" y1="0%" x2="100%" y2="100%">
                     <stop offset="0%" stopColor="#f59e0b" stopOpacity="0.8" />
                     <stop offset="50%" stopColor="#f59e0b" stopOpacity="0.4" />
                     <stop offset="100%" stopColor="#f59e0b" stopOpacity="0.2" />
+                  </linearGradient>
+                  <linearGradient id="lionGradientInner" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#f59e0b" stopOpacity="0.5" />
+                    <stop offset="100%" stopColor="#f59e0b" stopOpacity="0.15" />
                   </linearGradient>
                 </defs>
               </svg>
