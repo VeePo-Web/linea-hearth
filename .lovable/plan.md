@@ -1,180 +1,112 @@
 
-# About Page -- World-Class Consolidation and Elevation Plan
 
-## Current State Audit
+# About Page -- World-Class Elevation Plan
 
-### What Exists
-Two separate About pages with significant content overlap:
+## Current State Assessment
 
-**Our Story** (`/about/our-story`) -- 6 sections:
-1. StoryHero -- "FOUNDED ON FAITH." full-screen hero with founders image, parallax
-2. StoryCallingSection -- Split-grid with giant blockquote + story text
-3. StoryValuesGrid -- "THE DOCTRINE" with 3 values (Armor, Silent Witness, Tribe)
-4. StoryCommunityStats -- Counter stats (10K/45/5) + testimonial marquee
-5. StoryWorldwideTribe -- Bento gallery of 8 tribe members + Instagram CTA
-6. StoryJoinCTA -- Split hero + dual CTAs (Shop / Ambassador)
+The consolidation is complete and the 8-section flow is strong. The page already has solid editorial bones: character reveals, parallax, watermarks, dark/light rhythm. Here is what needs surgical elevation to reach Fantasy.co / DAZED / 032c tier.
 
-**Our Mission** (`/about/our-mission`) -- 7 sections:
-1. BrandFilmHero -- "WE DON'T MAKE CLOTHES. WE MAKE STATEMENTS." with character reveal
-2. FounderLetter -- Split layout, giant quote mark, Jordan Williams signature
-3. OriginStory -- Lion of Judah SVG + scripture + name meaning
-4. MinistryInMotion -- UGC bento grid (pulls from Supabase `product_ugc`)
-5. ImpactMap -- 4 stats + map visualization + city marquee
-6. ValuesPillars -- 3 full-height alternating sections (Evangelism, Identity, Conviction)
-7. WearTheMissionCTA -- 60/40 split with amber CTA block
+---
 
-### Critical Issues
+## Issues Identified
 
-1. **Redundancy**: Both pages repeat stats (10K believers, 45 cities, 5 countries), tribe galleries, values sections, and CTAs. This dilutes editorial impact.
+### 1. FounderLetter reuses `/founders.png` (same as Hero)
+The same image appears in sections 01 and 04. This is the single biggest "template" tell -- seeing the same photo twice on one scroll kills premium perception. The FounderLetter section needs a different visual treatment (or the image should be replaced with a typographic-only layout).
 
-2. **Navigation gap**: "Our Mission" is unreachable from the nav dropdown -- only "Our Story" is linked. Users never find the Mission page.
+### 2. StoryWorldwideTribe also uses `/founders.png`
+The tribe gallery member at index 6 (`@lineofjudah`) uses the founders image a third time. Replace with a product shot already available in the project.
 
-3. **Content overlap hurts CRO**: Two similar pages with no clear differentiation creates confusion and increases bounce.
+### 3. Back-to-back dark sections (05 Values + 06 ImpactMap) lack visual separation
+Both use `bg-stone-950` with grid-pattern overlays. Without a clear transition element, they blur into one mega-section. A thin amber separator or a brief light-background interstitial stat would fix this.
 
-4. **Excessive scroll depth**: Each page is 5-7 full-height sections. Combined content could fill a single, tighter editorial experience.
+### 4. OriginStory lion SVG is primitive
+The Lion of Judah SVG is a simple oval shape with two circles for eyes. For a brand whose literal name is "Lion of Judah," this is the highest-impact visual upgrade available. Replace with a refined lion silhouette path.
 
-5. **Image repetition**: Both pages reuse `/founders.png` across multiple sections (hero, founder letter, tribe gallery, CTA). This undermines premium perception.
+### 5. Mobile pacing needs tightening
+Sections 05-06-07 on mobile create an excessively long dark tunnel. The Values section numbers (`01`, `02`, `03`) at 120px on mobile push content down unnecessarily.
 
-6. **Values appear twice**: StoryValuesGrid (Armor/Witness/Tribe) and ValuesPillars (Evangelism/Identity/Conviction) are two different value systems competing for attention.
+### 6. No "sidebar navigation" or scroll progress
+Eight full-height sections with no indication of position. A minimal dot-nav or progress line on the side (desktop only) would add editorial sophistication.
 
-## The Plan: Consolidate Into One World-Class About Page
+### 7. StoryJoinCTA image height on mobile
+The CTA section image is `h-64` on mobile -- too short to create impact. Should be at least `h-80` or `aspect-[4/3]`.
 
-Merge the strongest sections from both pages into a single `/about/our-story` route. Remove `/about/our-mission` as a separate page (redirect to `/about/our-story`).
+---
 
-### Section Architecture (Final Page Flow)
+## Elevation Plan
 
-The consolidated page follows DAZED/032c editorial pacing -- loud, quiet, loud, quiet:
+### Phase A: Image Deduplication (High Impact)
 
-```text
-01  HERO (StoryHero -- keep)
-    "FOUNDED ON FAITH." -- the stronger, more restrained hero
-    Dark. Parallax founders image. Character reveal.
+**FounderLetter (Section 04)**
+- Replace the left image with `/products/heavenly-crewneck/lifestyle.png` or convert to a full-typography "letter" layout (no image, just the massive quote mark + text on a cream/stone-50 background with generous whitespace). This is more editorial and eliminates the repeat.
 
-02  CALLING (StoryCallingSection -- keep)
-    Giant blockquote + story text. Quiet section.
-    Light background. Editorial breathing room.
+**StoryWorldwideTribe (Section 07)**
+- Replace tribe member index 6 image from `/founders.png` to `/products/stay-holy-hoodie/flat-front.png` (product flat lay for variety).
 
-03  ORIGIN (OriginStory -- move from Mission)
-    Lion of Judah name meaning + scripture.
-    Dark. SVG animation. This is unique content that only exists on Mission.
+### Phase B: Section Transition Polish
 
-04  FOUNDER LETTER (FounderLetter -- move from Mission)
-    Split layout with signature. Personal story.
-    Light background. Magazine editorial feel.
+**Between Values (05) and ImpactMap (06)**
+- Add a 1px amber line separator (`w-24 h-px bg-amber-500/40 mx-auto`) as a `div` between the two sections in `OurStory.tsx`. This creates a visual breath without breaking the dark continuity.
 
-05  VALUES (StoryValuesGrid -- keep, enhanced)
-    "THE DOCTRINE" -- 3 values grid with massive numbers.
-    Dark. Grid pattern background. Drop the separate ValuesPillars.
+### Phase C: Lion SVG Upgrade (Section 03)
 
-06  STATS + IMPACT (merge StoryCommunityStats + ImpactMap)
-    Keep the massive counter numbers from ImpactMap (4 stats, better layout).
-    Add city marquee from ImpactMap.
-    Drop the duplicate testimonial marquee.
-    Dark background.
+Replace the primitive oval+circles SVG with a more detailed lion head silhouette path. The new SVG retains the same animated `pathLength` reveal but uses a properly crafted lion outline with mane detail. This is the brand's core symbol and deserves a premium execution.
 
-07  TRIBE GALLERY (StoryWorldwideTribe -- keep)
-    Bento gallery with grayscale-to-color hover.
-    Light background. Instagram CTA.
+### Phase D: Mobile Refinements
 
-08  FINAL CTA (StoryJoinCTA -- keep)
-    Split layout. Shop + Ambassador buttons.
-    Dark. Full-bleed.
-```
+**StoryValuesGrid (05)**
+- Reduce mobile value index numbers from `text-[120px]` to `text-[80px]` to prevent excessive vertical push.
 
-### File Changes
+**StoryJoinCTA (08)**
+- Increase mobile image from `h-64` to `h-80` for stronger visual impact.
 
-| File | Action | Details |
-|------|--------|---------|
-| `src/pages/about/OurStory.tsx` | **Modify** | Add OriginStory + FounderLetter imports. Replace StoryCommunityStats with ImpactMap. Update section order. |
-| `src/pages/about/OurMission.tsx` | **Modify** | Replace with redirect to `/about/our-story` |
-| `src/App.tsx` | **No change** | Keep both routes; OurMission will redirect |
-| `src/components/about/ImpactMap.tsx` | **Minor tweak** | Update section index watermark from 05 to 06 |
-| `src/components/about/OriginStory.tsx` | **No change** | Already well-built |
-| `src/components/about/FounderLetter.tsx` | **Minor tweak** | Update watermark from 02 to 04 |
-| `src/components/about/StoryValuesGrid.tsx` | **Minor tweak** | Update watermark from 03 to 05 |
-| `src/components/about/StoryWorldwideTribe.tsx` | **Minor tweak** | Update watermark from 05 to 07 |
-| `src/components/about/StoryJoinCTA.tsx` | **Minor tweak** | Update watermark from 06 to 08 |
-| `src/components/about/StoryCommunityStats.tsx` | **Remove usage** | Replaced by ImpactMap (superior layout with map + 4 stats) |
-| `src/components/about/ValuesPillars.tsx` | **Remove usage** | Consolidated into StoryValuesGrid |
-| `src/components/about/MinistryInMotion.tsx` | **Remove usage** | Tribe gallery (StoryWorldwideTribe) is stronger |
-| `src/components/about/WearTheMissionCTA.tsx` | **Remove usage** | StoryJoinCTA is the cleaner version |
-| `src/components/about/BrandFilmHero.tsx` | **Remove usage** | StoryHero is the better hero |
+### Phase E: Scroll Progress Indicator (Desktop)
 
-### Section Index Watermarks (Final)
+Add a minimal vertical progress line on the left edge (desktop only, `hidden lg:block`). This is a thin amber line that fills as you scroll, placed at `left-6` with `fixed` positioning. Implemented as a small component in `OurStory.tsx` using `useScroll` from framer-motion.
 
-```text
-01 -- StoryHero
-02 -- StoryCallingSection
-03 -- OriginStory
-04 -- FounderLetter
-05 -- StoryValuesGrid
-06 -- ImpactMap
-07 -- StoryWorldwideTribe
-08 -- StoryJoinCTA
-```
+---
 
-### OurStory.tsx (New Structure)
+## File Changes Summary
 
-```typescript
-import Layout from "@/components/layout/Layout";
-import StoryHero from "@/components/about/StoryHero";
-import StoryCallingSection from "@/components/about/StoryCallingSection";
-import OriginStory from "@/components/about/OriginStory";
-import FounderLetter from "@/components/about/FounderLetter";
-import StoryValuesGrid from "@/components/about/StoryValuesGrid";
-import ImpactMap from "@/components/about/ImpactMap";
-import StoryWorldwideTribe from "@/components/about/StoryWorldwideTribe";
-import StoryJoinCTA from "@/components/about/StoryJoinCTA";
+| File | Change | Impact |
+|------|--------|--------|
+| `src/components/about/FounderLetter.tsx` | Replace image with typography-only layout OR swap to different product image | Eliminates biggest "template" tell |
+| `src/components/about/StoryWorldwideTribe.tsx` | Swap index 6 image from `founders.png` to `flat-front.png` | Removes third image repeat |
+| `src/components/about/OriginStory.tsx` | Replace lion SVG path with refined lion head silhouette | Elevates brand centerpiece |
+| `src/components/about/StoryValuesGrid.tsx` | Reduce mobile number size from 120px to 80px | Better mobile pacing |
+| `src/components/about/StoryJoinCTA.tsx` | Increase mobile image height from h-64 to h-80 | Stronger mobile CTA |
+| `src/pages/about/OurStory.tsx` | Add amber separator div between StoryValuesGrid and ImpactMap; add scroll progress component | Visual separation + editorial nav |
 
-const OurStory = () => {
-  return (
-    <Layout>
-      <StoryHero />
-      <StoryCallingSection />
-      <OriginStory />
-      <FounderLetter />
-      <StoryValuesGrid />
-      <ImpactMap />
-      <StoryWorldwideTribe />
-      <StoryJoinCTA />
-    </Layout>
-  );
-};
-```
+---
 
-### OurMission.tsx (Redirect)
+## Technical Details
 
-```typescript
-import { Navigate } from 'react-router-dom';
-const OurMission = () => <Navigate to="/about/our-story" replace />;
-```
+### FounderLetter Typography-Only Variant
+Remove the left image column entirely. Make it a centered, full-width typographic section:
+- Giant quotation mark (200px) centered
+- Quote text centered at `max-w-3xl`
+- Signature centered below
+- Light background (`bg-stone-50`) with ample `py-32 md:py-48` padding
+- This creates a true "magazine letter page" feel -- no image needed
 
-### Editorial Pacing (Dark/Light Rhythm)
+### Scroll Progress Component
+A ~30 line component using `useScroll` targeting the page container:
+- Fixed position, `left-6 top-1/3 h-1/3`
+- 2px wide amber line that scales vertically with scroll
+- `hidden lg:block` for desktop only
+- Fades out near top and bottom of page
 
-```text
-01 StoryHero         -- DARK  (stone-950)
-02 StoryCallingSection -- LIGHT (stone-50)
-03 OriginStory        -- DARK  (stone-950)
-04 FounderLetter      -- LIGHT (background)
-05 StoryValuesGrid    -- DARK  (stone-950)
-06 ImpactMap          -- DARK  (stone-950) *back-to-back dark is intentional for stats weight*
-07 StoryWorldwideTribe -- LIGHT (stone-50)
-08 StoryJoinCTA       -- DARK  (stone-950)
-```
+### Lion SVG
+Replace the current path with a more detailed lion head outline (mane radiating outward, distinct jaw, noble profile). Keep the same gradient stroke and `pathLength` animation. The eyes remain as separate animated circles.
 
-### Why This Is Better
+---
 
-- **Single destination**: One world-class page instead of two mediocre ones
-- **Zero content loss**: Every unique section is preserved; only duplicates removed
-- **Stronger pacing**: 8 sections with intentional dark/light editorial rhythm
-- **Navigation works**: The existing "Our Story" link now leads to the complete brand story
-- **Performance**: Removing 4 redundant components reduces bundle size
-- **CRO improvement**: One clear journey from hero to CTA, no competing pages
+## Risk Assessment
 
-### Risk Assessment
+| Change | Risk | Mitigation |
+|--------|------|------------|
+| Removing FounderLetter image | Low | Typography-only is actually more editorial; the quote content is strong enough to stand alone |
+| Lion SVG replacement | Low | Same animation technique, just a better path |
+| Scroll progress bar | Low | Desktop-only, CSS-driven, no layout impact |
+| Mobile number size reduction | None | Pure cosmetic improvement |
 
-| Risk | Level | Mitigation |
-|------|-------|------------|
-| Longer single page | Low | 8 sections with varied pacing prevents monotony |
-| Losing /our-mission URL | None | Redirect preserves any external links |
-| Back-to-back dark sections (05-06) | Low | Different content types (values vs stats) create visual distinction |
