@@ -30,11 +30,8 @@ export default function StoryCard({ story, onOpenStory, index, size = "regular" 
     return text.slice(0, maxLength).trim() + "...";
   };
 
-  const aspectClass = size === "large" 
-    ? "aspect-[3/4]" 
-    : size === "wide" 
-      ? "aspect-[16/9]" 
-      : "aspect-[4/5]";
+  // No aspect ratio — grid auto-rows controls height; card fills cell
+
 
   // Hero card spans 2 cols + 2 rows on desktop
   const spanClass = size === "large" 
@@ -56,7 +53,7 @@ export default function StoryCard({ story, onOpenStory, index, size = "regular" 
       className={`group relative cursor-pointer ${spanClass} transition-transform duration-500 hover:scale-[1.02]`}
       onClick={() => onOpenStory(story)}
     >
-      <div className={`${aspectClass} min-h-[240px] md:min-h-0 relative overflow-hidden bg-muted border border-white/5`}>
+      <div className="h-full min-h-[200px] md:min-h-0 relative overflow-hidden bg-muted border border-white/5">
         {/* Background Image or Placeholder */}
         {story.customer_photo_url ? (
           <img
