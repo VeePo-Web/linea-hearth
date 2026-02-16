@@ -177,7 +177,7 @@ export default function StoryGrid({
       <div className="container mx-auto px-4 lg:px-8">
         {/* Section header - editorial index */}
         <div className="flex items-baseline gap-4 mb-10">
-          <span className="text-[10px] uppercase tracking-[0.2em] text-amber-500 font-medium">01</span>
+          <span className="text-[10px] uppercase tracking-[0.2em] text-amber-500 font-medium">02</span>
           <div className="h-px flex-1 bg-border" />
           <motion.p 
             initial={{ opacity: 0 }}
@@ -189,7 +189,7 @@ export default function StoryGrid({
         </div>
 
         {/* Bento Grid — adaptive columns based on item count */}
-        <div className={`grid grid-cols-1 md:grid-cols-2 ${displayStories.length <= 6 ? 'lg:grid-cols-2' : 'lg:grid-cols-3'} gap-4 lg:gap-5 auto-rows-[280px] md:auto-rows-[240px] lg:auto-rows-[260px]`}>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5 auto-rows-auto md:auto-rows-[240px] lg:auto-rows-[260px]">
           {displayStories.map((story, index) => (
             <StoryCard
               key={story.id}
@@ -217,6 +217,14 @@ export default function StoryGrid({
               Load More Stories
             </Button>
           </motion.div>
+        )}
+
+        {!hasMore && displayStories.length > 0 && (
+          <div className="flex items-center gap-4 mt-12">
+            <div className="h-px flex-1 bg-border" />
+            <span className="text-[9px] uppercase tracking-[0.3em] text-muted-foreground">End of stories</span>
+            <div className="h-px flex-1 bg-border" />
+          </div>
         )}
 
         <StoryModal
