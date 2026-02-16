@@ -114,8 +114,10 @@ export default function StoryGrid({
   // Bento sizes: first card hero, every 7th large, every 5th wide
   const getCardSize = (index: number): "regular" | "large" | "wide" => {
     if (index === 0) return "large";
-    if (index % 7 === 0) return "large";
-    if (index % 5 === 0 && index > 0) return "wide";
+    if (displayStories.length > 9) {
+      if (index % 7 === 0) return "large";
+      if (index % 5 === 0) return "wide";
+    }
     return "regular";
   };
 
