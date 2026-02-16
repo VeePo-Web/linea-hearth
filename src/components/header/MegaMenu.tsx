@@ -202,23 +202,14 @@ const MegaMenu = ({
                       {/* Gradient overlay */}
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                       {/* Label */}
-                      <motion.div
-                        className="absolute bottom-4 left-4 right-4"
-                        initial={{ opacity: 0, y: 10 }}
-                        whileHover={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.2 }}
+                      <div
+                        className="absolute bottom-4 left-4 right-4 opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200"
                       >
                         <span className="text-white text-sm font-light flex items-center gap-2">
                           {image.label}
-                          <motion.span
-                            initial={{ x: 0 }}
-                            whileHover={{ x: 4 }}
-                            transition={{ duration: 0.2 }}
-                          >
-                            <ArrowRight size={14} />
-                          </motion.span>
+                          <ArrowRight size={14} />
                         </span>
-                      </motion.div>
+                      </div>
                     </Link>
                   </motion.div>
                 ))}

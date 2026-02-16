@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ShoppingBag, Heart, Trash2, Check } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -214,6 +215,20 @@ function FavoriteItem({
 export default function FavoritesDrawer({ isOpen, onClose, onAuthRequired }: FavoritesDrawerProps) {
   const { user } = useAuth();
   const { favorites, isLoading, removeFavorite, favoritesCount } = useFavorites();
+
+  // Scroll lock + Escape key handler
+  useEffect(() => {
+    if (!isOpen) return;
+    document.body.style.overflow = 'hidden';
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    document.addEventListener('keydown', handleEscape);
+    return () => {
+      document.body.style.overflow = '';
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [isOpen, onClose]);
 
   return (
     <AnimatePresence>

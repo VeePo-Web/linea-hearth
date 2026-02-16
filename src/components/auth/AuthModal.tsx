@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import SignInForm from './SignInForm';
@@ -38,6 +38,20 @@ const panelVariants = {
 
 export default function AuthModal({ isOpen, onClose, defaultTab = 'signup' }: AuthModalProps) {
   const [activeTab, setActiveTab] = useState<'signin' | 'signup'>(defaultTab);
+
+  // Scroll lock + Escape key handler
+  useEffect(() => {
+    if (!isOpen) return;
+    document.body.style.overflow = 'hidden';
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    document.addEventListener('keydown', handleEscape);
+    return () => {
+      document.body.style.overflow = '';
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [isOpen, onClose]);
 
   const handleSuccess = () => {
     onClose();

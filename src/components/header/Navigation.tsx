@@ -297,10 +297,28 @@ const Navigation = () => {
       <SearchOverlay isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
 
       {/* Mobile Slide-Out Menu */}
-      <MobileMenu isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} navItems={navItems} onSearchOpen={() => setIsSearchOpen(true)} onFavoritesOpen={() => setOffCanvasType('favorites')} onAuthOpen={() => setIsAuthModalOpen(true)} />
+      <MobileMenu 
+        isOpen={isMobileMenuOpen} 
+        onClose={() => setIsMobileMenuOpen(false)} 
+        navItems={navItems} 
+        onSearchOpen={() => {
+          setIsMobileMenuOpen(false);
+          setIsSearchOpen(true);
+        }} 
+        onFavoritesOpen={() => {
+          setIsMobileMenuOpen(false);
+          setOffCanvasType('favorites');
+        }} 
+        onAuthOpen={() => {
+          setIsMobileMenuOpen(false);
+          setIsAuthModalOpen(true);
+        }} 
+      />
 
       {/* Cart Drawer */}
-      <CartDrawer onViewFavorites={() => setOffCanvasType('favorites')} />
+      <CartDrawer onViewFavorites={() => {
+        setOffCanvasType('favorites');
+      }} />
 
       {/* Auth Modal */}
       <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />

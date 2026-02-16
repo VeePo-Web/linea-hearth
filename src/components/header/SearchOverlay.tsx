@@ -228,13 +228,16 @@ const SearchOverlay = ({ isOpen, onClose }: SearchOverlayProps) => {
   const searchDisplay = searchResults?.map(mapProduct) || [];
 
   useEffect(() => {
-    if (isOpen && inputRef.current) {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
       setTimeout(() => inputRef.current?.focus(), 100);
-    }
-    if (!isOpen) {
+    } else {
       setSearchValue("");
       setDebouncedSearch("");
     }
+    return () => {
+      document.body.style.overflow = '';
+    };
   }, [isOpen]);
 
   useEffect(() => {

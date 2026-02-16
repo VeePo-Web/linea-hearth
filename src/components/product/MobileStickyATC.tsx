@@ -53,7 +53,7 @@ const MobileStickyATC = ({ price, salePrice, quantity, onAddToBag, disabled }: M
         className={`
           fixed bottom-0 left-0 right-0 z-50 lg:hidden
           bg-background/95 backdrop-blur-sm border-t border-border
-          px-4 py-3 transition-transform duration-300 ease-out
+          px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] transition-transform duration-300 ease-out
           ${shouldShow ? "translate-y-0" : "translate-y-full"}
         `}
       >
@@ -84,7 +84,7 @@ const MobileStickyATC = ({ price, salePrice, quantity, onAddToBag, disabled }: M
     <AnimatePresence>
       {shouldShow && (
         <motion.div
-          className="fixed bottom-0 left-0 right-0 z-50 lg:hidden bg-background/95 backdrop-blur-sm border-t border-border px-4 py-3"
+          className="fixed bottom-0 left-0 right-0 z-50 lg:hidden bg-background/95 backdrop-blur-sm border-t border-border px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]"
           initial={{ y: 100 }}
           animate={{ y: 0 }}
           exit={{ y: 100 }}

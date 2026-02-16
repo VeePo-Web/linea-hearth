@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import { X, Search, Heart, Instagram, Mail, ChevronDown, User, LogOut } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
 
@@ -104,6 +104,20 @@ const MobileMenu = ({
   const { profile } = useProfile();
 
   const firstName = profile?.full_name?.split(' ')[0] || user?.email?.split('@')[0] || 'Account';
+
+  // Scroll lock + Escape key handler
+  useEffect(() => {
+    if (!isOpen) return;
+    document.body.style.overflow = 'hidden';
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    document.addEventListener('keydown', handleEscape);
+    return () => {
+      document.body.style.overflow = '';
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [isOpen, onClose]);
 
   const toggleExpand = (name: string) => {
     setExpandedItem(expandedItem === name ? null : name);
