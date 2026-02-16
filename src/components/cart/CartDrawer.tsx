@@ -473,10 +473,9 @@ const CartDrawer = ({ onViewFavorites }: CartDrawerProps) => {
                   <Button
                     variant="ghost"
                     className="w-full rounded-none text-sm"
-                    onClick={closeCart}
                     asChild
                   >
-                    <Link to="/category/shop">
+                    <Link to="/category/shop" onClick={closeCart}>
                       Continue Shopping
                     </Link>
                   </Button>
