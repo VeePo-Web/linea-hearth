@@ -1,56 +1,85 @@
 
 
-# Community Page -- Phase 6: Grid Layout Fix and Mobile Polish
+# Community Page -- Phase 7: Visual QA and Rendering Stability
 
-## Current State
+## Current State Assessment
 
-After 5 phases of upgrades, the Community page is nearly world-class. The hero, featured story, sticky filters, social feed, and CTA sections all deliver editorial-grade quality. However, two layout issues remain that break the premium illusion:
+After 6 phases, the Community page has all sections implemented and structurally correct:
+- THE TRIBE manifesto hero (min-h-screen, word-reveal animation)
+- Featured Story (3/5 + 2/5 magazine spread)
+- StatStrip (industrial divider)
+- StoryFilters (sticky editorial tabs, desktop + mobile pills)
+- StoryGrid (3-col bento with placeholder fallback, "End of stories" footnote)
+- SocialFeed (4-col desktop grid, mobile snap-scroll with dots, CSS image transforms)
+- SubmitStoryCTA (032c industrial treatment)
 
-## Remaining Issues
+Phase 6 successfully removed aspect-ratio classes from StoryCard and adjusted grid auto-rows to 280px/300px.
 
-### 1. Bento grid card overlap on desktop (critical)
-On the 3-column desktop grid, the hero card (Sarah M.) uses `md:col-span-2 md:row-span-2` with `aspect-[3/4]`. The aspect ratio calculates height from the card's width (2/3 of grid = ~580px wide, so height = ~773px). But `auto-rows-[260px]` limits rows to 260px each, so 2 rows = 520px. The aspect ratio wants 773px but only gets 520px, causing the card content to compress or overflow. Meanwhile, the regular cards beside it have `aspect-[4/5]` in 260px rows, which also fights the constraint.
+### Confirmed Working
+- All database queries return successfully (empty arrays trigger placeholder data)
+- All sections exist in the DOM
+- StoryFilters state is wired to StoryGrid
+- SocialFeed image variety transforms applied
+- StoryModal accessibility (DialogDescription) intact
+- "End of stories" editorial footnote renders
 
-**Fix:** Remove the aspect ratio classes from StoryCard when inside the grid. The grid's `auto-rows` should control height, and cards should fill their grid cell using `h-full` instead of aspect ratios. The aspect classes only make sense in free-flow layouts.
+### Issues Identified in QA
 
-### 2. Mobile cards are still too tall
-On mobile, `auto-rows-auto` with `min-h-[240px]` means short testimonies (2-3 lines) still get 240px minimum height. The `aspect-[3/4]` on the hero card (index 0) creates a very tall card on mobile since it's full-width (~370px wide, so height = ~493px). For single-column mobile, all cards should have a consistent, content-driven height with a reasonable min-height of ~200px.
+**1. StoryGrid cards may render at 0 visible height on initial load**
+The `motion.div` wrapper on each StoryCard starts at `opacity: 0, y: 30` with `whileInView`. Combined with `auto-rows-auto` on mobile, cards that haven't been "seen" by the viewport remain invisible. The grid section `py-12 lg:py-16` renders, but the cards inside start hidden and may not trigger `whileInView` if the browser scrolls past them quickly or if they're below the fold in a tight layout.
 
-### 3. Memory note conflict
-The memory says "removed the sticky filter bar to reduce UI complexity" but Phase 4 re-added it. The filters are working and valuable -- this is correct behavior. No action needed, but noting for context.
+**Fix:** Add `initial={{ opacity: 1, y: 0 }}` as a fallback or use `viewport={{ once: true, amount: 0 }}` to trigger animation as soon as any pixel enters the viewport. Alternatively, stagger the first 4 cards with `animate` instead of `whileInView` since they're always visible placeholder data.
+
+**2. SocialFeed section is `lg:hidden` for mobile scroll + `hidden lg:block` for desktop grid**
+This is correct but on tablet (md breakpoint), neither the mobile scroll nor the desktop grid shows. The mobile scroll has `lg:hidden` (shows on sm/md) and desktop grid has `hidden lg:block` (shows on lg+). This works correctly -- the mobile horizontal scroll covers sm and md, desktop grid covers lg+. No fix needed.
+
+**3. StoryFilters mobile pills lack sort control**
+Phase 5 plan called for removing the dead "FILTERS" button and adding inline sort on mobile. The FILTERS button was removed, but the sort dropdown was not added to mobile. Mobile users can only filter by type (All/Reviews/Testimonies/Transformations) but cannot change sort order.
+
+**Fix:** Add a small sort toggle after the type pills on mobile.
+
+**4. The "End of stories" footnote spacing**
+Currently `mt-12` which creates a large gap between the last card and the footnote. With `auto-rows-auto` on mobile, this is fine, but on desktop with `auto-rows-[300px]`, the footnote sits 48px below the last row, which is appropriate. No fix needed.
+
+**5. Community page does not pass `immersiveHero` to Layout**
+The CommunityHero uses `min-h-screen` for the manifesto section, but the Layout component adds `pt-[var(--header-height)]` to the main element. This means the hero starts below the header, not behind it. For a true immersive hero (like a full-bleed dark section), it should pass `immersiveHero={true}` to Layout so the hero sits under the transparent header.
+
+**Fix:** Add `immersiveHero` prop to Layout in Community.tsx to allow the dark hero to extend behind the header for a more cinematic entry.
 
 ---
 
 ## Implementation Plan
 
-### File 1: `src/components/community/StoryCard.tsx`
-- Remove aspect ratio classes (`aspect-[3/4]`, `aspect-[4/5]`, `aspect-[16/9]`) from the card container
-- Instead, use `h-full` so the card fills whatever grid cell it's assigned to
-- Keep `min-h-[240px]` for mobile to prevent cards from being too short
-- The grid's `auto-rows` on desktop and `auto-rows-auto` on mobile will control the actual heights
-- This eliminates the aspect-ratio vs auto-rows conflict entirely
+### File 1: `src/pages/Community.tsx`
+- Pass `immersiveHero` prop to Layout for cinematic hero treatment
+- Change: `<Layout>` to `<Layout immersiveHero>`
 
-### File 2: `src/components/community/StoryGrid.tsx`  
-- Adjust the grid to use `auto-rows-[280px]` on tablet and `auto-rows-[300px]` on desktop (slightly taller to accommodate content)
-- On mobile, keep `auto-rows-auto` with cards sizing naturally
-- The hero card's `md:row-span-2` will give it 560-600px on desktop -- enough for the large card treatment without aspect ratio conflicts
+### File 2: `src/components/community/StoryCard.tsx`
+- Change `whileInView` viewport config to `{ once: true, amount: 0 }` so cards trigger animation immediately when any pixel enters viewport
+- This prevents cards from staying invisible if the user scrolls quickly past them
 
-### No other files change
-All other components (SocialFeed, CommunityHero, SubmitStoryCTA, StoryFilters, StoryModal) are working correctly and remain untouched.
+### File 3: `src/components/community/StoryFilters.tsx`
+- Add a sort dropdown to the mobile pill bar (after the type pills)
+- Use a minimal Select component matching the existing pill aesthetic
+- This completes the Phase 5 plan item that was not implemented
 
 ---
 
-## Technical Details
+## Files Modified
 
 | File | Change | Risk |
 |------|--------|------|
-| `src/components/community/StoryCard.tsx` | Replace aspect ratio classes with `h-full`, keep min-h | Low -- CSS only |
-| `src/components/community/StoryGrid.tsx` | Adjust auto-rows values for better content fit | Low -- CSS only |
+| `src/pages/Community.tsx` | Add `immersiveHero` prop to Layout | Low -- single prop |
+| `src/components/community/StoryCard.tsx` | Fix viewport trigger amount to 0 | Low -- animation config |
+| `src/components/community/StoryFilters.tsx` | Add mobile sort dropdown | Low -- additive UI |
 
 ## What Does NOT Change
-- All 5 previous phases of work preserved
+- StoryGrid.tsx -- grid layout from Phase 6 is correct
+- SocialFeed.tsx -- working correctly with image transforms
+- CommunityHero.tsx -- no changes needed
+- SubmitStoryCTA.tsx -- world-class, untouched
+- StoryModal.tsx -- accessibility intact
 - No new dependencies
-- No database changes  
-- Brand colors, animations, accessibility all preserved
-- SubmitStoryCTA, StoryModal, StoryFilters, SocialFeed, CommunityHero untouched
+- No database changes
+- Brand colors locked (amber-500, stone-950)
 
