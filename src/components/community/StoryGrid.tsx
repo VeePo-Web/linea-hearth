@@ -112,12 +112,14 @@ export default function StoryGrid({
   const isLoading = storiesLoading || reviewsLoading;
 
   // Bento sizes: first card hero, every 7th large, every 5th wide
-  const getCardSize = (index: number): "regular" | "large" | "wide" => {
+  const getCardSize = (index: number): "regular" | "large" | "wide" | "tablet-wide" => {
     if (index === 0) return "large";
     if (displayStories.length > 9) {
       if (index % 7 === 0) return "large";
       if (index % 5 === 0) return "wide";
     }
+    // Last card orphan fix for 2-col tablet grid
+    if (index === displayStories.length - 1 && (displayStories.length - 1) % 2 !== 0) return "tablet-wide";
     return "regular";
   };
 

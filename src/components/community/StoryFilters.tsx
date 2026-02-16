@@ -159,43 +159,6 @@ export default function StoryFilters({
           </div>
         </div>
 
-        {/* Mobile: Horizontal scroll */}
-        <div className="md:hidden py-4">
-          <div className="flex items-center gap-3 overflow-x-auto scrollbar-hide pb-2 -mx-4 px-4">
-            {/* Type pills */}
-            {storyTypes.map((type) => (
-              <button
-                key={type.value}
-                onClick={() => setSelectedType(type.value)}
-                className={`shrink-0 px-4 py-2 text-xs uppercase tracking-[0.15em] font-medium transition-colors rounded-full ${
-                  selectedType === type.value
-                    ? "bg-foreground text-background"
-                    : "bg-muted text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                {type.label}
-              </button>
-            ))}
-
-            {/* Divider */}
-            <div className="shrink-0 w-px h-5 bg-border" />
-
-            {/* Sort pill */}
-            {sortOptions.map((option) => (
-              <button
-                key={option.value}
-                onClick={() => setSortBy(option.value)}
-                className={`shrink-0 px-4 py-2 text-xs uppercase tracking-[0.15em] font-medium transition-colors rounded-full ${
-                  sortBy === option.value
-                    ? "bg-foreground text-background"
-                    : "bg-muted text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                {option.label}
-              </button>
-            ))}
-          </div>
-        </div>
       </div>
     </div>
   );

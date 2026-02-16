@@ -21,7 +21,7 @@ interface StoryCardProps {
   story: StoryCardData;
   onOpenStory: (story: StoryCardData) => void;
   index: number;
-  size?: "regular" | "large" | "wide";
+  size?: "regular" | "large" | "wide" | "tablet-wide";
 }
 
 export default function StoryCard({ story, onOpenStory, index, size = "regular" }: StoryCardProps) {
@@ -38,7 +38,9 @@ export default function StoryCard({ story, onOpenStory, index, size = "regular" 
     ? "md:row-span-2 md:col-span-2" 
     : size === "wide" 
       ? "md:col-span-2" 
-      : "";
+      : size === "tablet-wide"
+        ? "md:col-span-2 lg:col-span-1"
+        : "";
 
   return (
     <motion.div
