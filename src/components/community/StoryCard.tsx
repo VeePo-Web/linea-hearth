@@ -1,5 +1,4 @@
-import { Star, MapPin, Play, MessageCircle } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { Star, MapPin, Play } from "lucide-react";
 import { motion } from "framer-motion";
 
 export interface StoryCardData {
@@ -31,15 +30,18 @@ export default function StoryCard({ story, onOpenStory, index, size = "regular" 
     return text.slice(0, maxLength).trim() + "...";
   };
 
-  // Determine aspect ratio based on size
   const aspectClass = size === "large" 
     ? "aspect-[3/4]" 
     : size === "wide" 
       ? "aspect-[16/9]" 
       : "aspect-[4/5]";
 
-  // Determine row span for grid
-  const spanClass = size === "large" ? "row-span-2" : size === "wide" ? "col-span-2" : "";
+  // Hero card spans 2 cols + 2 rows on desktop
+  const spanClass = size === "large" 
+    ? "row-span-2 md:col-span-2" 
+    : size === "wide" 
+      ? "md:col-span-2" 
+      : "";
 
   return (
     <motion.div
@@ -51,19 +53,16 @@ export default function StoryCard({ story, onOpenStory, index, size = "regular" 
         delay: index * 0.08,
         ease: [0.25, 0.46, 0.45, 0.94]
       }}
-      className={`group relative cursor-pointer ${spanClass}`}
+      className={`group relative cursor-pointer ${spanClass} transition-transform duration-500 hover:scale-[1.02]`}
       onClick={() => onOpenStory(story)}
     >
-      {/* Card Container - DAZED hover effects */}
-      <div className={`${aspectClass} relative overflow-hidden bg-muted`}>
+      <div className={`${aspectClass} relative overflow-hidden bg-muted border border-white/5`}>
         {/* Background Image or Placeholder */}
         {story.customer_photo_url ? (
-          <motion.img
+          <img
             src={story.customer_photo_url}
             alt={story.customer_name}
             className="absolute inset-0 w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
-            whileHover={{ scale: 1.03 }}
-            transition={{ duration: 0.6 }}
           />
         ) : (
           <div className="absolute inset-0 bg-gradient-to-br from-stone-200 to-stone-300 dark:from-stone-800 dark:to-stone-900 flex items-center justify-center">
@@ -73,10 +72,10 @@ export default function StoryCard({ story, onOpenStory, index, size = "regular" 
           </div>
         )}
 
-        {/* Gradient Overlay - Intensifies on hover */}
+        {/* Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-stone-950 via-stone-950/30 to-transparent opacity-70 group-hover:opacity-85 transition-opacity duration-500" />
 
-        {/* Video Play Button - Pulsing */}
+        {/* Video Play Button */}
         {story.video_url && (
           <div className="absolute top-4 right-4 z-10">
             <motion.div 
@@ -89,16 +88,22 @@ export default function StoryCard({ story, onOpenStory, index, size = "regular" 
           </div>
         )}
 
-        {/* Product Badge - Minimal */}
-        {story.product_name && (
-          <div className="absolute top-4 left-4 z-10">
+        {/* Type Badge (top-left) — always visible */}
+        <div className="absolute top-4 left-4 z-10">
+          {story.product_name ? (
             <span className="text-[10px] uppercase tracking-[0.2em] text-white/70 font-medium">
               {story.product_name}
             </span>
-          </div>
-        )}
+          ) : (
+            <span className={`text-[9px] uppercase tracking-[0.2em] font-medium ${
+              story.type === "story" ? "text-amber-500" : "text-white/50"
+            }`}>
+              {story.type === "story" ? "Testimony" : "Review"}
+            </span>
+          )}
+        </div>
 
-        {/* AMA Badge - Rotated 90° on right edge (032c style) */}
+        {/* AMA Badge */}
         {story.is_contactable && (
           <div className="absolute right-0 top-1/2 -translate-y-1/2 z-10 hidden group-hover:block">
             <div className="bg-amber-500 px-2 py-1 -rotate-90 origin-right">
@@ -111,9 +116,9 @@ export default function StoryCard({ story, onOpenStory, index, size = "regular" 
 
         {/* Content Overlay */}
         <div className="absolute bottom-0 left-0 right-0 p-5 z-10">
-          {/* Rating - Only visible on hover for cleaner default */}
+          {/* Rating — always visible for reviews */}
           {story.rating && (
-            <div className="flex items-center gap-0.5 mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <div className="flex items-center gap-0.5 mb-2">
               {[...Array(5)].map((_, i) => (
                 <Star
                   key={i}
@@ -128,7 +133,9 @@ export default function StoryCard({ story, onOpenStory, index, size = "regular" 
           )}
 
           {/* Headline or Story Snippet */}
-          <p className="text-white font-light text-sm md:text-base leading-relaxed mb-4 italic">
+          <p className={`text-white font-light leading-relaxed mb-4 italic ${
+            size === "large" ? "text-base md:text-lg" : "text-sm md:text-base"
+          }`}>
             "{truncateText(story.headline || story.story_text, size === "large" ? 120 : 80)}"
           </p>
 
@@ -160,15 +167,6 @@ export default function StoryCard({ story, onOpenStory, index, size = "regular" 
             </div>
           </div>
         </div>
-
-        {/* Hover CTA - Subtle slide up */}
-        <motion.div 
-          className="absolute bottom-0 left-0 right-0 p-5 bg-gradient-to-t from-amber-500 to-amber-500/0 translate-y-full group-hover:translate-y-0 transition-transform duration-500"
-        >
-          <span className="text-stone-900 text-xs uppercase tracking-[0.2em] font-medium">
-            Read Story →
-          </span>
-        </motion.div>
       </div>
     </motion.div>
   );

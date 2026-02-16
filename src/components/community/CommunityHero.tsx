@@ -1,9 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Play, MapPin, MessageCircle, Users, Globe, ArrowDown } from "lucide-react";
+import { Play, MapPin, ArrowDown } from "lucide-react";
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { wordReveal, wordItem, fadeUp, staggerContainer, staggerItem } from "@/lib/animations";
+import { motion } from "framer-motion";
+import { wordReveal, wordItem, staggerContainer, staggerItem } from "@/lib/animations";
 
 interface FeaturedStory {
   id: string;
@@ -15,28 +15,6 @@ interface FeaturedStory {
   video_url: string | null;
 }
 
-// Counter animation hook
-function useCounter(target: number, duration: number = 2000) {
-  const [count, setCount] = useState(0);
-  
-  useEffect(() => {
-    let start = 0;
-    const end = target;
-    const incrementTime = duration / end;
-    
-    const timer = setInterval(() => {
-      start += 1;
-      setCount(start);
-      if (start >= end) clearInterval(timer);
-    }, incrementTime);
-    
-    return () => clearInterval(timer);
-  }, [target, duration]);
-  
-  return count;
-}
-
-// Manifesto lines with stagger animation
 const manifestoLines = [
   "Pray before you post.",
   "Walk different because you answer to a higher call.",
@@ -64,7 +42,6 @@ export default function CommunityHero() {
     },
   });
 
-  // Fallback featured story for display
   const displayStory = featuredStory || {
     customer_name: "Marcus T.",
     customer_location: "Calgary, AB",
@@ -74,16 +51,10 @@ export default function CommunityHero() {
     video_url: null,
   };
 
-  // Counter values
-  const storiesCount = useCounter(500, 2500);
-  const citiesCount = useCounter(45, 2000);
-  const tribeCount = useCounter(10, 1500);
-
   return (
     <>
-      {/* SECTION 1: The Manifesto - Full Viewport */}
+      {/* SECTION 1: The Manifesto */}
       <section className="relative min-h-screen bg-stone-950 flex items-center overflow-hidden">
-        {/* Noise texture overlay */}
         <div 
           className="absolute inset-0 opacity-[0.03]"
           style={{
@@ -91,7 +62,6 @@ export default function CommunityHero() {
           }}
         />
         
-        {/* Decorative image collage - i-D style asymmetric */}
         <div className="absolute right-0 top-0 bottom-0 w-1/2 lg:w-2/5 opacity-20 lg:opacity-30">
           <div className="absolute inset-0 bg-gradient-to-l from-transparent via-stone-950/50 to-stone-950 z-10" />
           <motion.div 
@@ -111,7 +81,6 @@ export default function CommunityHero() {
 
         <div className="container mx-auto px-4 lg:px-8 relative z-10">
           <div className="max-w-4xl">
-            {/* Eyebrow - 032c industrial */}
             <motion.p 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -121,7 +90,6 @@ export default function CommunityHero() {
               Not For Everyone
             </motion.p>
 
-            {/* THE TRIBE - Massive Typography */}
             <motion.div
               variants={wordReveal}
               initial="hidden"
@@ -134,7 +102,6 @@ export default function CommunityHero() {
               </h1>
             </motion.div>
 
-            {/* Brand Manifesto - Exclusive Language */}
             <motion.div 
               variants={staggerContainer}
               initial="hidden"
@@ -164,42 +131,30 @@ export default function CommunityHero() {
               </motion.p>
             </motion.div>
 
-            {/* Stats Row - Counter Animation */}
+            {/* Stats Row - grid for mobile stability */}
             <motion.div 
               variants={staggerContainer}
               initial="hidden"
               animate="visible"
-              className="flex flex-wrap gap-10 md:gap-16 pt-8 border-t border-white/10"
+              className="grid grid-cols-3 gap-4 md:flex md:gap-16 pt-8 border-t border-white/10"
             >
               <motion.div variants={staggerItem} className="text-center">
-                <p className="text-3xl md:text-4xl font-light text-white">
-                  {storiesCount}+
-                </p>
-                <p className="text-[10px] uppercase tracking-[0.2em] text-white/40 mt-1">
-                  Stories
-                </p>
+                <p className="text-2xl md:text-4xl font-light text-white">500+</p>
+                <p className="text-[10px] uppercase tracking-[0.2em] text-white/40 mt-1">Stories</p>
               </motion.div>
               <motion.div variants={staggerItem} className="text-center">
-                <p className="text-3xl md:text-4xl font-light text-white">
-                  {citiesCount}
-                </p>
-                <p className="text-[10px] uppercase tracking-[0.2em] text-white/40 mt-1">
-                  Cities
-                </p>
+                <p className="text-2xl md:text-4xl font-light text-white">45</p>
+                <p className="text-[10px] uppercase tracking-[0.2em] text-white/40 mt-1">Cities</p>
               </motion.div>
               <motion.div variants={staggerItem} className="text-center">
-                <p className="text-3xl md:text-4xl font-light text-white">
-                  {tribeCount}K+
-                </p>
-                <p className="text-[10px] uppercase tracking-[0.2em] text-white/40 mt-1">
-                  Tribe Members
-                </p>
+                <p className="text-2xl md:text-4xl font-light text-white">10K+</p>
+                <p className="text-[10px] uppercase tracking-[0.2em] text-white/40 mt-1">Tribe Members</p>
               </motion.div>
             </motion.div>
           </div>
         </div>
 
-        {/* Scroll indicator */}
+        {/* Scroll indicator on divider line */}
         <motion.div 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -215,9 +170,11 @@ export default function CommunityHero() {
         </motion.div>
       </section>
 
-      {/* SECTION 2: Featured Story - Magazine Spread */}
-      <section className="relative bg-background py-20 lg:py-32">
-        {/* Rotated badge - 032c style */}
+      {/* Industrial divider */}
+      <div className="h-px bg-border" />
+
+      {/* SECTION 2: Featured Story - Tighter padding */}
+      <section className="relative bg-background py-16 lg:py-24">
         <div className="absolute left-0 top-1/2 -translate-y-1/2 hidden lg:block">
           <p className="text-[10px] uppercase tracking-[0.4em] text-amber-500 font-medium -rotate-90 origin-left whitespace-nowrap">
             Featured Story
@@ -240,7 +197,7 @@ export default function CommunityHero() {
                     <div className="absolute inset-0 bg-gradient-to-t from-stone-900/60 to-transparent z-10" />
                     <button
                       onClick={() => setIsVideoPlaying(true)}
-                      className="absolute inset-0 z-20 flex items-center justify-center group/play"
+                      className="absolute inset-0 z-20 flex items-center justify-center"
                       aria-label="Play video"
                     >
                       <motion.div 
@@ -273,13 +230,12 @@ export default function CommunityHero() {
                 )}
               </div>
 
-              {/* Mobile featured badge */}
               <div className="absolute -bottom-3 left-4 lg:hidden bg-amber-500 px-4 py-2">
                 <p className="text-stone-900 font-medium text-xs uppercase tracking-wider">Featured Story</p>
               </div>
             </motion.div>
 
-            {/* Right: Story Content (40%) */}
+            {/* Right: Story Content (40%) -- no floating quote marks */}
             <motion.div 
               initial={{ opacity: 0, x: 40 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -287,16 +243,10 @@ export default function CommunityHero() {
               transition={{ duration: 0.8, delay: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
               className="lg:col-span-2 space-y-8"
             >
-              {/* Decorative quote marks */}
-              <div className="text-[120px] leading-none text-amber-500/10 font-serif absolute -top-8 -left-4 select-none hidden lg:block">
-                "
-              </div>
-
               <div className="space-y-6">
                 <p className="text-[10px] uppercase tracking-[0.3em] text-amber-500 font-medium">
                   ——— Featured
                 </p>
-
                 <h2 className="text-3xl lg:text-4xl xl:text-5xl font-light leading-[1.15] italic">
                   "{displayStory.headline}"
                 </h2>

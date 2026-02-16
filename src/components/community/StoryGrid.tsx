@@ -25,36 +25,21 @@ export default function StoryGrid({
   const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
   const [selectedStory, setSelectedStory] = useState<StoryCardData | null>(null);
 
-  // Fetch community stories
   const { data: stories, isLoading: storiesLoading } = useQuery({
     queryKey: ["community-stories", selectedProduct, selectedType, selectedGender, sortBy],
     queryFn: async () => {
       let query = supabase
         .from("community_stories")
         .select(`
-          id,
-          customer_name,
-          customer_photo_url,
-          customer_location,
-          headline,
-          story_text,
-          video_url,
-          gender,
-          is_contactable,
-          instagram_handle,
-          is_featured,
-          product_id,
+          id, customer_name, customer_photo_url, customer_location,
+          headline, story_text, video_url, gender, is_contactable,
+          instagram_handle, is_featured, product_id,
           products (name, slug)
         `)
         .eq("is_approved", true);
 
-      if (selectedGender !== "all") {
-        query = query.eq("gender", selectedGender);
-      }
-
-      if (sortBy === "featured") {
-        query = query.order("is_featured", { ascending: false });
-      }
+      if (selectedGender !== "all") query = query.eq("gender", selectedGender);
+      if (sortBy === "featured") query = query.order("is_featured", { ascending: false });
       query = query.order("created_at", { ascending: false });
 
       const { data, error } = await query;
@@ -63,35 +48,21 @@ export default function StoryGrid({
     },
   });
 
-  // Fetch reviews
   const { data: reviews, isLoading: reviewsLoading } = useQuery({
     queryKey: ["community-reviews", selectedProduct, selectedType, selectedGender, sortBy],
     queryFn: async () => {
       let query = supabase
         .from("reviews")
         .select(`
-          id,
-          customer_name,
-          customer_avatar_url,
-          customer_location,
-          review_text,
-          rating,
-          video_url,
-          gender,
-          is_contactable,
-          is_featured,
-          product_id,
+          id, customer_name, customer_avatar_url, customer_location,
+          review_text, rating, video_url, gender, is_contactable,
+          is_featured, product_id,
           products (name, slug)
         `)
         .eq("is_approved", true);
 
-      if (selectedGender !== "all") {
-        query = query.eq("gender", selectedGender);
-      }
-
-      if (sortBy === "featured") {
-        query = query.order("is_featured", { ascending: false });
-      }
+      if (selectedGender !== "all") query = query.eq("gender", selectedGender);
+      if (sortBy === "featured") query = query.order("is_featured", { ascending: false });
       query = query.order("created_at", { ascending: false });
 
       const { data, error } = await query;
@@ -100,9 +71,7 @@ export default function StoryGrid({
     },
   });
 
-  // Combine and transform data
   const allStories: StoryCardData[] = [
-    // Transform stories
     ...(stories || []).map((s: any) => ({
       id: s.id,
       type: "story" as const,
@@ -117,7 +86,6 @@ export default function StoryGrid({
       is_contactable: s.is_contactable,
       instagram_handle: s.instagram_handle,
     })),
-    // Transform reviews (only if type filter allows)
     ...((selectedType === "all" || selectedType === "product_review") && reviews
       ? reviews.map((r: any) => ({
           id: r.id,
@@ -135,38 +103,29 @@ export default function StoryGrid({
       : []),
   ];
 
-  // Filter by product if needed
   const filteredStories = selectedProduct === "all"
     ? allStories
     : allStories.filter((s) => s.product_slug === selectedProduct);
 
   const visibleStories = filteredStories.slice(0, visibleCount);
   const hasMore = visibleCount < filteredStories.length;
-
   const isLoading = storiesLoading || reviewsLoading;
 
-  // Determine card sizes for bento layout
+  // Bento sizes: first card hero, every 7th large, every 5th wide
   const getCardSize = (index: number): "regular" | "large" | "wide" => {
-    // First card is always large
     if (index === 0) return "large";
-    // Every 6th card is large
-    if (index % 6 === 0) return "large";
-    // Every 5th card is wide
+    if (index % 7 === 0) return "large";
     if (index % 5 === 0 && index > 0) return "wide";
     return "regular";
   };
 
   if (isLoading) {
     return (
-      <section className="py-16 bg-background">
+      <section className="py-12 lg:py-16 bg-background">
         <div className="container mx-auto px-4 lg:px-8">
-          {/* Bento skeleton */}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-5 auto-rows-[200px]">
-            {[...Array(8)].map((_, i) => (
-              <Skeleton 
-                key={i} 
-                className={`${i === 0 ? "row-span-2" : ""}`}
-              />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5 auto-rows-[280px]">
+            {[...Array(6)].map((_, i) => (
+              <Skeleton key={i} className={`${i === 0 ? "row-span-2 md:col-span-2" : ""}`} />
             ))}
           </div>
         </div>
@@ -174,7 +133,6 @@ export default function StoryGrid({
     );
   }
 
-  // Fallback placeholder stories if none exist
   const displayStories = visibleStories.length > 0 ? visibleStories : [
     {
       id: "placeholder-1",
@@ -215,19 +173,23 @@ export default function StoryGrid({
   ];
 
   return (
-    <section className="py-16 lg:py-24 bg-background">
+    <section className="py-12 lg:py-16 bg-background">
       <div className="container mx-auto px-4 lg:px-8">
-        {/* Results count - Editorial style */}
-        <motion.p 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground mb-10"
-        >
-          Showing {displayStories.length} {displayStories.length === 1 ? "story" : "stories"} from the tribe
-        </motion.p>
+        {/* Section header - editorial index */}
+        <div className="flex items-baseline gap-4 mb-10">
+          <span className="text-[10px] uppercase tracking-[0.2em] text-amber-500 font-medium">01</span>
+          <div className="h-px flex-1 bg-border" />
+          <motion.p 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground"
+          >
+            Stories From The Tribe · {displayStories.length}
+          </motion.p>
+        </div>
 
-        {/* Bento Grid - Asymmetric layout */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-5 auto-rows-[180px] md:auto-rows-[220px]">
+        {/* Bento Grid — 1 col mobile, 2 tablet, 3 desktop */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5 auto-rows-[320px] md:auto-rows-[260px] lg:auto-rows-[280px]">
           {displayStories.map((story, index) => (
             <StoryCard
               key={story.id}
@@ -239,7 +201,6 @@ export default function StoryGrid({
           ))}
         </div>
 
-        {/* Load More - Industrial button */}
         {hasMore && (
           <motion.div 
             initial={{ opacity: 0 }}
@@ -258,7 +219,6 @@ export default function StoryGrid({
           </motion.div>
         )}
 
-        {/* Story Modal */}
         <StoryModal
           story={selectedStory}
           onClose={() => setSelectedStory(null)}
