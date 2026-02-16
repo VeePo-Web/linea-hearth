@@ -35,7 +35,7 @@ const tribeMembers = [
     location: "London, UK",
   },
   {
-    image: "/founders.png",
+    image: "/products/stay-holy-hoodie/flat-front.png",
     username: "@lineofjudah",
     location: "Calgary, Canada",
   },

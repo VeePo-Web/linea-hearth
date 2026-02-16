@@ -26,7 +26,7 @@ const StoryJoinCTA = () => {
       <div className="grid lg:grid-cols-2 min-h-[80vh]">
         {/* Left: Image */}
         <motion.div
-          className="relative h-64 lg:h-auto"
+          className="relative h-80 lg:h-auto"
           initial={{ opacity: 0 }}
           animate={isInView ? { opacity: 1 } : {}}
           transition={{ delay: 0.2, duration: 1 }}

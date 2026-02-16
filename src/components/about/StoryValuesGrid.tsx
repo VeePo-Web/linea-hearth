@@ -79,7 +79,7 @@ const StoryValuesGrid = () => {
               transition={{ delay: 0.4 + index * 0.15, duration: 0.8 }}
             >
               {/* Massive index number as visual anchor */}
-              <span className="block text-[120px] md:text-[100px] lg:text-[120px] xl:text-[140px] font-light leading-none text-white/5 mb-4 transition-colors duration-500 group-hover:text-amber-500/10">
+              <span className="block text-[80px] md:text-[100px] lg:text-[120px] xl:text-[140px] font-light leading-none text-white/5 mb-4 transition-colors duration-500 group-hover:text-amber-500/10">
                 {value.index}
               </span>
 
