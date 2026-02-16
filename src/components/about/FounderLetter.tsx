@@ -18,7 +18,7 @@ const FounderLetter = () => {
         transition={{ duration: 1, delay: 0.3 }}
         className="absolute top-8 right-8 text-[20vw] font-light text-foreground leading-none select-none pointer-events-none z-0"
       >
-        02
+        04
       </motion.span>
 
       {/* Rotated vertical text */}
