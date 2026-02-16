@@ -1,57 +1,47 @@
 
 
-# Community Page -- Phase 9: Bento Grid Gap Fix
+# Phase 10: Tablet Grid Polish + Mobile Filter Removal
 
-## Issue Identified
+## Changes
 
-On desktop (1920px), the 3-column bento grid with 6 cards has a layout gap. The `getCardSize` function marks index 5 as "wide" (`col-span-2`) because `5 % 5 === 0`. On a 3-column grid:
+### 1. Remove mobile filter bar (StoryFilters)
+The horizontal pill bar ("All / Reviews / Testimonies / Transformations / Most Recent / Featured") on mobile feels cluttered and unnecessary. Remove the entire mobile section from `StoryFilters.tsx` (the `md:hidden` block, lines 162-198). The desktop/tablet editorial tabs remain untouched.
 
-- Row 1-2: Card 0 (large, 2x2) + Card 1 (1x1) + Card 2 (1x1) -- fills perfectly
-- Row 3: Card 3 (1x1) + Card 4 (1x1) + Card 5 (wide, needs 2 cols) -- Card 5 cannot fit in the remaining 1 column, so it wraps to Row 4, leaving a gap in Row 3 column 3
+### 2. Last card spans full width on tablet
+On a 2-column tablet grid (768px), when there's an odd number of non-hero cards, the last card sits alone in column 1. Fix: detect when the last card would be orphaned on tablet and make it span both columns for an editorial full-bleed finish.
 
-The fix is to make the `getCardSize` logic only apply spanning for larger datasets. With 6 or fewer items, only the hero card (index 0) should span. All others should be "regular" so the 3-column grid fills cleanly: hero (2x2) + 2 stacked right + 3 across the bottom row.
+**Grid math (6 items, 2-col tablet):**
+- Card 0 (hero): `md:col-span-2 md:row-span-2` -- fills rows 1-2
+- Cards 1-2: row 3
+- Cards 3-4: row 4
+- Card 5: row 5, col 1 alone -- needs `md:col-span-2`
 
-## What's Working (No Changes)
+But this span must NOT apply on desktop (3-col), so the class needs to be `md:col-span-2 lg:col-span-1`.
 
-- Hero section with immersive header, `pt-20` mobile padding, `opacity-30` background -- verified on both desktop and mobile
-- Featured Story magazine spread
-- Sticky filter bar with mobile sort pills
-- Social feed with corrected gradient
-- StoryCard keyboard accessibility (`tabIndex`, `role`, `onKeyDown`, focus rings)
-- SubmitStoryCTA industrial treatment
-- StatStrip deduplication (removed from Community.tsx)
-- 6 placeholder stories present
+**Implementation:** Add a new size value `"tablet-wide"` or pass an `isLastOdd` prop to StoryCard. The simplest approach: compute in `getCardSize` whether the last item would be orphaned on the tablet 2-col grid, and return a new size. Then in StoryCard, map that size to `md:col-span-2 lg:col-span-1`.
 
-## Implementation
+---
 
-### File: `src/components/community/StoryGrid.tsx`
+## File Changes
 
-Change the `getCardSize` function to only apply `wide` and secondary `large` spans when there are enough items to fill the grid without gaps. For 6 or fewer items on a 3-column grid, only index 0 gets "large":
+### `src/components/community/StoryFilters.tsx`
+- Remove the mobile section (lines 162-198): the `md:hidden` div containing type pills and sort pills
+- Keep the desktop `hidden md:flex` section intact
 
-```typescript
-const getCardSize = (index: number): "regular" | "large" | "wide" => {
-  if (index === 0) return "large";
-  // Only apply spanning for larger datasets where grid can absorb it
-  if (displayStories.length > 9) {
-    if (index % 7 === 0) return "large";
-    if (index % 5 === 0) return "wide";
-  }
-  return "regular";
-};
-```
+### `src/components/community/StoryGrid.tsx`
+- Update `getCardSize` to detect the last orphan on a 2-col grid:
+  - After the hero card (index 0, spans 2 cols), there are `N-1` remaining cards on a 2-col grid
+  - If `(N-1)` is odd, the last card is orphaned
+  - Return `"tablet-wide"` for that last card
+- Logic: `if (index === displayStories.length - 1 && (displayStories.length - 1) % 2 !== 0) return "tablet-wide"`
 
-This ensures:
-- With 6 placeholders: hero (2x2) + 5 regular cards -- fills 3-col grid perfectly (2 rows for hero section + 1 full row of 3)
-- With 12+ real stories from the database: the bento variety kicks in with wide and large cards
-- No empty cells on desktop
-
-## Technical Details
+### `src/components/community/StoryCard.tsx`
+- Add `"tablet-wide"` to the size type
+- Map it to `md:col-span-2 lg:col-span-1` in `spanClass`
 
 | File | Change | Risk |
 |------|--------|------|
-| `src/components/community/StoryGrid.tsx` | Guard spanning logic for small datasets | Low -- logic only |
-
-## No Other Changes
-
-All Phase 8 work is verified and correct. This is a single surgical fix.
+| StoryFilters.tsx | Remove mobile `md:hidden` block | Low |
+| StoryGrid.tsx | Add last-orphan detection | Low |
+| StoryCard.tsx | Add `tablet-wide` size mapping | Low |
 
