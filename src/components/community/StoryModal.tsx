@@ -1,6 +1,7 @@
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -91,6 +92,9 @@ export default function StoryModal({ story, onClose }: StoryModalProps) {
             </div>
 
             <DialogHeader className="text-left mb-8 relative z-10">
+              <DialogDescription className="sr-only">
+                Read the full story from {story.customer_name}
+              </DialogDescription>
               {/* Rating */}
               {story.rating && (
                 <div className="flex items-center gap-1 mb-4">
