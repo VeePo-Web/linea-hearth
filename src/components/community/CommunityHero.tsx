@@ -62,7 +62,7 @@ export default function CommunityHero() {
           }}
         />
         
-        <div className="absolute right-0 top-0 bottom-0 w-1/2 lg:w-2/5 opacity-20 lg:opacity-30">
+        <div className="absolute right-0 top-0 bottom-0 w-1/2 lg:w-2/5 opacity-30">
           <div className="absolute inset-0 bg-gradient-to-l from-transparent via-stone-950/50 to-stone-950 z-10" />
           <motion.div 
             initial={{ scale: 1.1, opacity: 0 }}
@@ -79,7 +79,7 @@ export default function CommunityHero() {
           </motion.div>
         </div>
 
-        <div className="container mx-auto px-4 lg:px-8 relative z-10">
+        <div className="container mx-auto px-4 lg:px-8 relative z-10 pt-20 lg:pt-0">
           <div className="max-w-4xl">
             <motion.p 
               initial={{ opacity: 0, y: 20 }}

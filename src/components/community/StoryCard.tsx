@@ -50,8 +50,16 @@ export default function StoryCard({ story, onOpenStory, index, size = "regular" 
         delay: index * 0.08,
         ease: [0.25, 0.46, 0.45, 0.94]
       }}
-      className={`group relative cursor-pointer ${spanClass} transition-transform duration-500 hover:scale-[1.02]`}
+      tabIndex={0}
+      role="button"
+      className={`group relative cursor-pointer ${spanClass} transition-transform duration-500 hover:scale-[1.02] focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 focus-visible:ring-offset-background outline-none`}
       onClick={() => onOpenStory(story)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onOpenStory(story);
+        }
+      }}
     >
       <div className="h-full min-h-[200px] md:min-h-0 relative overflow-hidden bg-muted border border-white/5">
         {/* Background Image or Placeholder */}
