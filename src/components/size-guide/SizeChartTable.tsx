@@ -49,7 +49,7 @@ const SizeChartTable = ({ data, unit, className }: SizeChartTableProps) => {
               key={row.size} 
               className={cn(
                 "border-stone-200 dark:border-stone-800 transition-colors",
-                row.isPopular && "bg-amber-50/50 dark:bg-amber-950/20"
+                row.isPopular && "bg-champagne-50/50 dark:bg-champagne-900/20"
               )}
             >
               <TableCell className="font-medium">
@@ -58,7 +58,7 @@ const SizeChartTable = ({ data, unit, className }: SizeChartTableProps) => {
                   {row.isPopular && (
                     <Badge 
                       variant="secondary" 
-                      className="bg-amber-500 text-white text-[10px] px-1.5 py-0 font-medium tracking-wider hover:bg-amber-500"
+                      className="bg-champagne-500 text-white text-[10px] px-1.5 py-0 font-medium tracking-wider hover:bg-champagne-500"
                     >
                       POPULAR
                     </Badge>

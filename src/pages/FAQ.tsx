@@ -212,7 +212,7 @@ const NoResultsState = ({
     </p>
     <Button 
       onClick={onAskClick}
-      className="bg-amber-500 hover:bg-amber-600 text-white min-h-[48px]"
+      className="bg-champagne-500 hover:bg-champagne-600 text-white min-h-[48px]"
     >
       <MessageCircle className="w-4 h-4 mr-2" />
       CONTACT COMMAND

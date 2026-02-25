@@ -29,7 +29,7 @@ const KeyboardShortcuts = () => {
       {/* Toggle Header */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between p-4 md:p-6 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2"
+        className="w-full flex items-center justify-between p-4 md:p-6 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-champagne-500 focus-visible:ring-offset-2"
         aria-expanded={isOpen}
         aria-controls="keyboard-shortcuts-content"
       >

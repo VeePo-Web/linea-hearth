@@ -55,7 +55,7 @@ const ServiceSidebar = () => {
                     className={cn(
                       "flex items-center gap-3 px-3 py-2.5 text-sm font-light transition-colors border-l-2",
                       isActive 
-                        ? "border-amber-500 bg-amber-500/5 text-foreground" 
+                        ? "border-champagne-500 bg-champagne-500/5 text-foreground" 
                         : "border-transparent text-muted-foreground hover:text-foreground hover:border-stone-300"
                     )}
                   >
@@ -78,14 +78,14 @@ const ServiceSidebar = () => {
         <div className="space-y-2">
           <a 
             href="mailto:hello@lineofjudah.com"
-            className="flex items-center gap-2 text-sm text-amber-600 hover:text-amber-700 transition-colors"
+            className="flex items-center gap-2 text-sm text-champagne-600 hover:text-champagne-700 transition-colors"
           >
             <Mail className="w-4 h-4" strokeWidth={1.5} />
             Email Us
           </a>
           <a 
             href="tel:+12125550123"
-            className="flex items-center gap-2 text-sm text-amber-600 hover:text-amber-700 transition-colors"
+            className="flex items-center gap-2 text-sm text-champagne-600 hover:text-champagne-700 transition-colors"
           >
             <Phone className="w-4 h-4" strokeWidth={1.5} />
             +1 (212) 555-0123

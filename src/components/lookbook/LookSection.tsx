@@ -269,7 +269,7 @@ const LookSection = ({ look, index }: LookSectionProps) => {
                     {genderLabel}
                   </span>
                   {look.scripture_reference && (
-                    <span className="text-[10px] uppercase tracking-[0.2em] text-amber-500 font-light">
+                    <span className="text-[10px] uppercase tracking-[0.2em] text-champagne-500 font-light">
                       {look.scripture_reference}
                     </span>
                   )}

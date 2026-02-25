@@ -65,12 +65,12 @@ const AccessibleToolsGrid = () => {
         const content = (
           <motion.div
             variants={staggerItem}
-            className="group relative p-6 bg-stone-50 dark:bg-stone-900/50 border border-foreground/5 hover:border-amber-500/30 transition-colors duration-200"
+            className="group relative p-6 bg-stone-50 dark:bg-stone-900/50 border border-foreground/5 hover:border-champagne-500/30 transition-colors duration-200"
           >
             {/* Icon */}
             <div className="mb-4">
               <Icon 
-                className="w-6 h-6 text-amber-500" 
+                className="w-6 h-6 text-champagne-500" 
                 strokeWidth={1.5} 
                 aria-hidden="true" 
               />
@@ -87,7 +87,7 @@ const AccessibleToolsGrid = () => {
             </p>
             
             {/* Link */}
-            <span className="inline-flex items-center gap-2 text-xs font-medium text-amber-600 group-hover:text-amber-700 transition-colors">
+            <span className="inline-flex items-center gap-2 text-xs font-medium text-champagne-600 group-hover:text-champagne-700 transition-colors">
               {tool.linkText}
               <ArrowRight 
                 className="w-3 h-3 transition-transform group-hover:translate-x-0.5" 
@@ -103,7 +103,7 @@ const AccessibleToolsGrid = () => {
             <Link 
               key={tool.title} 
               to={tool.link}
-              className="block focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2"
+              className="block focus:outline-none focus-visible:ring-2 focus-visible:ring-champagne-500 focus-visible:ring-offset-2"
             >
               {content}
             </Link>
@@ -114,7 +114,7 @@ const AccessibleToolsGrid = () => {
           <button
             key={tool.title}
             onClick={(e) => handleShortcutsClick(e, tool.link)}
-            className="block w-full text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2"
+            className="block w-full text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-champagne-500 focus-visible:ring-offset-2"
           >
             {content}
           </button>

@@ -45,7 +45,7 @@ const SearchQuickAdd = ({ product, onNavigate }: SearchQuickAddProps) => {
               ${displayPrice.toLocaleString()}
             </span>
             {quickAdd.canOneTap && (
-              <span className="text-[10px] text-amber-600 font-medium px-1.5 py-0.5 bg-amber-500/10 rounded-sm">
+              <span className="text-[10px] text-champagne-600 font-medium px-1.5 py-0.5 bg-champagne-500/10 rounded-sm">
                 Your size: {quickAdd.rememberedSize}
               </span>
             )}

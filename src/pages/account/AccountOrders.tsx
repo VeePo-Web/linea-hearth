@@ -18,7 +18,7 @@ export default function AccountOrders() {
         return 'bg-blue-100 text-blue-800';
       case 'processing':
       case 'paid':
-        return 'bg-amber-100 text-amber-800';
+        return 'bg-champagne-100 text-champagne-800';
       case 'cancelled':
       case 'refunded':
         return 'bg-red-100 text-red-800';

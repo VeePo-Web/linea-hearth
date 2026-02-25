@@ -85,7 +85,7 @@ export default function CommunityHero() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="text-[10px] uppercase tracking-[0.4em] text-amber-500 font-medium mb-8"
+              className="text-[10px] uppercase tracking-[0.4em] text-champagne-500 font-medium mb-8"
             >
               Not For Everyone
             </motion.p>
@@ -98,7 +98,7 @@ export default function CommunityHero() {
             >
               <h1 className="text-[18vw] md:text-[12vw] lg:text-[10vw] font-extralight text-white leading-[0.85] tracking-[-0.04em] uppercase">
                 <motion.span variants={wordItem} className="block">The</motion.span>
-                <motion.span variants={wordItem} className="block text-amber-500">Tribe</motion.span>
+                <motion.span variants={wordItem} className="block text-champagne-500">Tribe</motion.span>
               </h1>
             </motion.div>
 
@@ -125,7 +125,7 @@ export default function CommunityHero() {
               ))}
               <motion.p 
                 variants={staggerItem}
-                className="text-amber-500 text-xl md:text-2xl font-light italic pt-6"
+                className="text-champagne-500 text-xl md:text-2xl font-light italic pt-6"
               >
                 You belong here.
               </motion.p>
@@ -176,7 +176,7 @@ export default function CommunityHero() {
       {/* SECTION 2: Featured Story - Tighter padding */}
       <section className="relative bg-background pt-16 lg:pt-24 pb-10 lg:pb-16">
         <div className="absolute left-0 top-1/2 -translate-y-1/2 hidden lg:block">
-          <p className="text-[10px] uppercase tracking-[0.4em] text-amber-500 font-medium -rotate-90 origin-left whitespace-nowrap">
+          <p className="text-[10px] uppercase tracking-[0.4em] text-champagne-500 font-medium -rotate-90 origin-left whitespace-nowrap">
             01 — Featured Story
           </p>
         </div>
@@ -203,7 +203,7 @@ export default function CommunityHero() {
                       <motion.div 
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.95 }}
-                        className="w-24 h-24 rounded-full bg-amber-500 flex items-center justify-center"
+                        className="w-24 h-24 rounded-full bg-champagne-500 flex items-center justify-center"
                       >
                         <Play className="w-10 h-10 text-stone-900 ml-1" fill="currentColor" />
                       </motion.div>
@@ -230,7 +230,7 @@ export default function CommunityHero() {
                 )}
               </div>
 
-              <div className="absolute -bottom-3 left-4 lg:hidden bg-amber-500 px-4 py-2">
+              <div className="absolute -bottom-3 left-4 lg:hidden bg-champagne-500 px-4 py-2">
                 <p className="text-stone-900 font-medium text-xs uppercase tracking-wider">Featured Story</p>
               </div>
             </motion.div>
@@ -244,7 +244,7 @@ export default function CommunityHero() {
               className="lg:col-span-2 space-y-8"
             >
               <div className="space-y-6">
-                <p className="text-[10px] uppercase tracking-[0.3em] text-amber-500 font-medium">
+                <p className="text-[10px] uppercase tracking-[0.3em] text-champagne-500 font-medium">
                   ——— Featured
                 </p>
                 <h2 className="text-3xl lg:text-4xl xl:text-5xl font-light leading-[1.15] italic">
@@ -264,8 +264,8 @@ export default function CommunityHero() {
                     className="w-14 h-14 rounded-full object-cover grayscale"
                   />
                 ) : (
-                  <div className="w-14 h-14 rounded-full bg-amber-500/20 flex items-center justify-center">
-                    <span className="text-amber-500 font-medium text-xl">
+                   <div className="w-14 h-14 rounded-full bg-champagne-500/20 flex items-center justify-center">
+                    <span className="text-champagne-500 font-medium text-xl">
                       {displayStory.customer_name.charAt(0)}
                     </span>
                   </div>
@@ -285,7 +285,7 @@ export default function CommunityHero() {
                 <motion.button
                   whileHover={{ x: 4 }}
                   onClick={() => setIsVideoPlaying(true)}
-                  className="text-amber-500 text-sm uppercase tracking-[0.2em] font-medium flex items-center gap-2 group"
+                  className="text-champagne-500 text-sm uppercase tracking-[0.2em] font-medium flex items-center gap-2 group"
                 >
                   <Play className="w-4 h-4" />
                   Watch Video

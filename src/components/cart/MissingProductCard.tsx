@@ -199,7 +199,7 @@ const MissingProductCard = ({
           className="w-full h-full object-cover"
         />
         {isLowStock && (
-          <div className="absolute bottom-0 left-0 right-0 bg-amber-500/90 text-[8px] text-white text-center py-0.5 font-medium">
+          <div className="absolute bottom-0 left-0 right-0 bg-champagne-500/90 text-[8px] text-white text-center py-0.5 font-medium">
             Low Stock
           </div>
         )}

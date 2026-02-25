@@ -19,7 +19,7 @@ const highlightText = (text: string, query: string) => {
   
   return parts.map((part, i) => 
     regex.test(part) ? (
-      <mark key={i} className="bg-amber-200 dark:bg-amber-800 px-0.5 rounded">
+      <mark key={i} className="bg-champagne-200 dark:bg-champagne-800 px-0.5 rounded">
         {part}
       </mark>
     ) : (

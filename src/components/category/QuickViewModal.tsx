@@ -240,7 +240,7 @@ const QuickViewModal = ({ product, open, onClose, onAuthRequired }: QuickViewMod
               <span className="text-lg text-muted-foreground line-through">
                 {formatPrice(product.price)}
               </span>
-              <span className="text-xl font-medium text-amber-600">
+              <span className="text-xl font-medium text-champagne-600">
                 {formatPrice(product.sale_price)}
               </span>
             </div>
@@ -279,7 +279,7 @@ const QuickViewModal = ({ product, open, onClose, onAuthRequired }: QuickViewMod
                     {size}
                     {/* "Your size" badge */}
                     {isRemembered && isAvailable && selectedSize !== size && (
-                      <span className="absolute -top-2 left-1/2 -translate-x-1/2 px-1 text-[8px] uppercase tracking-wide text-amber-600 bg-background whitespace-nowrap">
+                      <span className="absolute -top-2 left-1/2 -translate-x-1/2 px-1 text-[8px] uppercase tracking-wide text-champagne-600 bg-background whitespace-nowrap">
                         yours
                       </span>
                     )}
@@ -367,7 +367,7 @@ const QuickViewModal = ({ product, open, onClose, onAuthRequired }: QuickViewMod
 
         {/* Stock status */}
         {currentStock > 0 && currentStock < 5 && (
-          <p className="text-sm text-amber-600 mb-4">
+          <p className="text-sm text-champagne-600 mb-4">
             Only {currentStock} left in stock
           </p>
         )}

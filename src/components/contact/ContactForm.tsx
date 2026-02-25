@@ -192,7 +192,7 @@ const ContactForm = () => {
       </div>
       
       {/* Priority Flag */}
-      <div className="flex items-start gap-3 p-4 bg-amber-500/5 border border-amber-500/20">
+      <div className="flex items-start gap-3 p-4 bg-champagne-500/5 border border-champagne-500/20">
         <Checkbox
           id="priority"
           checked={isPriority}

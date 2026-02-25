@@ -142,7 +142,7 @@ const AskUsModal = ({ isOpen, onClose }: AskUsModalProps) => {
           or email us directly at{" "}
           <a 
             href="mailto:hello@lineofjudah.com" 
-            className="text-amber-600 hover:underline inline-flex items-center min-h-[44px] px-1"
+            className="text-champagne-600 hover:underline inline-flex items-center min-h-[44px] px-1"
           >
             hello@lineofjudah.com
           </a>

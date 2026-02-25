@@ -24,10 +24,10 @@ const MiniTestimonial = () => {
   const testimonial = testimonials[currentIndex];
 
   return (
-    <div className="bg-muted/30 p-4 mt-6 border-l-2 border-amber-400">
-      <div className="flex gap-0.5 mb-2">
-        {[...Array(5)].map((_, i) => (
-          <Star key={i} className="h-3 w-3 fill-amber-400 text-amber-400" />
+     <div className="bg-muted/30 p-4 mt-6 border-l-2 border-champagne-300">
+       <div className="flex gap-0.5 mb-2">
+         {[...Array(5)].map((_, i) => (
+           <Star key={i} className="h-3 w-3 fill-champagne-300 text-champagne-300" />
         ))}
       </div>
       <p className="text-sm text-foreground italic mb-2">

@@ -83,7 +83,7 @@ const StoryCommunityStats = () => {
         {/* Section header */}
         <div className="text-center mb-16 lg:mb-20 xl:mb-24">
           <motion.p
-            className="text-[10px] tracking-[0.4em] text-amber-500 mb-6"
+            className="text-[10px] tracking-[0.4em] text-champagne-500 mb-6"
             initial={{ opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ delay: 0.2, duration: 0.8 }}
@@ -96,7 +96,7 @@ const StoryCommunityStats = () => {
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ delay: 0.3, duration: 0.8 }}
           >
-            The Movement Grows<span className="text-amber-500">.</span>
+            The Movement Grows<span className="text-champagne-500">.</span>
           </motion.h2>
         </div>
 

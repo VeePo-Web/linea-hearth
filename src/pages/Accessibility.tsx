@@ -146,7 +146,7 @@ const ComplianceStrip = () => (
     <span className="text-muted-foreground hidden sm:inline">—</span>
     <a 
       href="#" 
-      className="text-sm text-amber-600 hover:text-amber-700 inline-flex items-center gap-1 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2"
+      className="text-sm text-champagne-600 hover:text-champagne-700 inline-flex items-center gap-1 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-champagne-500 focus-visible:ring-offset-2"
       aria-label="View full accessibility conformance report (opens in new tab)"
     >
       View Full Report
@@ -296,7 +296,7 @@ const Accessibility = () => {
                 <p>Our virtual try-on room is keyboard navigable and screen reader compatible.</p>
                 <Link 
                   to="/try-on"
-                  className="inline-flex items-center gap-2 text-amber-600 hover:text-amber-700 transition-colors text-sm font-medium focus:outline-none focus-visible:underline"
+                  className="inline-flex items-center gap-2 text-champagne-600 hover:text-champagne-700 transition-colors text-sm font-medium focus:outline-none focus-visible:underline"
                 >
                   Enter Try-On Room
                   <ArrowRight className="w-3 h-3" aria-hidden="true" />

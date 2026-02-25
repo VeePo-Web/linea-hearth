@@ -19,11 +19,11 @@ const DeclarationBlock = ({ quote, attribution }: DeclarationBlockProps) => {
       className="relative mb-16 py-12 md:py-16 border-y border-foreground/10"
     >
       {/* Subtle background accent */}
-      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-amber-500/[0.02] to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-champagne-500/[0.02] to-transparent" />
       
       <div className="relative max-w-4xl mx-auto text-center px-4">
         {/* Quote marks */}
-        <div className="absolute -top-2 left-1/2 -translate-x-1/2 text-6xl md:text-8xl text-amber-500/10 font-serif leading-none select-none" aria-hidden="true">
+        <div className="absolute -top-2 left-1/2 -translate-x-1/2 text-6xl md:text-8xl text-champagne-500/10 font-serif leading-none select-none" aria-hidden="true">
           "
         </div>
         

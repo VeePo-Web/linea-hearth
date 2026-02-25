@@ -200,7 +200,7 @@ const Contact = () => {
               {channel.action.onClick ? (
                 <button
                   onClick={handleChatClick}
-                  className="inline-flex items-center gap-2 text-sm font-medium text-amber-600 hover:text-amber-700 transition-colors mt-4"
+                   className="inline-flex items-center gap-2 text-sm font-medium text-champagne-600 hover:text-champagne-700 transition-colors mt-4"
                 >
                   {channel.action.label}
                 </button>
@@ -209,7 +209,7 @@ const Contact = () => {
                   href={channel.action.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-sm font-medium text-amber-600 hover:text-amber-700 transition-colors mt-4"
+                   className="inline-flex items-center gap-2 text-sm font-medium text-champagne-600 hover:text-champagne-700 transition-colors mt-4"
                 >
                   {channel.action.label}
                   <ExternalLink className="w-3 h-3" />
@@ -217,7 +217,7 @@ const Contact = () => {
               ) : (
                 <a
                   href={channel.action.href}
-                  className="inline-flex items-center gap-2 text-sm font-medium text-amber-600 hover:text-amber-700 transition-colors mt-4"
+                  className="inline-flex items-center gap-2 text-sm font-medium text-champagne-600 hover:text-champagne-700 transition-colors mt-4"
                 >
                   {channel.action.label}
                 </a>
@@ -244,7 +244,7 @@ const Contact = () => {
                 <h4 className="font-medium">{hotline.subject}</h4>
                 <a 
                   href={`mailto:${hotline.email}?subject=${encodeURIComponent(hotline.subject)}`}
-                  className="text-sm text-amber-600 hover:text-amber-700 transition-colors"
+                  className="text-sm text-champagne-600 hover:text-champagne-700 transition-colors"
                 >
                   {hotline.email}
                 </a>
@@ -273,7 +273,7 @@ const Contact = () => {
                 icon={tool.icon}
                 iconColor="emerald"
               >
-                <span className="inline-flex items-center gap-1 text-sm font-medium text-amber-600 group-hover:text-amber-700 transition-colors mt-4">
+                <span className="inline-flex items-center gap-1 text-sm font-medium text-champagne-600 group-hover:text-champagne-700 transition-colors mt-4">
                   Open Tool
                   <ExternalLink className="w-3 h-3" />
                 </span>
@@ -309,7 +309,7 @@ const Contact = () => {
         <div className="mt-6 text-center">
           <Link 
             to="/faq" 
-            className="inline-flex items-center gap-2 text-sm font-medium text-amber-600 hover:text-amber-700 transition-colors"
+            className="inline-flex items-center gap-2 text-sm font-medium text-champagne-600 hover:text-champagne-700 transition-colors"
           >
             View All FAQs
             <ExternalLink className="w-3 h-3" />
