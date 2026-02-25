@@ -34,7 +34,7 @@ const MarqueeStrip = () => {
   return (
     <ScrollReveal variant="fadeIn" threshold={0.5}>
       <section 
-        className="w-full py-5 md:py-6 bg-foreground overflow-hidden"
+        className="w-full py-5 md:py-6 bg-background overflow-hidden"
         onTouchStart={() => setIsPaused(true)}
         onTouchEnd={() => setIsPaused(false)}
         onMouseEnter={() => setIsPaused(true)}
@@ -60,20 +60,20 @@ const MarqueeStrip = () => {
                 </div>
                 
                 {/* Quote - slightly larger on mobile for WCAG */}
-                <span className="text-sm md:text-sm text-background font-light">
+                <span className="text-sm md:text-sm text-foreground font-light">
                   "{review.quote}"
                 </span>
                 
                 {/* Separator */}
-                <span className="text-background/30">—</span>
+                <span className="text-foreground/30">—</span>
                 
                 {/* Name */}
-                <span className="text-sm md:text-sm text-background/60 font-light">
+                <span className="text-sm md:text-sm text-foreground/60 font-light">
                   {review.name}
                 </span>
                 
                 {/* Dot separator */}
-                <span className="text-background/20 mx-3 md:mx-4">•</span>
+                <span className="text-foreground/20 mx-3 md:mx-4">•</span>
               </div>
             ))}
           </div>

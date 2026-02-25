@@ -24,7 +24,7 @@ const InfoCard = memo(({
   children
 }: InfoCardProps) => {
   const variantClasses = {
-    default: "bg-stone-50 dark:bg-stone-900/50",
+    default: "bg-stone-900/50",
     muted: "bg-muted/30",
     accent: "border-l-4 border-amber-500 bg-amber-500/5"
   };

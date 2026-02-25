@@ -23,20 +23,20 @@ const InstagramFeed = () => {
   ];
 
   return (
-    <section className="w-full py-12 md:py-16 lg:py-24 bg-foreground">
+    <section className="w-full py-12 md:py-16 lg:py-24 bg-background">
       <div className="max-w-7xl mx-auto px-4 xs:px-6">
         {/* Section Header - Minimal */}
         <ScrollReveal variant="fadeUp">
           <div className="flex items-center justify-between mb-6 md:mb-8">
             <div className="flex items-center gap-3">
-              <Instagram className="w-5 h-5 text-background" />
-              <span className="text-sm font-light text-background">@lineofjudahwear</span>
+              <Instagram className="w-5 h-5 text-foreground" />
+              <span className="text-sm font-light text-foreground">@lineofjudahwear</span>
             </div>
             <motion.a 
               href="https://instagram.com/lineofjudahwear" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="text-caption text-background/50 hover:text-background transition-colors uppercase touch-target px-3 py-2"
+              className="text-caption text-muted-foreground hover:text-foreground transition-colors uppercase touch-target px-3 py-2"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
@@ -63,8 +63,8 @@ const InstagramFeed = () => {
                 loading="lazy"
               />
               {/* Instagram icon overlay on tap/hover */}
-              <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/20 group-active:bg-foreground/20 transition-colors duration-300 flex items-center justify-center">
-                <Instagram className="w-6 h-6 text-background opacity-0 group-hover:opacity-100 group-active:opacity-100 transition-opacity duration-300" />
+              <div className="absolute inset-0 bg-background/0 group-hover:bg-background/20 group-active:bg-background/20 transition-colors duration-300 flex items-center justify-center">
+                <Instagram className="w-6 h-6 text-foreground opacity-0 group-hover:opacity-100 group-active:opacity-100 transition-opacity duration-300" />
               </div>
             </motion.a>
           ))}
@@ -89,8 +89,8 @@ const InstagramFeed = () => {
               transition={{ duration: 0.6 }}
               loading="lazy"
             />
-            <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/20 transition-colors duration-300 flex items-center justify-center">
-              <Instagram className="w-8 h-8 text-background opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            <div className="absolute inset-0 bg-background/0 group-hover:bg-background/20 transition-colors duration-300 flex items-center justify-center">
+              <Instagram className="w-8 h-8 text-foreground opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </div>
           </motion.a>
 
@@ -113,8 +113,8 @@ const InstagramFeed = () => {
                 transition={{ duration: 0.6 }}
                 loading="lazy"
               />
-              <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/20 transition-colors duration-300 flex items-center justify-center">
-                <Instagram className="w-6 h-6 text-background opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="absolute inset-0 bg-background/0 group-hover:bg-background/20 transition-colors duration-300 flex items-center justify-center">
+                <Instagram className="w-6 h-6 text-foreground opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               </div>
             </motion.a>
           ))}
@@ -138,8 +138,8 @@ const InstagramFeed = () => {
                 transition={{ duration: 0.6 }}
                 loading="lazy"
               />
-              <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/20 transition-colors duration-300 flex items-center justify-center">
-                <Instagram className="w-6 h-6 text-background opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="absolute inset-0 bg-background/0 group-hover:bg-background/20 transition-colors duration-300 flex items-center justify-center">
+                <Instagram className="w-6 h-6 text-foreground opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               </div>
             </motion.a>
           ))}
@@ -147,7 +147,7 @@ const InstagramFeed = () => {
 
         {/* Tag CTA */}
         <ScrollReveal variant="fadeIn" delay={0.4}>
-          <p className="text-center text-caption text-background/50 mt-6 md:mt-8">
+          <p className="text-center text-caption text-muted-foreground mt-6 md:mt-8">
             Tag us for a chance to be featured
           </p>
         </ScrollReveal>

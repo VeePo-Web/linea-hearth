@@ -7,7 +7,7 @@ import TextReveal from "@/components/motion/TextReveal";
 
 const TestimonySpotlight = () => {
   return (
-    <section className="w-full bg-foreground">
+    <section className="w-full bg-background">
       <div className="grid grid-cols-1 lg:grid-cols-2 min-h-[70vh] md:min-h-[80vh]">
         {/* Portrait Image - i-D style full-height - reduced on mobile to prevent over-cropping */}
         <ImageReveal 
@@ -24,8 +24,8 @@ const TestimonySpotlight = () => {
             <ScrollReveal variant="fadeUp" delay={0.1} className="lg:hidden mb-6">
               <div>
                 <p className="text-xs uppercase tracking-[0.2em] text-accent mb-2">From the tribe</p>
-                <p className="text-sm font-medium text-background">Marcus T.</p>
-                <p className="text-caption text-background/50">Youth Pastor • Atlanta, GA</p>
+                <p className="text-sm font-medium text-foreground">Marcus T.</p>
+                <p className="text-caption text-muted-foreground">Youth Pastor • Atlanta, GA</p>
               </div>
             </ScrollReveal>
 
@@ -34,7 +34,7 @@ const TestimonySpotlight = () => {
               <blockquote className="mb-6 md:mb-8">
                 <TextReveal 
                   text="People stop me all the time. It's not just a conversation starter—" 
-                  className="text-2xl xs:text-3xl md:text-4xl lg:text-hero text-background leading-snug md:leading-tight"
+                  className="text-2xl xs:text-3xl md:text-4xl lg:text-hero text-foreground leading-snug md:leading-tight"
                   as="span"
                   delay={0.3}
                 />
@@ -53,8 +53,8 @@ const TestimonySpotlight = () => {
             <ScrollReveal variant="fadeUp" delay={0.6} className="hidden lg:block">
               <div className="mb-8">
                 <p className="text-xs uppercase tracking-[0.2em] text-accent mb-2">From the tribe</p>
-                <p className="text-sm font-medium text-background">Marcus T.</p>
-                <p className="text-caption text-background/50">Youth Pastor • Atlanta, GA</p>
+                <p className="text-sm font-medium text-foreground">Marcus T.</p>
+                <p className="text-caption text-muted-foreground">Youth Pastor • Atlanta, GA</p>
               </div>
             </ScrollReveal>
 
@@ -63,7 +63,7 @@ const TestimonySpotlight = () => {
               <motion.div whileHover={{ x: 4 }} transition={{ duration: 0.2 }}>
                 <Link 
                   to="/community"
-                  className="inline-flex items-center gap-2 text-background text-sm font-light hover:text-accent transition-colors group touch-target py-3 -my-3"
+                  className="inline-flex items-center gap-2 text-foreground text-sm font-light hover:text-accent transition-colors group touch-target py-3 -my-3"
                 >
                   Read More Stories
                   <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
