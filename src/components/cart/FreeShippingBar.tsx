@@ -66,9 +66,9 @@ const FreeShippingBar = () => {
       return 'linear-gradient(90deg, hsl(var(--primary)), hsl(var(--primary)))';
     }
     if (shippingProgress >= 90) {
-      return 'linear-gradient(90deg, hsl(45, 40%, 72%), hsl(45, 30%, 52%))';
+      return 'linear-gradient(90deg, hsl(152, 25%, 55%), hsl(152, 35%, 30%))';
     }
-    return 'linear-gradient(90deg, hsl(45, 20%, 28%), hsl(45, 30%, 52%))';
+    return 'linear-gradient(90deg, hsl(152, 30%, 18%), hsl(152, 35%, 30%))';
   };
 
   // Message key for AnimatePresence - changes when tier or celebration changes
@@ -115,7 +115,7 @@ const FreeShippingBar = () => {
               style={{
                 background: activeCelebration === 'unlocked' 
                   ? 'hsl(var(--primary) / 0.3)' 
-                  : 'hsl(45, 30%, 52%, 0.2)',
+                  : 'hsl(152, 35%, 30%, 0.2)',
                 filter: 'blur(4px)',
                 width: `${shippingProgress}%`,
               }}
@@ -144,9 +144,9 @@ const FreeShippingBar = () => {
             </div>
           ) : shippingProgress >= 90 ? (
             <>
-              <Truck className="h-4 w-4 text-champagne-500" />
+              <Truck className="h-4 w-4 text-forest-400" />
               <span className="text-muted-foreground">
-                Almost there—<span className="font-medium text-champagne-600">{formatPrice(amountToFreeShipping)}</span> more
+                Almost there—<span className="font-medium text-forest-500">{formatPrice(amountToFreeShipping)}</span> more
               </span>
             </>
           ) : activeCelebration === 'halfway' ? (
