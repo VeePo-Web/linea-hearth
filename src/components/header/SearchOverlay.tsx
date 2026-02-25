@@ -87,7 +87,7 @@ const ProductRow = ({ product, onClose }: { product: DisplayProduct; onClose: ()
               {product.category_name}
             </span>
             {quickAdd.canOneTap && (
-              <span className="text-[10px] text-champagne-600 font-medium px-1.5 py-0.5 bg-champagne-500/10 rounded-sm">>
+              <span className="text-[10px] text-champagne-600 font-medium px-1.5 py-0.5 bg-champagne-500/10 rounded-sm">
                 {quickAdd.rememberedSize}
               </span>
             )}
