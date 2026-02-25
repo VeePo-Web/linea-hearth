@@ -104,7 +104,7 @@ const ProductCard = ({ product, onQuickView, index = 0, onAuthRequired }: Produc
     badges.push({ label: "NEW", className: "bg-foreground text-background" });
   }
   if (product.is_on_sale && product.sale_price) {
-    badges.push({ label: "SALE", className: "bg-amber-500 text-white" });
+    badges.push({ label: "SALE", className: "bg-champagne-500 text-white" });
   }
   if (quickAdd.hasLowStock) {
     badges.push({ label: "LOW STOCK", className: "bg-orange-500 text-white" });
@@ -265,7 +265,7 @@ const ProductCard = ({ product, onQuickView, index = 0, onAuthRequired }: Produc
                     size="sm"
                     className={`text-xs h-10 md:h-9 px-4 md:px-3 ${
                       quickAdd.canOneTap 
-                        ? 'bg-amber-500 hover:bg-amber-400 text-white' 
+                        ? 'bg-champagne-500 hover:bg-champagne-400 text-white' 
                         : 'bg-foreground/95 hover:bg-foreground text-background'
                     }`}
                     onClick={quickAdd.handleQuickAdd}
@@ -317,7 +317,7 @@ const ProductCard = ({ product, onQuickView, index = 0, onAuthRequired }: Produc
                   <span className="text-sm font-light text-muted-foreground line-through">
                     {formatPrice(product.price)}
                   </span>
-                  <span className="text-sm font-medium text-amber-500">
+                  <span className="text-sm font-medium text-champagne-500">
                     {formatPrice(product.sale_price)}
                   </span>
                 </div>
@@ -365,7 +365,7 @@ const ProductCard = ({ product, onQuickView, index = 0, onAuthRequired }: Produc
             )}
             {/* Size memory indicator */}
             {quickAdd.rememberedSize && quickAdd.stockForRemembered > 0 && (
-              <span className="text-[10px] uppercase tracking-wide text-amber-600 font-medium">
+              <span className="text-[10px] uppercase tracking-wide text-champagne-600 font-medium">
                 {quickAdd.rememberedSize}
               </span>
             )}

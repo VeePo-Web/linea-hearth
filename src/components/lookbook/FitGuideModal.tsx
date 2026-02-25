@@ -95,7 +95,7 @@ const FitGuideModal = ({ model, onClose }: FitGuideModalProps) => {
                 <h2 className="text-2xl font-extralight text-white">
                   {model.name}
                 </h2>
-                <span className="text-[10px] uppercase tracking-wider bg-amber-600 text-white px-3 py-1.5">
+                <span className="text-[10px] uppercase tracking-wider bg-champagne-600 text-white px-3 py-1.5">
                   Size {model.size_worn}
                 </span>
               </div>
@@ -121,7 +121,7 @@ const FitGuideModal = ({ model, onClose }: FitGuideModalProps) => {
 
               {/* Size Worn */}
               <div className="mb-6 p-4 bg-stone-800/50 rounded-none border border-white/5">
-                <p className="text-[10px] uppercase tracking-[0.2em] text-amber-500 mb-2">
+                <p className="text-[10px] uppercase tracking-[0.2em] text-champagne-500 mb-2">
                   Size Worn in Photo
                 </p>
                 <p className="text-2xl font-extralight text-white">
@@ -152,7 +152,7 @@ const FitGuideModal = ({ model, onClose }: FitGuideModalProps) => {
                   </Button>
                 </Link>
                 <Link to={`/category/all?size=${model.size_worn}`}>
-                  <Button className="w-full bg-amber-600 hover:bg-amber-500 text-white h-12">
+                  <Button className="w-full bg-champagne-600 hover:bg-champagne-500 text-white h-12">
                     Shop in Size {model.size_worn}
                   </Button>
                 </Link>
@@ -235,7 +235,7 @@ const FitGuideModal = ({ model, onClose }: FitGuideModalProps) => {
             <h2 id="fit-model-name" className="text-2xl lg:text-3xl font-extralight text-white">
               {model.name}
             </h2>
-            <span className="text-[10px] uppercase tracking-wider bg-amber-600 text-white px-3 py-1.5">
+            <span className="text-[10px] uppercase tracking-wider bg-champagne-600 text-white px-3 py-1.5">
               Size {model.size_worn}
             </span>
           </motion.div>
@@ -278,7 +278,7 @@ const FitGuideModal = ({ model, onClose }: FitGuideModalProps) => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: timing.slow, ease: easing.editorial, delay: 0.5 }}
           >
-            <p className="text-[10px] uppercase tracking-[0.2em] text-amber-500 mb-2">
+            <p className="text-[10px] uppercase tracking-[0.2em] text-champagne-500 mb-2">
               Size Worn in Photo
             </p>
             <p className="text-2xl font-extralight text-white">
@@ -330,7 +330,7 @@ const FitGuideModal = ({ model, onClose }: FitGuideModalProps) => {
                 whileTap={prefersReducedMotion ? {} : { scale: 0.98 }}
                 transition={springConfig}
               >
-                <Button className="w-full bg-amber-600 hover:bg-amber-500 text-white h-12 md:h-11">
+                <Button className="w-full bg-champagne-600 hover:bg-champagne-500 text-white h-12 md:h-11">
                   Shop in Size {model.size_worn}
                 </Button>
               </motion.div>

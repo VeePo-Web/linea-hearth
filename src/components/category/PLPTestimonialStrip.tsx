@@ -32,7 +32,7 @@ const PLPTestimonialStrip = () => {
               key={i}
               className={`w-4 h-4 ${
                 i < review.rating
-                  ? "fill-amber-500 text-amber-500"
+                  ? "fill-champagne-500 text-champagne-500"
                   : "text-muted-foreground/30"
               }`}
             />

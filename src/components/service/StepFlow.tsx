@@ -64,7 +64,7 @@ const StepFlow = ({
                 variant === 'default' ? "w-20 h-20" : "w-16 h-16"
               )}>
                 {/* Number Badge */}
-                <span className="absolute -top-3 -left-3 bg-amber-500 text-white text-xs font-medium px-2 py-0.5">
+                <span className="absolute -top-3 -left-3 bg-champagne-500 text-white text-xs font-medium px-2 py-0.5">
                   {getStepNumber(index, step.number)}
                 </span>
                 <Icon 
@@ -115,7 +115,7 @@ const StepFlow = ({
                 <div className="flex flex-col items-center">
                   {/* Icon Box */}
                   <div className="relative flex items-center justify-center w-16 h-16 border-2 border-stone-900 dark:border-stone-100 bg-background">
-                    <span className="absolute -top-2 -left-2 bg-amber-500 text-white text-xs font-medium px-1.5 py-0.5">
+                    <span className="absolute -top-2 -left-2 bg-champagne-500 text-white text-xs font-medium px-1.5 py-0.5">
                       {getStepNumber(index, step.number)}
                     </span>
                     <Icon className="w-6 h-6 text-stone-900 dark:text-stone-100" strokeWidth={1.5} />

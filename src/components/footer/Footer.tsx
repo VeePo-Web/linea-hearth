@@ -12,7 +12,7 @@ const Footer = () => {
           {/* Brand - Left side */}
           <div>
             <h2 className="text-xl md:text-2xl font-light mb-4 tracking-wide">
-              LINE OF <span className="text-amber-500">JUDAH</span>
+              LINE OF <span className="text-champagne-500">JUDAH</span>
             </h2>
             <p className="text-sm font-light text-white/70 leading-relaxed max-w-md mb-6">
               For those who walk different. If you're not for us, that's okay — this isn't for everyone.
@@ -22,7 +22,7 @@ const Footer = () => {
             <div className="space-y-2 text-sm font-light text-white/70">
               <div>
                 <p className="font-normal text-white mb-1">Contact Us</p>
-                <a href="mailto:hello@lineofjudah.com" className="hover:text-amber-500 transition-colors touch-target-sm inline-flex items-center">
+                <a href="mailto:hello@lineofjudah.com" className="hover:text-champagne-500 transition-colors touch-target-sm inline-flex items-center">
                   hello@lineofjudah.com
                 </a>
               </div>
@@ -30,21 +30,21 @@ const Footer = () => {
               <div className="flex gap-6 mt-4">
                 <a 
                   href="https://instagram.com/lineofjudahwear" 
-                  className="text-white/70 hover:text-amber-500 transition-colors touch-target-sm py-2"
+                  className="text-white/70 hover:text-champagne-500 transition-colors touch-target-sm py-2"
                   aria-label="Instagram"
                 >
                   Instagram
                 </a>
                 <a 
                   href="https://tiktok.com/@lineofjudah" 
-                  className="text-white/70 hover:text-amber-500 transition-colors touch-target-sm py-2"
+                  className="text-white/70 hover:text-champagne-500 transition-colors touch-target-sm py-2"
                   aria-label="TikTok"
                 >
                   TikTok
                 </a>
                 <a 
                   href="https://youtube.com/@lineofjudah" 
-                  className="text-white/70 hover:text-amber-500 transition-colors touch-target-sm py-2"
+                  className="text-white/70 hover:text-champagne-500 transition-colors touch-target-sm py-2"
                   aria-label="YouTube"
                 >
                   YouTube
@@ -60,22 +60,22 @@ const Footer = () => {
               <h4 className="text-sm font-normal text-white mb-3 md:mb-4">Shop</h4>
               <ul className="space-y-1">
                 <li>
-                  <Link to="/category/tees" className="text-sm font-light text-white/70 hover:text-amber-500 transition-colors touch-target-sm py-2 inline-block">
+                  <Link to="/category/tees" className="text-sm font-light text-white/70 hover:text-champagne-500 transition-colors touch-target-sm py-2 inline-block">
                     T-Shirts
                   </Link>
                 </li>
                 <li>
-                  <Link to="/category/hoodies" className="text-sm font-light text-white/70 hover:text-amber-500 transition-colors touch-target-sm py-2 inline-block">
+                  <Link to="/category/hoodies" className="text-sm font-light text-white/70 hover:text-champagne-500 transition-colors touch-target-sm py-2 inline-block">
                     Hoodies
                   </Link>
                 </li>
                 <li>
-                  <Link to="/category/accessories" className="text-sm font-light text-white/70 hover:text-amber-500 transition-colors touch-target-sm py-2 inline-block">
+                  <Link to="/category/accessories" className="text-sm font-light text-white/70 hover:text-champagne-500 transition-colors touch-target-sm py-2 inline-block">
                     Accessories
                   </Link>
                 </li>
                 <li>
-                  <Link to="/category/sale" className="text-sm font-light text-white/70 hover:text-amber-500 transition-colors touch-target-sm py-2 inline-block">
+                  <Link to="/category/sale" className="text-sm font-light text-white/70 hover:text-champagne-500 transition-colors touch-target-sm py-2 inline-block">
                     Sale
                   </Link>
                 </li>
@@ -87,27 +87,27 @@ const Footer = () => {
               <h4 className="text-sm font-normal text-white mb-3 md:mb-4">Support</h4>
               <ul className="space-y-1">
                 <li>
-                  <Link to="/faq" className="text-sm font-light text-white/70 hover:text-amber-500 transition-colors touch-target-sm py-2 inline-block">
+                  <Link to="/faq" className="text-sm font-light text-white/70 hover:text-champagne-500 transition-colors touch-target-sm py-2 inline-block">
                     FAQ
                   </Link>
                 </li>
                 <li>
-                  <Link to="/shipping" className="text-sm font-light text-white/70 hover:text-amber-500 transition-colors touch-target-sm py-2 inline-block">
+                  <Link to="/shipping" className="text-sm font-light text-white/70 hover:text-champagne-500 transition-colors touch-target-sm py-2 inline-block">
                     Shipping
                   </Link>
                 </li>
                 <li>
-                  <Link to="/returns" className="text-sm font-light text-white/70 hover:text-amber-500 transition-colors touch-target-sm py-2 inline-block">
+                  <Link to="/returns" className="text-sm font-light text-white/70 hover:text-champagne-500 transition-colors touch-target-sm py-2 inline-block">
                     Returns
                   </Link>
                 </li>
                 <li>
-                  <Link to="/about/size-guide" className="text-sm font-light text-white/70 hover:text-amber-500 transition-colors touch-target-sm py-2 inline-block">
+                  <Link to="/about/size-guide" className="text-sm font-light text-white/70 hover:text-champagne-500 transition-colors touch-target-sm py-2 inline-block">
                     Size Guide
                   </Link>
                 </li>
                 <li className="hidden xs:block">
-                  <Link to="/accessibility" className="text-sm font-light text-white/70 hover:text-amber-500 transition-colors touch-target-sm py-2 inline-block">
+                  <Link to="/accessibility" className="text-sm font-light text-white/70 hover:text-champagne-500 transition-colors touch-target-sm py-2 inline-block">
                     Accessibility
                   </Link>
                 </li>
@@ -119,17 +119,17 @@ const Footer = () => {
               <h4 className="text-sm font-normal text-white mb-3 md:mb-4">About</h4>
               <ul className="space-y-1">
                 <li>
-                  <Link to="/about/our-story" className="text-sm font-light text-white/70 hover:text-amber-500 transition-colors touch-target-sm py-2 inline-block">
+                  <Link to="/about/our-story" className="text-sm font-light text-white/70 hover:text-champagne-500 transition-colors touch-target-sm py-2 inline-block">
                     Our Mission
                   </Link>
                 </li>
                 <li>
-                  <Link to="/contact" className="text-sm font-light text-white/70 hover:text-amber-500 transition-colors touch-target-sm py-2 inline-block">
+                  <Link to="/contact" className="text-sm font-light text-white/70 hover:text-champagne-500 transition-colors touch-target-sm py-2 inline-block">
                     Contact Us
                   </Link>
                 </li>
                 <li>
-                  <Link to="/ambassador" className="text-sm font-light text-white/70 hover:text-amber-500 transition-colors touch-target-sm py-2 inline-block">
+                  <Link to="/ambassador" className="text-sm font-light text-white/70 hover:text-champagne-500 transition-colors touch-target-sm py-2 inline-block">
                     Ambassadors
                   </Link>
                 </li>
@@ -146,10 +146,10 @@ const Footer = () => {
             © 2025 Line of Judah. All rights reserved.
           </p>
           <div className="flex space-x-4 md:space-x-6">
-            <Link to="/privacy-policy" className="text-xs md:text-sm font-light text-white/50 hover:text-amber-500 transition-colors touch-target-sm py-2">
+            <Link to="/privacy-policy" className="text-xs md:text-sm font-light text-white/50 hover:text-champagne-500 transition-colors touch-target-sm py-2">
               Privacy Policy
             </Link>
-            <Link to="/terms-of-service" className="text-xs md:text-sm font-light text-white/50 hover:text-amber-500 transition-colors touch-target-sm py-2">
+            <Link to="/terms-of-service" className="text-xs md:text-sm font-light text-white/50 hover:text-champagne-500 transition-colors touch-target-sm py-2">
               Terms of Service
             </Link>
           </div>

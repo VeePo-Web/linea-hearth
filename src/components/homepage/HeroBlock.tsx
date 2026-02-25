@@ -37,7 +37,7 @@ const HeroBlock = () => {
         >
           {/* Eyebrow Text */}
           <p 
-            className="text-amber-400/90 text-sm tracking-[0.3em] uppercase mb-6 font-light"
+            className="text-champagne-400/90 text-sm tracking-[0.3em] uppercase mb-6 font-light"
             style={{ transitionDelay: '200ms' }}
           >
             Faith-Forward Fashion
@@ -53,7 +53,7 @@ const HeroBlock = () => {
           >
             Wear Your Faith.
             <br />
-            <span className="text-amber-400">Live Your Purpose.</span>
+            <span className="text-champagne-400">Live Your Purpose.</span>
           </h1>
 
           {/* Subheadline */}
@@ -77,7 +77,7 @@ const HeroBlock = () => {
             <Button 
               asChild
               size="lg"
-              className="bg-amber-500 hover:bg-amber-400 text-black font-medium px-8 py-6 text-base rounded-none group"
+              className="bg-champagne-500 hover:bg-champagne-400 text-black font-medium px-8 py-6 text-base rounded-none group"
             >
               <Link to="/category/shop">
                 Shop the Collection

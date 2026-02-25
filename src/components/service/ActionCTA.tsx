@@ -98,12 +98,12 @@ const ActionCTA = ({
                 placeholder={inputPlaceholder}
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
-                className="flex-1 px-4 py-3 h-auto bg-white text-stone-900 border-0 placeholder:text-stone-400 text-sm rounded-none focus-visible:ring-amber-500"
+                className="flex-1 px-4 py-3 h-auto bg-white text-stone-900 border-0 placeholder:text-stone-400 text-sm rounded-none focus-visible:ring-champagne-500"
               />
             )}
             <Button 
               type="submit"
-              className="bg-amber-500 hover:bg-amber-600 text-white px-8 min-h-[48px] py-3 md:h-auto rounded-none"
+              className="bg-champagne-500 hover:bg-champagne-600 text-white px-8 min-h-[48px] py-3 md:h-auto rounded-none"
             >
               {buttonText}
               <ArrowRight className="w-4 h-4 ml-2" />
@@ -121,7 +121,7 @@ const ActionCTA = ({
                 {link.isExternal ? (
                   <a 
                     href={link.href}
-                    className="text-amber-400 hover:underline inline-flex items-center min-h-[44px] px-1"
+                    className="text-champagne-400 hover:underline inline-flex items-center min-h-[44px] px-1"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -130,7 +130,7 @@ const ActionCTA = ({
                 ) : (
                   <Link 
                     to={link.href}
-                    className="text-amber-400 hover:underline inline-flex items-center min-h-[44px] px-1"
+                    className="text-champagne-400 hover:underline inline-flex items-center min-h-[44px] px-1"
                   >
                     {link.text}
                   </Link>

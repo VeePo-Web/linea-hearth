@@ -180,7 +180,7 @@ const SizeSelector = ({
                   : isDisabled
                     ? "bg-muted/30 text-muted-foreground/40 border-border/50 cursor-not-allowed line-through"
                     : isRemembered
-                      ? "bg-amber-500/10 text-foreground border-amber-500/50 hover:border-amber-500"
+                      ? "bg-champagne-500/10 text-foreground border-champagne-500/50 hover:border-champagne-500"
                       : "bg-background text-foreground border-border hover:border-foreground"
                 }
               `}
@@ -191,7 +191,7 @@ const SizeSelector = ({
               {/* "Your size" badge for remembered size */}
               {isRemembered && stock > 0 && (
                 <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 flex flex-col items-center">
-                  <span className="text-[8px] uppercase tracking-wider bg-amber-500 text-white px-1.5 py-0.5 
+                  <span className="text-[8px] uppercase tracking-wider bg-champagne-500 text-white px-1.5 py-0.5 
                                    rounded-full whitespace-nowrap font-medium">
                     Your size
                   </span>
@@ -206,7 +206,7 @@ const SizeSelector = ({
               
               {/* Low stock indicator */}
               {state === "low" && !isSelected && !isRemembered && (
-                <span className="absolute -top-1 -right-1 w-2 h-2 bg-amber-500 rounded-full" />
+                <span className="absolute -top-1 -right-1 w-2 h-2 bg-champagne-500 rounded-full" />
               )}
             </button>
           );
@@ -214,7 +214,7 @@ const SizeSelector = ({
       </div>
 
       {selectedSize && sizes.find(s => s.size === selectedSize)?.stock! <= 3 && sizes.find(s => s.size === selectedSize)?.stock! > 0 && (
-        <p className="text-xs font-light text-amber-600">
+        <p className="text-xs font-light text-champagne-600">
           Only {sizes.find(s => s.size === selectedSize)?.stock} left in this size
         </p>
       )}

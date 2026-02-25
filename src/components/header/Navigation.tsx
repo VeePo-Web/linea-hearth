@@ -280,7 +280,7 @@ const Navigation = () => {
                   animate={{ scale: 1 }} 
                   exit={{ scale: 0 }}
                   transition={{ type: "spring" as const, stiffness: 500, damping: 15 }} 
-                  className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-amber-500 text-white text-[0.5rem] font-semibold rounded-full flex items-center justify-center pointer-events-none z-20"
+                  className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-champagne-500 text-white text-[0.5rem] font-semibold rounded-full flex items-center justify-center pointer-events-none z-20"
                 >
                   +{savedCount > 9 ? '9+' : savedCount}
                 </motion.span>

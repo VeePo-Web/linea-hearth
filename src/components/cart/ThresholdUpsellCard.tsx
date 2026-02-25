@@ -115,7 +115,7 @@ const ThresholdUpsellCard = ({
             className={cn(
               "rounded-none h-7 px-2 text-xs w-full transition-all",
               quickAdd.isAdded && "bg-emerald-500 text-white border-emerald-500",
-              quickAdd.canOneTap && !quickAdd.isAdded && "bg-amber-500 text-white border-amber-500 hover:bg-amber-400"
+              quickAdd.canOneTap && !quickAdd.isAdded && "bg-champagne-500 text-white border-champagne-500 hover:bg-champagne-400"
             )}
           >
             {quickAdd.isAdding ? (
@@ -168,7 +168,7 @@ const ThresholdUpsellCard = ({
           <p className="text-sm text-muted-foreground">{formatPrice(effectivePrice)}</p>
           {/* Size memory indicator */}
           {quickAdd.rememberedSize && quickAdd.stockForRemembered > 0 && (
-            <span className="text-[10px] uppercase tracking-wide text-amber-600 font-medium">
+            <span className="text-[10px] uppercase tracking-wide text-champagne-600 font-medium">
               {quickAdd.rememberedSize}
             </span>
           )}
@@ -209,7 +209,7 @@ const ThresholdUpsellCard = ({
                           isOOS 
                             ? "bg-muted/30 text-muted-foreground/30 cursor-not-allowed line-through"
                             : isRemembered
-                              ? "bg-amber-500 text-white font-medium"
+                              ? "bg-champagne-500 text-white font-medium"
                               : "bg-background hover:bg-muted text-foreground border border-border"
                         )}
                       >
@@ -240,7 +240,7 @@ const ThresholdUpsellCard = ({
           className={cn(
             "rounded-none h-9 px-3 transition-all",
             quickAdd.isAdded && "bg-emerald-500 text-white border-emerald-500",
-            quickAdd.canOneTap && !quickAdd.isAdded && "bg-amber-500 text-white border-amber-500 hover:bg-amber-400"
+            quickAdd.canOneTap && !quickAdd.isAdded && "bg-champagne-500 text-white border-champagne-500 hover:bg-champagne-400"
           )}
         >
           {quickAdd.isAdding ? (

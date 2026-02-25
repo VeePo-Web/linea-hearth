@@ -60,6 +60,18 @@ export default {
           foreground: "hsl(var(--card-foreground))",
         },
         /* Line of Judah specific colors */
+        champagne: {
+          50: "hsl(45, 40%, 96%)",
+          100: "hsl(45, 40%, 90%)",
+          200: "hsl(45, 45%, 82%)",
+          300: "hsl(45, 40%, 72%)",
+          400: "hsl(45, 35%, 62%)",
+          500: "hsl(45, 30%, 52%)",
+          600: "hsl(45, 30%, 42%)",
+          700: "hsl(45, 25%, 35%)",
+          800: "hsl(45, 20%, 28%)",
+          900: "hsl(45, 15%, 15%)",
+        },
         "status-bar": {
           DEFAULT: "hsl(var(--status-bar))",
           foreground: "hsl(var(--status-bar-foreground))",

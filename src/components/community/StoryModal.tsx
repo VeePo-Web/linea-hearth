@@ -71,7 +71,7 @@ export default function StoryModal({ story, onClose }: StoryModalProps) {
 
             {/* Type badge - Rotated */}
             <div className="absolute left-0 top-1/2 -translate-y-1/2 hidden md:block">
-              <div className="bg-amber-500 px-3 py-1.5 -rotate-90 origin-left">
+              <div className="bg-champagne-500 px-3 py-1.5 -rotate-90 origin-left">
                 <span className="text-[9px] uppercase tracking-[0.2em] text-stone-900 font-medium whitespace-nowrap">
                   {story.type === "review" ? "Review" : "Testimony"}
                 </span>
@@ -87,7 +87,7 @@ export default function StoryModal({ story, onClose }: StoryModalProps) {
             className="md:col-span-2 p-6 lg:p-10 flex flex-col relative scroll-mt-4"
           >
             {/* Decorative quote marks */}
-            <div className="absolute -top-4 -left-2 text-[100px] leading-none text-amber-500/10 font-serif select-none pointer-events-none hidden md:block">
+            <div className="absolute -top-4 -left-2 text-[100px] leading-none text-champagne-500/10 font-serif select-none pointer-events-none hidden md:block">
               "
             </div>
 
@@ -103,7 +103,7 @@ export default function StoryModal({ story, onClose }: StoryModalProps) {
                       key={i}
                       className={`w-4 h-4 ${
                         i < story.rating!
-                          ? "text-amber-500 fill-amber-500"
+                          ? "text-champagne-500 fill-champagne-500"
                           : "text-muted"
                       }`}
                     />
@@ -128,8 +128,8 @@ export default function StoryModal({ story, onClose }: StoryModalProps) {
                   className="w-14 h-14 rounded-full object-cover grayscale"
                 />
               ) : (
-                <div className="w-14 h-14 rounded-full bg-amber-500/10 flex items-center justify-center">
-                  <span className="text-amber-500 font-medium text-xl">
+                <div className="w-14 h-14 rounded-full bg-champagne-500/10 flex items-center justify-center">
+                  <span className="text-champagne-500 font-medium text-xl">
                     {story.customer_name.charAt(0)}
                   </span>
                 </div>
@@ -148,7 +148,7 @@ export default function StoryModal({ story, onClose }: StoryModalProps) {
                   href={`https://instagram.com/${story.instagram_handle.replace("@", "")}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-muted-foreground hover:text-amber-500 transition-colors"
+                  className="text-muted-foreground hover:text-champagne-500 transition-colors"
                 >
                   <Instagram className="w-5 h-5" />
                 </a>
@@ -183,7 +183,7 @@ export default function StoryModal({ story, onClose }: StoryModalProps) {
             {/* Actions */}
             <div className="flex items-center gap-3 pt-6 border-t border-border">
               {story.is_contactable && (
-                <Button className="flex-1 bg-amber-500 text-stone-900 hover:bg-amber-600 rounded-none text-xs uppercase tracking-wider">
+                <Button className="flex-1 bg-champagne-500 text-stone-900 hover:bg-champagne-600 rounded-none text-xs uppercase tracking-wider">
                   <MessageCircle className="w-4 h-4 mr-2" />
                   Ask Me Anything
                 </Button>

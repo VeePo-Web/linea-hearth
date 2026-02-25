@@ -157,7 +157,7 @@ const EmailOptIn = ({ variant = "default" }: EmailOptInProps) => {
                     initial="hidden"
                     animate={isInView ? "visible" : "hidden"}
                     className={`text-[12vw] xs:text-[11vw] sm:text-[10vw] md:text-[9vw] lg:text-[7vw] font-extralight leading-[0.85] tracking-[-0.04em] ${
-                      word === "FRONT" ? "text-amber-400" : "text-foreground"
+                      word === "FRONT" ? "text-champagne-400" : "text-foreground"
                     }`}
                   >
                     {prefersReducedMotion ? (
@@ -206,7 +206,7 @@ const EmailOptIn = ({ variant = "default" }: EmailOptInProps) => {
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     transition={{ type: "spring", stiffness: 300, damping: 15, delay: 0.1 }}
-                    className="w-8 h-8 rounded-full bg-amber-400 flex items-center justify-center"
+                    className="w-8 h-8 rounded-full bg-champagne-400 flex items-center justify-center"
                   >
                     <DrawCheckIcon size="sm" className="text-background" delay={200} />
                   </motion.div>
@@ -259,7 +259,7 @@ const EmailOptIn = ({ variant = "default" }: EmailOptInProps) => {
                       emailTypo.checkForTypos(email);
                     }}
                     className={`w-full bg-transparent border-0 border-b-2 py-2 text-base md:text-lg text-foreground placeholder-transparent focus:outline-none transition-colors duration-300 ${
-                      isFocused ? "border-amber-400" : "border-foreground/30"
+                      isFocused ? "border-champagne-400" : "border-foreground/30"
                     }`}
                     placeholder="your@email.com"
                     disabled={isLoading}
@@ -293,7 +293,7 @@ const EmailOptIn = ({ variant = "default" }: EmailOptInProps) => {
                     <Button
                       type="submit"
                       disabled={isLoading}
-                      className="w-full h-12 bg-amber-500 hover:bg-amber-400 text-background font-medium rounded-none"
+                      className="w-full h-12 bg-champagne-500 hover:bg-champagne-400 text-background font-medium rounded-none"
                     >
                       {isLoading ? "ENLISTING..." : "ENLIST NOW"}
                     </Button>

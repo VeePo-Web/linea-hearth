@@ -92,7 +92,7 @@ const FeaturedCollection = () => {
             >
               <Link 
                 to="/category/shop"
-                className="text-stone-900 text-sm font-light flex items-center gap-2 hover:text-amber-600 transition-colors group touch-target py-2"
+                className="text-stone-900 text-sm font-light flex items-center gap-2 hover:text-champagne-600 transition-colors group touch-target py-2"
               >
                 Shop All
                 <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
@@ -145,7 +145,7 @@ const FeaturedCollection = () => {
                   <p className="text-caption text-stone-500 uppercase mb-1">
                     {product.category_name}
                   </p>
-                  <h3 className="text-xs xs:text-sm font-light text-stone-950 mb-1 group-hover:text-amber-600 transition-colors line-clamp-1">
+                  <h3 className="text-xs xs:text-sm font-light text-stone-950 mb-1 group-hover:text-champagne-600 transition-colors line-clamp-1">
                     {product.name}
                   </h3>
                   <div className="flex items-center gap-2">

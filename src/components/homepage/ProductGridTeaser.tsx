@@ -102,7 +102,7 @@ const ProductGridTeaser = () => {
           }`}
         >
           <div>
-            <p className="text-amber-600 text-xs tracking-[0.2em] uppercase mb-2">
+            <p className="text-champagne-600 text-xs tracking-[0.2em] uppercase mb-2">
               Just For You
             </p>
             <h2 className="text-foreground text-3xl md:text-4xl font-light">
@@ -111,7 +111,7 @@ const ProductGridTeaser = () => {
           </div>
           <Link 
             to="/category/new-in"
-            className="text-foreground text-sm font-light flex items-center gap-2 hover:text-amber-600 transition-colors group"
+            className="text-foreground text-sm font-light flex items-center gap-2 hover:text-champagne-600 transition-colors group"
           >
             View All
             <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
@@ -154,7 +154,7 @@ const ProductGridTeaser = () => {
 
                 {/* Sale Badge */}
                 {product.is_on_sale && (
-                  <div className="absolute top-3 right-3 bg-amber-500 text-black text-[10px] font-medium tracking-wider uppercase px-2 py-1">
+                  <div className="absolute top-3 right-3 bg-champagne-500 text-black text-[10px] font-medium tracking-wider uppercase px-2 py-1">
                     Sale
                   </div>
                 )}
@@ -165,7 +165,7 @@ const ProductGridTeaser = () => {
                 <p className="text-muted-foreground text-xs uppercase tracking-wider mb-1">
                   {product.category_name}
                 </p>
-                <h3 className="text-foreground text-sm font-light mb-1 group-hover:text-amber-600 transition-colors">
+                <h3 className="text-foreground text-sm font-light mb-1 group-hover:text-champagne-600 transition-colors">
                   {product.name}
                 </h3>
                 <div className="flex items-center gap-2">

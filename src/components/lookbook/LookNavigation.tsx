@@ -106,7 +106,7 @@ const LookNavigation = ({ looks, onNavigate }: LookNavigationProps) => {
         <motion.span 
           className={`w-2.5 h-2.5 rounded-full border relative z-10 ${
             activeIndex === -1 
-              ? 'bg-amber-500 border-amber-500' 
+              ? 'bg-champagne-500 border-champagne-500'
               : 'border-white/30 bg-stone-900'
           }`}
           animate={activeIndex === -1 ? { scale: 1.3 } : { scale: 1 }}
@@ -146,7 +146,7 @@ const LookNavigation = ({ looks, onNavigate }: LookNavigationProps) => {
           <motion.span 
             className={`w-2.5 h-2.5 rounded-full border relative z-10 ${
               activeIndex === index 
-                ? 'bg-amber-500 border-amber-500' 
+                ? 'bg-champagne-500 border-champagne-500' 
                 : 'border-white/30 bg-stone-900'
             }`}
             animate={activeIndex === index ? { scale: 1.3 } : { scale: 1 }}

@@ -199,7 +199,7 @@ export default function StoryGrid({
       <div className="container mx-auto px-4 lg:px-8">
         {/* Section header - editorial index */}
         <div className="flex items-baseline gap-4 mb-10">
-          <span className="text-[10px] uppercase tracking-[0.2em] text-amber-500 font-medium">02</span>
+          <span className="text-[10px] uppercase tracking-[0.2em] text-champagne-500 font-medium">02</span>
           <div className="h-px flex-1 bg-border" />
           <motion.p 
             initial={{ opacity: 0 }}
