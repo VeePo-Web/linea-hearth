@@ -211,7 +211,7 @@ export default function CommunityHero() {
                     <img
                       src={displayStory.customer_photo_url || "/founders.png"}
                       alt="Featured story"
-                      className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
+                      className="w-full h-full object-cover md:grayscale md:group-hover:grayscale-0 transition-all duration-700"
                     />
                   </>
                 ) : displayStory.video_url && isVideoPlaying ? (
@@ -225,7 +225,7 @@ export default function CommunityHero() {
                   <img
                     src={displayStory.customer_photo_url || "/founders.png"}
                     alt="Featured story"
-                    className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
+                    className="w-full h-full object-cover md:grayscale md:group-hover:grayscale-0 transition-all duration-700"
                   />
                 )}
               </div>

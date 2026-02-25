@@ -2,6 +2,7 @@ import { motion, useInView } from "framer-motion";
 import { useRef, useState } from "react";
 import { Instagram } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const tribeMembers = [
   {
@@ -50,6 +51,7 @@ const StoryWorldwideTribe = () => {
   const sectionRef = useRef<HTMLElement>(null);
   const isInView = useInView(sectionRef, { once: true, margin: "-100px" });
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const isMobile = useIsMobile();
 
   return (
     <section
@@ -130,7 +132,7 @@ const StoryWorldwideTribe = () => {
                     src={member.image}
                     alt={`${member.username} wearing Line of Judah`}
                     className={`w-full h-full object-cover transition-all duration-500 ${
-                      hoveredIndex === index ? "grayscale-0 scale-105" : "grayscale"
+                      isMobile ? "scale-100" : hoveredIndex === index ? "grayscale-0 scale-105" : "grayscale"
                     }`}
                   />
 

@@ -208,7 +208,7 @@ const CategoryTile = ({ category, prefersReducedMotion, isWide = false, isMobile
         <img 
           src={category.image}
           alt={category.name}
-          className="w-full h-full object-cover grayscale contrast-110 group-hover:grayscale-0 group-hover:contrast-100 group-active:grayscale-0 group-active:contrast-100 transition-all duration-700"
+          className="w-full h-full object-cover md:grayscale md:contrast-110 md:group-hover:grayscale-0 md:group-hover:contrast-100 group-active:grayscale-0 group-active:contrast-100 transition-all duration-700"
           loading="lazy"
         />
       </motion.div>

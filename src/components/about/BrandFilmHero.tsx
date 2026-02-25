@@ -159,7 +159,7 @@ const BrandFilmHero = () => {
               <img
                 src="/founders.png"
                 alt="Line of Judah founders"
-                className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700"
+                className="w-full h-full object-cover md:grayscale md:hover:grayscale-0 transition-all duration-700"
               />
               {/* Amber accent border */}
               <div className="absolute -bottom-4 -right-4 w-full h-full border-2 border-champagne-500/30 -z-10" />

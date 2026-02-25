@@ -69,7 +69,7 @@ export default function StoryCard({ story, onOpenStory, index, size = "regular" 
           <img
             src={story.customer_photo_url}
             alt={story.customer_name}
-            className="absolute inset-0 w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
+            className="absolute inset-0 w-full h-full object-cover md:grayscale md:group-hover:grayscale-0 transition-all duration-700"
           />
         ) : (
           <div className={`absolute inset-0 ${
