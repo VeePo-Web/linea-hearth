@@ -50,7 +50,7 @@ const OriginStory = () => {
           >
             <div className="aspect-square relative overflow-hidden">
               {/* Gradient background */}
-              <div className="absolute inset-0 bg-gradient-to-br from-amber-900/30 via-stone-900 to-stone-950" />
+              <div className="absolute inset-0 bg-gradient-to-br from-champagne-900/30 via-stone-900 to-stone-950" />
               
               {/* Refined lion head silhouette */}
               <svg 
@@ -67,7 +67,7 @@ const OriginStory = () => {
                   stroke="url(#lionGradient)"
                   strokeWidth="1.5"
                   strokeLinecap="round"
-                  className="drop-shadow-[0_0_20px_rgba(245,158,11,0.3)]"
+                  className="drop-shadow-[0_0_20px_rgba(231,213,183,0.3)]"
                 />
                 {/* Inner face contour */}
                 <motion.path
@@ -105,14 +105,14 @@ const OriginStory = () => {
                   animate={isInView ? { opacity: 1 } : { opacity: 0 }}
                   transition={{ duration: 0.5, delay: 2 }}
                   cx="168" cy="175" rx="12" ry="8"
-                  className="fill-amber-500/50"
+                  className="fill-champagne-500/50"
                 />
                 <motion.ellipse
                   initial={{ opacity: 0 }}
                   animate={isInView ? { opacity: 1 } : { opacity: 0 }}
                   transition={{ duration: 0.5, delay: 2.1 }}
                   cx="232" cy="175" rx="12" ry="8"
-                  className="fill-amber-500/50"
+                  className="fill-champagne-500/50"
                 />
                 {/* Eye inner glow */}
                 <motion.circle
@@ -120,14 +120,14 @@ const OriginStory = () => {
                   animate={isInView ? { opacity: 1 } : { opacity: 0 }}
                   transition={{ duration: 0.3, delay: 2.3 }}
                   cx="172" cy="174" r="3"
-                  className="fill-amber-400/80"
+                  className="fill-champagne-400/80"
                 />
                 <motion.circle
                   initial={{ opacity: 0 }}
                   animate={isInView ? { opacity: 1 } : { opacity: 0 }}
                   transition={{ duration: 0.3, delay: 2.4 }}
                   cx="236" cy="174" r="3"
-                  className="fill-amber-400/80"
+                  className="fill-champagne-400/80"
                 />
                 {/* Nose */}
                 <motion.path
@@ -135,7 +135,7 @@ const OriginStory = () => {
                   animate={isInView ? { opacity: 1 } : { opacity: 0 }}
                   transition={{ duration: 0.5, delay: 2.2 }}
                   d="M200 210 L188 228 C192 234 196 238 200 240 C204 238 208 234 212 228 Z"
-                  className="fill-amber-500/35"
+                  className="fill-champagne-500/35"
                 />
                 {/* Mouth lines */}
                 <motion.path
@@ -143,36 +143,36 @@ const OriginStory = () => {
                   animate={isInView ? { pathLength: 1, opacity: 0.4 } : { pathLength: 0, opacity: 0 }}
                   transition={{ duration: 0.8, delay: 2.5, ease: "easeOut" }}
                   d="M200 240 L200 255 M188 248 C192 258 196 262 200 264 C204 262 208 258 212 248"
-                  stroke="#f59e0b"
+                  stroke="#dccfa4"
                   strokeWidth="0.8"
                   strokeLinecap="round"
                 />
                 {/* Whisker dots */}
-                <motion.circle initial={{ opacity: 0 }} animate={isInView ? { opacity: 0.3 } : {}} transition={{ delay: 2.6 }} cx="160" cy="235" r="2" fill="#f59e0b" />
-                <motion.circle initial={{ opacity: 0 }} animate={isInView ? { opacity: 0.3 } : {}} transition={{ delay: 2.65 }} cx="152" cy="228" r="1.5" fill="#f59e0b" />
-                <motion.circle initial={{ opacity: 0 }} animate={isInView ? { opacity: 0.3 } : {}} transition={{ delay: 2.7 }} cx="240" cy="235" r="2" fill="#f59e0b" />
-                <motion.circle initial={{ opacity: 0 }} animate={isInView ? { opacity: 0.3 } : {}} transition={{ delay: 2.75 }} cx="248" cy="228" r="1.5" fill="#f59e0b" />
+                <motion.circle initial={{ opacity: 0 }} animate={isInView ? { opacity: 0.3 } : {}} transition={{ delay: 2.6 }} cx="160" cy="235" r="2" fill="#dccfa4" />
+                <motion.circle initial={{ opacity: 0 }} animate={isInView ? { opacity: 0.3 } : {}} transition={{ delay: 2.65 }} cx="152" cy="228" r="1.5" fill="#dccfa4" />
+                <motion.circle initial={{ opacity: 0 }} animate={isInView ? { opacity: 0.3 } : {}} transition={{ delay: 2.7 }} cx="240" cy="235" r="2" fill="#dccfa4" />
+                <motion.circle initial={{ opacity: 0 }} animate={isInView ? { opacity: 0.3 } : {}} transition={{ delay: 2.75 }} cx="248" cy="228" r="1.5" fill="#dccfa4" />
                 
                 <defs>
                   <linearGradient id="lionGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#f59e0b" stopOpacity="0.8" />
-                    <stop offset="50%" stopColor="#f59e0b" stopOpacity="0.4" />
-                    <stop offset="100%" stopColor="#f59e0b" stopOpacity="0.2" />
+                    <stop offset="0%" stopColor="#dccfa4" stopOpacity="0.8" />
+                    <stop offset="50%" stopColor="#dccfa4" stopOpacity="0.4" />
+                    <stop offset="100%" stopColor="#dccfa4" stopOpacity="0.2" />
                   </linearGradient>
                   <linearGradient id="lionGradientInner" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#f59e0b" stopOpacity="0.5" />
-                    <stop offset="100%" stopColor="#f59e0b" stopOpacity="0.15" />
+                    <stop offset="0%" stopColor="#dccfa4" stopOpacity="0.5" />
+                    <stop offset="100%" stopColor="#dccfa4" stopOpacity="0.15" />
                   </linearGradient>
                 </defs>
               </svg>
 
               {/* Glow effect */}
-              <div className="absolute inset-0 bg-gradient-radial from-amber-500/10 via-transparent to-transparent opacity-50" />
+              <div className="absolute inset-0 bg-gradient-radial from-champagne-500/10 via-transparent to-transparent opacity-50" />
             </div>
 
             {/* Corner accents */}
-            <div className="absolute -top-4 -left-4 w-24 h-24 border-l-2 border-t-2 border-amber-500/30" />
-            <div className="absolute -bottom-4 -right-4 w-24 h-24 border-r-2 border-b-2 border-amber-500/30" />
+            <div className="absolute -top-4 -left-4 w-24 h-24 border-l-2 border-t-2 border-champagne-500/30" />
+            <div className="absolute -bottom-4 -right-4 w-24 h-24 border-r-2 border-b-2 border-champagne-500/30" />
           </motion.div>
 
           {/* Right: Story content */}
@@ -182,7 +182,7 @@ const OriginStory = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
               transition={{ duration: 0.6, delay: 0.3 }}
-              className="text-[10px] uppercase tracking-[0.4em] text-amber-500"
+              className="text-[10px] uppercase tracking-[0.4em] text-champagne-500"
             >
               The Name
             </motion.p>
@@ -195,7 +195,7 @@ const OriginStory = () => {
               className="text-5xl md:text-6xl lg:text-7xl font-light tracking-tight"
             >
               Line of
-              <span className="block text-amber-500">Judah</span>
+              <span className="block text-champagne-500">Judah</span>
             </motion.h2>
 
             {/* Body */}
@@ -206,7 +206,7 @@ const OriginStory = () => {
               className="space-y-6 text-white/70 font-light leading-relaxed text-lg"
             >
               <p>
-                <span className="text-amber-500 font-medium">Judah</span> means "praise." 
+                <span className="text-champagne-500 font-medium">Judah</span> means "praise." 
                 The lion is the symbol of the tribe of Judah — from which the Messiah descended. 
                 Genesis 49:9 declares:
               </p>
@@ -225,9 +225,9 @@ const OriginStory = () => {
               initial={{ opacity: 0, x: -30 }}
               animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -30 }}
               transition={{ duration: 0.8, delay: 0.9 }}
-              className="relative pl-8 border-l-4 border-amber-500"
+              className="relative pl-8 border-l-4 border-champagne-500"
             >
-              <p className="text-2xl md:text-3xl font-light text-amber-500 italic leading-relaxed">
+              <p className="text-2xl md:text-3xl font-light text-champagne-500 italic leading-relaxed">
                 "The Lion of the tribe of Judah has triumphed."
               </p>
               <cite className="text-sm text-white/50 not-italic mt-4 block uppercase tracking-[0.2em]">

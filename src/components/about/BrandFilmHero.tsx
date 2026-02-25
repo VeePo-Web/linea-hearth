@@ -81,7 +81,7 @@ const BrandFilmHero = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-[10px] uppercase tracking-[0.4em] text-amber-500 mb-8"
+            className="text-[10px] uppercase tracking-[0.4em] text-champagne-500 mb-8"
           >
             Born From The Lion
           </motion.p>
@@ -114,7 +114,7 @@ const BrandFilmHero = () => {
             />
             <CharacterReveal 
               text="STATEMENTS."
-              className="block text-[12vw] md:text-[10vw] lg:text-[8vw] font-light text-amber-500 leading-[0.85] tracking-tight"
+              className="block text-[12vw] md:text-[10vw] lg:text-[8vw] font-light text-champagne-500 leading-[0.85] tracking-tight"
               as="span"
               delay={1.2}
               staggerDelay={0.02}
@@ -162,7 +162,7 @@ const BrandFilmHero = () => {
                 className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700"
               />
               {/* Amber accent border */}
-              <div className="absolute -bottom-4 -right-4 w-full h-full border-2 border-amber-500/30 -z-10" />
+              <div className="absolute -bottom-4 -right-4 w-full h-full border-2 border-champagne-500/30 -z-10" />
             </div>
 
             {/* Floating badge */}
@@ -170,7 +170,7 @@ const BrandFilmHero = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
               transition={{ duration: 0.6, delay: 1.5 }}
-              className="absolute -bottom-8 -left-8 bg-amber-500 text-stone-950 px-4 py-2"
+              className="absolute -bottom-8 -left-8 bg-champagne-500 text-stone-950 px-4 py-2"
             >
               <p className="text-[10px] uppercase tracking-[0.2em] font-medium">Est. 2024</p>
             </motion.div>

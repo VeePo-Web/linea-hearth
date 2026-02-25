@@ -109,7 +109,7 @@ const ReviewsCarousel = () => {
     return Array.from({ length: 5 }, (_, i) => (
       <Star 
         key={i}
-        className={`w-4 h-4 ${i < rating ? 'fill-amber-500 text-amber-500' : 'text-stone-300'}`}
+        className={`w-4 h-4 ${i < rating ? 'fill-champagne-500 text-champagne-500' : 'text-stone-300'}`}
       />
     ));
   };
@@ -128,7 +128,7 @@ const ReviewsCarousel = () => {
             isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
           }`}
         >
-          <p className="text-amber-500 text-xs tracking-[0.2em] uppercase mb-2">
+          <p className="text-champagne-500 text-xs tracking-[0.2em] uppercase mb-2">
             Testimonials
           </p>
           <h2 className="text-white text-3xl md:text-4xl font-light">
@@ -176,7 +176,7 @@ const ReviewsCarousel = () => {
                       {review.verified && (
                         <>
                           <span className="text-white/30">•</span>
-                          <span className="text-amber-500 text-sm font-light">Verified Buyer</span>
+                          <span className="text-champagne-500 text-sm font-light">Verified Buyer</span>
                         </>
                       )}
                     </div>
@@ -214,7 +214,7 @@ const ReviewsCarousel = () => {
               onClick={() => setCurrentIndex(index)}
               className={`w-2 h-2 rounded-full transition-all duration-300 ${
                 index === currentIndex 
-                  ? 'bg-amber-500 w-6' 
+                  ? 'bg-champagne-500 w-6' 
                   : 'bg-white/30 hover:bg-white/50'
               }`}
               aria-label={`Go to review ${index + 1}`}

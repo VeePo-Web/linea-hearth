@@ -136,7 +136,7 @@ function LookProductCard({
                 flex items-center justify-center transition-colors
                 opacity-90 md:opacity-100
                 ${quickAdd.canOneTap 
-                  ? 'bg-amber-500 hover:bg-amber-400' 
+                  ? 'bg-champagne-500 hover:bg-champagne-400' 
                   : 'bg-white/95 hover:bg-white'
                 }
               `}
@@ -182,7 +182,7 @@ function LookProductCard({
           <p className="text-sm md:text-xs text-white/50 font-light">
             {product.is_on_sale && product.sale_price ? (
               <>
-                <span className="text-amber-500">${product.sale_price}</span>
+                <span className="text-champagne-500">${product.sale_price}</span>
                 <span className="line-through ml-1.5 text-white/30">${product.price}</span>
               </>
             ) : (
@@ -191,7 +191,7 @@ function LookProductCard({
           </p>
           {/* Show remembered size hint */}
           {quickAdd.rememberedSize && !isInCart && (
-            <span className="text-[10px] md:text-[9px] uppercase tracking-wide text-amber-500/70">
+            <span className="text-[10px] md:text-[9px] uppercase tracking-wide text-champagne-500/70">
               {quickAdd.rememberedSize}
             </span>
           )}
@@ -300,7 +300,7 @@ const ShopTheLook = ({ products, lookName, lookId }: ShopTheLookProps) => {
           <motion.p 
             initial={{ opacity: 0, x: 10 }}
             animate={{ opacity: 1, x: 0 }}
-            className="text-xs md:text-[10px] uppercase tracking-wide text-amber-500 font-medium"
+            className="text-xs md:text-[10px] uppercase tracking-wide text-champagne-500 font-medium"
           >
             {addedCount} of {products.length} in bag
           </motion.p>
@@ -333,7 +333,7 @@ const ShopTheLook = ({ products, lookName, lookId }: ShopTheLookProps) => {
             w-full font-light tracking-wide h-12 rounded-none transition-colors
             ${addedCount === products.length 
               ? 'bg-green-600 hover:bg-green-600 text-white' 
-              : 'bg-amber-600 hover:bg-amber-500 text-white'
+              : 'bg-champagne-600 hover:bg-champagne-500 text-white'
             }
           `}
         >

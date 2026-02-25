@@ -76,7 +76,7 @@ const LookNavigationMobile = ({ looks }: LookNavigationMobileProps) => {
           <motion.span 
             className={`w-2.5 h-2.5 md:w-2 md:h-2 rounded-full transition-colors ${
               activeIndex === -1 
-                ? 'bg-amber-500' 
+                ? 'bg-champagne-500'
                 : 'bg-white/40'
             }`}
             animate={activeIndex === -1 ? { scale: 1.3 } : { scale: 1 }}
@@ -98,7 +98,7 @@ const LookNavigationMobile = ({ looks }: LookNavigationMobileProps) => {
             <motion.span 
               className={`w-2.5 h-2.5 md:w-2 md:h-2 rounded-full transition-colors ${
                 activeIndex === index 
-                  ? 'bg-amber-500' 
+                  ? 'bg-champagne-500' 
                   : 'bg-white/40'
               }`}
               animate={activeIndex === index ? { scale: 1.3 } : { scale: 1 }}

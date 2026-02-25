@@ -215,7 +215,7 @@ const MissingProductCard = ({
             {formatPrice(displayPrice)}
           </span>
           {selectedSize && rememberedInStock && (
-            <span className="text-[9px] text-amber-600 dark:text-amber-400">
+            <span className="text-[9px] text-champagne-600 dark:text-champagne-400">
               • Size {selectedSize}
             </span>
           )}
@@ -330,19 +330,19 @@ const MissingProductCard = ({
                       className={cn(
                         "relative min-w-[32px] h-7 px-2 text-[11px] rounded transition-colors",
                         isRemembered
-                          ? "bg-amber-500 text-white font-medium"
+                          ? "bg-champagne-500 text-white font-medium"
                           : "bg-muted hover:bg-muted/80 text-foreground"
                       )}
                       aria-label={`Size ${size}${isRemembered ? ' - Your size' : ''}`}
                     >
                       {size}
                       {isRemembered && (
-                        <span className="absolute -top-1 left-1/2 -translate-x-1/2 text-[7px] uppercase tracking-wide text-amber-600 bg-background px-0.5 rounded whitespace-nowrap">
+                        <span className="absolute -top-1 left-1/2 -translate-x-1/2 text-[7px] uppercase tracking-wide text-champagne-600 bg-background px-0.5 rounded whitespace-nowrap">
                           yours
                         </span>
                       )}
                       {isLow && !isRemembered && (
-                        <span className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-amber-500" />
+                        <span className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-champagne-500" />
                       )}
                     </button>
                   );

@@ -291,7 +291,7 @@ const LookSection = ({ look, index }: LookSectionProps) => {
                     (e.currentTarget as HTMLElement).blur();
                     setBottomBarSwipeOpen(true);
                   }}
-                  className="w-full h-11 bg-amber-600 text-white text-sm font-medium uppercase tracking-widest hover:bg-amber-700 transition-colors px-6"
+                  className="w-full h-11 bg-champagne-600 text-white text-sm font-medium uppercase tracking-widest hover:bg-champagne-700 transition-colors px-6"
                 >
                   Shop This Look
                 </button>
@@ -348,7 +348,7 @@ function LookContent({
       {/* Scripture Reference */}
       {look.scripture_reference && (
         <motion.p 
-          className="text-xs uppercase tracking-[0.25em] text-amber-500 mb-2 md:mb-4 font-light"
+          className="text-xs uppercase tracking-[0.25em] text-champagne-500 mb-2 md:mb-4 font-light"
           initial={prefersReducedMotion ? {} : { opacity: 0, y: 10 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: timing.slow, ease: easing.editorial, delay: 0.5 }}
@@ -411,7 +411,7 @@ function LookContent({
             (e.currentTarget as HTMLElement).blur();
             setSwipeOpen(true);
           }}
-          className="w-full h-11 bg-amber-600 text-white text-sm font-medium uppercase tracking-widest hover:bg-amber-700 transition-colors"
+          className="w-full h-11 bg-champagne-600 text-white text-sm font-medium uppercase tracking-widest hover:bg-champagne-700 transition-colors"
         >
           Shop This Look
         </button>

@@ -54,7 +54,7 @@ export default function StoryCard({ story, onOpenStory, index, size = "regular" 
       }}
       tabIndex={0}
       role="button"
-      className={`group relative cursor-pointer ${spanClass} transition-transform duration-500 hover:scale-[1.02] focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 focus-visible:ring-offset-background outline-none`}
+      className={`group relative cursor-pointer ${spanClass} transition-transform duration-500 hover:scale-[1.02] focus-visible:ring-2 focus-visible:ring-champagne-500 focus-visible:ring-offset-2 focus-visible:ring-offset-background outline-none`}
       onClick={() => onOpenStory(story)}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
@@ -77,7 +77,7 @@ export default function StoryCard({ story, onOpenStory, index, size = "regular" 
               'bg-gradient-to-br from-stone-900 to-stone-800',
               'bg-gradient-to-br from-amber-950/80 to-stone-900',
               'bg-gradient-to-br from-stone-800 to-stone-700',
-              'bg-gradient-to-br from-stone-950 to-amber-950/40',
+              'bg-gradient-to-br from-stone-950 to-champagne-950/40',
             ][index % 4]
           }`}>
             <span className="absolute top-6 right-6 text-[60px] font-extralight text-white/[0.06] uppercase leading-none group-hover:scale-110 group-hover:rotate-3 transition-transform duration-700">
@@ -101,7 +101,7 @@ export default function StoryCard({ story, onOpenStory, index, size = "regular" 
         {story.video_url && (
           <div className="absolute top-4 right-4 z-10">
             <motion.div 
-              className="w-10 h-10 rounded-full bg-amber-500 flex items-center justify-center"
+              className="w-10 h-10 rounded-full bg-champagne-500 flex items-center justify-center"
               animate={{ scale: [1, 1.1, 1] }}
               transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
             >
@@ -118,7 +118,7 @@ export default function StoryCard({ story, onOpenStory, index, size = "regular" 
             </span>
           ) : (
             <span className={`text-[9px] uppercase tracking-[0.2em] font-medium ${
-              story.type === "story" ? "text-amber-500" : "text-white/50"
+              story.type === "story" ? "text-champagne-500" : "text-white/50"
             }`}>
               {story.type === "story" ? "Testimony" : "Review"}
             </span>
@@ -128,7 +128,7 @@ export default function StoryCard({ story, onOpenStory, index, size = "regular" 
         {/* AMA Badge */}
         {story.is_contactable && (
           <div className="absolute right-0 top-1/2 -translate-y-1/2 z-10 hidden group-hover:block">
-            <div className="bg-amber-500 px-2 py-1 -rotate-90 origin-right">
+            <div className="bg-champagne-500 px-2 py-1 -rotate-90 origin-right">
               <span className="text-[9px] uppercase tracking-[0.15em] text-stone-900 font-medium whitespace-nowrap">
                 AMA
               </span>
@@ -146,7 +146,7 @@ export default function StoryCard({ story, onOpenStory, index, size = "regular" 
                   key={i}
                   className={`w-3 h-3 ${
                     i < story.rating!
-                      ? "text-amber-500 fill-amber-500"
+                      ? "text-champagne-500 fill-champagne-500"
                       : "text-white/20"
                   }`}
                 />

@@ -53,7 +53,7 @@ const BundleSavingsRow = ({ variant = "drawer" }: BundleSavingsRowProps) => {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.3 }}
           >
-            <Sparkles className="w-3 h-3 text-amber-500" />
+            <Sparkles className="w-3 h-3 text-champagne-500" />
           </motion.div>
         </div>
         

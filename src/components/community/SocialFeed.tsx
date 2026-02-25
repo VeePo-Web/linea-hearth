@@ -36,13 +36,13 @@ const formatLikes = (n: number) => n >= 1000 ? `${(n / 1000).toFixed(1)}K` : Str
 
 // Alternating tint overlays for visual variety from same source image
 const tintOverlays = [
-  "bg-amber-900/20",
+  "bg-champagne-900/20",
   "bg-stone-700/30",
-  "bg-amber-800/25",
+  "bg-champagne-800/25",
   "bg-stone-600/20",
-  "bg-amber-700/15",
+  "bg-champagne-700/15",
   "bg-stone-800/25",
-  "bg-amber-600/20",
+  "bg-champagne-600/20",
   "bg-stone-500/15",
 ];
 
@@ -58,12 +58,12 @@ export default function SocialFeed() {
         className="container mx-auto px-4 lg:px-8 mb-8"
       >
         <div className="flex items-baseline gap-4 mb-6">
-          <motion.span variants={staggerItem} className="text-[10px] uppercase tracking-[0.2em] text-amber-500 font-medium">03</motion.span>
+          <motion.span variants={staggerItem} className="text-[10px] uppercase tracking-[0.2em] text-champagne-500 font-medium">03</motion.span>
           <div className="h-px flex-1 bg-border" />
         </div>
         <motion.p 
           variants={staggerItem}
-          className="text-[10px] uppercase tracking-[0.4em] text-amber-600 mb-4"
+          className="text-[10px] uppercase tracking-[0.4em] text-champagne-600 mb-4"
         >
           Join The Movement
         </motion.p>
@@ -145,7 +145,7 @@ function MobileScrollFeed({ posts }: { posts: SocialPost[] }) {
           <div
             key={i}
             className={`w-1.5 h-1.5 rounded-full transition-colors duration-200 ${
-              i === activeIndex ? 'bg-amber-500' : 'bg-foreground/15'
+              i === activeIndex ? 'bg-champagne-500' : 'bg-foreground/15'
             }`}
           />
         ))}

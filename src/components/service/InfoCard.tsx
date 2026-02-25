@@ -26,11 +26,11 @@ const InfoCard = memo(({
   const variantClasses = {
     default: "bg-stone-900/50",
     muted: "bg-muted/30",
-    accent: "border-l-4 border-amber-500 bg-amber-500/5"
+    accent: "border-l-4 border-champagne-500 bg-champagne-500/5"
   };
 
   const iconColorClasses = {
-    amber: "text-amber-500",
+    amber: "text-champagne-500",
     emerald: "text-emerald-500",
     blue: "text-blue-500",
     stone: "text-stone-400"

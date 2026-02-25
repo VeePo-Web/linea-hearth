@@ -44,7 +44,7 @@ export default function SubmitStoryCTA() {
             >
               <h2 className="text-4xl md:text-5xl lg:text-6xl font-extralight text-white leading-[1.1] uppercase tracking-[-0.02em]">
                 <motion.span variants={wordItem} className="block">Got a</motion.span>
-                <motion.span variants={wordItem} className="block text-amber-500">Testimony?</motion.span>
+                <motion.span variants={wordItem} className="block text-champagne-500">Testimony?</motion.span>
               </h2>
             </motion.div>
 

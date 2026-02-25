@@ -179,7 +179,7 @@ export default function SwipeLookbook({
                           initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: 0.5 }}
-                          className="flex items-center gap-2 bg-amber-500/20 text-amber-400 px-4 py-2 mb-8"
+                          className="flex items-center gap-2 bg-champagne-500/20 text-champagne-400 px-4 py-2 mb-8"
                         >
                           <Sparkles className="w-4 h-4" />
                           <span className="text-sm font-medium">{bundleDiscountPercent}% bundle discount applied!</span>
@@ -194,7 +194,7 @@ export default function SwipeLookbook({
                       >
                         <Button
                           onClick={handleViewBag}
-                          className="bg-amber-500 hover:bg-amber-400 text-white h-12 rounded-none font-medium"
+                          className="bg-champagne-500 hover:bg-champagne-400 text-white h-12 rounded-none font-medium"
                         >
                           <ShoppingBag className="w-5 h-5 mr-2" />
                           View Bag

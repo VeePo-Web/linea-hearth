@@ -94,7 +94,7 @@ export default function StoryFilters({
                 {selectedType === type.value && (
                   <motion.div
                     layoutId="activeFilter"
-                    className="absolute -bottom-3 left-0 right-0 h-[2px] bg-amber-500"
+                    className="absolute -bottom-3 left-0 right-0 h-[2px] bg-champagne-500"
                     transition={{ type: "spring", stiffness: 300, damping: 30 }}
                   />
                 )}

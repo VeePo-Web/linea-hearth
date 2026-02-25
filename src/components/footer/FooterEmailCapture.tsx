@@ -83,7 +83,7 @@ const FooterEmailCapture = () => {
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ type: "spring", stiffness: 300, damping: 15 }}
-              className="w-6 h-6 rounded-full bg-amber-500 flex items-center justify-center"
+              className="w-6 h-6 rounded-full bg-champagne-500 flex items-center justify-center"
             >
               <DrawCheckIcon size="xs" className="text-stone-900" delay={150} />
             </motion.div>
@@ -110,7 +110,7 @@ const FooterEmailCapture = () => {
                 }}
                 onBlur={() => emailTypo.checkForTypos(email)}
                 placeholder="Your email — enlist now"
-                className="w-full bg-transparent border-b border-white/20 py-2 text-sm text-white placeholder-white/40 focus:outline-none focus:border-amber-500 transition-colors duration-300"
+                className="w-full bg-transparent border-b border-white/20 py-2 text-sm text-white placeholder-white/40 focus:outline-none focus:border-champagne-500 transition-colors duration-300"
                 disabled={isLoading}
               />
               <EmailTypoSuggestion
@@ -129,7 +129,7 @@ const FooterEmailCapture = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="group w-10 h-10 flex items-center justify-center border border-white/20 hover:border-amber-500 hover:bg-amber-500 transition-all duration-300"
+              className="group w-10 h-10 flex items-center justify-center border border-white/20 hover:border-champagne-500 hover:bg-champagne-500 transition-all duration-300"
             >
               <ArrowRight className="w-4 h-4 text-white/70 group-hover:text-stone-900 transition-colors duration-300" />
             </button>

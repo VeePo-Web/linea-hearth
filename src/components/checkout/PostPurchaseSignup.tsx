@@ -227,7 +227,7 @@ export function PostPurchaseSignup({
       initial={prefersReducedMotion ? {} : { opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.5 }}
-      className="bg-gradient-to-br from-primary/5 to-amber-500/5 border border-primary/20 p-6 sm:p-8"
+      className="bg-gradient-to-br from-primary/5 to-champagne-500/5 border border-primary/20 p-6 sm:p-8"
     >
       {/* Header */}
       <div className="flex items-start gap-3 mb-6">
@@ -253,8 +253,8 @@ export function PostPurchaseSignup({
           <span>Checkout faster next time (sizes saved)</span>
         </div>
         <div className="flex items-center gap-3 text-sm">
-          <Sparkles className="w-4 h-4 text-amber-500 flex-shrink-0" />
-          <span className="font-medium text-amber-600 dark:text-amber-400">
+          <Sparkles className="w-4 h-4 text-champagne-500 flex-shrink-0" />
+          <span className="font-medium text-champagne-600 dark:text-champagne-400">
             Get 10% off your next order
           </span>
         </div>

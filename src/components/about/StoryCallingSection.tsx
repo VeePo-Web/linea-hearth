@@ -26,7 +26,7 @@ const StoryCallingSection = () => {
           <div className="relative">
             {/* Giant quotation mark */}
             <motion.span
-              className="absolute -top-12 lg:-top-16 -left-2 lg:-left-4 text-[200px] lg:text-[240px] xl:text-[280px] font-serif text-amber-500/10 leading-none select-none pointer-events-none"
+              className="absolute -top-12 lg:-top-16 -left-2 lg:-left-4 text-[200px] lg:text-[240px] xl:text-[280px] font-serif text-champagne-500/10 leading-none select-none pointer-events-none"
               initial={{ opacity: 0, scale: 0.8 }}
               animate={isInView ? { opacity: 1, scale: 1 } : {}}
               transition={{ delay: 0.2, duration: 0.8 }}
@@ -40,7 +40,7 @@ const StoryCallingSection = () => {
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ delay: 0.4, duration: 0.8 }}
             >
-              Every thread is a declaration. Every stitch is a stand. In the war between light and darkness, your wardrobe is your armor<span className="text-amber-500">.</span>
+              Every thread is a declaration. Every stitch is a stand. In the war between light and darkness, your wardrobe is your armor<span className="text-champagne-500">.</span>
             </motion.blockquote>
 
             {/* Rotated vertical text */}
@@ -57,7 +57,7 @@ const StoryCallingSection = () => {
           {/* Right: Story text */}
           <div className="space-y-8">
             <motion.p
-              className="text-[10px] tracking-[0.4em] text-amber-500"
+              className="text-[10px] tracking-[0.4em] text-champagne-500"
               initial={{ opacity: 0, y: 20 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ delay: 0.5, duration: 0.8 }}
@@ -93,7 +93,7 @@ const StoryCallingSection = () => {
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ delay: 0.8, duration: 0.8 }}
             >
-              <div className="w-16 h-px bg-amber-500" />
+              <div className="w-16 h-px bg-champagne-500" />
             </motion.div>
           </div>
         </div>

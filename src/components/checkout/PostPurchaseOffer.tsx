@@ -53,7 +53,7 @@ const PostPurchaseOffer = ({ isOpen, onClose, onAddToOrder }: PostPurchaseOfferP
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md p-0 gap-0 overflow-hidden">
         {/* Timer header */}
-        <div className="bg-amber-500 text-white px-4 py-2 flex items-center justify-center gap-2">
+        <div className="bg-champagne-500 text-white px-4 py-2 flex items-center justify-center gap-2">
           <Clock className="h-4 w-4" />
           <span className="text-sm font-medium">
             EXCLUSIVE OFFER • Expires in{" "}
@@ -65,7 +65,7 @@ const PostPurchaseOffer = ({ isOpen, onClose, onAddToOrder }: PostPurchaseOfferP
 
         <DialogHeader className="p-6 pb-0">
           <div className="flex items-center gap-2">
-            <Sparkles className="h-4 w-4 text-amber-500" />
+            <Sparkles className="h-4 w-4 text-champagne-500" />
             <DialogTitle className="text-lg font-light">One-Time Offer Just For You</DialogTitle>
           </div>
         </DialogHeader>

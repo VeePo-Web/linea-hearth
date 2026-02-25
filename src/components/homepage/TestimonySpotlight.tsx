@@ -63,7 +63,7 @@ const TestimonySpotlight = () => {
               <motion.div whileHover={{ x: 4 }} transition={{ duration: 0.2 }}>
                 <Link 
                   to="/community"
-                  className="inline-flex items-center gap-2 text-stone-900 text-sm font-light hover:text-amber-600 transition-colors group touch-target py-3 -my-3"
+                  className="inline-flex items-center gap-2 text-stone-900 text-sm font-light hover:text-champagne-600 transition-colors group touch-target py-3 -my-3"
                 >
                   Read More Stories
                   <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />

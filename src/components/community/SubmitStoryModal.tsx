@@ -261,7 +261,7 @@ export default function SubmitStoryModal({ isOpen, onClose }: SubmitStoryModalPr
           <Button
             type="submit"
             size="lg"
-            className="w-full bg-amber-500 text-stone-900 hover:bg-amber-600"
+            className="w-full bg-champagne-500 text-stone-900 hover:bg-champagne-600"
             disabled={submitMutation.isPending}
           >
             {submitMutation.isPending ? (

@@ -174,7 +174,7 @@ const FitGuideSection = () => {
           {/* Section Header */}
           <div className="text-center mb-12">
             <ScrollReveal variant="fadeUp">
-              <p className="text-[10px] uppercase tracking-[0.3em] text-amber-500 mb-6 font-light">
+              <p className="text-[10px] uppercase tracking-[0.3em] text-champagne-500 mb-6 font-light">
                 How It Fits
               </p>
             </ScrollReveal>
@@ -209,7 +209,7 @@ const FitGuideSection = () => {
               >
                 {selectedGender === 'male' && (
                   <motion.div
-                    className="absolute inset-0 bg-amber-600"
+                    className="absolute inset-0 bg-champagne-600"
                     layoutId="genderToggle"
                     transition={springConfig}
                   />
@@ -229,7 +229,7 @@ const FitGuideSection = () => {
               >
                 {selectedGender === 'female' && (
                   <motion.div
-                    className="absolute inset-0 bg-amber-600"
+                    className="absolute inset-0 bg-champagne-600"
                     layoutId="genderToggle"
                     transition={springConfig}
                   />
@@ -264,7 +264,7 @@ const FitGuideSection = () => {
                     <motion.button
                       key={model.id}
                       onClick={() => setSelectedModel(model)}
-                      className="group relative aspect-[3/4] overflow-hidden focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:ring-offset-stone-900 active:scale-[0.98] transition-transform"
+                      className="group relative aspect-[3/4] overflow-hidden focus:outline-none focus:ring-2 focus:ring-champagne-500 focus:ring-offset-2 focus:ring-offset-stone-900 active:scale-[0.98] transition-transform"
                       whileHover={prefersReducedMotion ? {} : { y: -6 }}
                       whileTap={prefersReducedMotion ? {} : { scale: 0.98 }}
                       transition={springConfig}
@@ -301,7 +301,7 @@ const FitGuideSection = () => {
                         transition={{ duration: 0.2 }}
                       >
                         <motion.span 
-                          className="text-[10px] uppercase tracking-wider text-white bg-amber-600 px-4 py-2"
+                          className="text-[10px] uppercase tracking-wider text-white bg-champagne-600 px-4 py-2"
                           initial={{ scale: 0.8, opacity: 0 }}
                           animate={{ scale: 1, opacity: 1 }}
                           whileHover={{ scale: 1.05 }}

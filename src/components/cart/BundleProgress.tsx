@@ -86,7 +86,7 @@ const BundleProgress = ({ bundle, variant = "drawer" }: BundleProgressProps) => 
           ? "border-emerald-500/40 bg-emerald-50/50 dark:bg-emerald-950/20"
           : hasDiscount 
             ? "border-emerald-500/30 bg-emerald-50/50 dark:bg-emerald-950/20" 
-            : "border-amber-500/30 bg-amber-50/50 dark:bg-amber-950/20"
+            : "border-champagne-500/30 bg-champagne-50/50 dark:bg-champagne-950/20"
       )}
     >
       {/* Close-to-completion pulse effect */}
@@ -95,9 +95,9 @@ const BundleProgress = ({ bundle, variant = "drawer" }: BundleProgressProps) => 
           className="absolute inset-0 rounded-none pointer-events-none"
           animate={{ 
             boxShadow: [
-              '0 0 0 1px rgba(245, 158, 11, 0.15)',
-              '0 0 0 4px rgba(245, 158, 11, 0.08)',
-              '0 0 0 1px rgba(245, 158, 11, 0.15)'
+              '0 0 0 1px rgba(231, 213, 183, 0.15)',
+              '0 0 0 4px rgba(231, 213, 183, 0.08)',
+              '0 0 0 1px rgba(231, 213, 183, 0.15)'
             ]
           }}
           transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
@@ -137,7 +137,7 @@ const BundleProgress = ({ bundle, variant = "drawer" }: BundleProgressProps) => 
             ) : (
               <Gift className={cn(
                 "w-4 h-4",
-                hasDiscount ? "text-emerald-600" : "text-amber-600"
+                hasDiscount ? "text-emerald-600" : "text-champagne-600"
               )} />
             )}
           </motion.div>
@@ -149,7 +149,7 @@ const BundleProgress = ({ bundle, variant = "drawer" }: BundleProgressProps) => 
                 ? "text-emerald-700 dark:text-emerald-400"
                 : hasDiscount 
                   ? "text-emerald-700 dark:text-emerald-400" 
-                  : "text-amber-700 dark:text-amber-400"
+                  : "text-champagne-700 dark:text-champagne-400"
             )}>
               {headline}
             </p>
@@ -176,7 +176,7 @@ const BundleProgress = ({ bundle, variant = "drawer" }: BundleProgressProps) => 
                 ? "bg-gradient-to-r from-emerald-500 to-emerald-400"
                 : hasDiscount 
                   ? "bg-gradient-to-r from-emerald-500 to-emerald-400" 
-                  : "bg-gradient-to-r from-amber-500 to-amber-400"
+                  : "bg-gradient-to-r from-champagne-500 to-champagne-400"
             )}
             initial={{ width: 0 }}
             animate={{ width: `${progress}%` }}
@@ -204,9 +204,9 @@ const BundleProgress = ({ bundle, variant = "drawer" }: BundleProgressProps) => 
           <motion.p 
             initial={{ opacity: 0, y: -4 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-[10px] text-amber-600 dark:text-amber-400 mt-2 font-medium flex items-center gap-1"
+            className="text-[10px] text-champagne-600 dark:text-champagne-400 mt-2 font-medium flex items-center gap-1"
           >
-            <span className="inline-block w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+            <span className="inline-block w-1.5 h-1.5 rounded-full bg-champagne-500 animate-pulse" />
             Just 1 item away from {bundle.nextTierDiscountPercent || bundle.discountPercent}% off!
           </motion.p>
         )}

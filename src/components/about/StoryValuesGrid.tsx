@@ -51,7 +51,7 @@ const StoryValuesGrid = () => {
         {/* Section header */}
         <div className="mb-16 lg:mb-20 xl:mb-24">
           <motion.p
-            className="text-[10px] tracking-[0.4em] text-amber-500 mb-6"
+            className="text-[10px] tracking-[0.4em] text-champagne-500 mb-6"
             initial={{ opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ delay: 0.2, duration: 0.8 }}
@@ -64,7 +64,7 @@ const StoryValuesGrid = () => {
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ delay: 0.3, duration: 0.8 }}
           >
-            What We Stand For<span className="text-amber-500">.</span>
+            What We Stand For<span className="text-champagne-500">.</span>
           </motion.h2>
         </div>
 
@@ -79,7 +79,7 @@ const StoryValuesGrid = () => {
               transition={{ delay: 0.4 + index * 0.15, duration: 0.8 }}
             >
               {/* Massive index number as visual anchor */}
-              <span className="block text-[56px] md:text-[100px] lg:text-[120px] xl:text-[140px] font-light leading-none text-stone-200 mb-2 md:mb-4 transition-colors duration-500 group-hover:text-amber-500/20">
+              <span className="block text-[56px] md:text-[100px] lg:text-[120px] xl:text-[140px] font-light leading-none text-stone-200 mb-2 md:mb-4 transition-colors duration-500 group-hover:text-champagne-500/20">
                 {value.index}
               </span>
 
@@ -94,7 +94,7 @@ const StoryValuesGrid = () => {
 
                 {/* Subtle accent line */}
                 <motion.div
-                  className="w-12 lg:w-16 h-px bg-amber-500/30 mt-6"
+                  className="w-12 lg:w-16 h-px bg-champagne-500/30 mt-6"
                   initial={{ scaleX: 0 }}
                   animate={isInView ? { scaleX: 1 } : {}}
                   transition={{ delay: 0.6 + index * 0.15, duration: 0.6 }}

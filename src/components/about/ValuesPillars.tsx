@@ -85,7 +85,7 @@ const PillarSection = ({ pillar, index }: PillarSectionProps) => {
             className={`flex-shrink-0 ${pillar.alignment === 'center' ? '' : 'md:w-1/3'}`}
           >
             <Icon 
-              className={`w-16 h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 text-amber-500 ${
+              className={`w-16 h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 text-champagne-500 ${
                 pillar.alignment === 'center' ? 'mx-auto' : ''
               }`} 
               strokeWidth={1}
@@ -110,7 +110,7 @@ const PillarSection = ({ pillar, index }: PillarSectionProps) => {
               animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
               transition={{ duration: 0.6, delay: 0.6 }}
               className={`text-xl md:text-2xl font-light italic mb-6 ${
-                isEven ? 'text-amber-500' : 'text-amber-600'
+                isEven ? 'text-champagne-500' : 'text-champagne-600'
               }`}
             >
               {pillar.subtitle}
@@ -160,7 +160,7 @@ const ValuesPillars = () => {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="text-4xl md:text-5xl lg:text-6xl font-light text-foreground tracking-tight"
           >
-            What We <span className="text-amber-500">Do</span> Stand For
+            What We <span className="text-champagne-500">Do</span> Stand For
           </motion.h2>
         </div>
       </div>
