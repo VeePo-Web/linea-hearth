@@ -48,7 +48,7 @@ const AnimatedCounter = ({ value, suffix = '', label, delay = 0, isInView }: Ani
         className="text-[80px] md:text-[100px] lg:text-[140px] font-light text-white leading-none tracking-tighter"
       >
         {count}
-        <span className="text-amber-500">{suffix}</span>
+        <span className="text-champagne-500">{suffix}</span>
       </motion.p>
       <motion.p
         initial={{ opacity: 0, y: 10 }}
@@ -123,7 +123,7 @@ const ImpactMap = () => {
           transition={{ duration: 0.8 }}
           className="text-center mb-16 md:mb-24"
         >
-          <p className="text-[10px] uppercase tracking-[0.4em] text-amber-500 mb-4">
+          <p className="text-[10px] uppercase tracking-[0.4em] text-champagne-500 mb-4">
             Our Reach
           </p>
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-light text-white tracking-tight">
@@ -173,9 +173,9 @@ const ImpactMap = () => {
                 style={{ top: pos.top, left: pos.left }}
               >
                 <div className="relative">
-                  <div className="w-2 h-2 bg-amber-500 rounded-full" />
+                  <div className="w-2 h-2 bg-champagne-500 rounded-full" />
                   <div 
-                    className="absolute inset-0 w-2 h-2 bg-amber-500 rounded-full animate-ping opacity-75"
+                    className="absolute inset-0 w-2 h-2 bg-champagne-500 rounded-full animate-ping opacity-75"
                     style={{ animationDelay: `${i * 200}ms`, animationDuration: '2s' }}
                   />
                 </div>
@@ -198,7 +198,7 @@ const ImpactMap = () => {
                 className="text-sm text-white/30 uppercase tracking-[0.2em] whitespace-nowrap flex items-center gap-8"
               >
                 {city}
-                <span className="w-1 h-1 bg-amber-500/50 rounded-full" />
+                <span className="w-1 h-1 bg-champagne-500/50 rounded-full" />
               </span>
             ))}
           </div>

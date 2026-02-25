@@ -87,7 +87,7 @@ const LegalSidebar = ({ tocSections }: LegalSidebarProps) => {
                 className={cn(
                   "flex items-center gap-3 px-3 py-2.5 text-sm font-light transition-colors rounded-none border-l-2",
                   isActive 
-                    ? "border-amber-500 bg-amber-500/5 text-foreground" 
+                    ? "border-champagne-500 bg-champagne-500/5 text-foreground" 
                     : "border-transparent text-muted-foreground hover:text-foreground hover:border-stone-300"
                 )}
               >
@@ -114,7 +114,7 @@ const LegalSidebar = ({ tocSections }: LegalSidebarProps) => {
                   className={cn(
                     "flex-1 text-left text-sm py-1.5 px-3 transition-colors font-light border-l-2",
                     activeSection === section.id
-                      ? "text-foreground border-amber-500 bg-amber-500/5"
+                      ? "text-foreground border-champagne-500 bg-champagne-500/5"
                       : "text-muted-foreground hover:text-foreground border-transparent hover:border-stone-300"
                   )}
                 >
@@ -141,7 +141,7 @@ const LegalSidebar = ({ tocSections }: LegalSidebarProps) => {
         </p>
         <a 
           href="mailto:hello@lineofjudah.com"
-          className="text-sm text-amber-600 hover:text-amber-700 transition-colors"
+          className="text-sm text-champagne-600 hover:text-champagne-700 transition-colors"
         >
           hello@lineofjudah.com
         </a>

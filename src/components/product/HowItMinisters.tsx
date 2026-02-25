@@ -151,7 +151,7 @@ const HowItMinisters = ({ ministryStatement, productName }: HowItMinistersProps)
             </motion.p>
             
             <motion.p 
-              className="text-sm font-light text-amber-600/80 leading-relaxed italic"
+              className="text-sm font-light text-champagne-600/80 leading-relaxed italic"
               variants={fadeUpVariants}
               initial="hidden"
               animate={isInView ? "visible" : "hidden"}

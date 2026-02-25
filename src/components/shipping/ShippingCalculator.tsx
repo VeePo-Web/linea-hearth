@@ -139,7 +139,7 @@ const ShippingCalculator = () => {
       {estimates && (
         <div className="space-y-4 pt-4 border-t border-border">
           {/* Order By Message */}
-          <div className="flex items-center gap-2 text-sm text-amber-600 dark:text-amber-500">
+          <div className="flex items-center gap-2 text-sm text-champagne-600 dark:text-champagne-500">
             <Clock className="w-4 h-4" />
             {getOrderByMessage()}
           </div>

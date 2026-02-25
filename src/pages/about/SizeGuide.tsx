@@ -153,7 +153,7 @@ const SizeGuide = () => {
             title="GET YOUR AI FIT RECOMMENDATION"
             description="Enter your measurements and body type. Our system analyzes thousands of data points to recommend your ideal size with 95%+ accuracy."
             variant="accent"
-            className="cursor-pointer hover:border-amber-400 transition-colors"
+            className="cursor-pointer hover:border-champagne-300 transition-colors"
           />
         </Link>
       </ServiceSection>

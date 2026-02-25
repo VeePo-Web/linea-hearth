@@ -184,7 +184,7 @@ export function SwipeableLookCard({
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ delay: 0.3 }}
-                className="bg-amber-500/20 border border-amber-500/30 text-amber-400 px-4 py-2 flex items-center gap-2"
+                className="bg-champagne-500/20 border border-champagne-500/30 text-champagne-300 px-4 py-2 flex items-center gap-2"
               >
                 <Sparkles className="w-4 h-4" />
                 <span className="text-sm font-medium">{bundleDiscountPercent}% Bundle Saved</span>
@@ -239,7 +239,7 @@ export function SwipeableLookCard({
                   className={`
                     h-12 rounded-none font-medium text-sm transition-all
                     ${rememberedSize === size 
-                      ? 'bg-amber-500 text-white ring-2 ring-amber-400 ring-offset-2 ring-offset-stone-900' 
+                      ? 'bg-champagne-500 text-white ring-2 ring-champagne-400 ring-offset-2 ring-offset-stone-900' 
                       : 'bg-white/10 text-white hover:bg-white/20'
                     }
                   `}
@@ -257,7 +257,7 @@ export function SwipeableLookCard({
             
             <Button
               onClick={() => handleSizeSelect('M')}
-              className="w-full h-12 bg-amber-600 hover:bg-amber-500 text-white rounded-none font-light"
+              className="w-full h-12 bg-champagne-600 hover:bg-champagne-500 text-white rounded-none font-light"
             >
               Apply to Look
             </Button>

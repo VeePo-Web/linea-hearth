@@ -44,7 +44,7 @@ export default function SwipeProgress({
             key={i}
             className={`w-2.5 h-2.5 md:w-2 md:h-2 rounded-full transition-colors ${
               i < currentIndex
-                ? 'bg-amber-500'
+                ? 'bg-champagne-500'
                 : i === currentIndex
                 ? 'bg-white'
                 : 'bg-white/20'
@@ -66,7 +66,7 @@ export default function SwipeProgress({
               animate={{ scale: 1, y: 0 }}
               className="flex items-center gap-2"
             >
-              <ShoppingBag className="w-4 h-4 text-amber-500" />
+              <ShoppingBag className="w-4 h-4 text-champagne-500" />
               <span className="text-white font-medium text-sm md:text-base">
                 {addedCount} {addedCount === 1 ? 'item' : 'items'}
               </span>
@@ -92,7 +92,7 @@ export default function SwipeProgress({
             <motion.span
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
-              className="flex items-center gap-1 text-[10px] bg-amber-500/20 text-amber-400 px-2 py-0.5"
+              className="flex items-center gap-1 text-[10px] bg-champagne-500/20 text-champagne-300 px-2 py-0.5"
             >
               <Sparkles className="w-3 h-3" />
               {bundleDiscountPercent}% off
@@ -110,7 +110,7 @@ export default function SwipeProgress({
               variant="ghost"
               size="sm"
               onClick={onViewBag}
-              className="text-amber-500 hover:text-amber-400 hover:bg-amber-500/10 h-9 md:h-8 px-4 md:px-3 min-w-[44px]"
+              className="text-champagne-500 hover:text-champagne-300 hover:bg-champagne-500/10 h-9 md:h-8 px-4 md:px-3 min-w-[44px]"
             >
               View Bag
               <ArrowRight className="w-4 h-4 ml-1" />
@@ -128,7 +128,7 @@ export default function SwipeProgress({
           />
           {/* Milestone dots */}
           <div 
-            className="absolute top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-amber-500/50 border border-amber-500"
+            className="absolute top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-champagne-500/50 border border-champagne-500"
             style={{ left: '50%' }}
           />
           <div 

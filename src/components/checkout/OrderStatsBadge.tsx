@@ -23,7 +23,7 @@ const OrderStatsBadge = () => {
   return (
     <div className="flex items-center gap-4 text-xs text-muted-foreground">
       <div className="flex items-center gap-1.5">
-        <Flame className="h-3 w-3 text-amber-500" />
+        <Flame className="h-3 w-3 text-champagne-500" />
         <span>
           <span className="font-medium text-foreground">{ordersToday}</span> orders today
         </span>

@@ -81,7 +81,7 @@ export default function SwipeActions({
           className={`
             w-16 h-16 rounded-full border-2 flex flex-col items-center justify-center gap-0.5
             ${canOneTap 
-              ? 'bg-amber-500 hover:bg-amber-400 border-amber-400 text-white' 
+              ? 'bg-champagne-500 hover:bg-champagne-400 border-champagne-400 text-white' 
               : 'bg-green-500/20 hover:bg-green-500/40 border-green-500/50 hover:border-green-400 text-green-400 hover:text-green-300'
             }
           `}

@@ -95,7 +95,7 @@ const InlineQuickSizePicker = ({
                     ? 'bg-white/5 text-white/30 cursor-not-allowed line-through' 
                     : 'bg-muted/50 text-muted-foreground/30 cursor-not-allowed line-through'
                   : isRemembered
-                    ? 'bg-amber-500 text-white font-medium'
+                    ? 'bg-champagne-500 text-white font-medium'
                     : isDark
                       ? 'bg-white/10 hover:bg-white/20 text-white'
                       : 'bg-muted hover:bg-muted/80 text-foreground'
@@ -111,15 +111,15 @@ const InlineQuickSizePicker = ({
                                   text-[8px] md:text-[7px] uppercase tracking-wide 
                                   px-1 rounded whitespace-nowrap
                                   ${isDark 
-                                    ? 'text-amber-500 bg-stone-900' 
-                                    : 'text-amber-600 bg-background'
+                                     ? 'text-champagne-500 bg-stone-900' 
+                                     : 'text-champagne-600 bg-background'
                                   }`}>
                   yours
                 </span>
               )}
               {isLowStock && !isRemembered && (
                 <span className={`absolute -bottom-0.5 left-1/2 -translate-x-1/2 
-                                  w-1.5 h-1.5 md:w-1 md:h-1 rounded-full bg-amber-500`} />
+                                  w-1.5 h-1.5 md:w-1 md:h-1 rounded-full bg-champagne-500`} />
               )}
             </motion.button>
           );

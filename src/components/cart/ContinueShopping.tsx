@@ -59,7 +59,7 @@ const MiniProductCard = ({ product, onAdd }: MiniProductCardProps) => {
             {formatPrice(displayPrice)}
           </span>
           {quickAdd.canOneTap && (
-            <span className="text-[10px] text-amber-600 font-medium">
+            <span className="text-[10px] text-champagne-600 font-medium">
               {quickAdd.rememberedSize}
             </span>
           )}

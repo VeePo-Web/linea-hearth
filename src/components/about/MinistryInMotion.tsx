@@ -73,7 +73,7 @@ const MinistryInMotion = () => {
           transition={{ duration: 0.8 }}
           className="mb-16"
         >
-          <p className="text-[10px] uppercase tracking-[0.4em] text-amber-500 mb-4">
+          <p className="text-[10px] uppercase tracking-[0.4em] text-champagne-500 mb-4">
             Our Tribe
           </p>
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
@@ -118,7 +118,7 @@ const MinistryInMotion = () => {
                   
                   {/* Featured badge */}
                   {'featured' in photo && photo.featured && (
-                    <div className="absolute top-3 left-3 bg-amber-500 text-stone-950 px-2 py-1">
+                    <div className="absolute top-3 left-3 bg-champagne-500 text-stone-950 px-2 py-1">
                       <span className="text-[9px] uppercase tracking-[0.15em] font-medium">Featured</span>
                     </div>
                   )}
@@ -144,9 +144,9 @@ const MinistryInMotion = () => {
               {/* CTA Card in grid */}
               <motion.div
                 variants={staggerItem}
-                className="col-span-2 bg-stone-950 text-white flex flex-col items-center justify-center p-8 group hover:bg-amber-500 transition-colors duration-500"
-              >
-                <Instagram className="h-8 w-8 mb-4 text-amber-500 group-hover:text-stone-950 transition-colors" />
+                 className="col-span-2 bg-stone-950 text-white flex flex-col items-center justify-center p-8 group hover:bg-champagne-500 transition-colors duration-500"
+               >
+                 <Instagram className="h-8 w-8 mb-4 text-champagne-500 group-hover:text-stone-950 transition-colors" />
                 <p className="text-lg font-light mb-2 group-hover:text-stone-950 transition-colors">Join the Tribe</p>
                 <p className="text-sm text-white/60 group-hover:text-stone-950/70 text-center mb-4 transition-colors">
                   Tag @lineofjudah for a chance to be featured
@@ -155,7 +155,7 @@ const MinistryInMotion = () => {
                   href="https://instagram.com" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-sm text-amber-500 group-hover:text-stone-950 transition-colors"
+                  className="inline-flex items-center gap-2 text-sm text-champagne-500 group-hover:text-stone-950 transition-colors"
                 >
                   <span className="underline underline-offset-4">Submit Your Story</span>
                   <ArrowUpRight className="h-4 w-4" />

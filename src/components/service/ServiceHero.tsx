@@ -89,7 +89,7 @@ const ServiceHero = ({
           {(eyebrow || lastUpdated) && (
             <motion.span 
               variants={itemVariants}
-              className="inline-block text-xs font-medium tracking-widest text-amber-500 mb-4"
+              className="inline-block text-xs font-medium tracking-widest text-champagne-500 mb-4"
             >
               {lastUpdated ? `LAST UPDATED: ${lastUpdated.toUpperCase()}` : eyebrow?.toUpperCase()}
             </motion.span>
@@ -127,7 +127,7 @@ const ServiceHero = ({
             >
               {valueProps.map((prop, index) => (
                 <span key={index} className="flex items-center gap-2">
-                  <prop.icon className="w-4 h-4 text-amber-500" />
+                  <prop.icon className="w-4 h-4 text-champagne-500" />
                   {prop.text}
                 </span>
               ))}
@@ -158,7 +158,7 @@ const ServiceHero = ({
               onChange={(e) => onSearchChange(e.target.value)}
               onFocus={handleSearchFocus}
               onBlur={() => setIsFocused(false)}
-              className="w-full h-14 pl-12 pr-12 bg-white text-stone-900 border-0 placeholder:text-stone-400 text-base focus-visible:ring-amber-500 rounded-none"
+              className="w-full h-14 pl-12 pr-12 bg-white text-stone-900 border-0 placeholder:text-stone-400 text-base focus-visible:ring-champagne-500 rounded-none"
             />
             {/* Clear search button */}
             {searchQuery && (

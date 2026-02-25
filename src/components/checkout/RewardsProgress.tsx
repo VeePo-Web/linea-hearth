@@ -92,7 +92,7 @@ const RewardsProgress = () => {
             return (
               <span>
                 Add <span className="font-medium text-foreground">${amountNeeded.toFixed(0)}</span> to unlock{" "}
-                <span className="text-amber-600 dark:text-amber-400">{nextMilestone.reward}</span>
+                <span className="text-champagne-600 dark:text-champagne-300">{nextMilestone.reward}</span>
               </span>
             );
           })()}

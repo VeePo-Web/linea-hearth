@@ -120,7 +120,7 @@ function FavoriteItem({
           )}
           {/* Size memory indicator */}
           {quickAdd.rememberedSize && (
-            <span className="text-[10px] uppercase tracking-wide text-amber-600 font-medium">
+            <span className="text-[10px] uppercase tracking-wide text-champagne-600 font-medium">
               {quickAdd.rememberedSize}
             </span>
           )}
@@ -182,14 +182,14 @@ function FavoriteItem({
                         className={`
                           relative min-w-[32px] h-8 px-2 text-xs rounded transition-colors
                           ${isRemembered
-                            ? 'bg-amber-500 text-white font-medium'
+                            ? 'bg-champagne-500 text-white font-medium'
                             : 'bg-background hover:bg-muted text-foreground border border-border'
                           }
                         `}
                       >
                         {size}
                         {isRemembered && (
-                          <span className="absolute -top-1.5 left-1/2 -translate-x-1/2 text-[7px] uppercase tracking-wide text-amber-600 bg-muted/50 px-1 rounded whitespace-nowrap">
+                          <span className="absolute -top-1.5 left-1/2 -translate-x-1/2 text-[7px] uppercase tracking-wide text-champagne-600 bg-muted/50 px-1 rounded whitespace-nowrap">
                             yours
                           </span>
                         )}

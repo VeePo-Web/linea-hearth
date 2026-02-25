@@ -30,11 +30,11 @@ interface ImportantCalloutProps {
 export const ImportantCallout = ({ children, className }: ImportantCalloutProps) => {
   return (
     <div className={cn(
-      "flex gap-4 p-6 bg-amber-50 dark:bg-amber-950/20 border-l-4 border-amber-500 my-6 print-avoid-break print-callout print:bg-transparent print:border-foreground",
+      "flex gap-4 p-6 bg-champagne-50 dark:bg-champagne-900/20 border-l-4 border-champagne-500 my-6 print-avoid-break print-callout print:bg-transparent print:border-foreground",
       className
     )}>
-      <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5 print:hidden" />
-      <div className="text-sm text-amber-800 dark:text-amber-200 font-light leading-relaxed print:text-foreground">
+      <AlertTriangle className="w-5 h-5 text-champagne-600 flex-shrink-0 mt-0.5 print:hidden" />
+      <div className="text-sm text-champagne-800 dark:text-champagne-200 font-light leading-relaxed print:text-foreground">
         {children}
       </div>
     </div>

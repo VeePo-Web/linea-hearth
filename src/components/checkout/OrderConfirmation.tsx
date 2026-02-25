@@ -63,7 +63,7 @@ const OrderConfirmation = ({
           <>
             <div className="absolute inset-0 rounded-full border-2 border-emerald-300 animate-ping" />
             <div
-              className="absolute inset-0 rounded-full border-2 border-amber-300 animate-ping"
+              className="absolute inset-0 rounded-full border-2 border-champagne-300 animate-ping"
               style={{ animationDelay: "0.2s" }}
             />
           </>

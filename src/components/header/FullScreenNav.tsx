@@ -226,7 +226,7 @@ const FullScreenNav = ({
                     to={link.href}
                     onClick={onClose}
                     data-nav-link
-                    className="block py-3 md:py-4 text-[14px] md:text-[15px] font-light uppercase tracking-[0.25em] text-stone-900 hover:text-amber-700 transition-colors duration-300 focus:outline-none focus-visible:text-amber-700"
+                    className="block py-3 md:py-4 text-[14px] md:text-[15px] font-light uppercase tracking-[0.25em] text-stone-900 hover:text-champagne-700 transition-colors duration-300 focus:outline-none focus-visible:text-champagne-700"
                     style={{ lineHeight: '3.5' }}
                   >
                     {link.label}

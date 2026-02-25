@@ -138,7 +138,7 @@ const TermsOfService = () => {
       <LegalSection id="privacy" title="Privacy Policy">
         <p>
           Your privacy is important to us. Please review our{" "}
-          <a href="/privacy-policy" className="text-amber-600 hover:text-amber-700 transition-colors">
+          <a href="/privacy-policy" className="text-champagne-600 hover:text-champagne-700 transition-colors">
             Privacy Policy
           </a>
           , which also governs your use of our website and services, to understand our 

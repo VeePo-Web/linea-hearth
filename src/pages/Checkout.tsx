@@ -1052,7 +1052,7 @@ const Checkout = () => {
                         </Button>
                         
                         {stripeError && (
-                          <div className="flex items-center gap-2 text-sm text-amber-600 bg-amber-50 dark:bg-amber-900/20 p-3 rounded-none">
+                          <div className="flex items-center gap-2 text-sm text-champagne-600 bg-champagne-50 dark:bg-champagne-900/20 p-3 rounded-none">
                             <AlertCircle className="w-4 h-4 flex-shrink-0" />
                             <span>{stripeError}</span>
                           </div>

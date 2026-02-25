@@ -36,14 +36,14 @@ const collectionData: Record<string, CollectionContent> = {
   "accessories": {
     title: "Accessories",
     tagline: "Finishing touches for the set apart.",
-    bgClass: "bg-gradient-to-br from-amber-900/80 to-stone-900",
+    bgClass: "bg-gradient-to-br from-stone-800/80 to-stone-900",
   },
 
   // Bottoms Subcategories
   "shorts": {
     title: "Shorts",
     tagline: "Light armor. Same conviction.",
-    bgClass: "bg-gradient-to-br from-amber-800/60 to-stone-900",
+    bgClass: "bg-gradient-to-br from-stone-700/60 to-stone-900",
   },
   "joggers": {
     title: "Joggers",
@@ -70,7 +70,7 @@ const collectionData: Record<string, CollectionContent> = {
   "cropped": {
     title: "Cropped",
     tagline: "Bold moves only.",
-    bgClass: "bg-gradient-to-br from-amber-700/60 to-neutral-900",
+    bgClass: "bg-gradient-to-br from-stone-600/60 to-neutral-900",
   },
 
   // Hoodies Subcategories
@@ -121,17 +121,17 @@ const collectionData: Record<string, CollectionContent> = {
   "bags": {
     title: "Bags",
     tagline: "Carry the message wherever you go.",
-    bgClass: "bg-gradient-to-br from-amber-800/70 to-stone-900",
+    bgClass: "bg-gradient-to-br from-stone-700/70 to-stone-900",
   },
   "socks": {
     title: "Socks",
     tagline: "Grounded. Every step.",
-    bgClass: "bg-gradient-to-br from-stone-700 to-amber-900/50",
+    bgClass: "bg-gradient-to-br from-stone-700 to-stone-900/50",
   },
   "stickers": {
     title: "Stickers",
     tagline: "Mark your territory.",
-    bgClass: "bg-gradient-to-br from-amber-700/50 to-neutral-900",
+    bgClass: "bg-gradient-to-br from-stone-600/50 to-neutral-900",
   },
 
   // Special Collections
@@ -153,7 +153,7 @@ const collectionData: Record<string, CollectionContent> = {
   "best-sellers": {
     title: "Best Sellers",
     tagline: "Tribe approved. Field tested.",
-    bgClass: "bg-gradient-to-br from-amber-800/60 to-stone-900",
+    bgClass: "bg-gradient-to-br from-stone-700/60 to-stone-900",
   },
   "sale": {
     title: "Sale",

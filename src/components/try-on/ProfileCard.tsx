@@ -48,8 +48,8 @@ export const ProfileCard = ({
             className={cn(
               "p-1 transition-colors shrink-0",
               profile.isDefault
-                ? "text-amber-500"
-                : "text-muted-foreground hover:text-amber-500"
+                 ? "text-champagne-500"
+                 : "text-muted-foreground hover:text-champagne-500"
             )}
             title={profile.isDefault ? "Default profile" : "Set as default"}
           >

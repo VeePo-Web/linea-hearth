@@ -15,7 +15,7 @@ const ScrollProgress = ({ containerRef }: ScrollProgressProps) => {
   return (
     <div className="hidden lg:block fixed left-6 top-1/3 h-1/3 w-[2px] bg-stone-500/10 z-50">
       <motion.div
-        className="w-full bg-amber-500/60 origin-top"
+        className="w-full bg-champagne-500/60 origin-top"
         style={{ 
           scaleY: scrollYProgress, 
           opacity,

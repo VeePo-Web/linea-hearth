@@ -60,16 +60,16 @@ export function EmailTypoSuggestion({
         >
           <div className={`
             flex items-start gap-2 p-3 rounded-sm
-            bg-amber-500/10 border border-amber-500/30
+            bg-champagne-500/10 border border-champagne-500/30
             ${variant === 'compact' ? 'text-xs' : 'text-sm'}
           `}>
             <Lightbulb className={`
-              text-amber-600 flex-shrink-0 mt-0.5
+              text-champagne-600 flex-shrink-0 mt-0.5
               ${variant === 'compact' ? 'h-3 w-3' : 'h-4 w-4'}
             `} />
             
             <div className="flex-1 min-w-0">
-              <p className="text-amber-700 dark:text-amber-400">
+              <p className="text-champagne-700 dark:text-champagne-300">
                 Did you mean{' '}
                 <span className="font-medium">{suggestion}</span>?
               </p>
@@ -81,8 +81,8 @@ export function EmailTypoSuggestion({
                   size="sm"
                   onClick={onAccept}
                   className={`
-                    h-auto py-1 px-2 text-amber-700 hover:text-amber-800 
-                    hover:bg-amber-500/20 dark:text-amber-400 dark:hover:text-amber-300
+                    h-auto py-1 px-2 text-champagne-700 hover:text-champagne-800 
+                    hover:bg-champagne-500/20 dark:text-champagne-300 dark:hover:text-champagne-200
                     ${variant === 'compact' ? 'text-xs' : 'text-sm'}
                   `}
                 >

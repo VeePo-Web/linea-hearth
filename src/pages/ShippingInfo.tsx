@@ -153,7 +153,7 @@ const ShippingInfo = () => {
               />
               <span className={`absolute top-4 right-4 text-xs font-medium tracking-wide ${
                 option.variant === 'accent' 
-                  ? 'text-amber-600 dark:text-amber-500' 
+                  ? 'text-champagne-600 dark:text-champagne-500' 
                   : 'text-muted-foreground'
               }`}>
                 {option.badge}

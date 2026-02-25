@@ -221,7 +221,7 @@ export default function SwipeCard({
           
           {/* Remembered Size Badge */}
           {rememberedSize && canOneTap && (
-            <span className="absolute top-4 right-4 text-[10px] uppercase tracking-wider bg-amber-500 text-white px-3 py-1.5 font-medium">
+            <span className="absolute top-4 right-4 text-[10px] uppercase tracking-wider bg-champagne-500 text-white px-3 py-1.5 font-medium">
               Size {rememberedSize}
             </span>
           )}
@@ -296,7 +296,7 @@ export default function SwipeCard({
             <div className="flex items-center gap-3">
               {product.is_on_sale && product.sale_price ? (
                 <>
-                  <span className="text-amber-400 text-lg font-medium">{formatPrice(product.sale_price)}</span>
+                  <span className="text-champagne-300 text-lg font-medium">{formatPrice(product.sale_price)}</span>
                   <span className="text-white/50 text-sm line-through">{formatPrice(product.price)}</span>
                 </>
               ) : (
