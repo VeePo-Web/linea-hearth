@@ -1,61 +1,46 @@
 
+# Fix: Main "Add to Bag" Button Not Working on PDP
 
-# Final Amber-to-Champagne Cleanup -- Phase 3
+## The Problem
+The primary "Add to Bag" button on the Product Detail Page (PDP) does not add items to the cart. Clicking it does nothing. This is because the button in `ProductInfo.tsx` has no click handler connected to the cart system.
 
-The previous two phases migrated ~55+ files but a final audit reveals **10 more non-excluded instances** still using amber. This phase completes the migration to zero remaining amber outside the explicitly excluded files.
+The mobile sticky "Add to Bag" button works correctly because it uses the `useQuickAdd` hook, but the main desktop/mobile button is disconnected.
 
----
+## Root Cause
+In `src/components/product/ProductInfo.tsx` (lines 451-465), the button renders with `disabled={!canAddToBag}` but has **no `onClick` handler**. The component never imports or calls `useCart().addItem()`.
 
-## Remaining Files to Fix
+## Fix Plan
 
-### 1. `src/components/legal/LegalPageLayout.tsx` (line 59)
-- `text-amber-500` on "LAST UPDATED" eyebrow text
-- Change to `text-champagne-500`
+### 1. Update `ProductInfo.tsx` to accept an `onAddToBag` callback
 
-### 2. `src/components/product/LookbookLookSection.tsx` (lines 189, 246)
-- `text-amber-600/80` on scripture references (2 instances)
-- Change to `text-champagne-600/80`
+Add a new prop `onAddToBag` to `ProductInfoProps`:
+```typescript
+interface ProductInfoProps {
+  // ...existing props
+  onAddToBag?: (details: { size: string | null; color: string | null; quantity: number }) => void;
+}
+```
 
-### 3. `src/components/product/LookbookProductCard.tsx` (lines 107, 185)
-- `bg-amber-600/90` on quick-add success overlay
-- `text-amber-600` on size memory indicator
-- Change to `bg-champagne-600/90` and `text-champagne-600`
+### 2. Wire the "Add to Bag" button's `onClick`
 
-### 4. `src/components/community/StoryCard.tsx` (line 78)
-- `from-amber-950/80` in gradient fallback
-- Change to `from-stone-900/80` (matching the other gradient entries -- this is a very dark tone, stone is more appropriate than champagne-900 which doesn't exist at 950)
+Both the reduced-motion and animated versions of the button (lines 258 and 451-464) need an `onClick` that calls `onAddToBag` with the selected size, color, and quantity.
 
-### 5. `src/components/homepage/HeroBlock.tsx` (line 22)
-- `via-amber-950` in hero background gradient
-- Change to `via-stone-800` (dark background gradient, not an accent)
+### 3. Update `ProductDetail.tsx` to pass the handler
 
-### 6. `src/components/accessibility/AccessibilityFeedback.tsx` (line 198)
-- `bg-amber-500/5 border border-amber-500/20` on priority checkbox container
-- Change to `bg-champagne-500/5 border border-champagne-500/20`
+In `ProductDetail.tsx`, use the existing `useQuickAdd` hook (already instantiated on line 80) to create a handler that:
+- Takes the size/color/quantity from ProductInfo
+- Calls `quickAdd.addToCart({ size, color, quantity })`
 
-### 7. `src/components/cart/CartItem.tsx` (line 133)
-- `text-amber-600` on "Only X left" low stock badge
-- Change to `text-champagne-600` (this is a soft warning, not urgency-level)
+This reuses the existing cart integration, size memory, toast notifications, and haptic feedback -- no duplicate logic.
 
-### 8. `src/components/checkout/RewardsProgress.tsx` (line 29)
-- `from-amber-400 to-amber-500` gradient on progress bar fill
-- Change to `from-champagne-400 to-champagne-500`
+### Files Changed
+1. **`src/components/product/ProductInfo.tsx`** -- Add `onAddToBag` prop, wire onClick on both button instances
+2. **`src/pages/ProductDetail.tsx`** -- Pass `onAddToBag` callback using `quickAdd.addToCart`
 
-### 9. `src/components/about/WearTheMissionCTA.tsx` (line 40)
-- `to-amber-500` in image gradient overlay
-- Change to `to-champagne-500`
-
----
-
-## Explicitly EXCLUDED (no changes, keeping amber)
-- `src/components/product/FlashSaleTimer.tsx` -- urgency/warning semantic
-- `src/components/checkout/UrgencyTimer.tsx` -- urgency/warning semantic
-- `src/components/try-on/utils/sizeRecommendation.ts` -- semantic fit indicator (green/amber/red)
-- `src/components/try-on/avatar-creator/avatarPresets.ts` -- skin tone name "Amber" (not a UI color)
-- `src/pages/admin/*` -- admin dashboard indicators
-- `src/components/about/WearTheMissionCTA.tsx` line 51 comment -- just a code comment, not rendered
-
----
-
-## Implementation
-9 files, ~12 line changes total. All class-name-only swaps, no layout or copy changes.
+### What This Fixes
+- Main "Add to Bag" button will add items to cart
+- Cart drawer will auto-open after adding
+- Size memory will be saved
+- Toast notification will appear
+- Haptic feedback on mobile
+- All consistent with the existing quick-add system used everywhere else
