@@ -1,94 +1,102 @@
 
 
-# Accent Color Migration: Champagne/Yellow to Silver Chrome + Warm Tan Glow
+# Accent Color Enhancement: Add Forest Green as Secondary Accent
 
-## The Problem
-The current yellow-toned `champagne` accent color (hue 45, warm gold) reads as tacky rather than luxurious. The landing page already established the correct brand palette: **silver/chrome metallic** for "LINE OF JUDAH" and a **soft warm tan glow** (`hsla(45 55% 82%)`) for the "glory" and "beauty" words. The rest of the site needs to match.
+## Current State
+The champagne palette was already migrated from tacky gold to silver/platinum in the previous update. The `--accent` CSS variable is currently `0 0% 62%` (neutral silver). This silver is working well site-wide.
 
-## The Two Target Colors
+## What the User Wants
+Keep silver as the **primary accent** but introduce **classic forest green** `hsl(152, 35%, 30%)` as a secondary accent for select highlight moments -- adding depth and richness to the palette without losing the chrome luxury feel.
 
-**1. Silver Chrome (primary accent)** -- from `.text-chrome` on the landing page:
-- Pure silver/platinum tones with zero or near-zero saturation
-- Used for: eyebrow text, accent words, highlighted labels, borders, dividers, star ratings, active indicators
+## The Two Colors
 
-**2. Warm Tan Glow (secondary, used sparingly)** -- from `.glory-word` / `.beauty-word`:
-- `hsla(45 55% 82% / 0.95)` -- a very light, refined warm champagne
-- Used for: special highlight moments, button backgrounds where a warm CTA is needed (since pure silver buttons can feel cold)
+**1. Silver Chrome (primary -- already in place)**
+- The champagne palette: neutral silver tones
+- `--accent: 0 0% 62%`
+- Used for: most labels, eyebrow text, star ratings, hover states, borders
 
-## The Approach: Redefine the Champagne Palette
+**2. Classic Forest Green (new secondary accent)**
+- `hsl(152, 35%, 30%)` -- deep, editorial, luxurious
+- Used for: hero keyword moments ("FAITH."), select section highlights, period punctuation accents
+- This pairs naturally with the silver like a high-end brand palette (think Rolex green + silver)
 
-Instead of hunting through 97 files and changing individual class names, we **redefine the `champagne` color scale** in `tailwind.config.ts` to silver/platinum tones. This cascades the change across the entire site in one move.
+## Implementation Plan
 
-We also update the CSS `--accent` variable in `src/index.css` to match.
-
-### New `champagne` palette (silver/platinum):
-
-```text
-Current (warm gold)              -->  New (silver/platinum)
-50:  hsl(45, 40%, 96%)           -->  hsl(0, 0%, 96%)
-100: hsl(45, 40%, 90%)           -->  hsl(0, 0%, 91%)
-200: hsl(45, 45%, 82%)           -->  hsl(220, 3%, 82%)
-300: hsl(45, 40%, 72%)           -->  hsl(220, 3%, 72%)
-400: hsl(45, 35%, 62%)           -->  hsl(220, 2%, 68%)
-500: hsl(45, 30%, 52%)           -->  hsl(0, 0%, 62%)
-600: hsl(45, 30%, 42%)           -->  hsl(0, 0%, 50%)
-700: hsl(45, 25%, 35%)           -->  hsl(0, 0%, 40%)
-800: hsl(45, 20%, 28%)           -->  hsl(0, 0%, 30%)
-900: hsl(45, 15%, 15%)           -->  hsl(0, 0%, 16%)
-```
-
-The slight hue 220 at 2-3% saturation on the mid-tones gives a barely perceptible cool steel quality (like real silver) without looking blue. The 500 level at 62% lightness provides good contrast on dark backgrounds.
-
-### CSS `--accent` variable update:
+### Step 1: Add Forest Green to Tailwind Config
+Add a `forest` color scale in `tailwind.config.ts` alongside champagne:
 
 ```text
-Current: --accent: 45 30% 52%
-New:     --accent: 0 0% 62%
+forest: {
+  50:  hsl(152, 25%, 95%)
+  100: hsl(152, 25%, 88%)
+  200: hsl(152, 28%, 75%)
+  300: hsl(152, 30%, 58%)
+  400: hsl(152, 33%, 42%)
+  500: hsl(152, 35%, 30%)   <-- primary forest green
+  600: hsl(152, 38%, 24%)
+  700: hsl(152, 40%, 18%)
+  800: hsl(152, 35%, 12%)
+  900: hsl(152, 30%, 8%)
+}
 ```
 
-And `--sidebar-ring` which also references champagne:
+### Step 2: Update CSS `--accent` to Forest Green
+Change the `--accent` variable to forest green so that all `text-accent` usage (the hero "FAITH." word, eyebrow labels, hover states) shifts from silver to forest green:
+
 ```text
-Current: --sidebar-ring: 45 30% 52%
-New:     --sidebar-ring: 0 0% 62%
+--accent: 152 35% 30%    (was: 0 0% 62%)
+--accent-foreground: 0 0% 98%
 ```
 
-## Special Cases: Warm CTA Buttons
+This is the highest-impact single change -- it transforms the "FAITH." word on the hero, section eyebrow text on MissionBlock, hover states on DropGrid links, and star ratings on MarqueeStrip all in one move.
 
-A few components use champagne as a **button background** color (e.g., "Shop the Collection" CTA, mobile sticky bar, email opt-in submit). Pure silver as a button background can feel passive. For these ~4 button instances, we switch to the warm tan glow color family -- a refined, lighter tone that maintains CTA energy without the tacky gold:
+### Step 3: Keep Silver Where It Belongs
+The `champagne-*` utility classes (already silver) remain untouched. These are used for:
+- Section number labels (`text-champagne-500`)
+- Period dot accents (`text-champagne-500`)
+- Subtle text treatments, borders, muted accents
 
-- `bg-champagne-500` on buttons --> change to a warm silver: `bg-[hsl(30,5%,72%)]` with hover `bg-[hsl(30,5%,78%)]`
-- This gives buttons a subtle warmth that reads as "platinum with warmth" rather than "cold gray"
+Silver stays as the quiet, structural accent. Forest green becomes the bold, editorial accent for words and CTAs that need to pop.
 
-### Files needing button-specific overrides (4 files):
-1. **`src/components/homepage/HeroBlock.tsx`** (line 80) -- "Shop the Collection" CTA
-2. **`src/components/homepage/EmailOptIn.tsx`** (line 296) -- "ENLIST NOW" button
-3. **`src/components/homepage/MobileStickyBar.tsx`** (line 58) -- Mobile sticky CTA
-4. **`src/components/about/WearTheMissionCTA.tsx`** (lines 49, 99, 111) -- Mission CTA block background and buttons
+### Step 4: Update the Warm Tan CTA Buttons (Optional)
+The 4 button files that currently use `bg-[hsl(30,5%,72%)]` (warm platinum) could optionally shift to forest green for stronger CTA contrast:
+- `HeroBlock.tsx` -- "Shop the Collection"
+- `EmailOptIn.tsx` -- "ENLIST NOW"
+- `MobileStickyBar.tsx` -- Mobile sticky CTA
+- `WearTheMissionCTA.tsx` -- Mission CTA block
 
-For these buttons, we replace `bg-champagne-500 hover:bg-champagne-400` with `bg-[hsl(30,5%,72%)] hover:bg-[hsl(30,5%,78%)]` (or define a new utility if preferred).
+However, the current warm platinum is working well and the user said "do not change anything else." So these stay as-is unless requested.
 
-## Implementation Steps
+## Files Changed
 
-### Step 1: `tailwind.config.ts` -- Redefine champagne palette to silver
-- Change all 10 color stops from warm gold to silver/platinum tones
-- This one change cascades to ~97 files automatically
+| File | Change |
+|------|--------|
+| `tailwind.config.ts` | Add `forest` color scale (10 shades) |
+| `src/index.css` | `--accent: 0 0% 62%` becomes `--accent: 152 35% 30%` (root + dark) |
 
-### Step 2: `src/index.css` -- Update CSS variables
-- Line 41: `--accent: 45 30% 52%` --> `--accent: 0 0% 62%`
-- Line 72: `--sidebar-ring: 45 30% 52%` --> `--sidebar-ring: 0 0% 62%`
-- Line 96: same for `.dark` block `--accent`
+**Total: 2 files, ~15 lines changed.**
 
-### Step 3: Button overrides (4 files)
-- Replace champagne button backgrounds with warm platinum tone so CTAs still pop
-- These are surgical, 1-2 line changes per file
+## Cascade Effect
+Changing `--accent` automatically updates these components (no file edits needed):
+- **EditorialHero** -- "FAITH." word turns forest green (both mobile + desktop)
+- **MissionBlock** -- "Our Mission" eyebrow label turns forest green
+- **TestimonySpotlight** -- "From the tribe" label + quote text
+- **MarqueeStrip** -- Star ratings fill with forest green
+- **DropGrid** -- Product name hover color
+- **FeaturedDrop** -- CTA hover color
+- Any other component using `text-accent` or `bg-accent`
+
+The silver `champagne-*` classes used across ~97 files remain completely unchanged.
 
 ## What Does NOT Change
 - No words, copy, or content
 - No layout, spacing, or design structure
 - No animations or motion
 - No component architecture
-- The landing page (it already uses `.text-chrome` and glory/beauty colors -- untouched)
+- The landing page chrome treatment (uses `.text-chrome`, not `text-accent`)
+- Silver champagne palette (structural accents stay silver)
+- CTA button colors (warm platinum stays)
 - Desktop/mobile behavior
 
 ## Result
-Every accent that was warm gold/yellow becomes silver/platinum -- matching the chrome luxury aesthetic established on the landing page. CTA buttons get a subtle warm platinum that maintains conversion energy. The entire site reads as cohesive, royal, and luxurious.
+The site gets a two-tone luxury palette: **silver chrome** for structural/quiet accents + **forest green** for bold editorial moments. This reads like a premium brand palette (Rolex, Bottega Veneta) rather than a single-color template theme.
