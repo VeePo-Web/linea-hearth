@@ -455,23 +455,17 @@ const ProductInfo = ({ product, variants = [], onColorChange, onAuthRequired, on
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
+          whileHover={{ scale: canAddToBag ? 1.01 : 1 }}
+          whileTap={{ scale: canAddToBag ? 0.99 : 1 }}
           transition={{ delay: 0.6, duration: 0.4, ease: easing.editorial }}
         >
           <Button 
             id="main-add-to-bag"
             disabled={!canAddToBag}
             className="w-full h-12 bg-foreground text-background hover:bg-foreground/90 font-light rounded-none disabled:opacity-50 disabled:cursor-not-allowed transition-all hover:shadow-lg"
-            asChild
+            onClick={() => onAddToBag?.({ size: selectedSize, color: selectedColor, quantity })}
           >
-            <motion.button
-              whileHover={{ scale: 1.01 }}
-              whileTap={{ scale: 0.99 }}
-              transition={{ type: "spring", stiffness: 400, damping: 20 }}
-              disabled={!canAddToBag}
-              onClick={() => onAddToBag?.({ size: selectedSize, color: selectedColor, quantity })}
-            >
-              Add to Bag — ${totalPrice.toFixed(2)}
-            </motion.button>
+            Add to Bag — ${totalPrice.toFixed(2)}
           </Button>
         </motion.div>
 
