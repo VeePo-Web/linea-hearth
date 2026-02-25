@@ -1,23 +1,34 @@
 
 
-# Fix Legacy Gold in FreeShippingBar.tsx
+# Update CTA Buttons from Warm Platinum to Forest Green
 
 ## Problem
-Three hardcoded `hsl(45, ...)` gold values remain in `FreeShippingBar.tsx` -- the last remnants of the old tacky yellow palette. These control the progress bar gradient and celebration glow overlay.
+Six hardcoded `hsl(30,5%,72%)` warm platinum values remain across 4 files. These power the primary CTA buttons and one large CTA block background. They need to become forest green for full brand cohesion with the new silver + forest green accent system.
 
-## Changes (1 file, 3 locations)
+## Color Mapping
+- `bg-[hsl(30,5%,72%)]` (warm platinum) becomes `bg-forest-500` (`hsl(152, 35%, 30%)`)
+- `hover:bg-[hsl(30,5%,78%)]` becomes `hover:bg-forest-400` (`hsl(152, 25%, 55%)`)
+- `active:bg-[hsl(30,5%,78%)]` becomes `active:bg-forest-400`
+- Text on forest green: `text-white` (high contrast) instead of `text-black`
 
-### Location 1: Progress gradient (lines 68-71)
-Replace the gold gradient with forest green tones:
-- **90%+ tier**: `hsl(45, 40%, 72%)` and `hsl(45, 30%, 52%)` become `hsl(152, 25%, 55%)` and `hsl(152, 35%, 30%)` (light-to-dark forest green)
-- **Default tier**: `hsl(45, 20%, 28%)` and `hsl(45, 30%, 52%)` become `hsl(152, 30%, 18%)` and `hsl(152, 35%, 30%)` (deep forest to medium forest)
+## Changes by File
 
-### Location 2: Celebration glow (line 118)
-Replace `hsl(45, 30%, 52%, 0.2)` with `hsl(152, 35%, 30%, 0.2)` -- forest green glow instead of gold glow.
+### 1. HeroBlock.tsx (line 80)
+- **Button**: "Shop the Collection"
+- Replace `bg-[hsl(30,5%,72%)] hover:bg-[hsl(30,5%,78%)] text-black` with `bg-forest-500 hover:bg-forest-400 text-white`
 
-### Location 3: Text colors (lines 147, 149)
-Replace `text-champagne-500` and `text-champagne-600` with `text-forest-400` and `text-forest-500` so the "Almost there" messaging uses forest green instead of silver (matching the progress bar's new color).
+### 2. MobileStickyBar.tsx (line 58)
+- **Button**: "Shop Bestsellers" (mobile sticky)
+- Replace `bg-[hsl(30,5%,72%)] hover:bg-[hsl(30,5%,78%)] active:bg-[hsl(30,5%,78%)] text-black` with `bg-forest-500 hover:bg-forest-400 active:bg-forest-400 text-white`
+
+### 3. EmailOptIn.tsx (line 296)
+- **Button**: "ENLIST NOW" (mobile variant)
+- Replace `bg-[hsl(30,5%,72%)] hover:bg-[hsl(30,5%,78%)] text-background` with `bg-forest-500 hover:bg-forest-400 text-white`
+
+### 4. WearTheMissionCTA.tsx (2 locations)
+- **Line 40** (gradient overlay): Replace `to-[hsl(30,5%,72%)]` with `to-forest-500`
+- **Line 49** (CTA block background): Replace `bg-[hsl(30,5%,72%)]` with `bg-forest-500`
+- The buttons inside this block (lines 96-116) already use `bg-stone-950` and `border-stone-950` -- these stay unchanged as they contrast well against the new forest green background
 
 ## Result
-The free shipping progress bar transitions through shades of forest green instead of warm gold, creating full palette consistency with the site's new silver + forest green accent system. The unlocked state already uses `--primary` (unchanged). Only the in-progress states needed updating.
-
+All primary CTA buttons shift from a warm beige/platinum to a rich forest green, creating stronger conversion contrast against the dark stone backgrounds while maintaining the luxury feel. The forest green reads as confident, editorial, and on-brand -- far more premium than warm beige on dark backgrounds.
