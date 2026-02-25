@@ -173,7 +173,7 @@ const FilterSortBar = ({
       <section 
         className={cn(
           "w-full px-4 md:px-6 mb-6 md:mb-8 border-b border-border pb-4 transition-all duration-200",
-          isSticky && "sticky top-[var(--header-height)] z-30 bg-background/95 backdrop-blur-sm shadow-sm pt-4 -mt-4"
+          isSticky && "sticky top-[var(--header-height)] z-30 bg-foreground/95 backdrop-blur-sm shadow-sm pt-4 -mt-4"
         )}
       >
         {/* Accessibility announcement */}
@@ -182,7 +182,7 @@ const FilterSortBar = ({
         </div>
         
         <div className="flex justify-between items-center">
-          <p className="text-sm font-light text-muted-foreground">
+          <p className="text-sm font-light text-background/50">
             {itemCount} {itemCount === 1 ? "item" : "items"}
           </p>
 

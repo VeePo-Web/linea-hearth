@@ -77,14 +77,14 @@ const FeaturedCollection = () => {
   const displayProducts = products.length > 0 ? products : placeholderProducts;
 
   return (
-    <section className="w-full py-12 md:py-16 lg:py-24 bg-background">
+    <section className="w-full py-12 md:py-16 lg:py-24 bg-foreground">
       <div className="max-w-7xl mx-auto px-4 xs:px-6">
         {/* Section Header - Editorial minimal */}
         <ScrollReveal variant="fadeUp">
           <div className="flex justify-between items-end mb-6 md:mb-8">
             <div>
-              <p className="text-eyebrow text-muted-foreground mb-2">Community picks</p>
-              <h2 className="text-section text-foreground">Tribe Approved</h2>
+              <p className="text-eyebrow text-background/50 mb-2">Community picks</p>
+              <h2 className="text-section text-background">Tribe Approved</h2>
             </div>
             <motion.div
               whileHover={{ x: 4 }}
@@ -92,7 +92,7 @@ const FeaturedCollection = () => {
             >
               <Link 
                 to="/category/shop"
-                className="text-foreground text-sm font-light flex items-center gap-2 hover:text-accent transition-colors group touch-target py-2"
+                className="text-background text-sm font-light flex items-center gap-2 hover:text-accent transition-colors group touch-target py-2"
               >
                 Shop All
                 <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
@@ -142,24 +142,24 @@ const FeaturedCollection = () => {
 
                 {/* Product Info - Minimal */}
                 <div>
-                  <p className="text-caption text-muted-foreground uppercase mb-1">
+                  <p className="text-caption text-background/50 uppercase mb-1">
                     {product.category_name}
                   </p>
-                  <h3 className="text-xs xs:text-sm font-light text-foreground mb-1 group-hover:text-accent transition-colors line-clamp-1">
+                  <h3 className="text-xs xs:text-sm font-light text-background mb-1 group-hover:text-accent transition-colors line-clamp-1">
                     {product.name}
                   </h3>
                   <div className="flex items-center gap-2">
                     {product.is_on_sale && product.sale_price ? (
                       <>
-                        <span className="text-xs xs:text-sm font-light text-foreground">
+                        <span className="text-xs xs:text-sm font-light text-background">
                           {formatPrice(product.sale_price)}
                         </span>
-                        <span className="text-xs xs:text-sm font-light text-muted-foreground line-through">
+                        <span className="text-xs xs:text-sm font-light text-background/50 line-through">
                           {formatPrice(product.price)}
                         </span>
                       </>
                     ) : (
-                      <span className="text-xs xs:text-sm font-light text-foreground">
+                      <span className="text-xs xs:text-sm font-light text-background">
                         {formatPrice(product.price)}
                       </span>
                     )}

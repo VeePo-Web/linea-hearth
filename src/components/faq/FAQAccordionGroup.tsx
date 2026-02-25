@@ -36,7 +36,7 @@ const FAQAccordionGroup = ({ items, searchQuery = "" }: FAQAccordionGroupProps) 
           key={item.id}
           id={item.id}
           value={item.id}
-          className="border border-border px-6 data-[state=open]:bg-stone-50 dark:data-[state=open]:bg-stone-900/50 active:bg-stone-50 dark:active:bg-stone-900/30"
+          className="border border-border px-6 data-[state=open]:bg-stone-900/50 active:bg-stone-900/30"
         >
           <AccordionTrigger className="text-left font-light py-6 md:py-5 hover:no-underline gap-4">
             <span className="pr-6 md:pr-4">
