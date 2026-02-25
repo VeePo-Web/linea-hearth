@@ -77,14 +77,14 @@ const FeaturedCollection = () => {
   const displayProducts = products.length > 0 ? products : placeholderProducts;
 
   return (
-    <section className="w-full py-12 md:py-16 lg:py-24 bg-background">
+    <section className="w-full py-12 md:py-16 lg:py-24 bg-white">
       <div className="max-w-7xl mx-auto px-4 xs:px-6">
         {/* Section Header - Editorial minimal */}
         <ScrollReveal variant="fadeUp">
           <div className="flex justify-between items-end mb-6 md:mb-8">
             <div>
-              <p className="text-eyebrow text-muted-foreground mb-2">Community picks</p>
-              <h2 className="text-section text-foreground">Tribe Approved</h2>
+              <p className="text-eyebrow text-stone-500 mb-2">Community picks</p>
+              <h2 className="text-section text-stone-950">Tribe Approved</h2>
             </div>
             <motion.div
               whileHover={{ x: 4 }}
@@ -92,7 +92,7 @@ const FeaturedCollection = () => {
             >
               <Link 
                 to="/category/shop"
-                className="text-foreground text-sm font-light flex items-center gap-2 hover:text-accent transition-colors group touch-target py-2"
+                className="text-stone-900 text-sm font-light flex items-center gap-2 hover:text-amber-600 transition-colors group touch-target py-2"
               >
                 Shop All
                 <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
@@ -114,7 +114,7 @@ const FeaturedCollection = () => {
                 className="group block tap-feedback active:scale-[0.98] transition-transform duration-150"
               >
                 {/* Product Image */}
-                <div className="aspect-[3/4] bg-muted mb-3 md:mb-4 overflow-hidden relative">
+                <div className="aspect-[3/4] bg-stone-100 mb-3 md:mb-4 overflow-hidden relative">
                   {product.primary_image ? (
                     <motion.img 
                       src={product.primary_image}
@@ -125,8 +125,8 @@ const FeaturedCollection = () => {
                       loading="lazy"
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-muted to-secondary">
-                      <span className="text-muted-foreground text-caption uppercase">
+                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-stone-100 to-stone-200">
+                      <span className="text-stone-500 text-caption uppercase">
                         {product.category_name}
                       </span>
                     </div>
@@ -142,24 +142,24 @@ const FeaturedCollection = () => {
 
                 {/* Product Info - Minimal */}
                 <div>
-                  <p className="text-caption text-muted-foreground uppercase mb-1">
+                  <p className="text-caption text-stone-500 uppercase mb-1">
                     {product.category_name}
                   </p>
-                  <h3 className="text-xs xs:text-sm font-light text-foreground mb-1 group-hover:text-accent transition-colors line-clamp-1">
+                  <h3 className="text-xs xs:text-sm font-light text-stone-950 mb-1 group-hover:text-amber-600 transition-colors line-clamp-1">
                     {product.name}
                   </h3>
                   <div className="flex items-center gap-2">
                     {product.is_on_sale && product.sale_price ? (
                       <>
-                        <span className="text-xs xs:text-sm font-light text-foreground">
+                        <span className="text-xs xs:text-sm font-light text-stone-950">
                           {formatPrice(product.sale_price)}
                         </span>
-                        <span className="text-xs xs:text-sm font-light text-muted-foreground line-through">
+                        <span className="text-xs xs:text-sm font-light text-stone-400 line-through">
                           {formatPrice(product.price)}
                         </span>
                       </>
                     ) : (
-                      <span className="text-xs xs:text-sm font-light text-foreground">
+                      <span className="text-xs xs:text-sm font-light text-stone-950">
                         {formatPrice(product.price)}
                       </span>
                     )}
