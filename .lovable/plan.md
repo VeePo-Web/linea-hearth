@@ -1,115 +1,122 @@
 
 
-# Strategic White Contrast Sections -- Editorial Rhythm Upgrade
+# About Page -- Strategic White Contrast Sections
 
-## Design Rationale
+## Current State
 
-In high-end fashion magazines (DAZED, 032c, i-D), the most impactful layouts alternate between dark and light "spreads." A fully dark site creates atmosphere but loses hierarchy -- every section blends into the next. Strategic white sections act like turning a bright page in a magazine: they reset the eye, elevate perceived quality, and create the "quiet section / loud section" editorial pacing that defines premium streetwear publishing.
+The Our Story page has 8 consecutive dark (`bg-stone-950`) sections with amber dividers between them. While atmospheric, this creates the same "dark fatigue" problem the homepage had before adding white breathers. Every section blends into the next -- the eye has no reset point.
 
-The current site is 100% dark after the root variable swap. The goal is to introduce 2-3 white "breather" sections that create deliberate contrast without breaking the overall dark identity.
-
----
-
-## Sections That Stay Dark (No Change)
-
-These sections are already perfect in dark and define the brand's editorial gravity:
-
-- **EditorialHero** -- cinematic, full-bleed, dark is essential
-- **FeaturedDrop** -- magazine spread on dark, image-forward
-- **CategoryTiles** -- 032c-style grid with dark overlays
-- **MarqueeStrip** -- dark ticker strip, brand texture
-- **DropGrid** -- new arrivals on dark, drop-culture energy
-- **InstagramFeed** -- dark editorial social proof
-- **Navigation + Footer** -- structural dark anchors
+The homepage now uses a 70/30 dark-to-light ratio with 3 white sections (ValueStackBanner, FeaturedCollection, TestimonySpotlight). The About page needs the same editorial rhythm: 1-2 strategic "bright page turns."
 
 ---
 
-## Sections That Become White (Strategic Contrast)
+## Which Sections Stay Dark (No Change)
 
-### 1. MissionBlock -- Already White Card, Perfect As-Is
-The floating white card on the dark image background is the ideal "bright page" moment. No changes needed -- this is already the right pattern.
+These are atmospheric/cinematic and must remain dark:
 
-### 2. FeaturedCollection ("Tribe Approved") -- Convert to White
-**Why:** This is the main product grid. White backgrounds are the industry standard for product browsing because they maximize product image clarity and color accuracy. Every premium fashion site (SSENSE, Mr Porter, END.) uses white/light backgrounds for product grids. Dark backgrounds compete with product imagery.
-
-**Changes:**
-- Section background: `bg-background` stays, but we wrap content in an explicit white container
-- Actually: add explicit `bg-white` to the section, with `text-stone-950` for all text
-- Category labels: `text-stone-500`
-- Product names: `text-stone-900`
-- Prices: `text-stone-900`
-- "Shop All" link: `text-stone-900 hover:text-amber-600`
-- Sale badge stays red
-- This creates a clean "catalog page" feel between two dark editorial sections
-
-### 3. TestimonySpotlight -- Convert to White
-**Why:** The testimony quote block benefits from a white background because it creates a "pull quote" magazine moment. The portrait image stays full-bleed on the left; the right side becomes a clean white field with dark text -- exactly like an i-D interview spread.
-
-**Changes:**
-- Section background: explicit `bg-white`
-- Quote text: `text-stone-950`
-- Accent text (faith line): keep `text-accent` (amber)
-- Customer info: `text-stone-600`
-- "From the tribe" eyebrow: keep `text-accent`
-- "Read More" link: `text-stone-900`
-
-### 4. ValueStackBanner -- Convert to White
-**Why:** A thin white strip between the hero and content creates a visual "palette cleanser." It also makes the trust messaging (Free Shipping, Returns, Quality) more legible and authoritative -- white strips with small caps text is a classic luxury e-commerce pattern (Kith, Fear of God).
-
-**Changes:**
-- Background: explicit `bg-white`
-- Text: `text-stone-500`
-- Border: `border-stone-200`
-- Dots: `text-stone-300`
+- **StoryHero** (01) -- cinematic full-bleed opener, dark is essential
+- **StoryCallingSection** (02) -- giant quotation mark + scripture, needs dark gravity
+- **OriginStory** (03) -- lion SVG animation on dark, amber accents need dark canvas
+- **ImpactMap** (06) -- map dots + animated counters, dark creates dashboard feel
+- **StoryWorldwideTribe** (07) -- grayscale gallery with hover color reveal, needs dark
+- **StoryJoinCTA** (08) -- closing CTA with model image, dark for finality
 
 ---
 
-## Resulting Editorial Rhythm
+## Which Sections Become White (2 Sections)
+
+### 1. FounderLetter (Section 04) -- White Pull-Quote Page
+
+**Why:** This is the emotional center of the page -- a founder's personal confession. In magazines like i-D and DAZED, the most powerful pull quotes always sit on white spreads. The contrast makes the words feel more vulnerable, more real, more intimate. A white page after three dark sections is a "page turn" moment that demands attention.
+
+**Changes:**
+- Section background: `bg-stone-950` becomes `bg-white`
+- Giant quotation mark: `text-amber-500/15` stays (amber on white reads beautifully)
+- Main quote text: `text-white` becomes `text-stone-950`
+- Sub-text: `text-white/50` becomes `text-stone-500`
+- Italic emphasis: `text-white` becomes `text-stone-950`
+- Signature line dividers: `bg-amber-500` stays
+- Signature name: `text-white` becomes `text-stone-950`
+- Title beneath name: `text-white/40` becomes `text-stone-400`
+- Bio text: `text-white/50` becomes `text-stone-500`
+- Bio emphasis: `text-white font-medium` becomes `text-stone-950 font-medium`
+- Index watermark: `text-white` at 3% opacity becomes `text-stone-950` at 3% opacity
+
+### 2. StoryValuesGrid (Section 05) -- White Manifesto Spread
+
+**Why:** The values/doctrine section is a "text-heavy" spread -- three columns of manifesto content. White backgrounds with dark text maximize readability for dense copy. This is the "editorial text page" pattern from 032c: clean white field, massive index numbers, tight typography. It also creates a two-section white "island" (04 + 05) sandwiched between dark sections -- exactly like a magazine opening to a bright double-page spread.
+
+**Changes:**
+- Section background: `bg-stone-950` becomes `bg-white`
+- Grid pattern overlay: `rgba(255,255,255,0.1)` becomes `rgba(0,0,0,0.04)` (subtle dark grid on white)
+- Section eyebrow: `text-amber-500` stays
+- Section heading: `text-white` becomes `text-stone-950`, amber period stays
+- Index watermark: `text-white/20` becomes `text-stone-950/10`
+- Giant index numbers (01/02/03): `text-white/5` becomes `text-stone-200`, hover `text-amber-500/10` becomes `text-amber-500/20`
+- Value titles: `text-white` becomes `text-stone-950`
+- Value descriptions: `text-white/50` becomes `text-stone-500`
+- Accent lines: `bg-amber-500/30` stays (amber on white reads well)
+
+---
+
+## Resulting About Page Rhythm
 
 ```text
-[DARK]  EditorialHero -- cinematic, immersive
-[WHITE] ValueStackBanner -- trust strip, palette cleanser
-[DARK]  RecentlyViewed -- contextual, subtle
-[DARK]  FeaturedDrop -- magazine spread, atmospheric
-[DARK]  CategoryTiles -- 032c grid, editorial
-[DARK]  MarqueeStrip -- brand texture
-[WHITE] FeaturedCollection -- clean product grid, catalog clarity
-[DARK]  MissionBlock -- dark image + white card overlay
-[DARK]  DropGrid -- new arrivals, drop energy
-[WHITE] TestimonySpotlight -- i-D interview spread
-[DARK]  InstagramFeed -- social proof
+[DARK]  StoryHero (01) -- cinematic opener
+[DARK]  StoryCallingSection (02) -- giant scripture quote
+[DARK]  OriginStory (03) -- lion animation + brand name origin
+[WHITE] FounderLetter (04) -- intimate pull-quote, "page turn"
+[WHITE] StoryValuesGrid (05) -- manifesto text spread
+[DARK]  ImpactMap (06) -- stats dashboard + map
+[DARK]  StoryWorldwideTribe (07) -- photo gallery
+[DARK]  StoryJoinCTA (08) -- closing call-to-action
 ```
 
-This creates a 70/30 dark-to-light ratio with three strategic "bright pages" that reset the viewer's eye and prevent dark fatigue.
+Three dark, two white, three dark. A clean A-B-A structure.
+
+---
+
+## Divider Updates
+
+The amber dividers between sections 03-04 and 05-06 need background color adjustments since they border white sections:
+
+- Divider between OriginStory (dark) and FounderLetter (white): change `bg-stone-950` to `bg-white` (matches the section it leads into)
+- Divider between FounderLetter (white) and StoryValuesGrid (white): keep or change to `bg-white` (both sides are white)
+- Divider between StoryValuesGrid (white) and ImpactMap (dark): change `bg-stone-950` stays (matches the section it leads into)
+
+Actually, the simplest approach: remove the dividers between 03-04, 04-05, and 05-06 entirely. The dark-to-white and white-to-dark transitions ARE the dividers. The color shift itself creates the separation. Amber hairlines between same-color sections make sense; between contrasting sections they add unnecessary noise.
 
 ---
 
 ## Technical Implementation
 
-### File 1: `src/components/homepage/FeaturedCollection.tsx`
-- Line 80: Change `bg-background` to `bg-white`
-- All `text-foreground` references become `text-stone-950`
-- All `text-muted-foreground` become `text-stone-500`
-- `hover:text-accent` becomes `hover:text-amber-600`
-- `bg-muted` (image placeholder) becomes `bg-stone-100`
-- `bg-gradient-to-br from-muted to-secondary` becomes `from-stone-100 to-stone-200`
+### File 1: `src/components/about/FounderLetter.tsx`
+- Line 12: `bg-stone-950` becomes `bg-white`
+- Line 22: watermark `text-white` becomes `text-stone-950`
+- Line 44: quote `text-white` becomes `text-stone-950`
+- Line 47: sub-text `text-white/50` becomes `text-stone-500`
+- Line 50: italic `text-white` becomes `text-stone-950`
+- Line 66: signature name `text-white` becomes `text-stone-950`
+- Line 70: title `text-white/40` becomes `text-stone-400`
+- Line 79: bio `text-white/50` becomes `text-stone-500`
+- Line 83: bio emphasis `text-white font-medium` becomes `text-stone-950 font-medium`
 
-### File 2: `src/components/homepage/TestimonySpotlight.tsx`
-- Line 10: Change `bg-background` to `bg-white`
-- All `text-foreground` become `text-stone-950`
-- All `text-muted-foreground` become `text-stone-500`
-- `text-accent` stays (amber on white reads well)
-- Link hover: `hover:text-amber-600`
+### File 2: `src/components/about/StoryValuesGrid.tsx`
+- Line 29: `bg-stone-950 text-white` becomes `bg-white text-stone-950`
+- Line 35-36: grid pattern `rgba(255,255,255,0.1)` becomes `rgba(0,0,0,0.04)`
+- Line 42: watermark `text-white/20` becomes `text-stone-950/10`
+- Line 62-63: heading, remove reliance on inherited text-white
+- Line 82: giant numbers `text-white/5` becomes `text-stone-200`, hover `text-amber-500/10` becomes `text-amber-500/20`
+- Line 88: titles `text-white` becomes `text-stone-950`
+- Line 91: descriptions `text-white/50` becomes `text-stone-500`
 
-### File 3: `src/components/homepage/ValueStackBanner.tsx`
-- Line 31: Change `bg-muted border-y border-border` to `bg-white border-y border-stone-200`
-- All `text-muted-foreground` become `text-stone-500`
-- `text-foreground/20` dots become `text-stone-300`
-- `text-foreground/40` chevron becomes `text-stone-400`
+### File 3: `src/pages/about/OurStory.tsx`
+- Remove divider between OriginStory and FounderLetter (line 25)
+- Remove divider between FounderLetter and StoryValuesGrid (line 27)
+- Remove divider between StoryValuesGrid and ImpactMap (line 29)
 
 ### Scope
 - 3 files modified
-- Class name changes only (no logic, no structure changes)
+- Class name swaps only (no logic, no structure changes)
 - Zero risk to dark sections
-- Preserves the dominant dark identity while adding editorial rhythm
 
