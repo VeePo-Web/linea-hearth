@@ -1,68 +1,83 @@
 
 
-# UI/UX Stress Test -- Post-Fix Verification Report
+# About Page -- Full Dark Colorway Conversion
 
-## Verification Results
+## Objective
 
-All 11 fixes from the previous plan have been confirmed deployed and working:
+Convert the Our Story page to a consistent black background (`bg-stone-950`) with white text throughout all 8 sections. Currently, sections 02 (StoryCallingSection), 04 (FounderLetter), and 07 (StoryWorldwideTribe) use light backgrounds (`bg-stone-50`). These three sections will be converted to dark while maintaining visual hierarchy and separation between sections.
 
-1. **MobileMenu** -- scroll lock + Escape handler present (lines 108-120)
-2. **FavoritesDrawer** -- scroll lock + Escape handler present (lines 219-231)
-3. **AuthModal** -- scroll lock + Escape handler present (lines 42-54)
-4. **SearchOverlay** -- scroll lock present (lines 230-241)
-5. **MobileStickyATC** -- safe-area padding applied on both variants (lines 56, 87)
-6. **CartDrawer "Proceed to Checkout"** -- `onClick` moved to `Link` (line 467)
-7. **MegaMenu label** -- replaced broken `whileHover` with CSS `group-hover` (lines 205-212)
-8. **Navigation overlay transitions** -- synchronous close-before-open (lines 299-334)
+---
 
-## One Remaining Bug Found
+## Current State
 
-### BUG 12: CartDrawer "Continue Shopping" -- Same `asChild` + `onClick` Pattern
-**Component:** `CartDrawer.tsx` (lines 473-482)
-**Severity:** Low
-**Issue:** The "Continue Shopping" `Button` uses `asChild` with `onClick={closeCart}` on the Button wrapper, but renders a `Link` child. This is the identical pattern that was fixed for "Proceed to Checkout" but was missed on this second button. On some mobile browsers, `onClick` on the Radix Slot parent may fire without propagating to the `Link` child, causing the cart to close but navigation to not fire.
+| Section | Component | Current BG | Status |
+|---------|-----------|------------|--------|
+| 01 Hero | StoryHero | `bg-stone-950` | Already dark |
+| 02 Calling | StoryCallingSection | `bg-stone-50` | Needs conversion |
+| 03 Origin | OriginStory | `bg-stone-950` | Already dark |
+| 04 Founder Letter | FounderLetter | `bg-stone-50` | Needs conversion |
+| 05 Values | StoryValuesGrid | `bg-stone-950` | Already dark |
+| 06 Impact | ImpactMap | `bg-stone-950` | Already dark |
+| 07 Tribe | StoryWorldwideTribe | `bg-stone-50` | Needs conversion |
+| 08 CTA | StoryJoinCTA | `bg-stone-950` | Already dark |
 
-**Fix:** Move `onClick={closeCart}` from the `Button` to the `Link` component, matching the pattern used for the "Proceed to Checkout" fix.
+---
 
-**Before:**
-```typescript
-<Button variant="ghost" className="..." onClick={closeCart} asChild>
-  <Link to="/category/shop">Continue Shopping</Link>
-</Button>
-```
+## Changes Per Section
 
-**After:**
-```typescript
-<Button variant="ghost" className="..." asChild>
-  <Link to="/category/shop" onClick={closeCart}>Continue Shopping</Link>
-</Button>
-```
+### Section 02: StoryCallingSection
+- Background: `bg-stone-50` to `bg-stone-950`
+- Text colors: `text-stone-950` to `text-white`, `text-stone-700` to `text-white/70`, `text-stone-500` to `text-white/50`
+- Watermark: `text-stone-950/10` to `text-white/10`
+- Giant quotation mark: `text-amber-500/10` to `text-amber-500/10` (stays)
+- Rotated vertical text: `text-stone-950/20` to `text-white/20`
+- Accent line remains amber
 
-## Full Sweep Summary
+### Section 04: FounderLetter
+- Background: `bg-stone-50` to `bg-stone-950`
+- Quote text: `text-stone-950` to `text-white`
+- Secondary text: `text-stone-500` to `text-white/50`
+- Italic accent: `text-stone-950` to `text-white`
+- Watermark: `text-stone-950` to `text-white`
+- Signature name: `text-stone-950` to `text-white`
+- Signature title: `text-stone-400` to `text-white/40`
+- Bio text: `text-stone-500` to `text-white/50`, `text-stone-950` to `text-white`
+- Giant quotation mark: `text-amber-500/15` stays (works on dark)
 
-All other overlay/modal surfaces in the codebase were audited:
+### Section 07: StoryWorldwideTribe
+- Background: `bg-stone-50 text-stone-950` to `bg-stone-950 text-white`
+- Watermark: `text-stone-950/10` to `text-white/10`
+- Subtitle: `text-stone-500` to `text-white/50`
+- Border: `border-stone-200` to `border-white/10`
+- CTA text: `text-stone-500` to `text-white/50`, `text-stone-950` to `text-white`
+- Button: `border-stone-950 text-stone-950 hover:bg-stone-950 hover:text-white` to `border-white text-white hover:bg-white hover:text-stone-950`
+- Instagram badge already dark-compatible
 
-| Component | Pattern | Scroll Lock | Escape | Status |
-|-----------|---------|-------------|--------|--------|
-| QuickViewModal | Radix Dialog / Vaul Drawer | Native | Native | OK |
-| SizeQuizModal | Radix Dialog | Native | Native | OK |
-| SubmitStoryModal | Radix Dialog | Native | Native | OK |
-| StoryModal | Radix Dialog | Native | Native | OK |
-| AskUsModal | Radix Dialog / Vaul Drawer | Native | Native | OK |
-| SaveLookModal | Radix Dialog | Native | Native | OK |
-| ProductDrawer (Try-On) | Radix Sheet | Native | Native | OK |
-| FitGuideModal | Custom (desktop) / Drawer (mobile) | Manual + Native | Manual | OK |
-| PostPurchaseOffer | Radix Dialog | Native | Native | OK |
-| SwipeLookbook | Vaul Drawer | Native | Native | OK |
-| FullScreenNav | Custom | Manual | Manual | OK |
-| CartDrawer | Custom | Manual | Manual | OK |
-| MobileMenu | Custom | Manual | Manual | OK (fixed) |
-| FavoritesDrawer | Custom | Manual | Manual | OK (fixed) |
-| AuthModal | Custom | Manual | Manual | OK (fixed) |
-| SearchOverlay | Custom | Manual | Existing | OK (fixed) |
+### Section Separation Strategy
+With all sections now dark, visual separation comes from:
+- Existing amber separator lines (already in OurStory.tsx between 05 and 06)
+- Add similar thin amber separators between sections 01-02, 02-03, 03-04, 04-05, 06-07, 07-08
+- Each section's unique visual density (massive type vs grid vs image) provides natural rhythm
+- Varying padding and content styles already create distinct "spreads"
 
-## Implementation
+### OurStory.tsx
+- Add thin amber line separators between each section transition for visual breathing
+- These are subtle 1px amber lines (`w-24 h-px bg-amber-500/40`) centered between sections
 
-**Single file change:**
-- `src/components/cart/CartDrawer.tsx` line 476: move `onClick={closeCart}` from `Button` to `Link`
+---
+
+## Files Modified
+
+| File | Change |
+|------|--------|
+| `src/components/about/StoryCallingSection.tsx` | Dark colorway conversion |
+| `src/components/about/FounderLetter.tsx` | Dark colorway conversion |
+| `src/components/about/StoryWorldwideTribe.tsx` | Dark colorway conversion |
+| `src/pages/about/OurStory.tsx` | Add amber separators between all sections |
+
+---
+
+## Visual Result
+
+The entire About page becomes a single continuous dark editorial scroll -- like a DAZED or 032c magazine spread printed on black stock. The amber accent color and white typography create the contrast. Section separation is handled by content density changes, padding variation, and subtle amber hairline dividers rather than background color flips. This is the more premium, editorial-correct approach -- luxury fashion magazines rarely flip between black and white backgrounds mid-feature.
 
