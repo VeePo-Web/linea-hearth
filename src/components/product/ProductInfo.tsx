@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -118,6 +118,14 @@ const ProductInfo = ({ product, variants = [], onColorChange, onAuthRequired, on
       };
     });
   }, [variants]);
+
+  // Auto-select color when only one option exists
+  useEffect(() => {
+    if (colors.length === 1 && !selectedColor) {
+      setSelectedColor(colors[0].color);
+      onColorChange?.(colors[0].color);
+    }
+  }, [colors]);
 
   const incrementQuantity = () => setQuantity(prev => prev + 1);
   const decrementQuantity = () => setQuantity(prev => Math.max(1, prev - 1));

@@ -27,11 +27,14 @@ import { useState, useEffect } from "react";
 import { useBehaviorTracking } from "@/hooks/useBehaviorTracking";
 import { useQuickAdd } from "@/hooks/useQuickAdd";
 import { useRecentlyViewed } from "@/contexts/RecentlyViewedContext";
+import { useCart } from "@/hooks/useCart";
+import { productIdToCartId, formatPrice } from "@/lib/cartUtils";
 
 const ProductDetail = () => {
   const { productId } = useParams();
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
   const { addProduct } = useRecentlyViewed();
+  const { addItem } = useCart();
 
   const { data: product, isLoading } = useQuery({
     queryKey: ["product", productId],
@@ -178,7 +181,20 @@ const ProductDetail = () => {
               variants={product.product_variants}
               onColorChange={setSelectedColor}
               onAddToBag={({ size, color, quantity }) => {
-                quickAdd.addToCart({ size: size || undefined, color: color || undefined, quantity });
+                const primaryImage = product.product_images?.find(img => img.is_primary)
+                  || product.product_images?.[0];
+                addItem({
+                  id: productIdToCartId(product.id),
+                  name: product.name,
+                  price: displayPrice,
+                  priceFormatted: formatPrice(displayPrice),
+                  image: primaryImage?.image_url || '/placeholder.svg',
+                  category: product.categories?.slug || 'tops',
+                  size: size || undefined,
+                  color: color || undefined,
+                  quantity,
+                  productId: product.id,
+                });
               }}
             />
           </div>
