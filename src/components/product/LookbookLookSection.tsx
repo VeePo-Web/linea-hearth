@@ -186,7 +186,7 @@ const LookbookLookSection = ({ currentProductId, fallbackCategoryId }: LookbookL
               "{lookData.look.headline}"
             </p>
             {lookData.look.scripture_reference && (
-              <p className="text-[11px] text-amber-600/80 font-light">
+              <p className="text-[11px] text-champagne-600/80 font-light">
                 {lookData.look.scripture_reference}
               </p>
             )}
@@ -243,7 +243,7 @@ const LookbookLookSection = ({ currentProductId, fallbackCategoryId }: LookbookL
           </motion.p>
           {lookData.look.scripture_reference && (
             <motion.p 
-              className="text-[11px] text-amber-600/80 font-light"
+              className="text-[11px] text-champagne-600/80 font-light"
               initial={{ opacity: 0 }}
               animate={isInView ? { opacity: 1 } : { opacity: 0 }}
               transition={{ delay: 0.3, duration: 0.5 }}

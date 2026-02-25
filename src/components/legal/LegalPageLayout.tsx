@@ -56,7 +56,7 @@ const LegalPageLayout = ({
           <div className="max-w-3xl">
             <div className="flex items-center justify-between gap-4 mb-4">
               {lastUpdated && (
-                <span className="inline-block text-xs font-medium tracking-widest text-amber-500 print:text-muted-foreground">
+                <span className="inline-block text-xs font-medium tracking-widest text-champagne-500 print:text-muted-foreground">
                   LAST UPDATED: {lastUpdated.toUpperCase()}
                 </span>
               )}

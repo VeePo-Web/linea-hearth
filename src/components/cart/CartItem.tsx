@@ -130,7 +130,7 @@ const CartItem = ({ item }: CartItemProps) => {
               
               {/* Low stock badge */}
               {isLowStock && (
-                <p className="text-xs text-amber-600 font-medium mt-1">
+                <p className="text-xs text-champagne-600 font-medium mt-1">
                   Only {item.stock} left
                 </p>
               )}

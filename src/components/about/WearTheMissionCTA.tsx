@@ -37,7 +37,7 @@ const WearTheMissionCTA = () => {
             className="w-full h-full object-cover"
           />
           {/* Gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-amber-500 opacity-20 lg:opacity-40" />
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-champagne-500 opacity-20 lg:opacity-40" />
           <div className="absolute inset-0 bg-gradient-to-t from-stone-950/60 via-transparent to-transparent lg:hidden" />
         </motion.div>
 
