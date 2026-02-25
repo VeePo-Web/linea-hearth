@@ -21,7 +21,7 @@ const MissionBlock = () => {
       />
       
       <motion.div 
-        className="absolute inset-0 bg-foreground/40"
+        className="absolute inset-0 bg-background/40"
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         transition={{ duration: 1 }}

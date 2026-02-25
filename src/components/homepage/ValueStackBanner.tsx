@@ -28,25 +28,25 @@ const ValueStackBanner = () => {
     <Link to="/shipping">
       <section 
         ref={sectionRef}
-        className={`w-full py-3 md:py-4 bg-foreground border-y border-background/10 transition-opacity duration-700 group ${
+        className={`w-full py-3 md:py-4 bg-muted border-y border-border transition-opacity duration-700 group ${
           isVisible ? 'opacity-100' : 'opacity-0'
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 xs:px-6">
           <div className="flex items-center justify-center gap-2 xs:gap-3 md:gap-8 text-center">
-            <span className="text-[9px] xs:text-[10px] md:text-caption text-background/60 uppercase whitespace-nowrap">
+            <span className="text-[9px] xs:text-[10px] md:text-caption text-muted-foreground uppercase whitespace-nowrap">
               Free Shipping ${CURRENCY.freeShippingThreshold}+
             </span>
-            <span className="text-background/20 hidden xs:inline">•</span>
-            <span className="text-[9px] xs:text-[10px] md:text-caption text-background/60 uppercase whitespace-nowrap">
+            <span className="text-foreground/20 hidden xs:inline">•</span>
+            <span className="text-[9px] xs:text-[10px] md:text-caption text-muted-foreground uppercase whitespace-nowrap">
               30-Day Returns
             </span>
-            <span className="text-background/20 hidden md:inline">•</span>
-            <span className="text-[9px] xs:text-[10px] md:text-caption text-background/60 uppercase whitespace-nowrap hidden md:inline">
+            <span className="text-foreground/20 hidden md:inline">•</span>
+            <span className="text-[9px] xs:text-[10px] md:text-caption text-muted-foreground uppercase whitespace-nowrap hidden md:inline">
               Premium Quality
             </span>
             {/* Mobile chevron indicator */}
-            <ChevronRight className="w-3 h-3 text-background/40 group-hover:text-background/60 transition-colors md:hidden" />
+            <ChevronRight className="w-3 h-3 text-foreground/40 group-hover:text-foreground/60 transition-colors md:hidden" />
           </div>
         </div>
       </section>

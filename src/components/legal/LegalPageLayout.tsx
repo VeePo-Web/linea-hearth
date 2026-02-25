@@ -92,7 +92,7 @@ const LegalPageLayout = ({
                   onOpenChange={setIsMobileTocOpen} 
                   className="lg:hidden mb-8"
                 >
-                  <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-stone-100 dark:bg-stone-900 border border-stone-200 dark:border-stone-800">
+                  <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-stone-900 border border-stone-800">
                     <span className="text-xs font-medium tracking-widest">ON THIS PAGE</span>
                     <ChevronDown 
                       className={cn(
@@ -101,7 +101,7 @@ const LegalPageLayout = ({
                       )} 
                     />
                   </CollapsibleTrigger>
-                  <CollapsibleContent className="bg-stone-50 dark:bg-stone-900/50 border border-t-0 border-stone-200 dark:border-stone-800">
+                  <CollapsibleContent className="bg-stone-900/50 border border-t-0 border-stone-800">
                     <ul className="p-4 space-y-2">
                       {tocSections.map((section) => (
                         <li key={section.id}>

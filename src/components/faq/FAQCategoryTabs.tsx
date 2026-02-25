@@ -64,8 +64,8 @@ const FAQCategoryTabs = ({
                 "px-4 py-3 md:py-2 text-[10px] xs:text-xs font-medium tracking-widest whitespace-nowrap uppercase transition-all border scroll-snap-start",
                 "active:scale-[0.98] touch-manipulation",
                 isActive
-                  ? "bg-stone-900 text-white border-stone-900 dark:bg-white dark:text-stone-900 dark:border-white"
-                  : "bg-transparent text-muted-foreground border-stone-300 hover:border-stone-900 hover:text-foreground dark:border-stone-600 dark:hover:border-white"
+                  ? "bg-white text-stone-950 border-white"
+                  : "bg-transparent text-muted-foreground border-stone-600 hover:border-white hover:text-foreground"
               )}
             >
               {category.label}

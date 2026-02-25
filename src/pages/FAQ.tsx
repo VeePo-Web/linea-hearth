@@ -203,7 +203,7 @@ const NoResultsState = ({
   onAskClick: () => void;
 }) => (
   <div className="text-center py-12 md:py-16">
-    <div className="w-16 h-16 bg-stone-100 dark:bg-stone-800 rounded-full flex items-center justify-center mx-auto mb-6">
+    <div className="w-16 h-16 bg-stone-800 rounded-full flex items-center justify-center mx-auto mb-6">
       <Search className="w-6 h-6 text-muted-foreground" />
     </div>
     <h3 className="text-lg md:text-xl font-light mb-2 uppercase tracking-wide">INTEL NOT FOUND.</h3>

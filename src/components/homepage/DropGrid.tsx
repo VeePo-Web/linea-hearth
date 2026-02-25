@@ -77,7 +77,7 @@ const DropGrid = () => {
   const displayProducts = products.length > 0 ? products : placeholderProducts;
 
   return (
-    <section className="w-full py-12 md:py-16 lg:py-24 bg-foreground">
+    <section className="w-full py-12 md:py-16 lg:py-24 bg-background">
       <div className="max-w-7xl mx-auto px-4 xs:px-6">
         {/* Section Header - Hypebeast style */}
         <ScrollReveal variant="slideInLeft">
@@ -87,11 +87,11 @@ const DropGrid = () => {
                 <span className="bg-destructive text-destructive-foreground text-[10px] font-bold tracking-wider uppercase px-2 py-0.5">
                   Just Dropped
                 </span>
-                <span className="text-caption text-background/50 hidden xs:inline">
+                <span className="text-caption text-muted-foreground hidden xs:inline">
                   {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
                 </span>
               </div>
-              <h2 className="text-section text-background">New Arrivals</h2>
+              <h2 className="text-section text-foreground">New Arrivals</h2>
             </div>
             <motion.div
               whileHover={{ x: 4 }}
@@ -99,7 +99,7 @@ const DropGrid = () => {
             >
               <Link 
                 to="/category/new-in"
-                className="text-background text-sm font-light flex items-center gap-2 hover:text-accent transition-colors group touch-target py-2"
+                className="text-foreground text-sm font-light flex items-center gap-2 hover:text-accent transition-colors group touch-target py-2"
               >
                 View All
                 <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
@@ -140,7 +140,7 @@ const DropGrid = () => {
                   )}
 
                   {/* Index Number - 032c style - responsive sizing */}
-                  <div className="absolute top-2 left-2 md:top-3 md:left-3 text-[10px] font-medium text-stone-950 bg-white px-2 py-1 min-h-[24px] flex items-center">
+                  <div className="absolute top-2 left-2 md:top-3 md:left-3 text-[10px] font-medium text-foreground bg-background px-2 py-1 min-h-[24px] flex items-center">
                     #{String(index + 1).padStart(2, '0')}
                   </div>
 
@@ -154,24 +154,24 @@ const DropGrid = () => {
 
                 {/* Product Info - Minimal */}
                 <div>
-                  <p className="text-caption text-background/50 uppercase mb-1">
+                  <p className="text-caption text-muted-foreground uppercase mb-1">
                     {product.category_name}
                   </p>
-                  <h3 className="text-xs xs:text-sm font-light text-background mb-1 group-hover:text-accent transition-colors line-clamp-1">
+                  <h3 className="text-xs xs:text-sm font-light text-foreground mb-1 group-hover:text-accent transition-colors line-clamp-1">
                     {product.name}
                   </h3>
                   <div className="flex items-center gap-2">
                     {product.is_on_sale && product.sale_price ? (
                       <>
-                        <span className="text-xs xs:text-sm font-light text-background">
+                        <span className="text-xs xs:text-sm font-light text-foreground">
                           {formatPrice(product.sale_price)}
                         </span>
-                        <span className="text-xs xs:text-sm font-light text-background/50 line-through">
+                        <span className="text-xs xs:text-sm font-light text-muted-foreground line-through">
                           {formatPrice(product.price)}
                         </span>
                       </>
                     ) : (
-                      <span className="text-xs xs:text-sm font-light text-background">
+                      <span className="text-xs xs:text-sm font-light text-foreground">
                         {formatPrice(product.price)}
                       </span>
                     )}

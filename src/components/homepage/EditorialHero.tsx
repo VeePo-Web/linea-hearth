@@ -30,7 +30,7 @@ const EditorialHero = () => {
   return (
     <section 
       ref={containerRef}
-      className="relative w-full min-h-dvh bg-foreground overflow-hidden hero-noise group"
+      className="relative w-full min-h-dvh bg-background overflow-hidden hero-noise group"
       style={{ position: "relative" }}
     >
       {/* Index Number - 032c Editorial Watermark */}
@@ -38,7 +38,7 @@ const EditorialHero = () => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 2.5, duration: 1 }}
-        className="absolute bottom-8 right-8 z-10 hero-index text-background/5 hidden lg:block"
+        className="absolute bottom-8 right-8 z-10 hero-index text-foreground/5 hidden lg:block"
       >
         01
       </motion.div>
@@ -63,8 +63,8 @@ const EditorialHero = () => {
             fetchpriority="high"
           />
           {/* Gradient overlays for text readability */}
-          <div className="absolute inset-0 bg-gradient-to-r from-foreground via-foreground/70 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-t from-foreground/80 via-transparent to-foreground/40" />
+          <div className="absolute inset-0 bg-gradient-to-r from-background via-background/70 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-background/40" />
         </motion.div>
       </motion.div>
 
@@ -113,7 +113,7 @@ const EditorialHero = () => {
         <div className="flex-1 flex flex-col justify-center">
           {/* Mobile Typography - Refined scaling */}
           <div className="block lg:hidden">
-            <h1 className="text-hero-massive-mobile-refined text-background leading-[0.85]">
+            <h1 className="text-hero-massive-mobile-refined text-foreground leading-[0.85]">
               <CharacterReveal 
                 text="WEAR" 
                 className="block"
@@ -137,7 +137,7 @@ const EditorialHero = () => {
 
           {/* Desktop Typography - Offset Layout */}
           <div className="hidden lg:block">
-            <h1 className="text-hero-massive text-background leading-[0.85]">
+            <h1 className="text-hero-massive text-foreground leading-[0.85]">
               <CharacterReveal 
                 text="WEAR" 
                 className="block"
@@ -168,7 +168,7 @@ const EditorialHero = () => {
           >
             Some people wear crosses as accessories.<br />
             You wear yours as a declaration.<br />
-            <span className="text-background">This is for you.</span>
+            <span className="text-foreground">This is for you.</span>
           </motion.p>
         </div>
 
@@ -183,7 +183,7 @@ const EditorialHero = () => {
           >
             <Link
               to="/category/shop"
-              className="editorial-link text-background inline-flex items-center gap-3 group/cta touch-target py-2"
+              className="editorial-link text-foreground inline-flex items-center gap-3 group/cta touch-target py-2"
             >
               Enter the Drop
               <motion.span
@@ -199,7 +199,7 @@ const EditorialHero = () => {
             {/* Secondary CTA */}
             <Link
               to="/about/our-story"
-              className="text-[10px] font-light tracking-[0.2em] uppercase text-muted-foreground hover:text-background transition-colors duration-300 touch-target-sm py-2"
+              className="text-[10px] font-light tracking-[0.2em] uppercase text-muted-foreground hover:text-foreground transition-colors duration-300 touch-target-sm py-2"
             >
               Read Our Story
             </Link>

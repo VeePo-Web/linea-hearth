@@ -59,7 +59,7 @@ const CategoryTiles = () => {
   const wideCategory = categories.find(c => c.layout === "wide")!;
 
   return (
-    <section className="w-full py-16 md:py-24 lg:py-40 bg-foreground relative overflow-hidden">
+    <section className="w-full py-16 md:py-24 lg:py-40 bg-background relative overflow-hidden">
       {/* Noise Texture Overlay */}
       <div 
         className="absolute inset-0 opacity-[0.02] pointer-events-none mix-blend-overlay"
@@ -72,7 +72,7 @@ const CategoryTiles = () => {
         {/* Editorial Section Header - 032c Style */}
         <div className="mb-12 md:mb-16 lg:mb-24">
           <motion.span
-            className="text-xs uppercase tracking-[0.3em] text-background/50 block mb-3"
+            className="text-xs uppercase tracking-[0.3em] text-muted-foreground block mb-3"
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -84,12 +84,12 @@ const CategoryTiles = () => {
             <TextReveal 
               text="COLLECTION" 
               as="h2"
-              className="text-[10vw] sm:text-[8vw] md:text-[6vw] lg:text-[5vw] font-extralight tracking-[-0.04em] text-background leading-[0.85]"
+              className="text-[10vw] sm:text-[8vw] md:text-[6vw] lg:text-[5vw] font-extralight tracking-[-0.04em] text-foreground leading-[0.85]"
             />
           </div>
           {/* Editorial Divider */}
           <motion.div 
-            className="w-16 md:w-24 h-px bg-background mt-6 md:mt-8"
+            className="w-16 md:w-24 h-px bg-foreground mt-6 md:mt-8"
             initial={{ scaleX: 0, originX: 0 }}
             whileInView={{ scaleX: 1 }}
             viewport={{ once: true }}
@@ -214,18 +214,18 @@ const CategoryTile = ({ category, prefersReducedMotion, isWide = false, isMobile
       </motion.div>
       
       {/* Overlay Gradient */}
-      <div className="absolute inset-0 bg-gradient-to-t from-foreground/60 via-foreground/20 to-transparent group-hover:from-foreground/40 group-hover:via-foreground/10 transition-all duration-500" />
+      <div className="absolute inset-0 bg-gradient-to-t from-background/60 via-background/20 to-transparent group-hover:from-background/40 group-hover:via-background/10 transition-all duration-500" />
 
       {/* Hover Border Frame */}
-      <div className="absolute inset-2 md:inset-3 border border-background/0 group-hover:border-background/30 transition-all duration-500 pointer-events-none" />
+      <div className="absolute inset-2 md:inset-3 border border-foreground/0 group-hover:border-foreground/30 transition-all duration-500 pointer-events-none" />
       
       {/* Index Number - 032c Style */}
       <div className="absolute bottom-4 right-4 md:bottom-6 md:right-6 lg:bottom-8 lg:right-8 flex flex-col items-end">
-        <span className={`${indexSize} font-extralight text-background/15 group-hover:text-background/25 transition-all duration-500 leading-none`}>
+        <span className={`${indexSize} font-extralight text-foreground/15 group-hover:text-foreground/25 transition-all duration-500 leading-none`}>
           {category.index}
         </span>
         <motion.div 
-          className="w-4 md:w-6 lg:w-8 h-px bg-background/20 group-hover:bg-background/40 mt-2 transition-all duration-500"
+          className="w-4 md:w-6 lg:w-8 h-px bg-foreground/20 group-hover:bg-foreground/40 mt-2 transition-all duration-500"
           initial={{ scaleX: 0 }}
           whileInView={{ scaleX: 1 }}
           viewport={{ once: true }}
@@ -236,20 +236,20 @@ const CategoryTile = ({ category, prefersReducedMotion, isWide = false, isMobile
       {/* Content Overlay */}
       <div className="absolute bottom-0 left-0 right-0 p-4 xs:p-6 md:p-10">
         {/* Category Name - Massive Typography */}
-        <h3 className={`${titleSize} font-extralight text-background uppercase tracking-[-0.04em] leading-[0.85] group-hover:tracking-[-0.02em] transition-all duration-500`}>
+        <h3 className={`${titleSize} font-extralight text-foreground uppercase tracking-[-0.04em] leading-[0.85] group-hover:tracking-[-0.02em] transition-all duration-500`}>
           {category.name}
         </h3>
         
         {/* Subtitle - Visible by default on mobile, appears on hover for desktop */}
         <div className={`overflow-hidden mt-2 ${isMobile ? 'h-6' : 'h-0 group-hover:h-6'} transition-all duration-500`}>
-          <p className={`text-[10px] md:text-xs uppercase tracking-[0.2em] text-background/70 ${isMobile ? '' : 'transform translate-y-full group-hover:translate-y-0'} transition-transform duration-500 delay-100`}>
+          <p className={`text-[10px] md:text-xs uppercase tracking-[0.2em] text-foreground/70 ${isMobile ? '' : 'transform translate-y-full group-hover:translate-y-0'} transition-transform duration-500 delay-100`}>
             {category.subtitle}
           </p>
         </div>
 
         {/* CTA - Editorial Underline Style - Always visible on mobile */}
         <div className={`mt-3 md:mt-4 lg:mt-6 ${isMobile ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'} transition-opacity duration-500 delay-200`}>
-          <span className="text-[10px] md:text-xs uppercase tracking-[0.2em] text-background inline-flex items-center gap-2 touch-target-sm">
+          <span className="text-[10px] md:text-xs uppercase tracking-[0.2em] text-foreground inline-flex items-center gap-2 touch-target-sm">
             Shop {category.name}
             <motion.span
               className="inline-block"
@@ -260,7 +260,7 @@ const CategoryTile = ({ category, prefersReducedMotion, isWide = false, isMobile
             </motion.span>
           </span>
           <motion.div 
-            className="h-px bg-background/60 mt-1 origin-left"
+            className="h-px bg-foreground/60 mt-1 origin-left"
             initial={{ scaleX: isMobile ? 1 : 0 }}
             whileHover={{ scaleX: 1 }}
             transition={{ duration: 0.3 }}

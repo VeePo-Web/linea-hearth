@@ -70,7 +70,7 @@ const ServiceSidebar = () => {
       ))}
       
       {/* Contact Card */}
-      <div className="mt-12 p-6 bg-stone-100 dark:bg-stone-900">
+      <div className="mt-12 p-6 bg-stone-900">
         <h4 className="text-sm font-medium mb-2">Need Help?</h4>
         <p className="text-sm text-muted-foreground mb-4">
           Our tribe is here for you.
