@@ -1,93 +1,65 @@
 
+Goal: make PDP “Add to Bag” reliably add the selected variant and immediately reflect in the cart drawer/header count (“Your Bag (N)”), based on the live audit where the click succeeds visually but cart state remains unchanged.
 
-# Fix: "Add to Bag" Button Not Adding Items to Cart
+What I audited
+- Verified the live flow on `/product/stay-holy-hoodie`:
+  - Selected size M.
+  - Clicked Add to Bag.
+  - Opened cart drawer and confirmed it still shows `Your Bag (0)` with empty state.
+- Confirmed in code:
+  - `ProductDetail.tsx` already passes `onAddToBag` to `useCart().addItem(...)`.
+  - `CartDrawer` and header cart badge both read from the same `useCart` context.
+  - There is only one `CartProvider` in `App.tsx`.
+- This isolates the issue to PDP CTA interaction path (button/control wiring), not cart provider wiring.
 
-## Root Cause Analysis
+Likely root cause
+1) The animated Add-to-Bag control in `ProductInfo.tsx` uses `Button asChild` + nested `motion.button` + duplicated disabled/click props.
+2) In this composition, the visible button can appear interactive, but click handling/disabled state propagation can be inconsistent.
+3) Result: `onAddToBag` callback is not consistently invoked in the non-reduced-motion branch even when size/color are selected.
 
-There are **two interconnected bugs** preventing items from being added to the cart:
+Implementation plan
+1. Normalize PDP Add-to-Bag control to a single native button event path
+- File: `src/components/product/ProductInfo.tsx`
+- Replace the non-reduced-motion Add-to-Bag block:
+  - Remove `asChild` + nested `motion.button` composition for the primary CTA.
+  - Keep animation wrapper on container (`motion.div`) if desired, but make the clickable element a single `Button` with direct `onClick`.
+  - Keep `id="main-add-to-bag"` for sticky observer compatibility.
+  - Keep `disabled={!canAddToBag}` on that same button only.
+- This eliminates event propagation ambiguity and ensures callback execution is deterministic.
 
-### Bug 1: Single-color products require manual color selection (primary cause)
+2. Harden single-color auto-selection effect
+- File: `src/components/product/ProductInfo.tsx`
+- Keep existing auto-select logic, but make effect dependencies explicit/stable:
+  - Include `selectedColor` and `onColorChange` in deps.
+  - Guard against unnecessary re-runs.
+- Purpose: guarantee `canAddToBag` is true once a size is chosen for single-color products.
 
-Both active products in the database have exactly **one color each**:
-- "Heavenly Crewneck" -- only "White"
-- "Stay Holy Hoodie" -- only "Carolina Blue"
+3. Keep PDP add handler direct to cart state
+- File: `src/pages/ProductDetail.tsx`
+- Retain direct `addItem(...)` callback currently wired in `onAddToBag`.
+- Verify payload fields are complete (`id`, `name`, `price`, `priceFormatted`, `image`, `category`, `size`, `color`, `quantity`, `productId`).
+- Do not reroute this main PDP CTA through quick-add path.
 
-The `canAddToBag` check in `ProductInfo.tsx` (line 138) requires `selectedColor` to be set when colors exist:
+4. Validate end-to-end in live preview (desktop + mobile)
+- Desktop:
+  - Open PDP.
+  - Confirm color is preselected for single-color products.
+  - Select size.
+  - Click Add to Bag.
+  - Confirm drawer auto-opens and shows item row.
+  - Confirm header/cart count increments > 0.
+- Mobile:
+  - Repeat PDP add flow.
+  - Confirm cart drawer and count are in sync.
+- Repeat on both available products to ensure variant handling is robust.
 
-```text
-canAddToBag = variants.length === 0 || (
-  (colors.length === 0 || selectedColor) &&   <-- requires color click
-  (sizes.length === 0 || selectedSize)
-)
-```
+5. Regression checks
+- Ensure `HighIntentPrompt` and `MobileStickyATC` still use quick-add behavior without breaking.
+- Ensure no changes to cart storage key behavior, bundle logic, or saved-for-later indicators.
+- Confirm no console errors introduced by the CTA rewrite.
 
-Since neither product auto-selects its sole color, the "Add to Bag" button **stays disabled** (50% opacity). Users may not realize they need to click the single color swatch before selecting a size.
-
-### Bug 2: Silent failure when `addToCart` receives no size
-
-Even if the button were clickable, the PDP routes through `useQuickAdd.addToCart`, which silently fails by calling `setIsPickerOpen(true)` when no size is resolved -- but the PDP never renders the quick-add size picker, so nothing happens.
-
-## Fix Plan
-
-### 1. Auto-select color when only one option exists (`ProductInfo.tsx`)
-
-Add a `useEffect` that auto-selects the color when there's exactly one available:
-
-```typescript
-useEffect(() => {
-  if (colors.length === 1 && !selectedColor) {
-    setSelectedColor(colors[0].color);
-    onColorChange?.(colors[0].color);
-  }
-}, [colors]);
-```
-
-This immediately satisfies the `canAddToBag` condition for single-color products.
-
-### 2. Wire "Add to Bag" directly to `useCart.addItem` (`ProductDetail.tsx`)
-
-The PDP already has its own size/color/quantity UI, so routing through `useQuickAdd` (designed for one-tap surfaces like PLP cards) adds unnecessary complexity and failure modes. Replace the `onAddToBag` callback to use `addItem` from `useCart` directly:
-
-```typescript
-const { addItem, openCart } = useCart();
-
-onAddToBag={({ size, color, quantity }) => {
-  const primaryImage = product.product_images?.find(img => img.is_primary)
-    || product.product_images?.[0];
-
-  addItem({
-    id: productIdToCartId(product.id),
-    name: product.name,
-    price: displayPrice,
-    priceFormatted: formatPrice(displayPrice),
-    image: primaryImage?.image_url || '/placeholder.svg',
-    category: product.categories?.slug || 'tops',
-    size: size || undefined,
-    color: color || undefined,
-    quantity,
-    productId: product.id,
-  });
-}}
-```
-
-This bypasses the `useQuickAdd` remembered-size/picker logic entirely on the PDP, where it's not needed.
-
-### 3. Keep `useQuickAdd` for surfaces that need it
-
-The `MobileStickyATC` and `HighIntentPrompt` on the PDP can continue using `quickAdd.handleQuickAdd` since those are "quick add" surfaces. But the main "Add to Bag" button should go direct.
-
-## Files Changed
-
-| File | Change |
-|------|--------|
-| `src/components/product/ProductInfo.tsx` | Add auto-select for single-color products |
-| `src/pages/ProductDetail.tsx` | Wire `onAddToBag` directly to `useCart.addItem` instead of `useQuickAdd.addToCart` |
-
-## Expected Result
-
-- User visits PDP for "Heavenly Crewneck"
-- Color "White" is auto-selected
-- User selects a size (e.g., "M")
-- "Add to Bag" button is enabled
-- Clicking it immediately adds the item to cart and opens the CartDrawer showing the item
-
+Acceptance criteria
+- Clicking PDP Add to Bag after valid selection always adds item to cart.
+- Cart drawer opens with the new line item visible.
+- Header/cart indicator and drawer title both show updated non-zero count.
+- Works on desktop and mobile for both active products.
