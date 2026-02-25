@@ -20,6 +20,16 @@ const FounderLetter = () => {
         04
       </motion.span>
 
+      {/* Eyebrow */}
+      <motion.p
+        initial={{ opacity: 0, y: 20 }}
+        animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+        transition={{ duration: 0.8, delay: 0.3 }}
+        className="absolute top-10 left-10 lg:top-12 lg:left-12 text-[10px] tracking-[0.4em] text-amber-500 z-10"
+      >
+        THE LETTER
+      </motion.p>
+
       {/* Centered typography-only layout */}
       <div className="relative z-10 flex items-center justify-center min-h-screen px-6 md:px-12 lg:px-16 py-32 md:py-48">
         <div className="max-w-3xl mx-auto text-center">
