@@ -221,14 +221,14 @@ export default function SubmitStoryModal({ isOpen, onClose }: SubmitStoryModalPr
             <Select
               value={formData.product_id}
               onValueChange={(value) =>
-                setFormData({ ...formData, product_id: value })
+                setFormData({ ...formData, product_id: value === "none" ? "" : value })
               }
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select a product" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">None</SelectItem>
+                <SelectItem value="none">None</SelectItem>
                 {products?.map((product) => (
                   <SelectItem key={product.id} value={product.id}>
                     {product.name}
