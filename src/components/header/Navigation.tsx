@@ -80,7 +80,7 @@ const Navigation = () => {
   const currentDropdownData = navItems.find(item => item.name === activeDropdown);
 
   return (
-    <nav className="relative h-[var(--nav-height)]" style={{ backgroundColor: 'rgba(255, 255, 255, 0.97)', backdropFilter: 'blur(12px)' }}>
+    <nav className="relative h-[var(--nav-height)] bg-nav/[0.97] backdrop-blur-[12px]">
       <div className="flex items-center justify-between h-full px-8">
         {/* Mobile hamburger */}
         <motion.button
