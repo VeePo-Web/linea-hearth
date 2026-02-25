@@ -113,7 +113,7 @@ const MinistryInMotion = () => {
                   <img
                     src={photo.image_url}
                     alt={`${photo.customer_name} wearing Line of Judah`}
-                    className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105"
+                    className="w-full h-full object-cover md:grayscale md:group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105"
                   />
                   
                   {/* Featured badge */}
