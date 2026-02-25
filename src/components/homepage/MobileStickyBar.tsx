@@ -55,7 +55,7 @@ const MobileStickyBar = () => {
           <Button 
             asChild
             size="lg"
-            className="flex-1 bg-[hsl(30,5%,72%)] hover:bg-[hsl(30,5%,78%)] active:bg-[hsl(30,5%,78%)] text-black font-medium h-12 rounded-none group touch-target"
+            className="flex-1 bg-forest-500 hover:bg-forest-400 active:bg-forest-400 text-white font-medium h-12 rounded-none group touch-target"
             onClick={handleTap}
           >
             <Link to="/category/shop">

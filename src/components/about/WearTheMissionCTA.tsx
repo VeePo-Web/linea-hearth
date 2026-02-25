@@ -37,7 +37,7 @@ const WearTheMissionCTA = () => {
             className="w-full h-full object-cover"
           />
           {/* Gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-[hsl(30,5%,72%)] opacity-20 lg:opacity-40" />
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-forest-500 opacity-20 lg:opacity-40" />
           <div className="absolute inset-0 bg-gradient-to-t from-stone-950/60 via-transparent to-transparent lg:hidden" />
         </motion.div>
 
@@ -46,7 +46,7 @@ const WearTheMissionCTA = () => {
           initial={{ opacity: 0, x: 30 }}
           animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: 30 }}
           transition={{ duration: 1, delay: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
-          className="lg:col-span-2 bg-[hsl(30,5%,72%)] flex items-center justify-center p-8 md:p-12 lg:p-16 relative"
+          className="lg:col-span-2 bg-forest-500 flex items-center justify-center p-8 md:p-12 lg:p-16 relative"
         >
           {/* Amber accent border */}
           <div className="absolute top-0 left-0 w-full h-2 bg-stone-950" />
@@ -57,7 +57,7 @@ const WearTheMissionCTA = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
               transition={{ duration: 0.6, delay: 0.4 }}
-              className="text-[10px] uppercase tracking-[0.4em] text-stone-950/60 mb-6"
+              className="text-[10px] uppercase tracking-[0.4em] text-white/60 mb-6"
             >
               Join the Movement
             </motion.p>
@@ -67,7 +67,7 @@ const WearTheMissionCTA = () => {
               initial={{ opacity: 0, y: 30 }}
               animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
               transition={{ duration: 0.8, delay: 0.5 }}
-              className="text-3xl md:text-4xl lg:text-5xl font-light text-stone-950 tracking-tight mb-6"
+              className="text-3xl md:text-4xl lg:text-5xl font-light text-white tracking-tight mb-6"
             >
               Ready to Wear<br />
               the Mission?
@@ -80,9 +80,9 @@ const WearTheMissionCTA = () => {
               transition={{ duration: 0.6, delay: 0.7 }}
               className="flex items-center justify-center lg:justify-start gap-3 mb-8"
             >
-              <Users className="h-5 w-5 text-stone-950/70" />
-              <span className="text-lg font-light text-stone-950/80">
-                Join <span className="font-medium text-stone-950">10K+ believers</span> wearing their faith
+              <Users className="h-5 w-5 text-white/70" />
+              <span className="text-lg font-light text-white/80">
+                Join <span className="font-medium text-white">10K+ believers</span> wearing their faith
               </span>
             </motion.div>
 
@@ -96,7 +96,7 @@ const WearTheMissionCTA = () => {
               <Button
                 asChild
                 size="lg"
-                className="bg-stone-950 text-[hsl(0,0%,82%)] hover:bg-stone-900 rounded-none px-8 py-6 text-base font-light tracking-wide group"
+                className="bg-white text-forest-500 hover:bg-white/90 rounded-none px-8 py-6 text-base font-light tracking-wide group"
               >
                 <Link to="/category/all">
                   Shop the Collection
@@ -108,7 +108,7 @@ const WearTheMissionCTA = () => {
                 asChild
                 variant="outline"
                 size="lg"
-                className="border-stone-950 text-stone-950 hover:bg-stone-950 hover:text-[hsl(0,0%,82%)] rounded-none px-8 py-6 text-base font-light tracking-wide bg-transparent"
+                className="border-white text-white hover:bg-white hover:text-forest-500 rounded-none px-8 py-6 text-base font-light tracking-wide bg-transparent"
               >
                 <Link to="/ambassador">
                   Become an Ambassador
@@ -121,9 +121,9 @@ const WearTheMissionCTA = () => {
               initial={{ opacity: 0 }}
               animate={isInView ? { opacity: 1 } : { opacity: 0 }}
               transition={{ duration: 0.6, delay: 1.2 }}
-              className="mt-10 pt-8 border-t border-stone-950/20"
+              className="mt-10 pt-8 border-t border-white/20"
             >
-              <p className="text-sm text-stone-950/60 font-light">
+              <p className="text-sm text-white/60 font-light">
                 Free shipping on orders over $99 • Easy returns • Made with conviction
               </p>
             </motion.div>
