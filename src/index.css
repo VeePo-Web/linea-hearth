@@ -38,8 +38,8 @@
     --muted: 0 0% 12%;
     --muted-foreground: 0 0% 55%;
     
-    --accent: 0 0% 62%;
-    --accent-foreground: 0 0% 4%;
+    --accent: 152 35% 30%;
+    --accent-foreground: 0 0% 98%;
     
     /* 032c-inspired red accent */
     --destructive: 0 62% 50%;
@@ -93,8 +93,8 @@
     --muted: 0 0% 12%;
     --muted-foreground: 0 0% 55%;
     
-    --accent: 0 0% 62%;
-    --accent-foreground: 0 0% 4%;
+    --accent: 152 35% 30%;
+    --accent-foreground: 0 0% 98%;
     
     --border: 0 0% 18%;
     --input: 0 0% 18%;
