@@ -22,11 +22,8 @@ const OurStory = () => {
         <StoryCallingSection />
         <div className="bg-stone-950 flex justify-center py-0"><div className="w-24 h-px bg-amber-500/40" /></div>
         <OriginStory />
-        <div className="bg-stone-950 flex justify-center py-0"><div className="w-24 h-px bg-amber-500/40" /></div>
         <FounderLetter />
-        <div className="bg-stone-950 flex justify-center py-0"><div className="w-24 h-px bg-amber-500/40" /></div>
         <StoryValuesGrid />
-        <div className="bg-stone-950 flex justify-center py-0"><div className="w-24 h-px bg-amber-500/40" /></div>
         <ImpactMap />
         <div className="bg-stone-950 flex justify-center py-0"><div className="w-24 h-px bg-amber-500/40" /></div>
         <StoryWorldwideTribe />

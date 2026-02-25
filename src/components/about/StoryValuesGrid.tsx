@@ -26,20 +26,20 @@ const StoryValuesGrid = () => {
   return (
     <section
       ref={sectionRef}
-      className="relative bg-stone-950 text-white py-32 md:py-48 overflow-hidden"
+      className="relative bg-white text-stone-950 py-32 md:py-48 overflow-hidden"
     >
       {/* Grid pattern background */}
       <div 
         className="absolute inset-0 opacity-[0.03]"
         style={{
-          backgroundImage: `linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)`,
+          backgroundImage: `linear-gradient(rgba(0,0,0,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.04) 1px, transparent 1px)`,
           backgroundSize: '60px 60px'
         }}
       />
 
       {/* Index watermark */}
       <motion.span 
-        className="absolute top-10 right-10 lg:top-12 lg:right-12 text-[10px] tracking-[0.4em] text-white/20 font-light"
+        className="absolute top-10 right-10 lg:top-12 lg:right-12 text-[10px] tracking-[0.4em] text-stone-950/10 font-light"
         initial={{ opacity: 0 }}
         animate={isInView ? { opacity: 1 } : {}}
         transition={{ delay: 0.3, duration: 0.8 }}
@@ -79,16 +79,16 @@ const StoryValuesGrid = () => {
               transition={{ delay: 0.4 + index * 0.15, duration: 0.8 }}
             >
               {/* Massive index number as visual anchor */}
-              <span className="block text-[80px] md:text-[100px] lg:text-[120px] xl:text-[140px] font-light leading-none text-white/5 mb-4 transition-colors duration-500 group-hover:text-amber-500/10">
+              <span className="block text-[80px] md:text-[100px] lg:text-[120px] xl:text-[140px] font-light leading-none text-stone-200 mb-4 transition-colors duration-500 group-hover:text-amber-500/20">
                 {value.index}
               </span>
 
               {/* Content */}
               <div className="relative -mt-12 lg:-mt-16 xl:-mt-20 pl-2">
-                <h3 className="text-lg md:text-xl font-medium tracking-wide mb-4 text-white">
+                <h3 className="text-lg md:text-xl font-medium tracking-wide mb-4 text-stone-950">
                   {value.title}
                 </h3>
-                <p className="text-sm md:text-base text-white/50 leading-relaxed font-light">
+                <p className="text-sm md:text-base text-stone-500 leading-relaxed font-light">
                   {value.description}
                 </p>
 
