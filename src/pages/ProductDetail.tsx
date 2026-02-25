@@ -177,6 +177,9 @@ const ProductDetail = () => {
               }}
               variants={product.product_variants}
               onColorChange={setSelectedColor}
+              onAddToBag={({ size, color, quantity }) => {
+                quickAdd.addToCart({ size: size || undefined, color: color || undefined, quantity });
+              }}
             />
           </div>
         </div>
