@@ -54,6 +54,7 @@ interface ProductInfoProps {
   variants?: ProductVariant[];
   onColorChange?: (color: string) => void;
   onAuthRequired?: () => void;
+  onAddToBag?: (details: { size: string | null; color: string | null; quantity: number }) => void;
 }
 
 // Color code mapping
@@ -70,7 +71,7 @@ const colorCodes: Record<string, string> = {
   cream: "#fffdd0",
 };
 
-const ProductInfo = ({ product, variants = [], onColorChange, onAuthRequired }: ProductInfoProps) => {
+const ProductInfo = ({ product, variants = [], onColorChange, onAuthRequired, onAddToBag }: ProductInfoProps) => {
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
@@ -255,7 +256,7 @@ const ProductInfo = ({ product, variants = [], onColorChange, onAuthRequired }: 
             </div>
           </div>
 
-          <Button id="main-add-to-bag" disabled={!canAddToBag} className="w-full h-12 bg-foreground text-background hover:bg-foreground/90 font-light rounded-none disabled:opacity-50 disabled:cursor-not-allowed">
+          <Button id="main-add-to-bag" disabled={!canAddToBag} onClick={() => onAddToBag?.({ size: selectedSize, color: selectedColor, quantity })} className="w-full h-12 bg-foreground text-background hover:bg-foreground/90 font-light rounded-none disabled:opacity-50 disabled:cursor-not-allowed">
             Add to Bag — ${totalPrice.toFixed(2)}
           </Button>
 
@@ -459,6 +460,7 @@ const ProductInfo = ({ product, variants = [], onColorChange, onAuthRequired }: 
               whileTap={{ scale: 0.99 }}
               transition={{ type: "spring", stiffness: 400, damping: 20 }}
               disabled={!canAddToBag}
+              onClick={() => onAddToBag?.({ size: selectedSize, color: selectedColor, quantity })}
             >
               Add to Bag — ${totalPrice.toFixed(2)}
             </motion.button>
