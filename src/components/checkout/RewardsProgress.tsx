@@ -26,7 +26,7 @@ const RewardsProgress = () => {
         <div className="h-1.5 bg-muted rounded-full overflow-hidden">
           {/* Filled progress */}
           <div
-            className="h-full bg-gradient-to-r from-amber-400 to-amber-500 transition-all duration-500 ease-out"
+            className="h-full bg-gradient-to-r from-champagne-400 to-champagne-500 transition-all duration-500 ease-out"
             style={{ width: `${progress}%` }}
           />
         </div>

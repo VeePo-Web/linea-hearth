@@ -75,7 +75,7 @@ export default function StoryCard({ story, onOpenStory, index, size = "regular" 
           <div className={`absolute inset-0 ${
             [
               'bg-gradient-to-br from-stone-900 to-stone-800',
-              'bg-gradient-to-br from-amber-950/80 to-stone-900',
+              'bg-gradient-to-br from-stone-900/80 to-stone-900',
               'bg-gradient-to-br from-stone-800 to-stone-700',
               'bg-gradient-to-br from-stone-950 to-champagne-950/40',
             ][index % 4]

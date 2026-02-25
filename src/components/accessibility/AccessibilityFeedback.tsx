@@ -195,7 +195,7 @@ const AccessibilityFeedback = () => {
       </div>
 
       {/* Priority Checkbox */}
-      <div className="flex items-start space-x-3 p-4 bg-amber-500/5 border border-amber-500/20">
+      <div className="flex items-start space-x-3 p-4 bg-champagne-500/5 border border-champagne-500/20">
         <Checkbox
           id="feedback-priority"
           checked={formData.isPriority}

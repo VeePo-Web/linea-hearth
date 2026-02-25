@@ -19,7 +19,7 @@ const HeroBlock = () => {
         />
         {/* Hero Background - Using a gradient placeholder, can be replaced with video/image */}
         <div 
-          className="w-full h-full bg-gradient-to-br from-stone-900 via-amber-950 to-stone-800"
+          className="w-full h-full bg-gradient-to-br from-stone-900 via-stone-800 to-stone-800"
           style={{
             backgroundImage: `url('/products/stay-holy-hoodie/male-model.png')`,
             backgroundSize: 'cover',

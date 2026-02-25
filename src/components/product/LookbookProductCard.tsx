@@ -104,7 +104,7 @@ const LookbookProductCard = ({ product, position }: LookbookProductCardProps) =>
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="absolute inset-0 bg-amber-600/90 flex items-center justify-center"
+                className="absolute inset-0 bg-champagne-600/90 flex items-center justify-center"
               >
                 <motion.div
                   initial={{ scale: 0 }}
@@ -182,7 +182,7 @@ const LookbookProductCard = ({ product, position }: LookbookProductCardProps) =>
             )}
             {/* Size memory indicator */}
             {quickAdd.rememberedSize && quickAdd.stockForRemembered > 0 && (
-              <span className="text-[9px] uppercase tracking-wide text-amber-600 font-medium">
+              <span className="text-[9px] uppercase tracking-wide text-champagne-600 font-medium">
                 {quickAdd.rememberedSize}
               </span>
             )}
