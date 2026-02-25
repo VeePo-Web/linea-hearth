@@ -37,7 +37,7 @@ const WearTheMissionCTA = () => {
             className="w-full h-full object-cover"
           />
           {/* Gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-champagne-500 opacity-20 lg:opacity-40" />
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-[hsl(30,5%,72%)] opacity-20 lg:opacity-40" />
           <div className="absolute inset-0 bg-gradient-to-t from-stone-950/60 via-transparent to-transparent lg:hidden" />
         </motion.div>
 
@@ -46,7 +46,7 @@ const WearTheMissionCTA = () => {
           initial={{ opacity: 0, x: 30 }}
           animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: 30 }}
           transition={{ duration: 1, delay: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
-          className="lg:col-span-2 bg-champagne-500 flex items-center justify-center p-8 md:p-12 lg:p-16 relative"
+          className="lg:col-span-2 bg-[hsl(30,5%,72%)] flex items-center justify-center p-8 md:p-12 lg:p-16 relative"
         >
           {/* Amber accent border */}
           <div className="absolute top-0 left-0 w-full h-2 bg-stone-950" />
@@ -96,7 +96,7 @@ const WearTheMissionCTA = () => {
               <Button
                 asChild
                 size="lg"
-                className="bg-stone-950 text-champagne-500 hover:bg-stone-900 rounded-none px-8 py-6 text-base font-light tracking-wide group"
+                className="bg-stone-950 text-[hsl(0,0%,82%)] hover:bg-stone-900 rounded-none px-8 py-6 text-base font-light tracking-wide group"
               >
                 <Link to="/category/all">
                   Shop the Collection
@@ -108,7 +108,7 @@ const WearTheMissionCTA = () => {
                 asChild
                 variant="outline"
                 size="lg"
-                className="border-stone-950 text-stone-950 hover:bg-stone-950 hover:text-champagne-500 rounded-none px-8 py-6 text-base font-light tracking-wide bg-transparent"
+                className="border-stone-950 text-stone-950 hover:bg-stone-950 hover:text-[hsl(0,0%,82%)] rounded-none px-8 py-6 text-base font-light tracking-wide bg-transparent"
               >
                 <Link to="/ambassador">
                   Become an Ambassador
