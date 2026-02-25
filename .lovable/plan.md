@@ -1,46 +1,54 @@
 
-# Fix: Main "Add to Bag" Button Not Working on PDP
+
+# Mobile Grayscale Removal -- Show Images in Full Color on Touch Devices
 
 ## The Problem
-The primary "Add to Bag" button on the Product Detail Page (PDP) does not add items to the cart. Clicking it does nothing. This is because the button in `ProductInfo.tsx` has no click handler connected to the cart system.
 
-The mobile sticky "Add to Bag" button works correctly because it uses the `useQuickAdd` hook, but the main desktop/mobile button is disconnected.
+Multiple sections across the site use a grayscale-to-color hover effect. On desktop, this is a polished editorial interaction. On mobile, users cannot hover, so images remain permanently desaturated -- making the site look washed out and reducing product desirability on the device where most traffic comes from.
 
-## Root Cause
-In `src/components/product/ProductInfo.tsx` (lines 451-465), the button renders with `disabled={!canAddToBag}` but has **no `onClick` handler**. The component never imports or calls `useCart().addItem()`.
+## Affected Components (7 files, ~10 line changes)
 
-## Fix Plan
+### 1. `src/components/homepage/CategoryTiles.tsx` (line 211)
+**Current:** `grayscale contrast-110 group-hover:grayscale-0 group-hover:contrast-100`
+**Fix:** `md:grayscale md:contrast-110 md:group-hover:grayscale-0 md:group-hover:contrast-100`
+- Prefix `grayscale` and `contrast-110` with `md:` so they only apply at 768px+
+- Keep `group-active:grayscale-0` and `group-active:contrast-100` for desktop tap fallback
 
-### 1. Update `ProductInfo.tsx` to accept an `onAddToBag` callback
+### 2. `src/components/about/StoryWorldwideTribe.tsx` (lines 132-133)
+**Current:** Conditional class `hoveredIndex === index ? "grayscale-0 scale-105" : "grayscale"`
+**Fix:** Change the grayscale branch to only apply on md+. On mobile, always show full color. The simplest approach: use the `isMobile` pattern (component doesn't have it yet, but we can detect via a CSS-only approach using responsive prefixes, or import `useIsMobile`).
+- Since this uses JS-driven hover state (not CSS `:hover`), we import `useIsMobile` and skip the grayscale class when `isMobile` is true.
 
-Add a new prop `onAddToBag` to `ProductInfoProps`:
-```typescript
-interface ProductInfoProps {
-  // ...existing props
-  onAddToBag?: (details: { size: string | null; color: string | null; quantity: number }) => void;
-}
-```
+### 3. `src/components/about/MinistryInMotion.tsx` (line 116)
+**Current:** `grayscale group-hover:grayscale-0`
+**Fix:** `md:grayscale md:group-hover:grayscale-0`
 
-### 2. Wire the "Add to Bag" button's `onClick`
+### 4. `src/components/about/BrandFilmHero.tsx` (line 162)
+**Current:** `grayscale hover:grayscale-0`
+**Fix:** `md:grayscale md:hover:grayscale-0`
 
-Both the reduced-motion and animated versions of the button (lines 258 and 451-464) need an `onClick` that calls `onAddToBag` with the selected size, color, and quantity.
+### 5. `src/components/community/StoryCard.tsx` (line 72)
+**Current:** `grayscale group-hover:grayscale-0`
+**Fix:** `md:grayscale md:group-hover:grayscale-0`
 
-### 3. Update `ProductDetail.tsx` to pass the handler
+### 6. `src/components/community/CommunityHero.tsx` (lines 214, 228)
+**Current:** `grayscale group-hover:grayscale-0`
+**Fix:** `md:grayscale md:group-hover:grayscale-0`
 
-In `ProductDetail.tsx`, use the existing `useQuickAdd` hook (already instantiated on line 80) to create a handler that:
-- Takes the size/color/quantity from ProductInfo
-- Calls `quickAdd.addToCart({ size, color, quantity })`
+### 7. `src/components/community/SocialFeed.tsx` (line 181)
+**Current:** `grayscale group-hover:grayscale-0`
+**Fix:** `md:grayscale md:group-hover:grayscale-0`
 
-This reuses the existing cart integration, size memory, toast notifications, and haptic feedback -- no duplicate logic.
+## Approach
 
-### Files Changed
-1. **`src/components/product/ProductInfo.tsx`** -- Add `onAddToBag` prop, wire onClick on both button instances
-2. **`src/pages/ProductDetail.tsx`** -- Pass `onAddToBag` callback using `quickAdd.addToCart`
+For 6 of the 7 components, the fix is a pure CSS class prefix swap -- adding `md:` before `grayscale` so it only activates at desktop breakpoint. No JS changes, no layout changes, no design changes.
 
-### What This Fixes
-- Main "Add to Bag" button will add items to cart
-- Cart drawer will auto-open after adding
-- Size memory will be saved
-- Toast notification will appear
-- Haptic feedback on mobile
-- All consistent with the existing quick-add system used everywhere else
+For `StoryWorldwideTribe.tsx`, which uses JS-driven hover state for the grayscale toggle, we import `useIsMobile` and conditionally skip the grayscale class on mobile -- keeping images full color while preserving the desktop hover interaction.
+
+## What Does NOT Change
+- No words, copy, or content
+- No layout, spacing, or design
+- No desktop behavior (grayscale + hover reveal stays identical)
+- No colors, fonts, or animations
+- Only the grayscale filter is removed on screens below 768px
+
