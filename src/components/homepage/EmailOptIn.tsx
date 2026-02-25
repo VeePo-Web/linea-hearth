@@ -293,7 +293,7 @@ const EmailOptIn = ({ variant = "default" }: EmailOptInProps) => {
                     <Button
                       type="submit"
                       disabled={isLoading}
-                      className="w-full h-12 bg-champagne-500 hover:bg-champagne-400 text-background font-medium rounded-none"
+                      className="w-full h-12 bg-[hsl(30,5%,72%)] hover:bg-[hsl(30,5%,78%)] text-background font-medium rounded-none"
                     >
                       {isLoading ? "ENLISTING..." : "ENLIST NOW"}
                     </Button>
