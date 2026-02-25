@@ -112,7 +112,7 @@ const Category = () => {
         productCount={totalCount}
       />
       
-      <div className="pt-6 md:pt-8 pb-safe">
+      <div className="pt-6 md:pt-8 pb-safe bg-foreground">
         <FilterSortBar 
           filtersOpen={filtersOpen}
           setFiltersOpen={setFiltersOpen}

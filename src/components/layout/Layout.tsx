@@ -25,7 +25,7 @@ const Layout = ({
   className = "" 
 }: LayoutProps) => {
   return (
-    <div className={`min-h-screen bg-background ${className}`}>
+    <div className={`min-h-screen bg-foreground ${className}`}>
       {/* Skip to main content - Accessibility */}
       <a 
         href="#main-content" 

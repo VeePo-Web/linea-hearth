@@ -300,29 +300,29 @@ const ProductCard = ({ product, onQuickView, index = 0, onAuthRequired }: Produc
         {/* Product Info */}
         <div className="space-y-1.5">
           {/* Category */}
-          <p className="text-[11px] uppercase tracking-[0.15em] text-muted-foreground font-light">
+          <p className="text-[11px] uppercase tracking-[0.15em] text-background/50 font-light">
             {product.categories?.name || "Uncategorized"}
           </p>
 
           {/* Name & Price Row */}
           <div className="flex justify-between items-start gap-2">
             <Link to={`/product/${product.slug}`}>
-              <h3 className="text-sm font-medium text-foreground hover:underline leading-tight line-clamp-2">
+              <h3 className="text-sm font-medium text-background hover:underline leading-tight line-clamp-2">
                 {product.name}
               </h3>
             </Link>
             <div className="text-right shrink-0">
               {product.is_on_sale && product.sale_price ? (
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-light text-muted-foreground line-through">
+                  <span className="text-sm font-light text-background/50 line-through">
                     {formatPrice(product.price)}
                   </span>
-                  <span className="text-sm font-medium text-amber-600">
+                  <span className="text-sm font-medium text-amber-500">
                     {formatPrice(product.sale_price)}
                   </span>
                 </div>
               ) : (
-                <span className="text-sm font-light text-foreground">
+                <span className="text-sm font-light text-background">
                   {formatPrice(product.price)}
                 </span>
               )}

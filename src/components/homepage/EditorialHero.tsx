@@ -223,13 +223,13 @@ const EditorialHero = () => {
         initial={{ opacity: 0, x: 20 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ delay: 2, duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
-        className="absolute bottom-24 right-8 z-20 bg-background/95 backdrop-blur-sm px-5 py-4 hidden lg:block"
+        className="absolute bottom-24 right-8 z-20 bg-white/95 backdrop-blur-sm px-5 py-4 hidden lg:block"
       >
-        <p className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground mb-1">
+        <p className="text-[10px] tracking-[0.2em] uppercase text-stone-500 mb-1">
           Featured
         </p>
-        <p className="text-sm font-medium text-foreground">Stay Holy Hoodie</p>
-        <p className="text-sm font-light text-foreground/80">{formatPrice(79)}</p>
+        <p className="text-sm font-medium text-stone-950">Stay Holy Hoodie</p>
+        <p className="text-sm font-light text-stone-700">{formatPrice(79)}</p>
       </motion.div>
 
       {/* Scroll Invitation - positioned above safe area on mobile */}

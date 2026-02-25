@@ -41,8 +41,8 @@ const RecentProductCard = ({ product }: RecentProductCardProps) => {
             disabled={quickAdd.isAdding || quickAdd.isAdded}
             className={cn(
               "absolute bottom-2 right-2 w-10 h-10 md:w-8 md:h-8 rounded-full flex items-center justify-center transition-all duration-200",
-              "bg-background/90 backdrop-blur-sm border border-border shadow-md",
-              "hover:bg-foreground hover:text-background active:bg-foreground active:text-background",
+              "bg-white/90 backdrop-blur-sm border border-white/20 shadow-md",
+              "hover:bg-white hover:text-stone-950 active:bg-white active:text-stone-950",
               quickAdd.isAdded && "bg-emerald-500 border-emerald-500 text-white"
             )}
             whileTap={{ scale: 0.9 }}
@@ -59,7 +59,7 @@ const RecentProductCard = ({ product }: RecentProductCardProps) => {
           
           {/* Size badge if remembered */}
           {quickAdd.canOneTap && !quickAdd.isAdded && (
-            <span className="absolute bottom-2 left-2 px-2 py-0.5 bg-background/90 backdrop-blur-sm border border-border text-[10px] font-medium">
+            <span className="absolute bottom-2 left-2 px-2 py-0.5 bg-white/90 backdrop-blur-sm border border-white/20 text-[10px] font-medium text-stone-950">
               {quickAdd.rememberedSize}
             </span>
           )}

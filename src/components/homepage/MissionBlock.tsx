@@ -31,7 +31,7 @@ const MissionBlock = () => {
       <div className="relative z-10 min-h-[60vh] md:min-h-[70vh] flex items-center justify-center px-4 xs:px-6">
         <ScrollReveal variant="fadeUp" delay={0.2}>
           <motion.div 
-            className="bg-background p-6 xs:p-8 md:p-12 lg:p-16 max-w-[90vw] md:max-w-2xl text-center"
+            className="bg-white/95 backdrop-blur-sm p-6 xs:p-8 md:p-12 lg:p-16 max-w-[90vw] md:max-w-2xl text-center"
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
@@ -50,7 +50,7 @@ const MissionBlock = () => {
             <div className="mb-4 md:mb-6">
               <TextReveal 
                 text="NOT FOR EVERYONE." 
-                className="text-3xl xs:text-4xl md:text-5xl lg:text-hero text-foreground font-light tracking-tight"
+                className="text-3xl xs:text-4xl md:text-5xl lg:text-hero text-stone-950 font-light tracking-tight"
                 as="h2"
                 delay={0.4}
               />
@@ -58,7 +58,7 @@ const MissionBlock = () => {
 
             {/* Quote */}
             <motion.p 
-              className="text-sm xs:text-base md:text-editorial text-muted-foreground mb-6 md:mb-8 max-w-md mx-auto leading-relaxed"
+              className="text-sm xs:text-base md:text-editorial text-stone-600 mb-6 md:mb-8 max-w-md mx-auto leading-relaxed"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6, duration: 0.6 }}
@@ -76,7 +76,7 @@ const MissionBlock = () => {
             >
               <Link 
                 to="/about/our-story"
-                className="inline-flex items-center gap-2 text-foreground text-sm font-medium tracking-wide hover:text-accent transition-colors group touch-target py-3"
+                className="inline-flex items-center gap-2 text-stone-950 text-sm font-medium tracking-wide hover:text-accent transition-colors group touch-target py-3"
               >
                 Our Story
                 <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />

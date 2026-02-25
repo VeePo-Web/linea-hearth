@@ -59,7 +59,7 @@ const CategoryTiles = () => {
   const wideCategory = categories.find(c => c.layout === "wide")!;
 
   return (
-    <section className="w-full py-16 md:py-24 lg:py-40 bg-background relative overflow-hidden">
+    <section className="w-full py-16 md:py-24 lg:py-40 bg-foreground relative overflow-hidden">
       {/* Noise Texture Overlay */}
       <div 
         className="absolute inset-0 opacity-[0.02] pointer-events-none mix-blend-overlay"
@@ -72,7 +72,7 @@ const CategoryTiles = () => {
         {/* Editorial Section Header - 032c Style */}
         <div className="mb-12 md:mb-16 lg:mb-24">
           <motion.span
-            className="text-xs uppercase tracking-[0.3em] text-muted-foreground block mb-3"
+            className="text-xs uppercase tracking-[0.3em] text-background/50 block mb-3"
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -84,12 +84,12 @@ const CategoryTiles = () => {
             <TextReveal 
               text="COLLECTION" 
               as="h2"
-              className="text-[10vw] sm:text-[8vw] md:text-[6vw] lg:text-[5vw] font-extralight tracking-[-0.04em] text-foreground leading-[0.85]"
+              className="text-[10vw] sm:text-[8vw] md:text-[6vw] lg:text-[5vw] font-extralight tracking-[-0.04em] text-background leading-[0.85]"
             />
           </div>
           {/* Editorial Divider */}
           <motion.div 
-            className="w-16 md:w-24 h-px bg-foreground mt-6 md:mt-8"
+            className="w-16 md:w-24 h-px bg-background mt-6 md:mt-8"
             initial={{ scaleX: 0, originX: 0 }}
             whileInView={{ scaleX: 1 }}
             viewport={{ once: true }}
