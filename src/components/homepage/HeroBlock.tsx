@@ -77,7 +77,7 @@ const HeroBlock = () => {
             <Button 
               asChild
               size="lg"
-              className="bg-[hsl(30,5%,72%)] hover:bg-[hsl(30,5%,78%)] text-black font-medium px-8 py-6 text-base rounded-none group"
+              className="bg-forest-500 hover:bg-forest-400 text-white font-medium px-8 py-6 text-base rounded-none group"
             >
               <Link to="/category/shop">
                 Shop the Collection
