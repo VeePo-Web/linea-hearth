@@ -8,11 +8,11 @@ const StoryCallingSection = () => {
   return (
     <section 
       ref={sectionRef}
-      className="relative bg-stone-50 text-stone-950 py-32 md:py-48 overflow-hidden"
+      className="relative bg-stone-950 text-white py-32 md:py-48 overflow-hidden"
     >
       {/* Index watermark */}
       <motion.span 
-        className="absolute top-10 right-10 lg:top-12 lg:right-12 text-[10px] tracking-[0.4em] text-stone-950/10 font-light"
+        className="absolute top-10 right-10 lg:top-12 lg:right-12 text-[10px] tracking-[0.4em] text-white/10 font-light"
         initial={{ opacity: 0 }}
         animate={isInView ? { opacity: 1 } : {}}
         transition={{ delay: 0.3, duration: 0.8 }}
@@ -45,7 +45,7 @@ const StoryCallingSection = () => {
 
             {/* Rotated vertical text */}
             <motion.span
-              className="hidden lg:block absolute -left-16 top-1/2 -translate-y-1/2 -rotate-90 text-[10px] tracking-[0.4em] text-stone-950/20 whitespace-nowrap origin-center"
+              className="hidden lg:block absolute -left-16 top-1/2 -translate-y-1/2 -rotate-90 text-[10px] tracking-[0.4em] text-white/20 whitespace-nowrap origin-center"
               initial={{ opacity: 0 }}
               animate={isInView ? { opacity: 1 } : {}}
               transition={{ delay: 0.8, duration: 0.8 }}
@@ -66,7 +66,7 @@ const StoryCallingSection = () => {
             </motion.p>
 
             <motion.p
-              className="text-lg md:text-xl font-light text-stone-700 leading-relaxed"
+              className="text-lg md:text-xl font-light text-white/70 leading-relaxed"
               initial={{ opacity: 0, y: 20 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ delay: 0.6, duration: 0.8 }}
@@ -77,7 +77,7 @@ const StoryCallingSection = () => {
             </motion.p>
 
             <motion.p
-              className="text-lg md:text-xl font-light text-stone-500 leading-relaxed"
+              className="text-lg md:text-xl font-light text-white/50 leading-relaxed"
               initial={{ opacity: 0, y: 20 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ delay: 0.7, duration: 0.8 }}

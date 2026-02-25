@@ -18,16 +18,19 @@ const OurStory = () => {
       <div ref={containerRef}>
         <ScrollProgress containerRef={containerRef} />
         <StoryHero />
+        <div className="bg-stone-950 flex justify-center py-0"><div className="w-24 h-px bg-amber-500/40" /></div>
         <StoryCallingSection />
+        <div className="bg-stone-950 flex justify-center py-0"><div className="w-24 h-px bg-amber-500/40" /></div>
         <OriginStory />
+        <div className="bg-stone-950 flex justify-center py-0"><div className="w-24 h-px bg-amber-500/40" /></div>
         <FounderLetter />
+        <div className="bg-stone-950 flex justify-center py-0"><div className="w-24 h-px bg-amber-500/40" /></div>
         <StoryValuesGrid />
-        {/* Amber separator between back-to-back dark sections */}
-        <div className="bg-stone-950 flex justify-center py-0">
-          <div className="w-24 h-px bg-amber-500/40" />
-        </div>
+        <div className="bg-stone-950 flex justify-center py-0"><div className="w-24 h-px bg-amber-500/40" /></div>
         <ImpactMap />
+        <div className="bg-stone-950 flex justify-center py-0"><div className="w-24 h-px bg-amber-500/40" /></div>
         <StoryWorldwideTribe />
+        <div className="bg-stone-950 flex justify-center py-0"><div className="w-24 h-px bg-amber-500/40" /></div>
         <StoryJoinCTA />
       </div>
     </Layout>

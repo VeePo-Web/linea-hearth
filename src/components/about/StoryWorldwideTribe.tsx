@@ -54,11 +54,11 @@ const StoryWorldwideTribe = () => {
   return (
     <section
       ref={sectionRef}
-      className="relative bg-stone-50 text-stone-950 py-32 md:py-48 overflow-hidden"
+      className="relative bg-stone-950 text-white py-32 md:py-48 overflow-hidden"
     >
       {/* Index watermark */}
       <motion.span
-        className="absolute top-10 right-10 lg:top-12 lg:right-12 text-[10px] tracking-[0.4em] text-stone-950/10 font-light"
+        className="absolute top-10 right-10 lg:top-12 lg:right-12 text-[10px] tracking-[0.4em] text-white/10 font-light"
         initial={{ opacity: 0 }}
         animate={isInView ? { opacity: 1 } : {}}
         transition={{ delay: 0.3, duration: 0.8 }}
@@ -86,7 +86,7 @@ const StoryWorldwideTribe = () => {
             Deployed Worldwide<span className="text-amber-500">.</span>
           </motion.h2>
           <motion.p
-            className="text-lg md:text-xl font-light text-stone-500 max-w-xl"
+            className="text-lg md:text-xl font-light text-white/50 max-w-xl"
             initial={{ opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ delay: 0.4, duration: 0.8 }}
@@ -165,17 +165,17 @@ const StoryWorldwideTribe = () => {
 
         {/* CTA strip */}
         <motion.div
-          className="flex flex-col md:flex-row items-center lg:items-end justify-between gap-6 pt-10 lg:pt-12 border-t border-stone-200"
+          className="flex flex-col md:flex-row items-center lg:items-end justify-between gap-6 pt-10 lg:pt-12 border-t border-white/10"
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ delay: 0.8, duration: 0.8 }}
         >
-          <p className="text-stone-500 font-light">
-            Tag <span className="text-stone-950 font-medium">@lineofjudah</span> to join the front line.
+          <p className="text-white/50 font-light">
+            Tag <span className="text-white font-medium">@lineofjudah</span> to join the front line.
           </p>
           <Button
             variant="outline"
-            className="group border-stone-950 text-stone-950 hover:bg-stone-950 hover:text-white px-8"
+            className="group border-white text-white hover:bg-white hover:text-stone-950 bg-transparent px-8"
             onClick={() => window.open("https://instagram.com/lineofjudah", "_blank")}
           >
             <Instagram className="w-4 h-4 mr-2" />

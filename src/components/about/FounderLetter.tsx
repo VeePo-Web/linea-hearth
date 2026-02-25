@@ -8,14 +8,14 @@ const FounderLetter = () => {
   return (
     <section 
       ref={sectionRef}
-      className="relative bg-stone-50 overflow-hidden"
+      className="relative bg-stone-950 overflow-hidden"
     >
       {/* Index watermark */}
       <motion.span
         initial={{ opacity: 0 }}
         animate={isInView ? { opacity: 0.03 } : { opacity: 0 }}
         transition={{ duration: 1, delay: 0.3 }}
-        className="absolute top-8 right-8 text-[20vw] font-light text-stone-950 leading-none select-none pointer-events-none z-0"
+        className="absolute top-8 right-8 text-[20vw] font-light text-white leading-none select-none pointer-events-none z-0"
       >
         04
       </motion.span>
@@ -40,15 +40,15 @@ const FounderLetter = () => {
             transition={{ duration: 0.8, delay: 0.6 }}
             className="relative z-10"
           >
-            <p className="text-3xl md:text-4xl lg:text-5xl font-light text-stone-950 leading-relaxed tracking-tight">
+            <p className="text-3xl md:text-4xl lg:text-5xl font-light text-white leading-relaxed tracking-tight">
               I got tired of hiding.
             </p>
-            <p className="text-lg md:text-xl font-light text-stone-500 leading-relaxed mt-8 max-w-2xl mx-auto">
+            <p className="text-lg md:text-xl font-light text-white/50 leading-relaxed mt-8 max-w-2xl mx-auto">
               Not my faith — I never hid that. But I was tired of my clothes 
               not matching my conviction. Everything in the market was either 
               corny Christian or watered-down safe.
             </p>
-            <p className="text-xl md:text-2xl font-light text-stone-950 leading-relaxed mt-8 italic">
+            <p className="text-xl md:text-2xl font-light text-white leading-relaxed mt-8 italic">
               So I built what I wanted to wear.
             </p>
           </motion.blockquote>
@@ -62,12 +62,12 @@ const FounderLetter = () => {
           >
             <div className="flex items-center justify-center gap-4">
               <div className="w-16 h-px bg-amber-500" />
-              <p className="text-lg font-light text-stone-950 italic tracking-wide">
+              <p className="text-lg font-light text-white italic tracking-wide">
                 Jordan Williams
               </p>
               <div className="w-16 h-px bg-amber-500" />
             </div>
-            <p className="text-[10px] uppercase tracking-[0.3em] text-stone-400 mt-3">
+            <p className="text-[10px] uppercase tracking-[0.3em] text-white/40 mt-3">
               Founder & Creative Director
             </p>
           </motion.div>
@@ -77,12 +77,12 @@ const FounderLetter = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
             transition={{ duration: 0.6, delay: 1.1 }}
-            className="text-stone-500 font-light leading-relaxed mt-14 max-w-xl mx-auto text-base"
+            className="text-white/50 font-light leading-relaxed mt-14 max-w-xl mx-auto text-base"
           >
             For the believer who won't apologize. Who starts conversations. 
             Who knows that if you're not for us, you're against us.
             <br /><br />
-            <span className="text-stone-950 font-medium">This is Line of Judah.</span> You're here because you're supposed to be.
+            <span className="text-white font-medium">This is Line of Judah.</span> You're here because you're supposed to be.
           </motion.p>
         </div>
       </div>
