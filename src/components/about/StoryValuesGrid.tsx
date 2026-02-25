@@ -79,12 +79,12 @@ const StoryValuesGrid = () => {
               transition={{ delay: 0.4 + index * 0.15, duration: 0.8 }}
             >
               {/* Massive index number as visual anchor */}
-              <span className="block text-[80px] md:text-[100px] lg:text-[120px] xl:text-[140px] font-light leading-none text-stone-200 mb-4 transition-colors duration-500 group-hover:text-amber-500/20">
+              <span className="block text-[56px] md:text-[100px] lg:text-[120px] xl:text-[140px] font-light leading-none text-stone-200 mb-2 md:mb-4 transition-colors duration-500 group-hover:text-amber-500/20">
                 {value.index}
               </span>
 
               {/* Content */}
-              <div className="relative -mt-12 lg:-mt-16 xl:-mt-20 pl-2">
+              <div className="relative -mt-6 lg:-mt-16 xl:-mt-20 pl-2">
                 <h3 className="text-lg md:text-xl font-medium tracking-wide mb-4 text-stone-950">
                   {value.title}
                 </h3>
@@ -105,6 +105,9 @@ const StoryValuesGrid = () => {
           ))}
         </div>
       </div>
+
+      {/* Gradient bridge to dark section */}
+      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-b from-transparent to-stone-950 pointer-events-none z-20" />
     </section>
   );
 };

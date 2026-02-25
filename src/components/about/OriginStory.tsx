@@ -247,6 +247,9 @@ const OriginStory = () => {
           </div>
         </div>
       </div>
+
+      {/* Gradient bridge to white section */}
+      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-b from-transparent to-white z-20 pointer-events-none" />
     </section>
   );
 };
