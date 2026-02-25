@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 const Header = () => {
   const location = useLocation();
   const isHomePage = location.pathname === "/home";
-  const { direction, isAtTop, isScrolled } = useScrollDirection(50);
+  const { direction, isAtTop, isScrolled } = useScrollDirection(80);
   const shouldHide = direction === "down" && isScrolled && !isAtTop;
 
   const [hasRevealed, setHasRevealed] = useState(!isHomePage);
@@ -42,9 +42,9 @@ const Header = () => {
       initial={{ y: isHomePage ? -100 : 0 }}
       animate={{ y: yPosition }}
       transition={{
-        type: "spring" as const,
-        stiffness: 300,
-        damping: 30,
+        type: "tween",
+        duration: 0.4,
+        ease: [0.25, 0.46, 0.45, 0.94],
       }}
     >
       <StatusBar />

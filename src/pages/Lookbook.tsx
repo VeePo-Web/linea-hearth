@@ -184,7 +184,7 @@ const Lookbook = () => {
         className="lookbook-scroll-container snap-y snap-mandatory overflow-y-auto scroll-smooth overscroll-y-contain"
         style={{ 
           height: 'calc(100dvh - var(--header-height))',
-          marginTop: 'var(--header-height)' 
+          paddingTop: 'var(--header-height)' 
         }}
       >
         {/* Hero Section */}

@@ -8,19 +8,19 @@ import StoryModal from "./StoryModal";
 import { motion } from "framer-motion";
 
 interface StoryGridProps {
-  selectedProduct: string;
-  selectedType: string;
-  selectedGender: string;
-  sortBy: string;
+  selectedProduct?: string;
+  selectedType?: string;
+  selectedGender?: string;
+  sortBy?: string;
 }
 
 const ITEMS_PER_PAGE = 12;
 
 export default function StoryGrid({
-  selectedProduct,
-  selectedType,
-  selectedGender,
-  sortBy,
+  selectedProduct = "all",
+  selectedType = "all",
+  selectedGender = "all",
+  sortBy = "recent",
 }: StoryGridProps) {
   const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
   const [selectedStory, setSelectedStory] = useState<StoryCardData | null>(null);
