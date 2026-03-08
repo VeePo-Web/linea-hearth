@@ -315,7 +315,7 @@ export const SizeQuizProvider = ({ children }: SizeQuizProviderProps) => {
   );
 };
 
-// ============= Hook =============
+// ============= Hooks =============
 
 export const useSizeQuizContext = (): SizeQuizContextType => {
   const context = useContext(SizeQuizContext);
@@ -323,6 +323,14 @@ export const useSizeQuizContext = (): SizeQuizContextType => {
     throw new Error('useSizeQuizContext must be used within a SizeQuizProvider');
   }
   return context;
+};
+
+/**
+ * Safe version that returns null if the provider is missing,
+ * instead of throwing. Use in hooks that may render outside the provider.
+ */
+export const useSizeQuizContextSafe = (): SizeQuizContextType | null => {
+  return useContext(SizeQuizContext);
 };
 
 export default SizeQuizProvider;

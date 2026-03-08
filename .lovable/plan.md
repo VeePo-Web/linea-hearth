@@ -1,50 +1,52 @@
 
 
-# Round 13 — Fix MobileMenu and FavoritesDrawer Crashes + Auth Audit Confirmation
+# Navigation Bar: Full Audit Results and Remaining Fixes
 
-## Auth System Audit: Complete
+## What Was Already Fixed (Previous Diff)
+- Community page: StoryFilters bar removed, `immersiveHero` removed -- content now clears header correctly
+- Header animation: Spring replaced with editorial tween (0.4s, custom ease)
+- Scroll threshold: Increased from 50 to 80 to prevent micro-scroll flickering
 
-The full auth system has been audited across all previous rounds and is production-ready:
+## Issue Found: Lookbook Page Regression
 
-- **Email/password sign-up and sign-in**: Uses standard backend calls, works on any domain
-- **Google OAuth**: Try/catch fallback from managed OAuth to standard `supabase.auth.signInWithOAuth`
-- **Email confirmation handling**: `CreateAccountForm` checks `confirmed_at` and shows appropriate messaging
-- **Password reset**: Full flow with `/reset-password` page, inline forgot-password in `SignInForm`
-- **Protected routes**: `ProtectedAccountRoute` redirects to `/?auth=true`, `Navigation` reads the param and opens auth modal, post-login redirects to intended destination via `sessionStorage`
-- **Error handling**: Graceful messages for all failure states, email typo detection on all email inputs
-- **Design system compliance**: All auth components use `rounded-none`, `text-foreground` for indicators
+The previous change to Lookbook.tsx introduced a bug by switching `marginTop` to `paddingTop`. Here's why:
 
-No auth changes needed.
+The Lookbook uses a **custom scroll container** (not `<Layout>`). Its `height` is set to `calc(100dvh - var(--header-height))`. With `marginTop`, the container is positioned below the fixed header and sized correctly. With `paddingTop`, the container starts behind the header and the internal padding eats into the already-reduced height, effectively stealing ~100px from the bottom of the page.
 
-## Critical Issue: MobileMenu and FavoritesDrawer Crashes
+**Fix:** Revert `paddingTop` back to `marginTop` on the Lookbook scroll container. The original `marginTop` was correct -- the scroll container already starts below the header, so no content overlaps.
 
-Console logs show two components crashing on render: `<MobileMenu>` and `<FavoritesDrawer>`. The error traces don't include the root cause message, which means I need to investigate by reading the code carefully and adding defensive guards.
+### File: `src/pages/Lookbook.tsx`
+- Line 187: Change `paddingTop: 'var(--header-height)'` back to `marginTop: 'var(--header-height)'`
 
-### Likely Cause: `useQuickAdd` hook in `FavoritesDrawer`
+## Full Audit: All Pages Checked
 
-The `FavoriteItem` component calls `useQuickAdd` for every rendered favorite item. `useQuickAdd` internally calls `useSizeQuizContext()` which uses `useContext` and is wrapped in a try/catch. However, if `SizeQuizContext` throws during render (not just returns undefined), the catch may not handle it properly in React's strict mode.
+| Page | Header Approach | Status |
+|------|----------------|--------|
+| `/` (Landing) | No header, no Layout | OK -- cinematic portal, no nav |
+| `/home` (Index) | Layout + `immersiveHero` | OK -- header hidden until scroll-up, hero is full-bleed |
+| `/community` | Layout (standard) | OK after previous fix -- `immersiveHero` removed, hero has `pt-20 lg:pt-0` + Layout padding |
+| `/lookbook` | Raw `<Header />` + custom scroll | NEEDS FIX -- revert `paddingTop` to `marginTop` |
+| `/about/our-story` | Layout (standard) | OK -- `pt-[var(--header-height)]` applied |
+| `/category/:slug` | Layout (standard) | OK |
+| `/product/:slug` | Layout (standard) | OK |
+| `/checkout` | CheckoutHeader (different component) | OK -- separate header system |
+| `/contact`, `/faq`, `/returns`, `/shipping` | ServicePageLayout | OK -- has its own header offset |
+| `/ambassador` | Layout (standard) | OK |
+| `/try-on` | Raw `<Header />` + `pt-[var(--header-height)]` | OK |
+| Legal pages | LegalPageLayout | OK -- uses `pt-[calc(var(--header-height)+2rem)]` |
 
-Additionally, `MobileMenu` calls `useProfile()` which depends on `useAuth()`. If there's a subtle timing issue (e.g., profile query fires before auth is ready), it could cause a crash.
+## Header Animation Quality Check
 
-### Plan
+The current tween config is correct:
+```
+type: "tween"
+duration: 0.4
+ease: [0.25, 0.46, 0.45, 0.94]
+```
 
-1. **Add an ErrorBoundary component** — Wrap `Navigation`'s children (MobileMenu, FavoritesDrawer) in error boundaries so crashes in these drawers don't take down the entire site. This is defensive infrastructure that any production site needs.
+This matches the project's `editorialEase` standard documented in animation-standards memory. No further changes needed.
 
-2. **Fix the root crash in FavoritesDrawer** — Investigate `useQuickAdd`'s `useSizeQuizContext()` try/catch pattern. Hooks cannot be called conditionally in React, and wrapping a hook call in try/catch is technically valid but fragile. If the context provider is missing or throws, this can cause React to crash. Make the hook usage defensive.
+## Summary
 
-3. **Fix the root crash in MobileMenu** — Review `useProfile` and ensure it handles the unauthenticated state gracefully without triggering any Supabase query errors during initial render.
-
-## Implementation
-
-| File | Change |
-|------|--------|
-| `src/components/ui/ErrorBoundary.tsx` | Create a reusable ErrorBoundary component |
-| `src/components/header/Navigation.tsx` | Wrap MobileMenu and FavoritesDrawer in ErrorBoundary |
-| `src/hooks/useQuickAdd.ts` | Make `useSizeQuizContext()` usage safer — always call the hook but handle missing context gracefully |
-
-## What Is NOT Changed
-- Auth flow (confirmed complete and working)
-- SignInForm, CreateAccountForm, AuthModal, GoogleAuthButton
-- Database schema or RLS policies
-- Any other pages or components
+Only one fix needed: revert the Lookbook `paddingTop` back to `marginTop`. Everything else is working correctly after the previous changes.
 

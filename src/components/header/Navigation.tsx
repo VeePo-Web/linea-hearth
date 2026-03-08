@@ -1,4 +1,5 @@
 import { X, User } from "lucide-react";
+import ErrorBoundary from "@/components/ui/ErrorBoundary";
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -319,23 +320,25 @@ const Navigation = () => {
       <SearchOverlay isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
 
       {/* Mobile Slide-Out Menu */}
-      <MobileMenu 
-        isOpen={isMobileMenuOpen} 
-        onClose={() => setIsMobileMenuOpen(false)} 
-        navItems={navItems} 
-        onSearchOpen={() => {
-          setIsMobileMenuOpen(false);
-          setIsSearchOpen(true);
-        }} 
-        onFavoritesOpen={() => {
-          setIsMobileMenuOpen(false);
-          setOffCanvasType('favorites');
-        }} 
-        onAuthOpen={() => {
-          setIsMobileMenuOpen(false);
-          setIsAuthModalOpen(true);
-        }} 
-      />
+      <ErrorBoundary>
+        <MobileMenu 
+          isOpen={isMobileMenuOpen} 
+          onClose={() => setIsMobileMenuOpen(false)} 
+          navItems={navItems} 
+          onSearchOpen={() => {
+            setIsMobileMenuOpen(false);
+            setIsSearchOpen(true);
+          }} 
+          onFavoritesOpen={() => {
+            setIsMobileMenuOpen(false);
+            setOffCanvasType('favorites');
+          }} 
+          onAuthOpen={() => {
+            setIsMobileMenuOpen(false);
+            setIsAuthModalOpen(true);
+          }} 
+        />
+      </ErrorBoundary>
 
       {/* Cart Drawer */}
       <CartDrawer onViewFavorites={() => {
@@ -346,14 +349,16 @@ const Navigation = () => {
       <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
 
       {/* Favorites Drawer */}
-      <FavoritesDrawer 
-        isOpen={offCanvasType === 'favorites'} 
-        onClose={() => setOffCanvasType(null)} 
-        onAuthRequired={() => {
-          setOffCanvasType(null);
-          setIsAuthModalOpen(true);
-        }}
-      />
+      <ErrorBoundary>
+        <FavoritesDrawer 
+          isOpen={offCanvasType === 'favorites'} 
+          onClose={() => setOffCanvasType(null)} 
+          onAuthRequired={() => {
+            setOffCanvasType(null);
+            setIsAuthModalOpen(true);
+          }}
+        />
+      </ErrorBoundary>
     </nav>
   );
 };
