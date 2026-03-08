@@ -386,11 +386,11 @@ const Checkout = () => {
                 <div className="pt-4 border-t border-muted-foreground/20">
                   {appliedDiscount ? (
                     <div className="space-y-2">
-                      <div className="flex items-center justify-between bg-emerald-500/10 border border-emerald-500/30 p-3">
+                      <div className="flex items-center justify-between bg-champagne-50 dark:bg-champagne-950/30 border border-champagne-200 dark:border-champagne-800 p-3">
                         <div className="flex items-center gap-2">
-                          <Check className="h-4 w-4 text-emerald-600" />
+                          <Check className="h-4 w-4 text-champagne-700 dark:text-champagne-400" />
                           <div>
-                            <p className="text-sm font-medium text-emerald-600">
+                            <p className="text-sm font-medium text-champagne-700 dark:text-champagne-400">
                               {appliedDiscount.name}
                             </p>
                             <p className="text-xs text-muted-foreground">
