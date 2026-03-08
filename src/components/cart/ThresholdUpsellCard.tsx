@@ -46,7 +46,7 @@ const ThresholdUpsellCard = ({
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="absolute inset-0 bg-emerald-500/90 flex items-center justify-center"
+                className="absolute inset-0 bg-foreground/90 flex items-center justify-center"
               >
                 <Check className="w-4 h-4 text-white" />
               </motion.div>
@@ -114,7 +114,7 @@ const ThresholdUpsellCard = ({
             disabled={quickAdd.isAdding || quickAdd.isAdded}
             className={cn(
               "rounded-none h-7 px-2 text-xs w-full transition-all",
-              quickAdd.isAdded && "bg-emerald-500 text-white border-emerald-500",
+              quickAdd.isAdded && "bg-foreground text-background border-foreground",
               quickAdd.canOneTap && !quickAdd.isAdded && "bg-champagne-500 text-white border-champagne-500 hover:bg-champagne-400"
             )}
           >
@@ -153,7 +153,7 @@ const ThresholdUpsellCard = ({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-emerald-500/90 flex items-center justify-center"
+              className="absolute inset-0 bg-foreground/90 flex items-center justify-center"
             >
               <Check className="w-5 h-5 text-white" />
             </motion.div>
@@ -175,7 +175,7 @@ const ThresholdUpsellCard = ({
         </div>
         
         {willUnlockShipping && (
-          <p className="text-xs text-emerald-600 mt-0.5 font-medium">
+          <p className="text-xs text-champagne-600 mt-0.5 font-medium">
             + Unlocks free shipping!
           </p>
         )}
@@ -239,7 +239,7 @@ const ThresholdUpsellCard = ({
           disabled={quickAdd.isAdding || quickAdd.isAdded}
           className={cn(
             "rounded-none h-9 px-3 transition-all",
-            quickAdd.isAdded && "bg-emerald-500 text-white border-emerald-500",
+            quickAdd.isAdded && "bg-foreground text-background border-foreground",
             quickAdd.canOneTap && !quickAdd.isAdded && "bg-champagne-500 text-white border-champagne-500 hover:bg-champagne-400"
           )}
         >

@@ -15,18 +15,18 @@ const SavingsSummary = ({ discountAmount = 0 }: SavingsSummaryProps) => {
   if (totalSavings <= 0) return null;
 
   return (
-    <div className="bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 p-3 animate-fade-in">
+    <div className="bg-champagne-50 dark:bg-champagne-950/30 border border-champagne-200 dark:border-champagne-800 p-3 animate-fade-in">
       <div className="flex items-center gap-2">
-        <div className="p-1 bg-emerald-500 rounded-full">
-          <Sparkles className="h-3 w-3 text-white" />
+        <div className="p-1 bg-foreground rounded-full">
+          <Sparkles className="h-3 w-3 text-background" />
         </div>
-        <span className="text-sm font-medium text-emerald-700 dark:text-emerald-400">
+        <span className="text-sm font-medium text-champagne-700 dark:text-champagne-400">
           You're saving ${totalSavings.toLocaleString()} on this order!
         </span>
       </div>
       
       {/* Breakdown */}
-      <div className="mt-2 space-y-1 text-xs text-emerald-600 dark:text-emerald-500">
+      <div className="mt-2 space-y-1 text-xs text-champagne-600 dark:text-champagne-500">
         {discountAmount > 0 && (
           <div className="flex justify-between">
             <span>Discount applied</span>

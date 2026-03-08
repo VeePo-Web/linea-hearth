@@ -77,7 +77,7 @@ function FavoriteItem({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-emerald-600/90 flex items-center justify-center"
+              className="absolute inset-0 bg-foreground/90 flex items-center justify-center"
             >
               <motion.div
                 initial={{ scale: 0 }}

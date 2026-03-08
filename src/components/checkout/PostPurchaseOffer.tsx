@@ -92,7 +92,7 @@ const PostPurchaseOffer = ({ isOpen, onClose, onAddToOrder }: PostPurchaseOfferP
                 <span className="text-sm text-muted-foreground line-through">
                   ${originalPrice}
                 </span>
-                <span className="text-xs bg-emerald-100 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-300 px-2 py-0.5">
+                <span className="text-xs bg-champagne-100 dark:bg-champagne-900 text-champagne-700 dark:text-champagne-300 px-2 py-0.5">
                   -{discountPercent}%
                 </span>
               </div>
