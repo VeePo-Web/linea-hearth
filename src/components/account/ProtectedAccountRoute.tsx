@@ -11,8 +11,6 @@ export default function ProtectedAccountRoute({ children }: ProtectedAccountRout
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const [shouldShowAuth, setShouldShowAuth] = useState(false);
-
   useEffect(() => {
     if (!loading && !user) {
       // Store the intended destination

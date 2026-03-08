@@ -1,52 +1,52 @@
 
 
-# Round 12 — Auth System Audit: Bugs and Hardening
+# Navigation Bar: Full Audit Results and Remaining Fixes
 
-## Critical Bug Found
+## What Was Already Fixed (Previous Diff)
+- Community page: StoryFilters bar removed, `immersiveHero` removed -- content now clears header correctly
+- Header animation: Spring replaced with editorial tween (0.4s, custom ease)
+- Scroll threshold: Increased from 50 to 80 to prevent micro-scroll flickering
 
-### 1. `?auth=true` Redirect Is Broken
-`ProtectedAccountRoute` redirects unauthenticated users to `/?auth=true`, but **nothing reads that query parameter**. The `LandingPage` component (mounted at `/`) never checks for `?auth=true` and never opens the auth modal. The user lands on the landing page with no indication they need to sign in.
+## Issue Found: Lookbook Page Regression
 
-Additionally, the `authRedirect` sessionStorage value is set but **never consumed** after successful auth — the user is never redirected back to their intended destination.
+The previous change to Lookbook.tsx introduced a bug by switching `marginTop` to `paddingTop`. Here's why:
 
-**Fix:** Add a `useEffect` in `Navigation.tsx` that reads `?auth=true` from the URL and opens the auth modal. After successful auth, read `authRedirect` from sessionStorage and navigate there. Clean up both the query param and sessionStorage after use.
+The Lookbook uses a **custom scroll container** (not `<Layout>`). Its `height` is set to `calc(100dvh - var(--header-height))`. With `marginTop`, the container is positioned below the fixed header and sized correctly. With `paddingTop`, the container starts behind the header and the internal padding eats into the already-reduced height, effectively stealing ~100px from the bottom of the page.
 
-### 2. Sign-Up Success Message Is Misleading (Email Confirmation)
-The `CreateAccountForm` calls `onSuccess()` immediately and shows "Your account has been created successfully" — but if email confirmation is enabled (the default, and the correct setting for this project), the user **cannot sign in until they confirm their email**. The modal closes and the user appears signed in momentarily before the session is rejected.
+**Fix:** Revert `paddingTop` back to `marginTop` on the Lookbook scroll container. The original `marginTop` was correct -- the scroll container already starts below the header, so no content overlaps.
 
-**Fix:** After `signUp`, check the response for `data.user?.identities`. If identities is empty or `email_confirmed_at` is null, show a "Check your email to confirm" message instead of closing the modal and toasting success. Only call `onSuccess()` if the user is actually authenticated.
+### File: `src/pages/Lookbook.tsx`
+- Line 187: Change `paddingTop: 'var(--header-height)'` back to `marginTop: 'var(--header-height)'`
 
-### 3. Sign-Up Error Handling Gaps
-- The `signUp` function in `useAuth` returns `{ error }` but doesn't return `{ data, error }`. The `CreateAccountForm` has no way to inspect the response data to determine if email confirmation is pending vs. the account was auto-confirmed.
+## Full Audit: All Pages Checked
 
-**Fix:** Update `signUp` in `useAuth.tsx` to return `{ data, error }` so the form can inspect the signup response.
+| Page | Header Approach | Status |
+|------|----------------|--------|
+| `/` (Landing) | No header, no Layout | OK -- cinematic portal, no nav |
+| `/home` (Index) | Layout + `immersiveHero` | OK -- header hidden until scroll-up, hero is full-bleed |
+| `/community` | Layout (standard) | OK after previous fix -- `immersiveHero` removed, hero has `pt-20 lg:pt-0` + Layout padding |
+| `/lookbook` | Raw `<Header />` + custom scroll | NEEDS FIX -- revert `paddingTop` to `marginTop` |
+| `/about/our-story` | Layout (standard) | OK -- `pt-[var(--header-height)]` applied |
+| `/category/:slug` | Layout (standard) | OK |
+| `/product/:slug` | Layout (standard) | OK |
+| `/checkout` | CheckoutHeader (different component) | OK -- separate header system |
+| `/contact`, `/faq`, `/returns`, `/shipping` | ServicePageLayout | OK -- has its own header offset |
+| `/ambassador` | Layout (standard) | OK |
+| `/try-on` | Raw `<Header />` + `pt-[var(--header-height)]` | OK |
+| Legal pages | LegalPageLayout | OK -- uses `pt-[calc(var(--header-height)+2rem)]` |
 
-### 4. Google OAuth Button — `rounded` Inconsistency
-The Google auth button uses `rounded` (line 65 of GoogleAuthButton.tsx). The design system uses sharp corners (`rounded-none`). This was missed in prior rounds.
+## Header Animation Quality Check
 
-**Fix:** Replace `rounded` with `rounded-none`.
+The current tween config is correct:
+```
+type: "tween"
+duration: 0.4
+ease: [0.25, 0.46, 0.45, 0.94]
+```
 
-### 5. `ProtectedAccountRoute` — Unused State
-`shouldShowAuth` state variable (line 14) is declared but never used.
-
-**Fix:** Remove it.
-
----
+This matches the project's `editorialEase` standard documented in animation-standards memory. No further changes needed.
 
 ## Summary
 
-| File | Change |
-|------|--------|
-| `Navigation.tsx` | Add `useEffect` to read `?auth=true` and open auth modal; consume `authRedirect` after auth success |
-| `useAuth.tsx` | Return `{ data, error }` from `signUp` |
-| `CreateAccountForm.tsx` | Handle email confirmation pending state instead of assuming instant success |
-| `GoogleAuthButton.tsx` | Replace `rounded` with `rounded-none` |
-| `ProtectedAccountRoute.tsx` | Remove unused `shouldShowAuth` state |
-
-## What Is NOT Changed
-- Auth provider logic (Google OAuth fallback already in place)
-- SignInForm (already robust)
-- ResetPassword page (already handles invalid sessions)
-- Admin auth flow (separate system, already secured)
-- Database schema or RLS policies
+Only one fix needed: revert the Lookbook `paddingTop` back to `marginTop`. Everything else is working correctly after the previous changes.
 

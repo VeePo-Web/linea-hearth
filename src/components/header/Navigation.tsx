@@ -1,6 +1,6 @@
 import { X, User } from "lucide-react";
 import { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "@/hooks/useCart";
 import { useAuth } from "@/hooks/useAuth";
@@ -25,13 +25,35 @@ const Navigation = () => {
   const [isAccountDropdownOpen, setIsAccountDropdownOpen] = useState(false);
   const location = useLocation();
 
+  const navigate = useNavigate();
   const { user } = useAuth();
   const { itemCount, openCart, addItem, items } = useCart();
   const { favoritesCount } = useFavorites();
   const { savedCount } = useSavedForLater();
   const prefersReducedMotion = useReducedMotion();
 
-  // Demo auto-add removed — cart starts empty for real users
+  // Open auth modal when ?auth=true is in the URL (from ProtectedAccountRoute redirect)
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    if (params.get('auth') === 'true') {
+      setIsAuthModalOpen(true);
+      // Clean the query param from URL without navigation
+      params.delete('auth');
+      const cleanUrl = params.toString() ? `${location.pathname}?${params}` : location.pathname;
+      window.history.replaceState({}, '', cleanUrl);
+    }
+  }, [location.search]);
+
+  // After auth success, redirect to stored destination
+  useEffect(() => {
+    if (user) {
+      const redirect = sessionStorage.getItem('authRedirect');
+      if (redirect) {
+        sessionStorage.removeItem('authRedirect');
+        navigate(redirect);
+      }
+    }
+  }, [user, navigate]);
 
   useEffect(() => {
     const imagesToPreload = [

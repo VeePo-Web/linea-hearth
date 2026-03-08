@@ -55,7 +55,7 @@ export default function CreateAccountForm({ onSuccess, onSwitchToSignIn }: Creat
   const onSubmit = async (data: CreateAccountFormData) => {
     setIsLoading(true);
     try {
-      const { error } = await signUp(data.email, data.password, data.fullName);
+      const { data: signUpData, error } = await signUp(data.email, data.password, data.fullName);
 
       if (error) {
         if (error.message.includes('already registered')) {
@@ -66,10 +66,21 @@ export default function CreateAccountForm({ onSuccess, onSwitchToSignIn }: Creat
         return;
       }
 
-      toast.success('Welcome to Line of Judah!', {
-        description: 'Your account has been created successfully.',
-      });
-      onSuccess();
+      // Check if email confirmation is required
+      const needsConfirmation = signUpData?.user && !signUpData.user.confirmed_at;
+      
+      if (needsConfirmation) {
+        toast.success('Check your email', {
+          description: 'We sent a confirmation link to verify your account.',
+          duration: 6000,
+        });
+        onSuccess();
+      } else {
+        toast.success('Welcome to Line of Judah!', {
+          description: 'Your account has been created successfully.',
+        });
+        onSuccess();
+      }
     } catch (err) {
       console.error('Sign up error:', err);
       setError('root', { message: 'An unexpected error occurred' });
