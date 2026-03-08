@@ -1,4 +1,5 @@
 import { X, User } from "lucide-react";
+import ErrorBoundary from "@/components/ui/ErrorBoundary";
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
