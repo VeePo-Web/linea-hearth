@@ -511,8 +511,6 @@ const ProductInfo = ({ product, variants = [], onColorChange, onAuthRequired, on
               className="flex items-center gap-1.5"
               variants={staggerItemVariants}
               custom={index}
-              whileHover={{ y: -2 }}
-              transition={{ type: "spring", stiffness: 400, damping: 20 }}
             >
               <Icon className="w-3.5 h-3.5" strokeWidth={1.5} />
               <span>{label}</span>
