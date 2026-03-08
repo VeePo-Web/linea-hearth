@@ -153,7 +153,7 @@ const CartDrawer = ({ onViewFavorites }: CartDrawerProps) => {
         <div className="fixed inset-0 z-50 min-h-screen h-[100dvh]">
           {/* Backdrop */}
           <motion.div
-            className="absolute inset-0 bg-black/50 min-h-screen h-[100dvh]"
+            className="absolute inset-0 bg-black/50 min-h-screen h-[100dvh] touch-none"
             variants={backdropVariants}
             initial="hidden"
             animate="visible"
