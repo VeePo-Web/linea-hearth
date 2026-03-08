@@ -26,7 +26,7 @@ const CheckoutProgress = ({ currentStep }: CheckoutProgressProps) => {
                   currentStep > step.id
                     ? "bg-emerald-500 text-white"
                     : currentStep === step.id
-                    ? "bg-foreground text-background animate-pulse"
+                    ? "bg-foreground text-background"
                     : "bg-muted text-muted-foreground"
                 )}
               >

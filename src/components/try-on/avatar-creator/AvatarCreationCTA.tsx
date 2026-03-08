@@ -18,7 +18,7 @@ export const AvatarCreationCTA = ({ onStart, onQuickStart }: AvatarCreationCTAPr
           <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
             <User className="w-8 h-8 text-primary" strokeWidth={1.5} />
           </div>
-          <Sparkles className="absolute -top-1 -right-1 w-5 h-5 text-primary animate-pulse" />
+          <Sparkles className="absolute -top-1 -right-1 w-5 h-5 text-primary" />
         </div>
         
         {/* Text */}
