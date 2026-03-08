@@ -184,9 +184,9 @@ const ProductInfo = ({ product, variants = [], onColorChange, onAuthRequired, on
       opacity: 1,
       scale: 1,
       transition: {
-        type: "spring" as const,
-        stiffness: 400,
-        damping: 20,
+        type: "tween" as const,
+        duration: 0.3,
+        ease: [0.25, 0.46, 0.45, 0.94],
       }
     }
   };
