@@ -198,7 +198,7 @@ const CheckoutSuccess = () => {
         <div className="max-w-2xl mx-auto">
           {/* Success Header */}
           <div className="text-center mb-12">
-            <div className="w-20 h-20 bg-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6 animate-scale-in">
+            <div className="w-20 h-20 bg-foreground rounded-full flex items-center justify-center mx-auto mb-6 animate-scale-in">
               <CheckCircle className="w-10 h-10 text-white" />
             </div>
             <h1 className="text-3xl font-light mb-2">Thank You for Your Order!</h1>
