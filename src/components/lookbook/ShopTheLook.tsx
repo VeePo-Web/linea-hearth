@@ -117,7 +117,7 @@ function LookProductCard({
 
           {/* In Cart Badge */}
           {isInCart && !quickAdd.isAdded && (
-            <div className="absolute top-2 right-2 bg-green-600 p-1">
+            <div className="absolute top-2 right-2 bg-foreground p-1">
               <Check className="w-3 h-3 text-white" />
             </div>
           )}
