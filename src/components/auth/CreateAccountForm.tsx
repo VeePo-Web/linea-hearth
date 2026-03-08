@@ -171,7 +171,7 @@ export default function CreateAccountForm({ onSuccess, onSwitchToSignIn }: Creat
         <div className="flex items-center gap-2 text-xs">
           <span
             className={`flex items-center gap-1 transition-colors ${
-              isPasswordValid ? 'text-green-600' : 'text-muted-foreground'
+              isPasswordValid ? 'text-foreground' : 'text-muted-foreground'
             }`}
           >
             {isPasswordValid && <Check size={12} />}

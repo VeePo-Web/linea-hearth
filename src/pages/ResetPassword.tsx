@@ -168,11 +168,11 @@ export default function ResetPassword() {
                 {password.length > 0 && (
                   <>
                     {passwordStrength ? (
-                      <CheckCircle2 size={14} className="text-green-600" />
+                      <CheckCircle2 size={14} className="text-foreground" />
                     ) : (
                       <AlertCircle size={14} className="text-muted-foreground" />
                     )}
-                    <span className={passwordStrength ? 'text-green-600' : 'text-muted-foreground'}>
+                    <span className={passwordStrength ? 'text-foreground' : 'text-muted-foreground'}>
                       {passwordStrength ? 'Password strength: Good' : 'At least 6 characters'}
                     </span>
                   </>
@@ -208,8 +208,8 @@ export default function ResetPassword() {
                 <div className="flex items-center gap-2 text-xs">
                   {passwordsMatch ? (
                     <>
-                      <CheckCircle2 size={14} className="text-green-600" />
-                      <span className="text-green-600">Passwords match</span>
+                      <CheckCircle2 size={14} className="text-foreground" />
+                      <span className="text-foreground">Passwords match</span>
                     </>
                   ) : (
                     <>
