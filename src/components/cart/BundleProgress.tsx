@@ -173,9 +173,9 @@ const BundleProgress = ({ bundle, variant = "drawer" }: BundleProgressProps) => 
             className={cn(
               "h-full rounded-full",
               isComplete
-                ? "bg-gradient-to-r from-emerald-500 to-emerald-400"
+                ? "bg-gradient-to-r from-champagne-600 to-champagne-500"
                 : hasDiscount 
-                  ? "bg-gradient-to-r from-emerald-500 to-emerald-400" 
+                  ? "bg-gradient-to-r from-champagne-600 to-champagne-500" 
                   : "bg-gradient-to-r from-champagne-500 to-champagne-400"
             )}
             initial={{ width: 0 }}
