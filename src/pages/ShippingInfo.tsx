@@ -118,10 +118,10 @@ const ShippingInfo = () => {
       heroValueProps={heroValueProps}
     >
       {/* Delivery Confidence Strip */}
-      <div className="mb-12 p-4 bg-emerald-950/20 border border-emerald-900 text-center">
+      <div className="mb-12 p-4 bg-foreground/5 border border-foreground/10 text-center">
         <div className="flex items-center justify-center gap-3">
-          <CheckCircle className="w-5 h-5 text-emerald-500 flex-shrink-0" />
-          <p className="text-sm font-medium text-emerald-100 tracking-wide">
+          <CheckCircle className="w-5 h-5 text-foreground flex-shrink-0" />
+          <p className="text-sm font-medium text-foreground/80 tracking-wide">
             98% of orders delivered on time — Over 10,000 packages shipped this year
           </p>
         </div>

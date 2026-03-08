@@ -104,7 +104,7 @@ function LookProductCard({
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-               className="absolute inset-0 bg-green-600/90 
+               className="absolute inset-0 bg-foreground/90 
                            flex flex-col items-center justify-center gap-2"
               >
                 <DrawCheckIcon size="lg" color="white" animate delay={0.1} />
@@ -117,7 +117,7 @@ function LookProductCard({
 
           {/* In Cart Badge */}
           {isInCart && !quickAdd.isAdded && (
-            <div className="absolute top-2 right-2 bg-green-600 p-1">
+            <div className="absolute top-2 right-2 bg-foreground p-1">
               <Check className="w-3 h-3 text-white" />
             </div>
           )}
@@ -332,7 +332,7 @@ const ShopTheLook = ({ products, lookName, lookId }: ShopTheLookProps) => {
           className={`
             w-full font-light tracking-wide h-12 rounded-none transition-colors
             ${addedCount === products.length 
-              ? 'bg-green-600 hover:bg-green-600 text-white' 
+              ? 'bg-foreground hover:bg-foreground text-background' 
               : 'bg-champagne-600 hover:bg-champagne-500 text-white'
             }
           `}

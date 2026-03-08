@@ -50,13 +50,13 @@ const AddedToCartToast = ({
         duration: prefersReducedMotion ? 0 : 0.25,
         ease: [0.25, 0.46, 0.45, 0.94]
       }}
-      className="flex items-center gap-3 p-3 bg-background border border-border rounded-lg shadow-lg max-w-[320px] w-full cursor-pointer"
+      className="flex items-center gap-3 p-3 bg-background border border-border shadow-sm max-w-[320px] w-full cursor-pointer"
       role="status"
       aria-live="polite"
       onClick={() => toastId && sonnerToast.dismiss(toastId)}
     >
       {/* Product Thumbnail */}
-      <div className="w-12 h-16 bg-muted/30 overflow-hidden flex-shrink-0 rounded">
+      <div className="w-12 h-16 bg-muted/30 overflow-hidden flex-shrink-0">
         <img
           src={productImage}
           alt=""
