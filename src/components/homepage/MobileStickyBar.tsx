@@ -45,9 +45,6 @@ const MobileStickyBar = () => {
           : 'translate-y-full opacity-0'
       }`}
     >
-      {/* Gradient fade */}
-      <div className="h-6 bg-gradient-to-t from-stone-900 to-transparent" />
-      
       {/* Main Bar */}
       <div className="bg-stone-900 px-4 py-3">
         <div className="flex items-center gap-3">

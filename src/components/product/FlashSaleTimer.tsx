@@ -180,11 +180,6 @@ const FlashSaleTimer = ({
         </div>
       </div>
       
-      {isVeryUrgent && (
-        <span className="text-[10px] font-medium uppercase tracking-wider text-red-600 dark:text-red-400 animate-pulse">
-          Hurry!
-        </span>
-      )}
     </motion.div>
   );
 };
