@@ -120,7 +120,7 @@ const PostPurchaseOffer = ({ isOpen, onClose, onAddToOrder }: PostPurchaseOfferP
             onClick={onClose}
             className="w-full text-xs text-muted-foreground hover:text-foreground transition-colors py-2"
           >
-            No thanks, I'll pay full price later
+            No thanks
           </button>
         </div>
       </DialogContent>

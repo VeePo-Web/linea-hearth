@@ -1030,7 +1030,7 @@ const Checkout = () => {
                         >
                           {isProcessing || isStripeLoading ? (
                             <>
-                              <span className="animate-spin mr-2">⏳</span>
+                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                               Preparing Checkout...
                             </>
                           ) : (

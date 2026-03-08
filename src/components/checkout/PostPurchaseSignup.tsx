@@ -172,7 +172,7 @@ export function PostPurchaseSignup({
         <motion.div
           initial={prefersReducedMotion ? {} : { scale: 0 }}
           animate={{ scale: 1 }}
-          transition={{ delay: 0.2, type: "spring" }}
+          transition={{ delay: 0.2, type: "tween", duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
           className="w-16 h-16 bg-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6"
         >
           <Check className="w-8 h-8 text-white" />
