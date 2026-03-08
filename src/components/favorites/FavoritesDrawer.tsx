@@ -236,7 +236,7 @@ export default function FavoritesDrawer({ isOpen, onClose, onAuthRequired }: Fav
         <>
           {/* Backdrop */}
           <motion.div
-            className="fixed inset-0 z-50 bg-black/50"
+            className="fixed inset-0 z-50 bg-black/50 touch-none"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
