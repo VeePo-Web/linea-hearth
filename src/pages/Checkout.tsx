@@ -1005,8 +1005,8 @@ const Checkout = () => {
                         </div>
                         {discountAmount > 0 && (
                           <div className="flex justify-between text-sm">
-                            <span className="text-emerald-600">Discount</span>
-                            <span className="text-emerald-600">-${discountAmount.toLocaleString()}</span>
+                            <span className="text-champagne-600">Discount</span>
+                            <span className="text-champagne-600">-${discountAmount.toLocaleString()}</span>
                           </div>
                         )}
                         <div className="flex justify-between text-sm">
