@@ -206,7 +206,7 @@ const BundleProgress = ({ bundle, variant = "drawer" }: BundleProgressProps) => 
             animate={{ opacity: 1, y: 0 }}
             className="text-[10px] text-champagne-600 dark:text-champagne-400 mt-2 font-medium flex items-center gap-1"
           >
-            <span className="inline-block w-1.5 h-1.5 rounded-full bg-champagne-500 animate-pulse" />
+            <span className="inline-block w-1.5 h-1.5 rounded-full bg-champagne-500" />
             Just 1 item away from {bundle.nextTierDiscountPercent || bundle.discountPercent}% off!
           </motion.p>
         )}

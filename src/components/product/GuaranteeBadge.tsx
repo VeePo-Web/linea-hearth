@@ -75,7 +75,7 @@ const GuaranteeBadge = () => {
           <motion.div
             initial={{ scale: 0, rotate: -20 }}
             animate={isInView ? { scale: 1, rotate: 0 } : { scale: 0, rotate: -20 }}
-            transition={{ type: "spring" as const, stiffness: 400, damping: 15, delay: 0.1 }}
+            transition={{ type: "tween" as const, duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94], delay: 0.1 }}
           >
             <Shield className="w-8 h-8 text-foreground" strokeWidth={1.5} />
           </motion.div>

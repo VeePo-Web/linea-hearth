@@ -108,9 +108,7 @@ const HeroBlock = () => {
       >
         <div className="flex flex-col items-center text-white/60">
           <span className="text-xs tracking-widest uppercase mb-2">Scroll</span>
-          <div className="w-px h-8 bg-white/30 relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-1/2 bg-white animate-bounce" />
-          </div>
+          <div className="w-px h-8 bg-white/30" />
         </div>
       </div>
     </section>

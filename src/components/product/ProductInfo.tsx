@@ -178,15 +178,16 @@ const ProductInfo = ({ product, variants = [], onColorChange, onAuthRequired, on
     }
   };
 
+  const editorialEase = [0.25, 0.46, 0.45, 0.94] as const;
   const staggerItemVariants = {
     hidden: { opacity: 0, scale: 0.8 },
     visible: {
       opacity: 1,
       scale: 1,
       transition: {
-        type: "spring" as const,
-        stiffness: 400,
-        damping: 20,
+        type: "tween" as const,
+        duration: 0.3,
+        ease: editorialEase,
       }
     }
   };
@@ -511,8 +512,6 @@ const ProductInfo = ({ product, variants = [], onColorChange, onAuthRequired, on
               className="flex items-center gap-1.5"
               variants={staggerItemVariants}
               custom={index}
-              whileHover={{ y: -2 }}
-              transition={{ type: "spring", stiffness: 400, damping: 20 }}
             >
               <Icon className="w-3.5 h-3.5" strokeWidth={1.5} />
               <span>{label}</span>

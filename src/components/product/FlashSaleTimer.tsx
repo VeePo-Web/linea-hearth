@@ -76,7 +76,7 @@ const FlashSaleTimer = ({
             : isUrgent 
               ? "bg-amber-500 text-white" 
               : "bg-amber-400 text-amber-900",
-          !prefersReducedMotion && isVeryUrgent && "animate-pulse",
+          
           className
         )}
       >
@@ -102,7 +102,7 @@ const FlashSaleTimer = ({
           className
         )}
       >
-        <Clock className={cn("h-3 w-3", !prefersReducedMotion && isUrgent && "animate-pulse")} />
+        <Clock className="h-3 w-3" />
         <span className="font-mono font-medium">
           {formatUnit(timeLeft.hours)}:{formatUnit(timeLeft.minutes)}:{formatUnit(timeLeft.seconds)}
         </span>

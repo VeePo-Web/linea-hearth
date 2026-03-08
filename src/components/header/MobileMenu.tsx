@@ -43,14 +43,17 @@ const backdropVariants = {
   },
 };
 
+const editorialEase = [0.25, 0.46, 0.45, 0.94] as const;
+const exitEase = [0.4, 0, 1, 1] as const;
+
 const panelVariants = {
   hidden: { x: "100%" },
   visible: {
     x: 0,
     transition: {
-      type: "spring" as const,
-      stiffness: 300,
-      damping: 30,
+      type: "tween" as const,
+      duration: 0.35,
+      ease: editorialEase,
       staggerChildren: 0.06,
       delayChildren: 0.15,
     },
@@ -58,9 +61,9 @@ const panelVariants = {
   exit: {
     x: "100%",
     transition: {
-      type: "spring" as const,
-      stiffness: 400,
-      damping: 40,
+      type: "tween" as const,
+      duration: 0.3,
+      ease: exitEase,
     },
   },
 };
@@ -71,9 +74,9 @@ const navItemVariants = {
     opacity: 1,
     x: 0,
     transition: {
-      type: "spring" as const,
-      stiffness: 300,
-      damping: 25,
+      type: "tween" as const,
+      duration: 0.25,
+      ease: editorialEase,
     },
   },
   exit: {
