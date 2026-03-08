@@ -211,7 +211,7 @@ const Accessibility = () => {
                 icon={feature.icon}
                 title={feature.title}
                 description={feature.description}
-                iconColor="emerald"
+                iconColor="stone"
               />
             ))}
           </div>

@@ -332,7 +332,7 @@ const ShopTheLook = ({ products, lookName, lookId }: ShopTheLookProps) => {
           className={`
             w-full font-light tracking-wide h-12 rounded-none transition-colors
             ${addedCount === products.length 
-              ? 'bg-green-600 hover:bg-green-600 text-white' 
+              ? 'bg-foreground hover:bg-foreground text-background' 
               : 'bg-champagne-600 hover:bg-champagne-500 text-white'
             }
           `}

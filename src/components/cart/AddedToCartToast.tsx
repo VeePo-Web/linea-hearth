@@ -56,7 +56,7 @@ const AddedToCartToast = ({
       onClick={() => toastId && sonnerToast.dismiss(toastId)}
     >
       {/* Product Thumbnail */}
-      <div className="w-12 h-16 bg-muted/30 overflow-hidden flex-shrink-0 rounded">
+      <div className="w-12 h-16 bg-muted/30 overflow-hidden flex-shrink-0">
         <img
           src={productImage}
           alt=""
