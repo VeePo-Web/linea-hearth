@@ -51,23 +51,12 @@ const OrderConfirmation = ({
       {/* Success icon with confetti effect */}
       <div className="relative mx-auto w-20 h-20">
         <div
-          className={`absolute inset-0 bg-emerald-500 rounded-full flex items-center justify-center transition-transform duration-500 ${
+          className={`absolute inset-0 bg-foreground rounded-full flex items-center justify-center transition-transform duration-500 ${
             showConfetti ? "scale-100" : "scale-0"
           }`}
         >
-          <DrawCheckIcon size="lg" className="text-white" delay={500} />
+          <DrawCheckIcon size="lg" className="text-background" delay={500} />
         </div>
-        
-        {/* Confetti rings */}
-        {showConfetti && (
-          <>
-            <div className="absolute inset-0 rounded-full border-2 border-emerald-300 animate-ping" />
-            <div
-              className="absolute inset-0 rounded-full border-2 border-champagne-300 animate-ping"
-              style={{ animationDelay: "0.2s" }}
-            />
-          </>
-        )}
       </div>
 
       {/* Main confirmation text */}
