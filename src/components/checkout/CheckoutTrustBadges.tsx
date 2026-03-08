@@ -1,4 +1,4 @@
-import { Lock, Shield, CreditCard, RefreshCw } from "lucide-react";
+import { Lock, Shield, RefreshCw } from "lucide-react";
 
 const CheckoutTrustBadges = () => {
   return (
