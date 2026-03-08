@@ -89,9 +89,9 @@ const MobileStickyATC = ({ price, salePrice, quantity, onAddToBag, disabled }: M
           animate={{ y: 0 }}
           exit={{ y: 100 }}
           transition={{ 
-            type: "spring" as const, 
-            stiffness: 400, 
-            damping: 30,
+            type: "tween" as const, 
+            duration: 0.35,
+            ease: [0.25, 0.46, 0.45, 0.94],
           }}
         >
           <div className="flex items-center justify-between gap-4 max-w-lg mx-auto">
