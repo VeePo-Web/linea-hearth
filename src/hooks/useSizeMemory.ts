@@ -246,8 +246,10 @@ export const useSizeMemory = (): UseSizeMemoryReturn => {
 
   // Fetch database preferences and merge
   const syncWithDatabase = useCallback(async (userId: string, showMigrationToast = false) => {
+    // Prevent duplicate sync calls (React strict mode double-mount)
+    if (isSyncingRef.current) return;
+    isSyncingRef.current = true;
     setIsLoading(true);
-    
     try {
       // Get current localStorage state
       const localMemory = loadFromLocalStorage();
