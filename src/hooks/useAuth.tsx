@@ -7,6 +7,7 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   isAdmin: boolean;
+  adminLoading: boolean;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signUp: (email: string, password: string, fullName?: string) => Promise<{ data: { user: User | null; session: Session | null } | null; error: Error | null }>;
@@ -20,6 +21,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [adminLoading, setAdminLoading] = useState(true);
   const [loading, setLoading] = useState(true);
 
   const checkAdminRole = async (userId: string) => {
@@ -49,13 +51,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setSession(session);
         setUser(session?.user ?? null);
         
-        // Defer admin check with setTimeout to prevent deadlock
         if (session?.user) {
+          setAdminLoading(true);
           setTimeout(() => {
-            checkAdminRole(session.user.id).then(setIsAdmin);
+            checkAdminRole(session.user.id).then((val) => {
+              setIsAdmin(val);
+              setAdminLoading(false);
+            });
           }, 0);
         } else {
           setIsAdmin(false);
+          setAdminLoading(false);
         }
         
         setLoading(false);
@@ -68,7 +74,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(session?.user ?? null);
       
       if (session?.user) {
-        checkAdminRole(session.user.id).then(setIsAdmin);
+        setAdminLoading(true);
+        checkAdminRole(session.user.id).then((val) => {
+          setIsAdmin(val);
+          setAdminLoading(false);
+        });
+      } else {
+        setAdminLoading(false);
       }
       
       setLoading(false);
@@ -124,7 +136,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, isAdmin, loading, signIn, signUp, signInWithGoogle, signOut }}>
+    <AuthContext.Provider value={{ user, session, isAdmin, adminLoading, loading, signIn, signUp, signInWithGoogle, signOut }}>
       {children}
     </AuthContext.Provider>
   );
@@ -134,6 +146,7 @@ const AUTH_SAFE_DEFAULTS: AuthContextType = {
   user: null,
   session: null,
   isAdmin: false,
+  adminLoading: true,
   loading: true,
   signIn: async () => ({ error: new Error('Auth not ready') }),
   signUp: async () => ({ data: null, error: new Error('Auth not ready') }),

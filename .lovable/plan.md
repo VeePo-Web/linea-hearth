@@ -1,46 +1,52 @@
 
 
-# Round 21 — Scroll Lock Re-entrancy Fix + Admin Route Race Condition + Google Icon Polish
+# Navigation Bar: Full Audit Results and Remaining Fixes
 
-## Issues Found
+## What Was Already Fixed (Previous Diff)
+- Community page: StoryFilters bar removed, `immersiveHero` removed -- content now clears header correctly
+- Header animation: Spring replaced with editorial tween (0.4s, custom ease)
+- Scroll threshold: Increased from 50 to 80 to prevent micro-scroll flickering
 
-### 1. Scroll Lock Re-entrancy Bug (Critical)
-The `scrollLock.ts` utility uses a single `savedScrollY` variable. If two overlays open sequentially (e.g., MobileMenu opens, then user taps "Sign In" which opens AuthModal), the second `lockScroll()` call overwrites `savedScrollY` with `0` (because the body is already `position: fixed` and `window.scrollY` returns 0). When both close, the page jumps to the top.
+## Issue Found: Lookbook Page Regression
 
-**Fix:** Add a reference counter. Only capture `scrollY` on the first lock, only restore on the last unlock.
+The previous change to Lookbook.tsx introduced a bug by switching `marginTop` to `paddingTop`. Here's why:
 
-```text
-lockScroll() called (count 0→1): save scrollY, apply class
-lockScroll() called (count 1→2): no-op (already locked)
-unlockScroll() called (count 2→1): no-op (still locked)
-unlockScroll() called (count 1→0): remove class, restore scrollY
+The Lookbook uses a **custom scroll container** (not `<Layout>`). Its `height` is set to `calc(100dvh - var(--header-height))`. With `marginTop`, the container is positioned below the fixed header and sized correctly. With `paddingTop`, the container starts behind the header and the internal padding eats into the already-reduced height, effectively stealing ~100px from the bottom of the page.
+
+**Fix:** Revert `paddingTop` back to `marginTop` on the Lookbook scroll container. The original `marginTop` was correct -- the scroll container already starts below the header, so no content overlaps.
+
+### File: `src/pages/Lookbook.tsx`
+- Line 187: Change `paddingTop: 'var(--header-height)'` back to `marginTop: 'var(--header-height)'`
+
+## Full Audit: All Pages Checked
+
+| Page | Header Approach | Status |
+|------|----------------|--------|
+| `/` (Landing) | No header, no Layout | OK -- cinematic portal, no nav |
+| `/home` (Index) | Layout + `immersiveHero` | OK -- header hidden until scroll-up, hero is full-bleed |
+| `/community` | Layout (standard) | OK after previous fix -- `immersiveHero` removed, hero has `pt-20 lg:pt-0` + Layout padding |
+| `/lookbook` | Raw `<Header />` + custom scroll | NEEDS FIX -- revert `paddingTop` to `marginTop` |
+| `/about/our-story` | Layout (standard) | OK -- `pt-[var(--header-height)]` applied |
+| `/category/:slug` | Layout (standard) | OK |
+| `/product/:slug` | Layout (standard) | OK |
+| `/checkout` | CheckoutHeader (different component) | OK -- separate header system |
+| `/contact`, `/faq`, `/returns`, `/shipping` | ServicePageLayout | OK -- has its own header offset |
+| `/ambassador` | Layout (standard) | OK |
+| `/try-on` | Raw `<Header />` + `pt-[var(--header-height)]` | OK |
+| Legal pages | LegalPageLayout | OK -- uses `pt-[calc(var(--header-height)+2rem)]` |
+
+## Header Animation Quality Check
+
+The current tween config is correct:
+```
+type: "tween"
+duration: 0.4
+ease: [0.25, 0.46, 0.45, 0.94]
 ```
 
-| File | Change |
-|------|--------|
-| `src/lib/scrollLock.ts` | Add `lockCount` variable. `lockScroll()` increments count, only captures scrollY and applies class when count goes from 0 to 1. `unlockScroll()` decrements count, only removes class and restores scrollY when count goes from 1 to 0. |
+This matches the project's `editorialEase` standard documented in animation-standards memory. No further changes needed.
 
-### 2. Admin ProtectedRoute Flash of "ACCESS DENIED" (UX Bug)
-When navigating to `/ops-portal` after login, `useAuth` sets `loading = false` before `isAdmin` resolves (due to `setTimeout` in `onAuthStateChange`). The `ProtectedRoute` sees `user` exists but `isAdmin` is false, briefly showing "ACCESS DENIED" before the role check completes.
+## Summary
 
-**Fix:** Track admin role loading separately. While admin status is still being checked, show the loading spinner instead of "ACCESS DENIED".
-
-| File | Change |
-|------|--------|
-| `src/hooks/useAuth.tsx` | Add `adminLoading` boolean state. Set it to `true` when starting the admin check, `false` when resolved. Expose in context. |
-| `src/components/admin/ProtectedRoute.tsx` | Consume `adminLoading`. When `requireAdmin && adminLoading`, show spinner instead of "ACCESS DENIED". |
-
-### 3. Google Icon is Monochrome (Cheap Detail)
-`GoogleAuthButton.tsx` renders all 4 Google logo paths with `fill="currentColor"`, making them all one color. The recognizable Google "G" uses 4 distinct brand colors (blue, red, yellow, green). Monochrome reads as a knockoff.
-
-**Fix:** Replace `fill="currentColor"` on the parent SVG with the official Google brand colors on each individual path.
-
-| File | Change |
-|------|--------|
-| `src/components/auth/GoogleAuthButton.tsx` | Remove `fill="currentColor"` from `<svg>`, add `fill="#4285F4"` (blue), `fill="#34A853"` (green), `fill="#FBBC05"` (yellow), `fill="#EA4335"` (red) to the 4 paths respectively. |
-
-## What Is NOT Changed
-- No layout, typography, or spacing changes
-- No database changes
-- No visual design changes beyond fixing the Google icon to use its actual brand colors
+Only one fix needed: revert the Lookbook `paddingTop` back to `marginTop`. Everything else is working correctly after the previous changes.
 
