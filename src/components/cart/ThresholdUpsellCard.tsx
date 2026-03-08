@@ -114,7 +114,7 @@ const ThresholdUpsellCard = ({
             disabled={quickAdd.isAdding || quickAdd.isAdded}
             className={cn(
               "rounded-none h-7 px-2 text-xs w-full transition-all",
-              quickAdd.isAdded && "bg-emerald-500 text-white border-emerald-500",
+              quickAdd.isAdded && "bg-foreground text-background border-foreground",
               quickAdd.canOneTap && !quickAdd.isAdded && "bg-champagne-500 text-white border-champagne-500 hover:bg-champagne-400"
             )}
           >
