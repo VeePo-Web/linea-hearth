@@ -2,6 +2,20 @@
 @tailwind components;
 @tailwind utilities;
 
+/* iOS-safe scroll lock for overlays */
+html.scroll-locked,
+html.scroll-locked body {
+  overflow: hidden !important;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: auto;
+}
+@supports (-webkit-touch-callout: none) {
+  html.scroll-locked body {
+    position: fixed;
+    width: 100%;
+  }
+}
+
 /* Line of Judah - Editorial Streetwear Design System */
 /* Inspired by DAZED / i-D / 032c / Hypebeast */
 

@@ -168,7 +168,7 @@ const CartDrawer = ({ onViewFavorites }: CartDrawerProps) => {
             role="dialog"
             aria-modal="true"
             aria-labelledby="cart-title"
-            className="absolute right-0 top-0 min-h-screen h-[100dvh] w-full max-w-md bg-background border-l border-border flex flex-col shadow-2xl"
+            className="absolute right-0 top-0 min-h-screen h-[100dvh] w-full max-w-md bg-background border-l border-border flex flex-col shadow-2xl overscroll-contain"
             variants={drawerVariants}
             initial="hidden"
             animate="visible"
