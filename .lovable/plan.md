@@ -1,52 +1,56 @@
 
 
-# Navigation Bar: Full Audit Results and Remaining Fixes
+# Performance & Polish Audit: Round 9 — Shipping/Accessibility Emerald, Lookbook Green, and Border-Radius Inconsistency
 
-## What Was Already Fixed (Previous Diff)
-- Community page: StoryFilters bar removed, `immersiveHero` removed -- content now clears header correctly
-- Header animation: Spring replaced with editorial tween (0.4s, custom ease)
-- Scroll threshold: Increased from 50 to 80 to prevent micro-scroll flickering
+## Findings
 
-## Issue Found: Lookbook Page Regression
+### 1. ShippingInfo — Emerald Delivery Confidence Strip
+**File:** `src/pages/ShippingInfo.tsx` (lines 121-127)
+`bg-emerald-950/20 border border-emerald-900`, `text-emerald-500`, `text-emerald-100`. A full emerald-themed strip on a customer-facing service page.
 
-The previous change to Lookbook.tsx introduced a bug by switching `marginTop` to `paddingTop`. Here's why:
+**Fix:** Replace with `bg-foreground/5 border border-foreground/10`, `text-foreground`, `text-foreground/80`.
 
-The Lookbook uses a **custom scroll container** (not `<Layout>`). Its `height` is set to `calc(100dvh - var(--header-height))`. With `marginTop`, the container is positioned below the fixed header and sized correctly. With `paddingTop`, the container starts behind the header and the internal padding eats into the already-reduced height, effectively stealing ~100px from the bottom of the page.
+### 2. Accessibility — Emerald Compliance Strip (4 instances)
+**File:** `src/pages/Accessibility.tsx` (lines 134-138, 214)
+`border-emerald-500/20`, `bg-emerald-500`, `text-emerald-500` on compliance indicators and `iconColor="emerald"` passed to InfoCard. While semantically green makes sense for "compliance," the emerald is off-brand.
 
-**Fix:** Revert `paddingTop` back to `marginTop` on the Lookbook scroll container. The original `marginTop` was correct -- the scroll container already starts below the header, so no content overlaps.
+**Fix:** Replace border with `border-foreground/20`, dot with `bg-foreground`, icon with `text-foreground`. Change `iconColor="emerald"` to `iconColor="stone"` (neutral). Keep the `"emerald"` prop references in Contact.tsx since InfoCard already maps them to champagne.
 
-### File: `src/pages/Lookbook.tsx`
-- Line 187: Change `paddingTop: 'var(--header-height)'` back to `marginTop: 'var(--header-height)'`
+### 3. ShopTheLook — Green Success Overlays (3 instances)
+**File:** `src/components/lookbook/ShopTheLook.tsx` (lines 107, 120, 335)
+`bg-green-600/90` success overlay, `bg-green-600` in-cart badge, and `bg-green-600` on "all added" button state. These are in the lookbook which was previously excluded, but ShopTheLook is a direct commerce surface (add-to-cart), not an immersive gesture.
 
-## Full Audit: All Pages Checked
+**Fix:** Replace `bg-green-600/90` with `bg-foreground/90`, `bg-green-600 p-1` with `bg-foreground p-1`, and `bg-green-600 hover:bg-green-600` with `bg-foreground hover:bg-foreground`.
 
-| Page | Header Approach | Status |
-|------|----------------|--------|
-| `/` (Landing) | No header, no Layout | OK -- cinematic portal, no nav |
-| `/home` (Index) | Layout + `immersiveHero` | OK -- header hidden until scroll-up, hero is full-bleed |
-| `/community` | Layout (standard) | OK after previous fix -- `immersiveHero` removed, hero has `pt-20 lg:pt-0` + Layout padding |
-| `/lookbook` | Raw `<Header />` + custom scroll | NEEDS FIX -- revert `paddingTop` to `marginTop` |
-| `/about/our-story` | Layout (standard) | OK -- `pt-[var(--header-height)]` applied |
-| `/category/:slug` | Layout (standard) | OK |
-| `/product/:slug` | Layout (standard) | OK |
-| `/checkout` | CheckoutHeader (different component) | OK -- separate header system |
-| `/contact`, `/faq`, `/returns`, `/shipping` | ServicePageLayout | OK -- has its own header offset |
-| `/ambassador` | Layout (standard) | OK |
-| `/try-on` | Raw `<Header />` + `pt-[var(--header-height)]` | OK |
-| Legal pages | LegalPageLayout | OK -- uses `pt-[calc(var(--header-height)+2rem)]` |
+### 4. AddedToCartToast — `rounded-lg` Border Radius
+**File:** `src/components/cart/AddedToCartToast.tsx` (line 53)
+`rounded-lg` on the toast and `rounded` on the thumbnail. The entire design system uses sharp corners (`rounded-none` or `rounded-sm`). A `rounded-lg` toast breaks the editorial language.
 
-## Header Animation Quality Check
+**Fix:** Replace `rounded-lg` with `rounded-none` on the toast container. Replace `rounded` on the thumbnail with nothing (remove it).
 
-The current tween config is correct:
-```
-type: "tween"
-duration: 0.4
-ease: [0.25, 0.46, 0.45, 0.94]
-```
+### 5. AddedToCartToast — `shadow-lg`
+Same line 53. The rest of the site uses flat, editorial surfaces. A `shadow-lg` drop shadow reads as Material Design, not high-fashion editorial.
 
-This matches the project's `editorialEase` standard documented in animation-standards memory. No further changes needed.
+**Fix:** Replace `shadow-lg` with `shadow-sm` or remove entirely, relying on the border for definition.
+
+---
 
 ## Summary
 
-Only one fix needed: revert the Lookbook `paddingTop` back to `marginTop`. Everything else is working correctly after the previous changes.
+| File | Change |
+|------|--------|
+| `ShippingInfo.tsx` | Replace emerald strip with foreground palette |
+| `Accessibility.tsx` | Replace emerald compliance indicators with foreground/stone |
+| `ShopTheLook.tsx` | Replace 3 green commerce overlays with foreground |
+| `AddedToCartToast.tsx` | Replace `rounded-lg` with `rounded-none`, `shadow-lg` with `shadow-sm`, remove `rounded` from thumbnail |
+
+## What Is NOT Changed
+- Lookbook swipe gestures (`SwipeCard`, `SwipeActions`, `SwipeableLookCard`, `SwipeLookbook`, `SwipeProgress`) — immersive directional feedback using green for "add" vs red for "skip"
+- Admin status badges — semantic status colors
+- Account order status badges — standard status
+- Form validation green (CreateAccountForm, ResetPassword) — standard UX validation
+- Try-on SizeRecommendation — internal tool with semantic traffic-light colors
+- AvatarPreview green checks — internal try-on tool
+- FlashSaleTimer red — semantic urgency indicator
+- All functional logic preserved exactly
 
