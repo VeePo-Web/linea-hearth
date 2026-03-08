@@ -10,10 +10,13 @@ interface AuthModalProps {
   defaultTab?: 'signin' | 'signup';
 }
 
+const editorialEase = [0.25, 0.46, 0.45, 0.94] as const;
+const exitEase = [0.4, 0, 1, 1] as const;
+
 const backdropVariants = {
   hidden: { opacity: 0 },
   visible: { opacity: 1, transition: { duration: 0.3 } },
-  exit: { opacity: 0, transition: { duration: 0.3, delay: 0.1 } },
+  exit: { opacity: 0, transition: { duration: 0.2, delay: 0.1 } },
 };
 
 const panelVariants = {
@@ -21,17 +24,17 @@ const panelVariants = {
   visible: {
     x: 0,
     transition: {
-      type: 'spring' as const,
-      stiffness: 300,
-      damping: 30,
+      type: 'tween' as const,
+      duration: 0.35,
+      ease: editorialEase,
     },
   },
   exit: {
     x: '100%',
     transition: {
-      type: 'spring' as const,
-      stiffness: 400,
-      damping: 40,
+      type: 'tween' as const,
+      duration: 0.3,
+      ease: exitEase,
     },
   },
 };
