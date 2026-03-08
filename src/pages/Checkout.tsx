@@ -467,9 +467,6 @@ const Checkout = () => {
                   )}
                 </div>
 
-                {/* Rewards Progress */}
-                <RewardsProgress />
-
                 {/* Price Breakdown */}
                 <div className="border-t border-muted-foreground/20 pt-4 space-y-2">
                   <div className="flex justify-between text-sm">
