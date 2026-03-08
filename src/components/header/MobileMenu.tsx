@@ -111,13 +111,13 @@ const MobileMenu = ({
   // Scroll lock + Escape key handler
   useEffect(() => {
     if (!isOpen) return;
-    document.body.style.overflow = 'hidden';
+    document.documentElement.classList.add('scroll-locked');
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
     };
     document.addEventListener('keydown', handleEscape);
     return () => {
-      document.body.style.overflow = '';
+      document.documentElement.classList.remove('scroll-locked');
       document.removeEventListener('keydown', handleEscape);
     };
   }, [isOpen, onClose]);
@@ -137,7 +137,7 @@ const MobileMenu = ({
         <>
           {/* Backdrop */}
           <motion.div
-            className="fixed inset-0 bg-black/80 z-40"
+            className="fixed inset-0 bg-black/80 z-40 touch-none"
             variants={backdropVariants}
             initial="hidden"
             animate="visible"
@@ -147,7 +147,7 @@ const MobileMenu = ({
 
           {/* Panel */}
           <motion.div
-            className="fixed right-0 top-0 h-screen w-full max-w-md bg-background z-50 flex flex-col shadow-2xl"
+            className="fixed right-0 top-0 h-screen w-full max-w-md bg-background z-50 flex flex-col shadow-2xl overscroll-contain"
             variants={panelVariants}
             initial="hidden"
             animate="visible"

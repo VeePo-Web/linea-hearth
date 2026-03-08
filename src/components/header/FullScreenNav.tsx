@@ -112,17 +112,16 @@ const FullScreenNav = ({
   // Body scroll lock
   useEffect(() => {
     if (isOpen) {
-      document.body.style.overflow = 'hidden';
-      // Focus first link after animation
+      document.documentElement.classList.add('scroll-locked');
       const timer = setTimeout(() => {
         firstLinkRef.current?.focus();
       }, 300);
       return () => clearTimeout(timer);
     } else {
-      document.body.style.overflow = '';
+      document.documentElement.classList.remove('scroll-locked');
     }
     return () => {
-      document.body.style.overflow = '';
+      document.documentElement.classList.remove('scroll-locked');
     };
   }, [isOpen]);
 
@@ -160,7 +159,7 @@ const FullScreenNav = ({
           role="dialog"
           aria-modal="true"
           aria-label="Site navigation"
-          className="fixed inset-0 z-50 flex flex-col"
+          className="fixed inset-0 z-50 flex flex-col overscroll-contain touch-none"
           variants={safeBackgroundVariants}
           initial="hidden"
           animate="visible"

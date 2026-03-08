@@ -229,14 +229,14 @@ const SearchOverlay = ({ isOpen, onClose }: SearchOverlayProps) => {
 
   useEffect(() => {
     if (isOpen) {
-      document.body.style.overflow = 'hidden';
+      document.documentElement.classList.add('scroll-locked');
       setTimeout(() => inputRef.current?.focus(), 100);
     } else {
       setSearchValue("");
       setDebouncedSearch("");
     }
     return () => {
-      document.body.style.overflow = '';
+      document.documentElement.classList.remove('scroll-locked');
     };
   }, [isOpen]);
 
@@ -311,7 +311,7 @@ const SearchOverlay = ({ isOpen, onClose }: SearchOverlayProps) => {
         <>
           {/* Mobile: Full-screen overlay */}
           <motion.div
-            className="fixed inset-0 bg-background z-50 md:hidden flex flex-col"
+            className="fixed inset-0 bg-background z-50 md:hidden flex flex-col overscroll-contain"
             variants={containerVariants}
             initial="hidden"
             animate="visible"

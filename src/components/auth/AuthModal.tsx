@@ -10,10 +10,13 @@ interface AuthModalProps {
   defaultTab?: 'signin' | 'signup';
 }
 
+const editorialEase = [0.25, 0.46, 0.45, 0.94] as const;
+const exitEase = [0.4, 0, 1, 1] as const;
+
 const backdropVariants = {
   hidden: { opacity: 0 },
   visible: { opacity: 1, transition: { duration: 0.3 } },
-  exit: { opacity: 0, transition: { duration: 0.3, delay: 0.1 } },
+  exit: { opacity: 0, transition: { duration: 0.2, delay: 0.1 } },
 };
 
 const panelVariants = {
@@ -21,17 +24,17 @@ const panelVariants = {
   visible: {
     x: 0,
     transition: {
-      type: 'spring' as const,
-      stiffness: 300,
-      damping: 30,
+      type: 'tween' as const,
+      duration: 0.35,
+      ease: editorialEase,
     },
   },
   exit: {
     x: '100%',
     transition: {
-      type: 'spring' as const,
-      stiffness: 400,
-      damping: 40,
+      type: 'tween' as const,
+      duration: 0.3,
+      ease: exitEase,
     },
   },
 };
@@ -42,13 +45,13 @@ export default function AuthModal({ isOpen, onClose, defaultTab = 'signup' }: Au
   // Scroll lock + Escape key handler
   useEffect(() => {
     if (!isOpen) return;
-    document.body.style.overflow = 'hidden';
+    document.documentElement.classList.add('scroll-locked');
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
     };
     document.addEventListener('keydown', handleEscape);
     return () => {
-      document.body.style.overflow = '';
+      document.documentElement.classList.remove('scroll-locked');
       document.removeEventListener('keydown', handleEscape);
     };
   }, [isOpen, onClose]);
@@ -63,7 +66,7 @@ export default function AuthModal({ isOpen, onClose, defaultTab = 'signup' }: Au
         <>
           {/* Backdrop */}
           <motion.div
-            className="fixed inset-0 bg-black/60 z-50"
+            className="fixed inset-0 bg-black/60 z-50 touch-none"
             variants={backdropVariants}
             initial="hidden"
             animate="visible"
@@ -73,7 +76,7 @@ export default function AuthModal({ isOpen, onClose, defaultTab = 'signup' }: Au
 
           {/* Panel */}
           <motion.div
-            className="fixed right-0 top-0 h-screen w-full max-w-md bg-background z-50 flex flex-col shadow-2xl"
+            className="fixed right-0 top-0 h-screen w-full max-w-md bg-background z-50 flex flex-col shadow-2xl overscroll-contain"
             variants={panelVariants}
             initial="hidden"
             animate="visible"

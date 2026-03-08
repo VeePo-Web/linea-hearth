@@ -219,13 +219,13 @@ export default function FavoritesDrawer({ isOpen, onClose, onAuthRequired }: Fav
   // Scroll lock + Escape key handler
   useEffect(() => {
     if (!isOpen) return;
-    document.body.style.overflow = 'hidden';
+    document.documentElement.classList.add('scroll-locked');
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
     };
     document.addEventListener('keydown', handleEscape);
     return () => {
-      document.body.style.overflow = '';
+      document.documentElement.classList.remove('scroll-locked');
       document.removeEventListener('keydown', handleEscape);
     };
   }, [isOpen, onClose]);
@@ -236,7 +236,7 @@ export default function FavoritesDrawer({ isOpen, onClose, onAuthRequired }: Fav
         <>
           {/* Backdrop */}
           <motion.div
-            className="fixed inset-0 z-50 bg-black/50"
+            className="fixed inset-0 z-50 bg-black/50 touch-none"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -246,11 +246,11 @@ export default function FavoritesDrawer({ isOpen, onClose, onAuthRequired }: Fav
           
           {/* Drawer */}
           <motion.div
-            className="fixed right-0 top-0 h-screen w-full max-w-md bg-background border-l border-border z-50 flex flex-col shadow-2xl"
+            className="fixed right-0 top-0 h-screen w-full max-w-md bg-background border-l border-border z-50 flex flex-col shadow-2xl overscroll-contain"
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
-            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+            transition={{ type: 'tween', duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] }}
           >
             {/* Header */}
             <div className="flex items-center justify-between p-6 border-b border-border">

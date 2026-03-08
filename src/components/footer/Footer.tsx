@@ -160,17 +160,23 @@ const Footer = () => {
             href="https://veepo.ca/case-studies"
             target="_blank"
             rel="noopener noreferrer"
-            className="group flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3 transition-all duration-300 hover:scale-[1.02]"
+            className="group flex flex-col items-center justify-center gap-3 transition-all duration-500 hover:scale-[1.02]"
             aria-label="Visit VeePo case studies"
           >
-            <p className="text-xs tracking-[0.15em] uppercase text-white/40 transition-colors duration-300 group-hover:text-white/70">
-              This Vision Is <span className="group-hover:text-white transition-colors duration-300">Powered</span> By
+            <p className="text-xs tracking-[0.15em] uppercase text-white/40 transition-colors duration-500">
+              This{' '}
+              <span className="transition-colors duration-500 group-hover:text-[#FF6B35]">Vision</span>
+              {' '}Is{' '}
+              <span className="transition-colors duration-500 group-hover:text-[#4CAF50]">Powered</span>
+              {' '}By
             </p>
             <img
               src={veepoLogo}
               alt="VeePo"
-              className="h-7 w-auto transition-all duration-300 opacity-60 group-hover:opacity-100 group-hover:brightness-110"
+              className="h-8 w-auto transition-all duration-500 opacity-50 group-hover:opacity-100 group-hover:brightness-125"
             />
+            {/* Gradient underline reveal */}
+            <span className="block h-px w-24 bg-gradient-to-r from-[#FF6B35] to-[#4CAF50] scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-center" />
           </a>
         </div>
       </div>
