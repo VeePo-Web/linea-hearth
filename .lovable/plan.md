@@ -1,52 +1,81 @@
 
 
-# Navigation Bar: Full Audit Results and Remaining Fixes
+# Round 18 — UI/UX Stress Test Fixes + Veepo Footer Brand Upgrade
 
-## What Was Already Fixed (Previous Diff)
-- Community page: StoryFilters bar removed, `immersiveHero` removed -- content now clears header correctly
-- Header animation: Spring replaced with editorial tween (0.4s, custom ease)
-- Scroll threshold: Increased from 50 to 80 to prevent micro-scroll flickering
+## Issues Found
 
-## Issue Found: Lookbook Page Regression
+### 1. Background Scroll Bleed on Mobile Overlays
+All overlay components use `document.body.style.overflow = 'hidden'` for scroll lock, but on iOS Safari this is insufficient — the background still scrolls on touch. Missing `overscroll-behavior: contain` on overlay panels and `touch-action: none` on backdrops. Affects:
+- `FullScreenNav` (lines 112-127)
+- `MobileMenu` (lines 112-123)
+- `CartDrawer` (lines 134-148)
+- `AuthModal` (lines 43-54)
+- `FavoritesDrawer`
+- `SearchOverlay`
 
-The previous change to Lookbook.tsx introduced a bug by switching `marginTop` to `paddingTop`. Here's why:
+**Fix:** Add `overscroll-contain` class to all scrollable overlay panels and `touch-none` to all backdrop elements. Also add a global CSS rule for `body.overflow-hidden` with `-webkit-overflow-scrolling: auto` and `position: fixed` pattern for iOS.
 
-The Lookbook uses a **custom scroll container** (not `<Layout>`). Its `height` is set to `calc(100dvh - var(--header-height))`. With `marginTop`, the container is positioned below the fixed header and sized correctly. With `paddingTop`, the container starts behind the header and the internal padding eats into the already-reduced height, effectively stealing ~100px from the bottom of the page.
+### 2. AuthModal Uses Bouncy Spring Animations
+The `AuthModal` panel uses `type: 'spring', stiffness: 300, damping: 30` which creates a bouncy effect inconsistent with the editorial `tween` animations used by `CartDrawer`, `MobileMenu`, and `FavoritesDrawer`. This reads as cheap/playful rather than premium.
 
-**Fix:** Revert `paddingTop` back to `marginTop` on the Lookbook scroll container. The original `marginTop` was correct -- the scroll container already starts below the header, so no content overlaps.
+**Fix:** Replace spring with the editorial tween pattern (`duration: 0.35, ease: editorialEase`) matching the cart drawer exactly.
 
-### File: `src/pages/Lookbook.tsx`
-- Line 187: Change `paddingTop: 'var(--header-height)'` back to `marginTop: 'var(--header-height)'`
+### 3. Veepo Footer — Brand Identity Upgrade with Orange/Green
+Current implementation is monochrome `text-white/40`. User wants Veepo's orange and green brand colors incorporated for a bold, bespoke attribution that pops.
 
-## Full Audit: All Pages Checked
+**Fix:** Upgrade the attribution strip with:
+- "This Vision Is Powered By" text with `tracking-[0.15em] uppercase`
+- Key words "Vision" and "Powered" get Veepo brand color accents on hover: orange (`#FF6B35`) for "Vision", green (`#4CAF50`) for "Powered"
+- Veepo logo with hover brightness lift
+- Subtle animated gradient underline on hover using Veepo's orange→green
+- `group` hover scales the unit `1.02` with `duration-500` for premium feel
 
-| Page | Header Approach | Status |
-|------|----------------|--------|
-| `/` (Landing) | No header, no Layout | OK -- cinematic portal, no nav |
-| `/home` (Index) | Layout + `immersiveHero` | OK -- header hidden until scroll-up, hero is full-bleed |
-| `/community` | Layout (standard) | OK after previous fix -- `immersiveHero` removed, hero has `pt-20 lg:pt-0` + Layout padding |
-| `/lookbook` | Raw `<Header />` + custom scroll | NEEDS FIX -- revert `paddingTop` to `marginTop` |
-| `/about/our-story` | Layout (standard) | OK -- `pt-[var(--header-height)]` applied |
-| `/category/:slug` | Layout (standard) | OK |
-| `/product/:slug` | Layout (standard) | OK |
-| `/checkout` | CheckoutHeader (different component) | OK -- separate header system |
-| `/contact`, `/faq`, `/returns`, `/shipping` | ServicePageLayout | OK -- has its own header offset |
-| `/ambassador` | Layout (standard) | OK |
-| `/try-on` | Raw `<Header />` + `pt-[var(--header-height)]` | OK |
-| Legal pages | LegalPageLayout | OK -- uses `pt-[calc(var(--header-height)+2rem)]` |
+## Implementation Details
 
-## Header Animation Quality Check
+| File | Change |
+|------|--------|
+| `src/index.css` | Add global scroll-lock styles: `body.scroll-locked { position: fixed; width: 100%; overflow: hidden; }` with `-webkit-overflow-scrolling` handling for iOS |
+| `src/components/header/FullScreenNav.tsx` | Add `overscroll-contain` to the root `motion.div`. Use class-based body scroll lock (`scroll-locked`) instead of inline style |
+| `src/components/header/MobileMenu.tsx` | Add `touch-none` to backdrop, `overscroll-contain` to panel. Use class-based scroll lock |
+| `src/components/cart/CartDrawer.tsx` | Add `touch-none` to backdrop, `overscroll-contain` to drawer panel. Use class-based scroll lock |
+| `src/components/auth/AuthModal.tsx` | Replace spring animations with editorial tween (`duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94]`). Add `touch-none` to backdrop, `overscroll-contain` to panel. Use class-based scroll lock |
+| `src/components/favorites/FavoritesDrawer.tsx` | Add `touch-none` to backdrop, `overscroll-contain` to panel |
+| `src/components/header/SearchOverlay.tsx` | Add `overscroll-contain` to container |
+| `src/components/footer/Footer.tsx` | Upgrade Veepo attribution: add orange (`#FF6B35`) hover on "Vision", green (`#4CAF50`) hover on "Powered", animated gradient underline reveal, brighter logo hover. Keep idle state subtle (`text-white/40`) to respect host brand |
 
-The current tween config is correct:
+### Scroll Lock Pattern (shared across all overlays)
+```typescript
+// Replace inline overflow: hidden with class toggle
+document.documentElement.classList.add('scroll-locked');
+// cleanup:
+document.documentElement.classList.remove('scroll-locked');
 ```
-type: "tween"
-duration: 0.4
-ease: [0.25, 0.46, 0.45, 0.94]
+
+```css
+/* index.css */
+html.scroll-locked,
+html.scroll-locked body {
+  overflow: hidden;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: auto;
+}
+/* iOS position:fixed fallback */
+@supports (-webkit-touch-callout: none) {
+  html.scroll-locked body {
+    position: fixed;
+    width: 100%;
+  }
+}
 ```
 
-This matches the project's `editorialEase` standard documented in animation-standards memory. No further changes needed.
+### Veepo Footer Design
+- Idle: subtle `text-white/40`, monochrome
+- Hover: "Vision" transitions to `text-[#FF6B35]` (Veepo orange), "Powered" to `text-[#4CAF50]` (Veepo green), logo opacity 100% + brightness lift
+- A thin gradient line (`bg-gradient-to-r from-[#FF6B35] to-[#4CAF50]`) scales from 0 to full width on hover beneath the text
+- All transitions use `duration-500` for smooth, premium feel
 
-## Summary
-
-Only one fix needed: revert the Lookbook `paddingTop` back to `marginTop`. Everything else is working correctly after the previous changes.
+## What Is NOT Changed
+- No layout, typography, or spacing changes
+- No database/schema changes
+- Auth system logic untouched (only animation timing)
 
