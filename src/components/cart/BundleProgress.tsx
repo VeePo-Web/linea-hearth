@@ -83,9 +83,9 @@ const BundleProgress = ({ bundle, variant = "drawer" }: BundleProgressProps) => 
       className={cn(
         "relative border rounded-none overflow-hidden",
         isComplete
-          ? "border-emerald-500/40 bg-emerald-50/50 dark:bg-emerald-950/20"
+          ? "border-champagne-600/40 bg-champagne-50/50 dark:bg-champagne-950/20"
           : hasDiscount 
-            ? "border-emerald-500/30 bg-emerald-50/50 dark:bg-emerald-950/20" 
+            ? "border-champagne-500/30 bg-champagne-50/50 dark:bg-champagne-950/20" 
             : "border-champagne-500/30 bg-champagne-50/50 dark:bg-champagne-950/20"
       )}
     >
