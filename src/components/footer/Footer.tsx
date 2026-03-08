@@ -154,6 +154,17 @@ const Footer = () => {
             </Link>
           </div>
         </div>
+        <p className="text-center text-xs font-light text-white/40 mt-3">
+          Locally powered by{" "}
+          <a
+            href="https://veepo.ca/case-studies"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-champagne-500 transition-colors"
+          >
+            veepo.ca
+          </a>
+        </p>
       </div>
     </footer>
   );
