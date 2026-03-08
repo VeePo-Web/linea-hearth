@@ -281,7 +281,7 @@ const MobileMenu = ({
                   className="flex-1 flex items-center justify-center gap-2 py-3 border border-border hover:border-foreground hover:bg-muted/50 transition-all text-sm"
                   onClick={() => {
                     onClose();
-                    setTimeout(onSearchOpen, 300);
+                    setTimeout(onSearchOpen, 150);
                   }}
                   aria-label="Search"
                 >
