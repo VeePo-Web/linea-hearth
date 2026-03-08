@@ -1,36 +1,52 @@
 
 
-# Round 11 — Fix Navigation Crash and Verify Auth Independence
+# Round 12 — Auth System Audit: Bugs and Hardening
 
-## Critical Issue: Navigation Component Crash
+## Critical Bug Found
 
-The console shows an unhandled error crashing the `<Navigation>` component. The error trace shows the crash but not the root cause message. This is the top priority since it blocks the entire site.
+### 1. `?auth=true` Redirect Is Broken
+`ProtectedAccountRoute` redirects unauthenticated users to `/?auth=true`, but **nothing reads that query parameter**. The `LandingPage` component (mounted at `/`) never checks for `?auth=true` and never opens the auth modal. The user lands on the landing page with no indication they need to sign in.
 
-### Diagnosis Approach
-The crash occurs in Navigation which depends on: `useAuth`, `useCart`, `useFavorites`, `useSavedForLater`, `useReducedMotion`, and several child components (`CartDrawer`, `AuthModal`, `AccountDropdown`, `FavoritesDrawer`, `MobileMenu`, `SearchOverlay`, `MegaMenu`).
+Additionally, the `authRedirect` sessionStorage value is set but **never consumed** after successful auth — the user is never redirected back to their intended destination.
 
-Most likely cause: a recent edit to one of the files in the previous rounds introduced a breaking change (e.g., a component that was edited now has a rendering error, or an import was broken).
+**Fix:** Add a `useEffect` in `Navigation.tsx` that reads `?auth=true` from the URL and opens the auth modal. After successful auth, read `authRedirect` from sessionStorage and navigate there. Clean up both the query param and sessionStorage after use.
 
-### Plan
+### 2. Sign-Up Success Message Is Misleading (Email Confirmation)
+The `CreateAccountForm` calls `onSuccess()` immediately and shows "Your account has been created successfully" — but if email confirmation is enabled (the default, and the correct setting for this project), the user **cannot sign in until they confirm their email**. The modal closes and the user appears signed in momentarily before the session is rejected.
 
-1. **Investigate and fix the Navigation crash** by adding an error boundary around Navigation to capture the actual error, and reviewing recent edits to identify the breaking change. The crash is likely in one of the child components edited in recent rounds (`SearchOverlay`, `CartDrawer`, etc.).
+**Fix:** After `signUp`, check the response for `data.user?.identities`. If identities is empty or `email_confirmed_at` is null, show a "Check your email to confirm" message instead of closing the modal and toasting success. Only call `onSuccess()` if the user is actually authenticated.
 
-2. **Verify auth independence is complete** — the current code already has:
-   - Email/password auth via standard backend calls (works everywhere)
-   - Google OAuth with try/catch fallback to standard OAuth
-   - Graceful error handling in `GoogleAuthButton`
-   
-   No additional auth changes are needed. The system already works independently.
+### 3. Sign-Up Error Handling Gaps
+- The `signUp` function in `useAuth` returns `{ error }` but doesn't return `{ data, error }`. The `CreateAccountForm` has no way to inspect the response data to determine if email confirmation is pending vs. the account was auto-confirmed.
 
-## Implementation
+**Fix:** Update `signUp` in `useAuth.tsx` to return `{ data, error }` so the form can inspect the signup response.
+
+### 4. Google OAuth Button — `rounded` Inconsistency
+The Google auth button uses `rounded` (line 65 of GoogleAuthButton.tsx). The design system uses sharp corners (`rounded-none`). This was missed in prior rounds.
+
+**Fix:** Replace `rounded` with `rounded-none`.
+
+### 5. `ProtectedAccountRoute` — Unused State
+`shouldShowAuth` state variable (line 14) is declared but never used.
+
+**Fix:** Remove it.
+
+---
+
+## Summary
 
 | File | Change |
 |------|--------|
-| `Navigation.tsx` or child component | Fix the crash-causing code identified during investigation |
-| Potentially add `ErrorBoundary` wrapper | Prevent full-page crashes from header component errors |
+| `Navigation.tsx` | Add `useEffect` to read `?auth=true` and open auth modal; consume `authRedirect` after auth success |
+| `useAuth.tsx` | Return `{ data, error }` from `signUp` |
+| `CreateAccountForm.tsx` | Handle email confirmation pending state instead of assuming instant success |
+| `GoogleAuthButton.tsx` | Replace `rounded` with `rounded-none` |
+| `ProtectedAccountRoute.tsx` | Remove unused `shouldShowAuth` state |
 
 ## What Is NOT Changed
-- Auth flow logic (already has Lovable-independent fallback)
-- All other pages and components
+- Auth provider logic (Google OAuth fallback already in place)
+- SignInForm (already robust)
+- ResetPassword page (already handles invalid sessions)
+- Admin auth flow (separate system, already secured)
 - Database schema or RLS policies
 
