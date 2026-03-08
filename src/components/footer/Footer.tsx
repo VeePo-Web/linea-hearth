@@ -144,7 +144,7 @@ const Footer = () => {
       <div className="border-t border-white/10 -mx-4 xs:-mx-6 px-4 xs:px-6 pt-4">
         <div className="flex flex-col md:flex-row justify-between items-center gap-3">
           <p className="text-xs md:text-sm font-light text-white/50 text-center md:text-left">
-            © 2025 Line of Judah. All rights reserved.
+            © 2026 Line of Judah. All rights reserved.
           </p>
           <div className="flex space-x-4 md:space-x-6">
             <Link to="/privacy-policy" className="text-xs md:text-sm font-light text-white/50 hover:text-champagne-500 transition-colors touch-target-sm py-2">
@@ -172,9 +172,10 @@ const Footer = () => {
             </p>
             <img
               src={veepoLogo}
-              alt="VeePo"
+              alt="veepo.ca — Where Vision Meets Precision"
               className="h-8 w-auto transition-all duration-500 opacity-50 group-hover:opacity-100 group-hover:brightness-125"
             />
+            <span className="text-[10px] tracking-[0.2em] uppercase text-white/30 group-hover:text-white/60 transition-colors duration-500">veepo.ca</span>
             {/* Gradient underline reveal */}
             <span className="block h-px w-24 bg-gradient-to-r from-[#FF6B35] to-[#4CAF50] scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-center" />
           </a>
