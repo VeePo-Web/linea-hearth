@@ -320,23 +320,25 @@ const Navigation = () => {
       <SearchOverlay isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
 
       {/* Mobile Slide-Out Menu */}
-      <MobileMenu 
-        isOpen={isMobileMenuOpen} 
-        onClose={() => setIsMobileMenuOpen(false)} 
-        navItems={navItems} 
-        onSearchOpen={() => {
-          setIsMobileMenuOpen(false);
-          setIsSearchOpen(true);
-        }} 
-        onFavoritesOpen={() => {
-          setIsMobileMenuOpen(false);
-          setOffCanvasType('favorites');
-        }} 
-        onAuthOpen={() => {
-          setIsMobileMenuOpen(false);
-          setIsAuthModalOpen(true);
-        }} 
-      />
+      <ErrorBoundary>
+        <MobileMenu 
+          isOpen={isMobileMenuOpen} 
+          onClose={() => setIsMobileMenuOpen(false)} 
+          navItems={navItems} 
+          onSearchOpen={() => {
+            setIsMobileMenuOpen(false);
+            setIsSearchOpen(true);
+          }} 
+          onFavoritesOpen={() => {
+            setIsMobileMenuOpen(false);
+            setOffCanvasType('favorites');
+          }} 
+          onAuthOpen={() => {
+            setIsMobileMenuOpen(false);
+            setIsAuthModalOpen(true);
+          }} 
+        />
+      </ErrorBoundary>
 
       {/* Cart Drawer */}
       <CartDrawer onViewFavorites={() => {
