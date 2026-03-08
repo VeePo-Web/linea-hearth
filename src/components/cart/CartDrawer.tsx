@@ -35,17 +35,17 @@ const drawerVariants = {
   visible: {
     x: 0,
     transition: {
-      type: "spring" as const,
-      stiffness: 300,
-      damping: 30,
+      type: "tween" as const,
+      duration: 0.35,
+      ease: [0.25, 0.46, 0.45, 0.94],
     },
   },
   exit: {
     x: "100%",
     transition: {
-      type: "spring" as const,
-      stiffness: 400,
-      damping: 40,
+      type: "tween" as const,
+      duration: 0.3,
+      ease: [0.4, 0, 1, 1],
     },
   },
 };
