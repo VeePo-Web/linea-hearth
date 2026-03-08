@@ -1,52 +1,61 @@
 
 
-# Navigation Bar: Full Audit Results and Remaining Fixes
+# Round 20 — iOS Scroll Position Fix + Veepo Footer Final Polish
 
-## What Was Already Fixed (Previous Diff)
-- Community page: StoryFilters bar removed, `immersiveHero` removed -- content now clears header correctly
-- Header animation: Spring replaced with editorial tween (0.4s, custom ease)
-- Scroll threshold: Increased from 50 to 80 to prevent micro-scroll flickering
+## Issue 1: iOS Scroll Position Loss on Overlay Open/Close
 
-## Issue Found: Lookbook Page Regression
+**Problem:** The `position: fixed` iOS fallback in the scroll lock CSS resets `window.scrollY` to 0 when an overlay opens. When the overlay closes, the page jumps to the top instead of staying where the user was. This affects all 6 overlay surfaces (MobileMenu, CartDrawer, AuthModal, FavoritesDrawer, SearchOverlay, FullScreenNav).
 
-The previous change to Lookbook.tsx introduced a bug by switching `marginTop` to `paddingTop`. Here's why:
+**Fix:** Update the global CSS to use a `top` offset approach, and create a shared utility function that saves/restores scroll position:
 
-The Lookbook uses a **custom scroll container** (not `<Layout>`). Its `height` is set to `calc(100dvh - var(--header-height))`. With `marginTop`, the container is positioned below the fixed header and sized correctly. With `paddingTop`, the container starts behind the header and the internal padding eats into the already-reduced height, effectively stealing ~100px from the bottom of the page.
+| File | Change |
+|------|--------|
+| `src/index.css` | Update the iOS `position: fixed` rule to include `top: calc(-1 * var(--scroll-y, 0px))` so the body stays visually in place while locked |
+| `src/lib/scrollLock.ts` | **New file.** Export `lockScroll()` and `unlockScroll()` functions that: (1) save `window.scrollY` to a CSS custom property `--scroll-y`, (2) add/remove `scroll-locked` class, (3) on unlock restore `window.scrollTo(0, savedY)`. Single source of truth for all overlays. |
+| `src/components/header/MobileMenu.tsx` | Replace `classList.add/remove('scroll-locked')` with `lockScroll()`/`unlockScroll()` |
+| `src/components/header/FullScreenNav.tsx` | Same replacement |
+| `src/components/cart/CartDrawer.tsx` | Same replacement |
+| `src/components/auth/AuthModal.tsx` | Same replacement |
+| `src/components/favorites/FavoritesDrawer.tsx` | Same replacement |
+| `src/components/header/SearchOverlay.tsx` | Same replacement |
 
-**Fix:** Revert `paddingTop` back to `marginTop` on the Lookbook scroll container. The original `marginTop` was correct -- the scroll container already starts below the header, so no content overlaps.
-
-### File: `src/pages/Lookbook.tsx`
-- Line 187: Change `paddingTop: 'var(--header-height)'` back to `marginTop: 'var(--header-height)'`
-
-## Full Audit: All Pages Checked
-
-| Page | Header Approach | Status |
-|------|----------------|--------|
-| `/` (Landing) | No header, no Layout | OK -- cinematic portal, no nav |
-| `/home` (Index) | Layout + `immersiveHero` | OK -- header hidden until scroll-up, hero is full-bleed |
-| `/community` | Layout (standard) | OK after previous fix -- `immersiveHero` removed, hero has `pt-20 lg:pt-0` + Layout padding |
-| `/lookbook` | Raw `<Header />` + custom scroll | NEEDS FIX -- revert `paddingTop` to `marginTop` |
-| `/about/our-story` | Layout (standard) | OK -- `pt-[var(--header-height)]` applied |
-| `/category/:slug` | Layout (standard) | OK |
-| `/product/:slug` | Layout (standard) | OK |
-| `/checkout` | CheckoutHeader (different component) | OK -- separate header system |
-| `/contact`, `/faq`, `/returns`, `/shipping` | ServicePageLayout | OK -- has its own header offset |
-| `/ambassador` | Layout (standard) | OK |
-| `/try-on` | Raw `<Header />` + `pt-[var(--header-height)]` | OK |
-| Legal pages | LegalPageLayout | OK -- uses `pt-[calc(var(--header-height)+2rem)]` |
-
-## Header Animation Quality Check
-
-The current tween config is correct:
-```
-type: "tween"
-duration: 0.4
-ease: [0.25, 0.46, 0.45, 0.94]
+### scrollLock utility pattern:
+```typescript
+let scrollY = 0;
+export function lockScroll() {
+  scrollY = window.scrollY;
+  document.documentElement.style.setProperty('--scroll-y', `-${scrollY}px`);
+  document.documentElement.classList.add('scroll-locked');
+}
+export function unlockScroll() {
+  document.documentElement.classList.remove('scroll-locked');
+  document.documentElement.style.removeProperty('--scroll-y');
+  window.scrollTo(0, scrollY);
+}
 ```
 
-This matches the project's `editorialEase` standard documented in animation-standards memory. No further changes needed.
+### Updated CSS:
+```css
+@supports (-webkit-touch-callout: none) {
+  html.scroll-locked body {
+    position: fixed;
+    width: 100%;
+    top: var(--scroll-y, 0px);
+  }
+}
+```
 
-## Summary
+## Issue 2: Veepo Footer — Add Tagline for Full Brand Identity
 
-Only one fix needed: revert the Lookbook `paddingTop` back to `marginTop`. Everything else is working correctly after the previous changes.
+The attribution strip works well but is missing Veepo's core tagline. Adding "Where Vision Meets Precision" as a whisper line below the domain creates a complete brand moment.
+
+| File | Change |
+|------|--------|
+| `src/components/footer/Footer.tsx` | Replace the `veepo.ca` span with a stacked pair: `veepo.ca` domain label + `Where Vision Meets Precision` tagline in `text-[9px] tracking-[0.15em] italic text-white/20 group-hover:text-white/40`. Keeps idle state subtle, reveals on hover. |
+
+## What Is NOT Changed
+- No layout, typography, or spacing changes
+- No database changes
+- Auth system logic untouched
+- Admin dashboard untouched (verified solid)
 
