@@ -198,7 +198,7 @@ const CheckoutSuccess = () => {
         <div className="max-w-2xl mx-auto">
           {/* Success Header */}
           <div className="text-center mb-12">
-            <div className="w-20 h-20 bg-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6 animate-scale-in">
+            <div className="w-20 h-20 bg-foreground rounded-full flex items-center justify-center mx-auto mb-6 animate-scale-in">
               <CheckCircle className="w-10 h-10 text-white" />
             </div>
             <h1 className="text-3xl font-light mb-2">Thank You for Your Order!</h1>
@@ -269,7 +269,7 @@ const CheckoutSuccess = () => {
             {order.discount_cents > 0 && (
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Discount</span>
-                <span className="text-emerald-600">-{formatCents(order.discount_cents)}</span>
+                <span className="text-champagne-600">-{formatCents(order.discount_cents)}</span>
               </div>
             )}
             <div className="flex justify-between pt-3 border-t border-border font-medium">

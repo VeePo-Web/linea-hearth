@@ -43,7 +43,7 @@ const RecentProductCard = ({ product }: RecentProductCardProps) => {
               "absolute bottom-2 right-2 w-10 h-10 md:w-8 md:h-8 rounded-full flex items-center justify-center transition-all duration-200",
               "bg-white/90 backdrop-blur-sm border border-white/20 shadow-md",
               "hover:bg-white hover:text-stone-950 active:bg-white active:text-stone-950",
-              quickAdd.isAdded && "bg-emerald-500 border-emerald-500 text-white"
+              quickAdd.isAdded && "bg-foreground border-foreground text-background"
             )}
             whileTap={{ scale: 0.9 }}
             aria-label={quickAdd.canOneTap ? `Quick add ${product.name} in ${quickAdd.rememberedSize}` : `Add ${product.name}`}

@@ -386,11 +386,11 @@ const Checkout = () => {
                 <div className="pt-4 border-t border-muted-foreground/20">
                   {appliedDiscount ? (
                     <div className="space-y-2">
-                      <div className="flex items-center justify-between bg-emerald-500/10 border border-emerald-500/30 p-3">
+                      <div className="flex items-center justify-between bg-champagne-50 dark:bg-champagne-950/30 border border-champagne-200 dark:border-champagne-800 p-3">
                         <div className="flex items-center gap-2">
-                          <Check className="h-4 w-4 text-emerald-600" />
+                          <Check className="h-4 w-4 text-champagne-700 dark:text-champagne-400" />
                           <div>
-                            <p className="text-sm font-medium text-emerald-600">
+                            <p className="text-sm font-medium text-champagne-700 dark:text-champagne-400">
                               {appliedDiscount.name}
                             </p>
                             <p className="text-xs text-muted-foreground">
@@ -475,13 +475,13 @@ const Checkout = () => {
                   </div>
                   {discountAmount > 0 && (
                     <div className="flex justify-between text-sm">
-                      <span className="text-emerald-600">Discount</span>
-                      <span className="text-emerald-600">-${discountAmount.toLocaleString()}</span>
+                      <span className="text-champagne-600">Discount</span>
+                      <span className="text-champagne-600">-${discountAmount.toLocaleString()}</span>
                     </div>
                   )}
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Shipping</span>
-                    <span className={shipping === 0 ? "text-emerald-600" : "text-foreground"}>
+                    <span className={shipping === 0 ? "text-champagne-600" : "text-foreground"}>
                       {shipping === 0 ? "FREE" : `$${shipping}`}
                     </span>
                   </div>
@@ -872,7 +872,7 @@ const Checkout = () => {
                         </div>
                         <div className="text-sm">
                           {hasFreeShipping ? (
-                            <span className="text-emerald-600 dark:text-emerald-400 font-medium">FREE ✓</span>
+                            <span className="text-foreground font-medium">Free</span>
                           ) : (
                             <span className="text-muted-foreground">{formatPrice(CURRENCY.standardShippingCost)} • 3-5 business days</span>
                           )}
@@ -1005,13 +1005,13 @@ const Checkout = () => {
                         </div>
                         {discountAmount > 0 && (
                           <div className="flex justify-between text-sm">
-                            <span className="text-emerald-600">Discount</span>
-                            <span className="text-emerald-600">-${discountAmount.toLocaleString()}</span>
+                            <span className="text-champagne-600">Discount</span>
+                            <span className="text-champagne-600">-${discountAmount.toLocaleString()}</span>
                           </div>
                         )}
                         <div className="flex justify-between text-sm">
                           <span className="text-muted-foreground">Shipping</span>
-                          <span className={shipping === 0 ? "text-emerald-600" : "text-foreground"}>
+                          <span className={shipping === 0 ? "text-champagne-600" : "text-foreground"}>
                             {shipping === 0 ? "FREE" : `$${shipping}`}
                           </span>
                         </div>
@@ -1075,7 +1075,7 @@ const Checkout = () => {
 
                       {/* Security assurance */}
                       <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
-                        <span className="inline-block w-2 h-2 bg-emerald-500 rounded-full" />
+                        <span className="inline-block w-2 h-2 bg-foreground rounded-full" />
                         100% Secure Checkout • Your data is never stored
                       </div>
                     </div>

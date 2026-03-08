@@ -195,7 +195,7 @@ export function PostPurchaseSignup({
                 className="h-8 w-8 p-0"
               >
                 {copied ? (
-                  <Check className="w-4 h-4 text-emerald-500" />
+                  <Check className="w-4 h-4 text-foreground" />
                 ) : (
                   <Copy className="w-4 h-4" />
                 )}
@@ -209,11 +209,11 @@ export function PostPurchaseSignup({
 
         <div className="space-y-2 text-sm text-muted-foreground">
           <div className="flex items-center justify-center gap-2">
-            <Check className="w-4 h-4 text-emerald-500" />
+            <Check className="w-4 h-4 text-foreground" />
             <span>Your sizes have been saved</span>
           </div>
           <div className="flex items-center justify-center gap-2">
-            <Check className="w-4 h-4 text-emerald-500" />
+            <Check className="w-4 h-4 text-foreground" />
             <span>This order is linked to your account</span>
           </div>
         </div>

@@ -219,7 +219,7 @@ const ProductCard = ({ product, onQuickView, index = 0, onAuthRequired }: Produc
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="absolute inset-0 bg-emerald-600/90 flex flex-col items-center justify-center gap-2 z-10"
+                  className="absolute inset-0 bg-foreground/90 flex flex-col items-center justify-center gap-2 z-10"
                 >
                   <motion.div
                     initial={{ scale: 0 }}

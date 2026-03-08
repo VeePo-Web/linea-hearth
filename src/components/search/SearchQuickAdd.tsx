@@ -60,7 +60,7 @@ const SearchQuickAdd = ({ product, onNavigate }: SearchQuickAddProps) => {
         className={cn(
           "flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center transition-all",
           "border border-border hover:border-foreground hover:bg-foreground hover:text-background",
-          quickAdd.isAdded && "bg-emerald-500 border-emerald-500 text-white"
+          quickAdd.isAdded && "bg-foreground border-foreground text-background"
         )}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}

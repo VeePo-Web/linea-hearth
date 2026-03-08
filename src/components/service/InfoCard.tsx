@@ -31,7 +31,7 @@ const InfoCard = memo(({
 
   const iconColorClasses = {
     amber: "text-champagne-500",
-    emerald: "text-emerald-500",
+    emerald: "text-champagne-500",
     blue: "text-blue-500",
     stone: "text-stone-400"
   };
