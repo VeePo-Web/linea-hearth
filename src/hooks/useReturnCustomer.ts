@@ -172,7 +172,7 @@ export function useReturnCustomer(): ReturnCustomerData {
     if (!firstName || hasSeenGreeting) return null;
     
     if (isReturningCustomer) {
-      return `Welcome back, ${firstName}! 👋`;
+      return `Welcome back, ${firstName}.`;
     }
     
     return `Hey ${firstName}!`;

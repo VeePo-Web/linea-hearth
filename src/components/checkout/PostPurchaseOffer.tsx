@@ -101,9 +101,9 @@ const PostPurchaseOffer = ({ isOpen, onClose, onAddToOrder }: PostPurchaseOfferP
 
           {/* Benefits */}
           <div className="text-xs text-muted-foreground bg-muted/30 p-3 space-y-1">
-            <p>✓ Add to your order with ONE CLICK</p>
-            <p>✓ No re-entering payment details</p>
-            <p>✓ Ships together with your order</p>
+             <p>— Add to your order with one click</p>
+            <p>— No re-entering payment details</p>
+            <p>— Ships together with your order</p>
           </div>
 
           {/* CTA */}

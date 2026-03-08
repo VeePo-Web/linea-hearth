@@ -159,7 +159,7 @@ const QuickViewModal = ({ product, open, onClose, onAuthRequired }: QuickViewMod
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="absolute inset-0 bg-emerald-600/90 flex flex-col items-center justify-center gap-3"
+                  className="absolute inset-0 bg-foreground/90 flex flex-col items-center justify-center gap-3"
                 >
                   <motion.div
                     initial={{ scale: 0 }}

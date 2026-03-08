@@ -269,7 +269,7 @@ const CheckoutSuccess = () => {
             {order.discount_cents > 0 && (
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Discount</span>
-                <span className="text-emerald-600">-{formatCents(order.discount_cents)}</span>
+                <span className="text-champagne-600">-{formatCents(order.discount_cents)}</span>
               </div>
             )}
             <div className="flex justify-between pt-3 border-t border-border font-medium">

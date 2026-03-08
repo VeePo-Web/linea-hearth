@@ -213,7 +213,7 @@ export function PostPurchaseSignup({
             <span>Your sizes have been saved</span>
           </div>
           <div className="flex items-center justify-center gap-2">
-            <Check className="w-4 h-4 text-emerald-500" />
+            <Check className="w-4 h-4 text-foreground" />
             <span>This order is linked to your account</span>
           </div>
         </div>
