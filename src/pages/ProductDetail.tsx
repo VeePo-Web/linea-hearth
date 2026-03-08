@@ -13,7 +13,7 @@ import LookbookLookSection from "../components/product/LookbookLookSection";
 import GuaranteeBadge from "../components/product/GuaranteeBadge";
 import MobileStickyATC from "../components/product/MobileStickyATC";
 import ProductCarousel from "../components/content/ProductCarousel";
-import HighIntentPrompt from "../components/product/HighIntentPrompt";
+
 import RecentlyViewed from "../components/homepage/RecentlyViewed";
 import { 
   Breadcrumb, 
