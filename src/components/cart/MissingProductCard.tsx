@@ -238,7 +238,7 @@ const MissingProductCard = ({
                 size="xs" 
                 variant="circle-check"
                 filled
-                className="text-emerald-500" 
+                className="text-foreground" 
               />
             </motion.div>
           ) : state === 'adding' ? (
