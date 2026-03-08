@@ -2,6 +2,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import { X, Search, Heart, Instagram, Mail, ChevronDown, User, LogOut } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
+import { lockScroll, unlockScroll } from "@/lib/scrollLock";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
 
