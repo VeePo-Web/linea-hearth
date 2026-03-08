@@ -275,8 +275,8 @@ const BundleProgress = ({ bundle, variant = "drawer" }: BundleProgressProps) => 
                     </span>
                   </div>
                   <div className="flex justify-between text-xs mt-1">
-                    <span className="text-emerald-600 font-medium">{bundle.discountPercent}% bundle discount</span>
-                    <span className="text-emerald-600 font-medium">-${bundle.savingsAmount.toFixed(2)}</span>
+                    <span className="text-champagne-700 dark:text-champagne-400 font-medium">{bundle.discountPercent}% bundle discount</span>
+                    <span className="text-champagne-700 dark:text-champagne-400 font-medium">-${bundle.savingsAmount.toFixed(2)}</span>
                   </div>
                 </div>
               )}
