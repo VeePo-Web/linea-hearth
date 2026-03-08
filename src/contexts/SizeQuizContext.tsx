@@ -234,7 +234,7 @@ export const SizeQuizProvider = ({ children }: SizeQuizProviderProps) => {
 
     // 4. Show success toast
     toast({
-      title: "Sizes saved! 🎉",
+      title: "Sizes saved",
       description: "You'll save 12 seconds on every future purchase with one-tap shopping.",
     });
 

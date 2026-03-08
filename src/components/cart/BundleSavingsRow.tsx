@@ -58,7 +58,7 @@ const BundleSavingsRow = ({ variant = "drawer" }: BundleSavingsRowProps) => {
         </div>
         
         <motion.span
-          className="text-sm font-medium text-emerald-600 dark:text-emerald-400"
+          className="text-sm font-medium text-champagne-700 dark:text-champagne-400"
           initial={{ opacity: 0, x: 10 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.2 }}
