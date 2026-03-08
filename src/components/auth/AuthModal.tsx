@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import SignInForm from './SignInForm';
 import CreateAccountForm from './CreateAccountForm';
 import { lockScroll, unlockScroll } from '@/lib/scrollLock';
@@ -176,13 +177,13 @@ export default function AuthModal({ isOpen, onClose, defaultTab = 'signup' }: Au
             <div className="px-6 py-4 border-t border-border bg-secondary/30">
               <p className="text-xs text-muted-foreground text-center">
                 By continuing, you agree to our{' '}
-                <a href="/terms-of-service" className="underline hover:text-foreground">
+                <Link to="/terms-of-service" onClick={onClose} className="underline hover:text-foreground">
                   Terms of Service
-                </a>{' '}
+                </Link>{' '}
                 and{' '}
-                <a href="/privacy-policy" className="underline hover:text-foreground">
+                <Link to="/privacy-policy" onClick={onClose} className="underline hover:text-foreground">
                   Privacy Policy
-                </a>
+                </Link>
               </p>
             </div>
           </motion.div>

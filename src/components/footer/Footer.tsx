@@ -160,7 +160,7 @@ const Footer = () => {
             href="https://veepo.ca/case-studies"
             target="_blank"
             rel="noopener noreferrer"
-            className="group flex flex-col items-center justify-center gap-3 transition-all duration-500 hover:scale-[1.02]"
+            className="group flex flex-col items-center justify-center gap-1.5 transition-all duration-500 hover:scale-[1.02]"
             aria-label="Visit VeePo case studies"
           >
             <p className="text-xs tracking-[0.15em] uppercase text-white/40 transition-colors duration-500">
