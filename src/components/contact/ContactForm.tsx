@@ -85,8 +85,8 @@ const ContactForm = () => {
         animate={{ opacity: 1, scale: 1 }}
         className="flex flex-col items-center justify-center py-16 text-center"
       >
-        <div className="w-16 h-16 rounded-full bg-emerald-500/10 flex items-center justify-center mb-6">
-          <DrawCheckIcon className="w-8 h-8 text-emerald-500" />
+        <div className="w-16 h-16 rounded-full bg-foreground/10 flex items-center justify-center mb-6">
+          <DrawCheckIcon className="w-8 h-8 text-foreground" />
         </div>
         <h3 className="text-xl font-medium mb-2">Transmission Received</h3>
         <p className="text-muted-foreground max-w-md">
