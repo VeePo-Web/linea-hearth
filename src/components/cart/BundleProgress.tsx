@@ -133,11 +133,11 @@ const BundleProgress = ({ bundle, variant = "drawer" }: BundleProgressProps) => 
             transition={{ duration: 0.5, delay: 0.1 }}
           >
             {isComplete ? (
-              <Sparkles className="w-4 h-4 text-emerald-600" />
+              <Sparkles className="w-4 h-4 text-champagne-600" />
             ) : (
               <Gift className={cn(
                 "w-4 h-4",
-                hasDiscount ? "text-emerald-600" : "text-champagne-600"
+                hasDiscount ? "text-champagne-600" : "text-champagne-600"
               )} />
             )}
           </motion.div>
