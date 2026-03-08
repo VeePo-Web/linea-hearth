@@ -1,52 +1,33 @@
 
 
-# Navigation Bar: Full Audit Results and Remaining Fixes
+# Round 15 — Fix Blank Screen Crash from useAuth Context Loss
 
-## What Was Already Fixed (Previous Diff)
-- Community page: StoryFilters bar removed, `immersiveHero` removed -- content now clears header correctly
-- Header animation: Spring replaced with editorial tween (0.4s, custom ease)
-- Scroll threshold: Increased from 50 to 80 to prevent micro-scroll flickering
+## Root Cause
 
-## Issue Found: Lookbook Page Regression
+The error `useAuth must be used within an AuthProvider` causes a **blank screen** because:
 
-The previous change to Lookbook.tsx introduced a bug by switching `marginTop` to `paddingTop`. Here's why:
+1. `Navigation` itself calls `useAuth()` at line 30
+2. When the context is temporarily unavailable (HMR, fast refresh, or edge-case React reconciliation), `useAuth()` throws
+3. The `ErrorBoundary` components around `MobileMenu`, `FavoritesDrawer`, and `AccountDropdown` are irrelevant because the crash happens in their **parent** (`Navigation`), not in the children
+4. No ErrorBoundary exists above `Navigation` → the error propagates to the root and blanks the screen
 
-The Lookbook uses a **custom scroll container** (not `<Layout>`). Its `height` is set to `calc(100dvh - var(--header-height))`. With `marginTop`, the container is positioned below the fixed header and sized correctly. With `paddingTop`, the container starts behind the header and the internal padding eats into the already-reduced height, effectively stealing ~100px from the bottom of the page.
+## Fix
 
-**Fix:** Revert `paddingTop` back to `marginTop` on the Lookbook scroll container. The original `marginTop` was correct -- the scroll container already starts below the header, so no content overlaps.
+**Make `useAuth` resilient instead of throwing.** Return safe defaults when the context is missing, so no component ever crashes from a missing provider. This is the same pattern already applied for `useSizeQuizContextSafe`.
 
-### File: `src/pages/Lookbook.tsx`
-- Line 187: Change `paddingTop: 'var(--header-height)'` back to `marginTop: 'var(--header-height)'`
+| File | Change |
+|------|--------|
+| `src/hooks/useAuth.tsx` | Change `useAuth()` to return safe defaults (null user, no-op functions, loading=true) when context is undefined, instead of throwing. Remove the throw entirely. |
 
-## Full Audit: All Pages Checked
+The safe defaults ensure:
+- `user` is `null` → UI shows logged-out state
+- `loading` is `true` → protected routes show spinner instead of redirecting
+- `signIn`, `signUp`, `signOut`, `signInWithGoogle` are no-op async functions that return error objects
 
-| Page | Header Approach | Status |
-|------|----------------|--------|
-| `/` (Landing) | No header, no Layout | OK -- cinematic portal, no nav |
-| `/home` (Index) | Layout + `immersiveHero` | OK -- header hidden until scroll-up, hero is full-bleed |
-| `/community` | Layout (standard) | OK after previous fix -- `immersiveHero` removed, hero has `pt-20 lg:pt-0` + Layout padding |
-| `/lookbook` | Raw `<Header />` + custom scroll | NEEDS FIX -- revert `paddingTop` to `marginTop` |
-| `/about/our-story` | Layout (standard) | OK -- `pt-[var(--header-height)]` applied |
-| `/category/:slug` | Layout (standard) | OK |
-| `/product/:slug` | Layout (standard) | OK |
-| `/checkout` | CheckoutHeader (different component) | OK -- separate header system |
-| `/contact`, `/faq`, `/returns`, `/shipping` | ServicePageLayout | OK -- has its own header offset |
-| `/ambassador` | Layout (standard) | OK |
-| `/try-on` | Raw `<Header />` + `pt-[var(--header-height)]` | OK |
-| Legal pages | LegalPageLayout | OK -- uses `pt-[calc(var(--header-height)+2rem)]` |
+This is a single-line-area change that eliminates the entire class of "useAuth outside AuthProvider" crashes across the app — MobileMenu, AccountDropdown, and any future component.
 
-## Header Animation Quality Check
-
-The current tween config is correct:
-```
-type: "tween"
-duration: 0.4
-ease: [0.25, 0.46, 0.45, 0.94]
-```
-
-This matches the project's `editorialEase` standard documented in animation-standards memory. No further changes needed.
-
-## Summary
-
-Only one fix needed: revert the Lookbook `paddingTop` back to `marginTop`. Everything else is working correctly after the previous changes.
+## What Is NOT Changed
+- AuthProvider logic, session handling, admin checks
+- ErrorBoundary wrappers (kept as defense-in-depth)
+- Any UI components, pages, or database schema
 
