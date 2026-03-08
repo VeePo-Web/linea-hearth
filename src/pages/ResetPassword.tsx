@@ -208,8 +208,8 @@ export default function ResetPassword() {
                 <div className="flex items-center gap-2 text-xs">
                   {passwordsMatch ? (
                     <>
-                      <CheckCircle2 size={14} className="text-green-600" />
-                      <span className="text-green-600">Passwords match</span>
+                      <CheckCircle2 size={14} className="text-foreground" />
+                      <span className="text-foreground">Passwords match</span>
                     </>
                   ) : (
                     <>

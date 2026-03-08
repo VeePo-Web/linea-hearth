@@ -102,11 +102,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signInWithGoogle = async () => {
-    const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
-    });
-    const error = result.error ? (result.error instanceof Error ? result.error : new Error(String(result.error))) : null;
-    return { error };
+    try {
+      const result = await lovable.auth.signInWithOAuth("google", {
+        redirect_uri: window.location.origin,
+      });
+      const error = result.error ? (result.error instanceof Error ? result.error : new Error(String(result.error))) : null;
+      return { error };
+    } catch {
+      // Fallback to standard OAuth when managed auth is unavailable
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: { redirectTo: window.location.origin },
+      });
+      return { error };
+    }
   };
 
   const signOut = async () => {

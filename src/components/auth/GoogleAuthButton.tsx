@@ -35,10 +35,9 @@ export default function GoogleAuthButton({
       const { error } = await signInWithGoogle();
       
       if (error) {
-        // User cancelled or other OAuth error
         console.error('Google sign in error:', error);
-        toast.error('Failed to connect with Google', {
-          description: error.message,
+        toast.error('Google sign-in is unavailable', {
+          description: 'Please use email and password to sign in.',
         });
         setIsLoading(false);
         return;
