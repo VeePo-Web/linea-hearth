@@ -1,4 +1,5 @@
 import { X, Lock } from "lucide-react";
+import { lockScroll, unlockScroll } from "@/lib/scrollLock";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "@/hooks/useCart";
