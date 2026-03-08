@@ -126,9 +126,10 @@ export const useSizeMemory = (): UseSizeMemoryReturn => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   
-  // Prevent duplicate migration toasts
+  // Prevent duplicate migration toasts and duplicate sync calls
   const hasMigratedRef = useRef(false);
   const currentUserIdRef = useRef<string | null>(null);
+  const isSyncingRef = useRef(false);
 
   // Merge localStorage and database preferences (most recent wins per category)
   const mergePreferences = useCallback((
@@ -245,8 +246,10 @@ export const useSizeMemory = (): UseSizeMemoryReturn => {
 
   // Fetch database preferences and merge
   const syncWithDatabase = useCallback(async (userId: string, showMigrationToast = false) => {
+    // Prevent duplicate sync calls (React strict mode double-mount)
+    if (isSyncingRef.current) return;
+    isSyncingRef.current = true;
     setIsLoading(true);
-    
     try {
       // Get current localStorage state
       const localMemory = loadFromLocalStorage();
@@ -295,6 +298,7 @@ export const useSizeMemory = (): UseSizeMemoryReturn => {
       console.warn('Error syncing with database:', e);
     } finally {
       setIsLoading(false);
+      isSyncingRef.current = false;
     }
   }, [mergePreferences, upsertToDatabase, fetchSizeConfidence, toast]);
 

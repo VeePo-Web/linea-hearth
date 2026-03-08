@@ -98,7 +98,7 @@ export default function CreateAccountForm({ onSuccess, onSwitchToSignIn }: Creat
 
       {/* Error message */}
       {errors.root && (
-        <div className="p-3 bg-destructive/10 border border-destructive/20 text-destructive text-sm rounded">
+        <div className="p-3 bg-destructive/10 border border-destructive/20 text-destructive text-sm rounded-none">
           {errors.root.message}
         </div>
       )}
