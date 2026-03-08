@@ -30,6 +30,9 @@ const backdropVariants = {
   exit: { opacity: 0, transition: { duration: 0.2, delay: 0.1 } },
 };
 
+const editorialEase = [0.25, 0.46, 0.45, 0.94] as const;
+const exitEase = [0.4, 0, 1, 1] as const;
+
 const drawerVariants = {
   hidden: { x: "100%" },
   visible: {
@@ -37,7 +40,7 @@ const drawerVariants = {
     transition: {
       type: "tween" as const,
       duration: 0.35,
-      ease: [0.25, 0.46, 0.45, 0.94],
+      ease: editorialEase,
     },
   },
   exit: {
@@ -45,7 +48,7 @@ const drawerVariants = {
     transition: {
       type: "tween" as const,
       duration: 0.3,
-      ease: [0.4, 0, 1, 1],
+      ease: exitEase,
     },
   },
 };
