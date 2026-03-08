@@ -326,7 +326,7 @@ const MobileMenu = ({
                     className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
                     onClick={() => {
                       onClose();
-                      setTimeout(onAuthOpen, 300);
+                      setTimeout(onAuthOpen, 150);
                     }}
                   >
                     <User size={16} strokeWidth={1.5} />
