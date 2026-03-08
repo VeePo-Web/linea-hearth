@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import SignInForm from './SignInForm';
 import CreateAccountForm from './CreateAccountForm';
 import { lockScroll, unlockScroll } from '@/lib/scrollLock';
