@@ -247,7 +247,7 @@ export default function FavoritesDrawer({ isOpen, onClose, onAuthRequired }: Fav
           
           {/* Drawer */}
           <motion.div
-            className="fixed right-0 top-0 h-screen w-full max-w-md bg-background border-l border-border z-50 flex flex-col shadow-2xl overscroll-contain"
+            className="fixed right-0 top-0 h-[100dvh] w-full max-w-md bg-background border-l border-border z-50 flex flex-col shadow-2xl overscroll-contain"
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
