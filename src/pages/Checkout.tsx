@@ -872,7 +872,7 @@ const Checkout = () => {
                         </div>
                         <div className="text-sm">
                           {hasFreeShipping ? (
-                            <span className="text-emerald-600 dark:text-emerald-400 font-medium">FREE ✓</span>
+                            <span className="text-foreground font-medium">Free</span>
                           ) : (
                             <span className="text-muted-foreground">{formatPrice(CURRENCY.standardShippingCost)} • 3-5 business days</span>
                           )}
