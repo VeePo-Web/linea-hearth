@@ -235,7 +235,6 @@ const SearchOverlay = ({ isOpen, onClose }: SearchOverlayProps) => {
     } else {
       setSearchValue("");
       setDebouncedSearch("");
-      unlockScroll();
     }
     return () => {
       unlockScroll();
