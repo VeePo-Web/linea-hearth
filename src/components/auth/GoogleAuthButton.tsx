@@ -62,7 +62,7 @@ export default function GoogleAuthButton({
       whileHover={{ scale: 1.01 }}
       whileTap={{ scale: 0.99 }}
       transition={{ duration: 0.15 }}
-      className="w-full h-12 flex items-center justify-center gap-3 border border-border rounded bg-transparent hover:bg-muted/50 text-foreground font-normal tracking-wide transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+      className="w-full h-12 flex items-center justify-center gap-3 border border-border rounded-none bg-transparent hover:bg-muted/50 text-foreground font-normal tracking-wide transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
     >
       {isLoading ? (
         <>
