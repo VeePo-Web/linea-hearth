@@ -13,6 +13,7 @@ html.scroll-locked body {
   html.scroll-locked body {
     position: fixed;
     width: 100%;
+    top: var(--scroll-y, 0px);
   }
 }
 

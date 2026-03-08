@@ -46,13 +46,13 @@ export default function AuthModal({ isOpen, onClose, defaultTab = 'signup' }: Au
   // Scroll lock + Escape key handler
   useEffect(() => {
     if (!isOpen) return;
-    document.documentElement.classList.add('scroll-locked');
+    lockScroll();
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
     };
     document.addEventListener('keydown', handleEscape);
     return () => {
-      document.documentElement.classList.remove('scroll-locked');
+      unlockScroll();
       document.removeEventListener('keydown', handleEscape);
     };
   }, [isOpen, onClose]);

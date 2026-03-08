@@ -139,11 +139,11 @@ const CartDrawer = ({ onViewFavorites }: CartDrawerProps) => {
     };
 
     document.addEventListener('keydown', handleEscape);
-    document.documentElement.classList.add('scroll-locked');
+    lockScroll();
 
     return () => {
       document.removeEventListener('keydown', handleEscape);
-      document.documentElement.classList.remove('scroll-locked');
+      unlockScroll();
     };
   }, [isCartOpen, closeCart]);
 
