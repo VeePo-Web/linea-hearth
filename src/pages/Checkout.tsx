@@ -491,8 +491,6 @@ const Checkout = () => {
                   </div>
                 </div>
 
-                {/* Mini Testimonial */}
-                <MiniTestimonial />
               </div>
             </div>
 
