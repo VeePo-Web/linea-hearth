@@ -40,8 +40,8 @@ const TestimonialSnippet = ({ productId }: TestimonialSnippetProps) => {
       <p className="text-sm font-light text-muted-foreground italic">
         "{snippet}"
         <span className="not-italic text-foreground ml-2">
-          — {testimonial.customer_name}
-          {testimonial.customer_location && `, ${testimonial.customer_location}`}
+          — {review.customer_name}
+          {review.customer_location && `, ${review.customer_location}`}
         </span>
       </p>
     </div>
