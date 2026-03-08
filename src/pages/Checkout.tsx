@@ -326,10 +326,7 @@ const Checkout = () => {
             {/* Order Summary - First on mobile, last on desktop */}
             <div className="lg:col-span-1 lg:order-2">
               <div className="bg-muted/20 p-6 lg:p-8 rounded-none sticky top-6 space-y-6">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-lg font-light text-foreground">Order Summary</h2>
-                  <OrderStatsBadge />
-                </div>
+                <h2 className="text-lg font-light text-foreground">Order Summary</h2>
                 
                 {/* Free Shipping Progress */}
                 <FreeShippingBar />

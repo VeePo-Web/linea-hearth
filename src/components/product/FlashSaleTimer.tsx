@@ -136,8 +136,7 @@ const FlashSaleTimer = ({
             : "bg-amber-400 text-amber-900"
       )}>
         <Flame className={cn(
-          "h-4 w-4",
-          !prefersReducedMotion && isUrgent && "animate-pulse"
+          "h-4 w-4"
         )} />
       </div>
       

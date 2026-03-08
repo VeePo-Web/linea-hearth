@@ -46,7 +46,7 @@ const UrgencyTimer = ({ initialMinutes = 15, type = "cart" }: UrgencyTimerProps)
           : "text-muted-foreground bg-muted/30"
       )}
     >
-      <Clock className={cn("h-3 w-3", isLowTime && "animate-pulse")} />
+      <Clock className="h-3 w-3" />
       <span>
         {type === "cart" ? "Cart reserved for " : "Free shipping expires in "}
         <span className={cn("font-mono font-medium", isLowTime && "text-amber-600 dark:text-amber-400")}>
