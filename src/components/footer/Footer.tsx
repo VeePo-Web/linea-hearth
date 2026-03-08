@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import FooterEmailCapture from "./FooterEmailCapture";
+import veepoLogo from "@/assets/veepo-logo.png";
 
 const Footer = () => {
   return (
@@ -154,17 +155,24 @@ const Footer = () => {
             </Link>
           </div>
         </div>
-        <p className="text-center text-xs font-light text-white/40 mt-3">
-          Locally powered by{" "}
+        <div className="border-t border-white/5 mt-4 pt-4">
           <a
             href="https://veepo.ca/case-studies"
             target="_blank"
             rel="noopener noreferrer"
-            className="hover:text-champagne-500 transition-colors"
+            className="group flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3 transition-all duration-300 hover:scale-[1.02]"
+            aria-label="Visit VeePo case studies"
           >
-            veepo.ca
+            <p className="text-xs tracking-[0.15em] uppercase text-white/40 transition-colors duration-300 group-hover:text-white/70">
+              This Vision Is <span className="group-hover:text-white transition-colors duration-300">Powered</span> By
+            </p>
+            <img
+              src={veepoLogo}
+              alt="VeePo"
+              className="h-7 w-auto transition-all duration-300 opacity-60 group-hover:opacity-100 group-hover:brightness-110"
+            />
           </a>
-        </p>
+        </div>
       </div>
     </footer>
   );
