@@ -51,13 +51,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setSession(session);
         setUser(session?.user ?? null);
         
-        // Defer admin check with setTimeout to prevent deadlock
         if (session?.user) {
+          setAdminLoading(true);
           setTimeout(() => {
-            checkAdminRole(session.user.id).then(setIsAdmin);
+            checkAdminRole(session.user.id).then((val) => {
+              setIsAdmin(val);
+              setAdminLoading(false);
+            });
           }, 0);
         } else {
           setIsAdmin(false);
+          setAdminLoading(false);
         }
         
         setLoading(false);
