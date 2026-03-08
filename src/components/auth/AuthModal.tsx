@@ -66,7 +66,7 @@ export default function AuthModal({ isOpen, onClose, defaultTab = 'signup' }: Au
         <>
           {/* Backdrop */}
           <motion.div
-            className="fixed inset-0 bg-black/60 z-50"
+            className="fixed inset-0 bg-black/60 z-50 touch-none"
             variants={backdropVariants}
             initial="hidden"
             animate="visible"
