@@ -2,6 +2,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import { X, Search, Heart, Instagram, Mail, ChevronDown, User, LogOut } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
+import { lockScroll, unlockScroll } from "@/lib/scrollLock";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
 
@@ -111,13 +112,13 @@ const MobileMenu = ({
   // Scroll lock + Escape key handler
   useEffect(() => {
     if (!isOpen) return;
-    document.documentElement.classList.add('scroll-locked');
+    lockScroll();
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
     };
     document.addEventListener('keydown', handleEscape);
     return () => {
-      document.documentElement.classList.remove('scroll-locked');
+      unlockScroll();
       document.removeEventListener('keydown', handleEscape);
     };
   }, [isOpen, onClose]);

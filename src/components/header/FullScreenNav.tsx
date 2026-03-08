@@ -6,6 +6,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { BRAND } from "@/config/brand";
+import { lockScroll, unlockScroll } from "@/lib/scrollLock";
 
 interface FullScreenNavProps {
   isOpen: boolean;
@@ -112,17 +113,12 @@ const FullScreenNav = ({
   // Body scroll lock
   useEffect(() => {
     if (isOpen) {
-      document.documentElement.classList.add('scroll-locked');
+      lockScroll();
       const timer = setTimeout(() => {
         firstLinkRef.current?.focus();
       }, 300);
-      return () => clearTimeout(timer);
-    } else {
-      document.documentElement.classList.remove('scroll-locked');
+      return () => { unlockScroll(); clearTimeout(timer); };
     }
-    return () => {
-      document.documentElement.classList.remove('scroll-locked');
-    };
   }, [isOpen]);
 
   // Keyboard handling (Escape + focus trap)

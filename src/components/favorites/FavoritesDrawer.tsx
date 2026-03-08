@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { lockScroll, unlockScroll } from '@/lib/scrollLock';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ShoppingBag, Heart, Trash2, Check } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -219,13 +220,13 @@ export default function FavoritesDrawer({ isOpen, onClose, onAuthRequired }: Fav
   // Scroll lock + Escape key handler
   useEffect(() => {
     if (!isOpen) return;
-    document.documentElement.classList.add('scroll-locked');
+    lockScroll();
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
     };
     document.addEventListener('keydown', handleEscape);
     return () => {
-      document.documentElement.classList.remove('scroll-locked');
+      unlockScroll();
       document.removeEventListener('keydown', handleEscape);
     };
   }, [isOpen, onClose]);

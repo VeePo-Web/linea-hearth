@@ -1,4 +1,5 @@
 import { X, Lock } from "lucide-react";
+import { lockScroll, unlockScroll } from "@/lib/scrollLock";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "@/hooks/useCart";
@@ -139,11 +140,11 @@ const CartDrawer = ({ onViewFavorites }: CartDrawerProps) => {
     };
 
     document.addEventListener('keydown', handleEscape);
-    document.documentElement.classList.add('scroll-locked');
+    lockScroll();
 
     return () => {
       document.removeEventListener('keydown', handleEscape);
-      document.documentElement.classList.remove('scroll-locked');
+      unlockScroll();
     };
   }, [isCartOpen, closeCart]);
 

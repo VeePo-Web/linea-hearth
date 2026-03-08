@@ -176,6 +176,7 @@ const Footer = () => {
               className="h-8 w-auto transition-all duration-500 opacity-50 group-hover:opacity-100 group-hover:brightness-125"
             />
             <span className="text-[10px] tracking-[0.2em] uppercase text-white/30 group-hover:text-white/60 transition-colors duration-500">veepo.ca</span>
+            <span className="text-[9px] tracking-[0.15em] italic text-white/20 group-hover:text-white/40 transition-colors duration-500">Where Vision Meets Precision</span>
             {/* Gradient underline reveal */}
             <span className="block h-px w-24 bg-gradient-to-r from-[#FF6B35] to-[#4CAF50] scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-center" />
           </a>
