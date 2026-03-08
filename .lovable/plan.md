@@ -1,52 +1,36 @@
 
 
-# Navigation Bar: Full Audit Results and Remaining Fixes
+# Round 11 — Fix Navigation Crash and Verify Auth Independence
 
-## What Was Already Fixed (Previous Diff)
-- Community page: StoryFilters bar removed, `immersiveHero` removed -- content now clears header correctly
-- Header animation: Spring replaced with editorial tween (0.4s, custom ease)
-- Scroll threshold: Increased from 50 to 80 to prevent micro-scroll flickering
+## Critical Issue: Navigation Component Crash
 
-## Issue Found: Lookbook Page Regression
+The console shows an unhandled error crashing the `<Navigation>` component. The error trace shows the crash but not the root cause message. This is the top priority since it blocks the entire site.
 
-The previous change to Lookbook.tsx introduced a bug by switching `marginTop` to `paddingTop`. Here's why:
+### Diagnosis Approach
+The crash occurs in Navigation which depends on: `useAuth`, `useCart`, `useFavorites`, `useSavedForLater`, `useReducedMotion`, and several child components (`CartDrawer`, `AuthModal`, `AccountDropdown`, `FavoritesDrawer`, `MobileMenu`, `SearchOverlay`, `MegaMenu`).
 
-The Lookbook uses a **custom scroll container** (not `<Layout>`). Its `height` is set to `calc(100dvh - var(--header-height))`. With `marginTop`, the container is positioned below the fixed header and sized correctly. With `paddingTop`, the container starts behind the header and the internal padding eats into the already-reduced height, effectively stealing ~100px from the bottom of the page.
+Most likely cause: a recent edit to one of the files in the previous rounds introduced a breaking change (e.g., a component that was edited now has a rendering error, or an import was broken).
 
-**Fix:** Revert `paddingTop` back to `marginTop` on the Lookbook scroll container. The original `marginTop` was correct -- the scroll container already starts below the header, so no content overlaps.
+### Plan
 
-### File: `src/pages/Lookbook.tsx`
-- Line 187: Change `paddingTop: 'var(--header-height)'` back to `marginTop: 'var(--header-height)'`
+1. **Investigate and fix the Navigation crash** by adding an error boundary around Navigation to capture the actual error, and reviewing recent edits to identify the breaking change. The crash is likely in one of the child components edited in recent rounds (`SearchOverlay`, `CartDrawer`, etc.).
 
-## Full Audit: All Pages Checked
+2. **Verify auth independence is complete** — the current code already has:
+   - Email/password auth via standard backend calls (works everywhere)
+   - Google OAuth with try/catch fallback to standard OAuth
+   - Graceful error handling in `GoogleAuthButton`
+   
+   No additional auth changes are needed. The system already works independently.
 
-| Page | Header Approach | Status |
-|------|----------------|--------|
-| `/` (Landing) | No header, no Layout | OK -- cinematic portal, no nav |
-| `/home` (Index) | Layout + `immersiveHero` | OK -- header hidden until scroll-up, hero is full-bleed |
-| `/community` | Layout (standard) | OK after previous fix -- `immersiveHero` removed, hero has `pt-20 lg:pt-0` + Layout padding |
-| `/lookbook` | Raw `<Header />` + custom scroll | NEEDS FIX -- revert `paddingTop` to `marginTop` |
-| `/about/our-story` | Layout (standard) | OK -- `pt-[var(--header-height)]` applied |
-| `/category/:slug` | Layout (standard) | OK |
-| `/product/:slug` | Layout (standard) | OK |
-| `/checkout` | CheckoutHeader (different component) | OK -- separate header system |
-| `/contact`, `/faq`, `/returns`, `/shipping` | ServicePageLayout | OK -- has its own header offset |
-| `/ambassador` | Layout (standard) | OK |
-| `/try-on` | Raw `<Header />` + `pt-[var(--header-height)]` | OK |
-| Legal pages | LegalPageLayout | OK -- uses `pt-[calc(var(--header-height)+2rem)]` |
+## Implementation
 
-## Header Animation Quality Check
+| File | Change |
+|------|--------|
+| `Navigation.tsx` or child component | Fix the crash-causing code identified during investigation |
+| Potentially add `ErrorBoundary` wrapper | Prevent full-page crashes from header component errors |
 
-The current tween config is correct:
-```
-type: "tween"
-duration: 0.4
-ease: [0.25, 0.46, 0.45, 0.94]
-```
-
-This matches the project's `editorialEase` standard documented in animation-standards memory. No further changes needed.
-
-## Summary
-
-Only one fix needed: revert the Lookbook `paddingTop` back to `marginTop`. Everything else is working correctly after the previous changes.
+## What Is NOT Changed
+- Auth flow logic (already has Lovable-independent fallback)
+- All other pages and components
+- Database schema or RLS policies
 
