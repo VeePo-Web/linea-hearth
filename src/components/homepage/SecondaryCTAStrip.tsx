@@ -49,7 +49,7 @@ const SecondaryCTAStrip = () => {
         {/* Center Content */}
         <div className="flex items-center gap-4">
           <span className="text-black text-sm font-medium">
-            ✨ New Arrivals Just Dropped — Shop the Latest
+            New Arrivals Just Dropped — Shop the Latest
           </span>
           <Button 
             asChild

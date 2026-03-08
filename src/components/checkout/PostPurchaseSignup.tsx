@@ -167,13 +167,13 @@ export function PostPurchaseSignup({
       <motion.div
         initial={prefersReducedMotion ? {} : { opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-gradient-to-br from-emerald-500/10 to-primary/5 border border-emerald-500/30 p-6 sm:p-8 text-center"
+        className="bg-gradient-to-br from-foreground/5 to-primary/5 border border-foreground/20 p-6 sm:p-8 text-center"
       >
         <motion.div
           initial={prefersReducedMotion ? {} : { scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ delay: 0.2, type: "tween", duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
-          className="w-16 h-16 bg-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6"
+          className="w-16 h-16 bg-foreground rounded-full flex items-center justify-center mx-auto mb-6"
         >
           <Check className="w-8 h-8 text-white" />
         </motion.div>

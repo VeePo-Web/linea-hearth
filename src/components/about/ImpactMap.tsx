@@ -172,12 +172,8 @@ const ImpactMap = () => {
                 className="absolute"
                 style={{ top: pos.top, left: pos.left }}
               >
-                <div className="relative">
-                  <div className="w-2 h-2 bg-champagne-500 rounded-full" />
-                  <div 
-                    className="absolute inset-0 w-2 h-2 bg-champagne-500 rounded-full animate-ping opacity-75"
-                    style={{ animationDelay: `${i * 200}ms`, animationDuration: '2s' }}
-                  />
+                  <div className="relative">
+                    <div className="w-2 h-2 bg-champagne-500 rounded-full" />
                 </div>
               </motion.div>
             ))}

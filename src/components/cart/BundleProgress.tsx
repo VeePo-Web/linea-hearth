@@ -83,9 +83,9 @@ const BundleProgress = ({ bundle, variant = "drawer" }: BundleProgressProps) => 
       className={cn(
         "relative border rounded-none overflow-hidden",
         isComplete
-          ? "border-emerald-500/40 bg-emerald-50/50 dark:bg-emerald-950/20"
+          ? "border-champagne-600/40 bg-champagne-50/50 dark:bg-champagne-950/20"
           : hasDiscount 
-            ? "border-emerald-500/30 bg-emerald-50/50 dark:bg-emerald-950/20" 
+            ? "border-champagne-500/30 bg-champagne-50/50 dark:bg-champagne-950/20" 
             : "border-champagne-500/30 bg-champagne-50/50 dark:bg-champagne-950/20"
       )}
     >
@@ -112,7 +112,7 @@ const BundleProgress = ({ bundle, variant = "drawer" }: BundleProgressProps) => 
             animate={{ opacity: [0, 0.3, 0] }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.6 }}
-            className="absolute inset-0 bg-emerald-400 rounded-none pointer-events-none"
+            className="absolute inset-0 bg-champagne-400 rounded-none pointer-events-none"
           />
         )}
       </AnimatePresence>
@@ -133,11 +133,11 @@ const BundleProgress = ({ bundle, variant = "drawer" }: BundleProgressProps) => 
             transition={{ duration: 0.5, delay: 0.1 }}
           >
             {isComplete ? (
-              <Sparkles className="w-4 h-4 text-emerald-600" />
+              <Sparkles className="w-4 h-4 text-champagne-600" />
             ) : (
               <Gift className={cn(
                 "w-4 h-4",
-                hasDiscount ? "text-emerald-600" : "text-champagne-600"
+                hasDiscount ? "text-champagne-600" : "text-champagne-600"
               )} />
             )}
           </motion.div>
@@ -146,9 +146,9 @@ const BundleProgress = ({ bundle, variant = "drawer" }: BundleProgressProps) => 
             <p className={cn(
               "text-xs font-medium",
               isComplete
-                ? "text-emerald-700 dark:text-emerald-400"
+                ? "text-champagne-700 dark:text-champagne-400"
                 : hasDiscount 
-                  ? "text-emerald-700 dark:text-emerald-400" 
+                  ? "text-champagne-700 dark:text-champagne-400" 
                   : "text-champagne-700 dark:text-champagne-400"
             )}>
               {headline}
@@ -173,9 +173,9 @@ const BundleProgress = ({ bundle, variant = "drawer" }: BundleProgressProps) => 
             className={cn(
               "h-full rounded-full",
               isComplete
-                ? "bg-gradient-to-r from-emerald-500 to-emerald-400"
+                ? "bg-gradient-to-r from-champagne-600 to-champagne-500"
                 : hasDiscount 
-                  ? "bg-gradient-to-r from-emerald-500 to-emerald-400" 
+                  ? "bg-gradient-to-r from-champagne-600 to-champagne-500" 
                   : "bg-gradient-to-r from-champagne-500 to-champagne-400"
             )}
             initial={{ width: 0 }}
@@ -230,7 +230,7 @@ const BundleProgress = ({ bundle, variant = "drawer" }: BundleProgressProps) => 
                 </p>
                 {bundle.itemsInCart.map((item) => (
                   <div key={item.id} className="flex items-center gap-2 text-xs">
-                    <Check className="w-3 h-3 text-emerald-500 flex-shrink-0" />
+                    <Check className="w-3 h-3 text-champagne-600 flex-shrink-0" />
                     <span className="text-foreground/80 truncate flex-1">{item.name}</span>
                     <span className="text-muted-foreground flex-shrink-0">Size {item.size}</span>
                   </div>
@@ -275,8 +275,8 @@ const BundleProgress = ({ bundle, variant = "drawer" }: BundleProgressProps) => 
                     </span>
                   </div>
                   <div className="flex justify-between text-xs mt-1">
-                    <span className="text-emerald-600 font-medium">{bundle.discountPercent}% bundle discount</span>
-                    <span className="text-emerald-600 font-medium">-${bundle.savingsAmount.toFixed(2)}</span>
+                    <span className="text-champagne-700 dark:text-champagne-400 font-medium">{bundle.discountPercent}% bundle discount</span>
+                    <span className="text-champagne-700 dark:text-champagne-400 font-medium">-${bundle.savingsAmount.toFixed(2)}</span>
                   </div>
                 </div>
               )}

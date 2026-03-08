@@ -1,70 +1,52 @@
 
 
-# Performance & Polish Audit: Round 6 — Remaining Emerald Bleed, Emojis, and Cheap Patterns
+# Navigation Bar: Full Audit Results and Remaining Fixes
 
-## Findings
+## What Was Already Fixed (Previous Diff)
+- Community page: StoryFilters bar removed, `immersiveHero` removed -- content now clears header correctly
+- Header animation: Spring replaced with editorial tween (0.4s, custom ease)
+- Scroll threshold: Increased from 50 to 80 to prevent micro-scroll flickering
 
-### 1. PostPurchaseSignup Success State — Emerald Gradient + Circle
-**File:** `src/components/checkout/PostPurchaseSignup.tsx` (lines 170, 176)
-The success state uses `bg-gradient-to-br from-emerald-500/10 to-primary/5 border border-emerald-500/30` and a `bg-emerald-500` circle. Previous rounds standardized other checkout surfaces to `bg-foreground` but missed this one.
+## Issue Found: Lookbook Page Regression
 
-**Fix:** Replace emerald gradient with `from-foreground/5 to-primary/5 border border-foreground/20`. Replace `bg-emerald-500` circle with `bg-foreground`.
+The previous change to Lookbook.tsx introduced a bug by switching `marginTop` to `paddingTop`. Here's why:
 
-### 2. BundleProgress — Heavy Emerald Theming (14 instances)
-**File:** `src/components/cart/BundleProgress.tsx`
-The entire bundle progress component is themed in emerald green — borders, backgrounds, text, gradients, check icons. This creates a jarring "Shopify plugin" feel inside the otherwise editorial cart drawer.
+The Lookbook uses a **custom scroll container** (not `<Layout>`). Its `height` is set to `calc(100dvh - var(--header-height))`. With `marginTop`, the container is positioned below the fixed header and sized correctly. With `paddingTop`, the container starts behind the header and the internal padding eats into the already-reduced height, effectively stealing ~100px from the bottom of the page.
 
-**Fix:** Replace all emerald references with the brand's champagne palette (which is already used for the pre-discount state). Use `champagne-500/600/700` consistently for all states — the distinction between "has discount" and "no discount" can use opacity/weight differences instead of a color switch.
+**Fix:** Revert `paddingTop` back to `marginTop` on the Lookbook scroll container. The original `marginTop` was correct -- the scroll container already starts below the header, so no content overlaps.
 
-### 3. BundleSavingsRow — Emerald Text and Icon
-**File:** `src/components/cart/BundleSavingsRow.tsx` (lines 46, 48, 61)
-`text-emerald-500` on Gift icon, `text-emerald-600` on savings text. Same issue — cart internals bleeding generic green.
+### File: `src/pages/Lookbook.tsx`
+- Line 187: Change `paddingTop: 'var(--header-height)'` back to `marginTop: 'var(--header-height)'`
 
-**Fix:** Replace with `text-champagne-600 dark:text-champagne-400` to match the brand palette.
+## Full Audit: All Pages Checked
 
-### 4. SecondaryCTAStrip — Sparkle Emoji in Copy
-**File:** `src/components/homepage/SecondaryCTAStrip.tsx` (line 52)
-`"✨ New Arrivals Just Dropped"` — Emojis in marketing copy read as social media, not premium editorial. A luxury brand would never use sparkle emojis in a persistent CTA strip.
+| Page | Header Approach | Status |
+|------|----------------|--------|
+| `/` (Landing) | No header, no Layout | OK -- cinematic portal, no nav |
+| `/home` (Index) | Layout + `immersiveHero` | OK -- header hidden until scroll-up, hero is full-bleed |
+| `/community` | Layout (standard) | OK after previous fix -- `immersiveHero` removed, hero has `pt-20 lg:pt-0` + Layout padding |
+| `/lookbook` | Raw `<Header />` + custom scroll | NEEDS FIX -- revert `paddingTop` to `marginTop` |
+| `/about/our-story` | Layout (standard) | OK -- `pt-[var(--header-height)]` applied |
+| `/category/:slug` | Layout (standard) | OK |
+| `/product/:slug` | Layout (standard) | OK |
+| `/checkout` | CheckoutHeader (different component) | OK -- separate header system |
+| `/contact`, `/faq`, `/returns`, `/shipping` | ServicePageLayout | OK -- has its own header offset |
+| `/ambassador` | Layout (standard) | OK |
+| `/try-on` | Raw `<Header />` + `pt-[var(--header-height)]` | OK |
+| Legal pages | LegalPageLayout | OK -- uses `pt-[calc(var(--header-height)+2rem)]` |
 
-**Fix:** Remove the `✨` emoji. The copy stands on its own: `"New Arrivals Just Dropped — Shop the Latest"`.
+## Header Animation Quality Check
 
-### 5. SizeQuizContext — Party Emoji in Toast
-**File:** `src/contexts/SizeQuizContext.tsx` (line 237)
-`title: "Sizes saved! 🎉"` — Emojis in system toasts are informal and cheap.
+The current tween config is correct:
+```
+type: "tween"
+duration: 0.4
+ease: [0.25, 0.46, 0.45, 0.94]
+```
 
-**Fix:** Change to `"Sizes saved"` (no emoji, no exclamation).
-
-### 6. SignInForm — Green Success Circle with Spring Animation
-**File:** `src/components/auth/SignInForm.tsx` (lines 361-364)
-`bg-green-100 dark:bg-green-900/20` circle with `text-green-600` Mail icon, using a spring animation. The green is off-brand and the spring is inconsistent with the editorial tween standard.
-
-**Fix:** Replace `bg-green-100` with `bg-muted`, `text-green-600` with `text-foreground`. Replace spring with editorial tween: `type: 'tween', duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94]`.
-
-### 7. ImpactMap — animate-ping on Map Dots
-**File:** `src/components/about/ImpactMap.tsx` (line 178)
-`animate-ping` on map indicator dots. While thematically appropriate for a "live presence" visualization, the ping effect still reads as cheap notification-style UI. A subtle opacity pulse via CSS would be more refined.
-
-**Fix:** Replace `animate-ping` with a custom CSS animation using `animate-[pulse-soft_3s_ease-in-out_infinite]` or simply remove it — the staggered entrance animation already communicates activity.
-
----
+This matches the project's `editorialEase` standard documented in animation-standards memory. No further changes needed.
 
 ## Summary
 
-| File | Change |
-|------|--------|
-| `PostPurchaseSignup.tsx` | Replace emerald gradient/circle with foreground |
-| `BundleProgress.tsx` | Replace all emerald with champagne palette |
-| `BundleSavingsRow.tsx` | Replace emerald text/icon with champagne |
-| `SecondaryCTAStrip.tsx` | Remove ✨ emoji from copy |
-| `SizeQuizContext.tsx` | Remove 🎉 emoji from toast |
-| `SignInForm.tsx` | Replace green with foreground, spring with tween |
-| `ImpactMap.tsx` | Remove animate-ping from map dots |
-
-## What Is NOT Changed
-- Green in admin pages (AdminProducts status badges, AdminOrderDetail discounts) — admin uses standard semantic colors, acceptable
-- Green in account pages (order status badges) — standard status indicators
-- Green in form validation (CreateAccountForm, ResetPassword) — standard validation UX
-- Green in lookbook swipe actions — transient gesture feedback in an immersive context
-- Green in AskUsModal success — genuine form submission confirmation
-- All functional logic preserved exactly
+Only one fix needed: revert the Lookbook `paddingTop` back to `marginTop`. Everything else is working correctly after the previous changes.
 

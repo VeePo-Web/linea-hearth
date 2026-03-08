@@ -358,10 +358,10 @@ export default function SignInForm({ onSuccess, onSwitchToSignUp }: SignInFormPr
             <motion.div
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              transition={{ type: 'spring', stiffness: 200, damping: 20, delay: 0.1 }}
-              className="w-16 h-16 mx-auto rounded-full bg-green-100 dark:bg-green-900/20 flex items-center justify-center"
+              transition={{ type: 'tween', duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94], delay: 0.1 }}
+              className="w-16 h-16 mx-auto rounded-full bg-muted flex items-center justify-center"
             >
-              <Mail className="w-8 h-8 text-green-600" />
+              <Mail className="w-8 h-8 text-foreground" />
             </motion.div>
             <div className="space-y-2">
               <h3 className="text-lg font-normal">Check your email</h3>
