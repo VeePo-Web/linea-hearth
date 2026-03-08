@@ -20,7 +20,7 @@ import SavingsSummary from "@/components/checkout/SavingsSummary";
 import UrgencyTimer from "@/components/checkout/UrgencyTimer";
 import RewardsProgress from "@/components/checkout/RewardsProgress";
 import MiniTestimonial from "@/components/checkout/MiniTestimonial";
-import OrderStatsBadge from "@/components/checkout/OrderStatsBadge";
+
 import OrderConfirmation from "@/components/checkout/OrderConfirmation";
 import PostPurchaseOffer from "@/components/checkout/PostPurchaseOffer";
 import MobileStickyCheckout from "@/components/checkout/MobileStickyCheckout";
