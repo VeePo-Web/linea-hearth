@@ -135,12 +135,9 @@ export function useQuickAdd(
   const { getRememberedSize, rememberSize, getSizeConfidence, getSizeConfidenceMessage } = useSizeMemory();
   
   // Size quiz integration for first-time users
-  let sizeQuizContext: { shouldTriggerQuiz: () => boolean; openQuizWithPending: (action: any) => void } | null = null;
-  try {
-    sizeQuizContext = useSizeQuizContext();
-  } catch {
-    // SizeQuizContext not available (e.g., in tests)
-  }
+  // Always call the hook unconditionally (React rules of hooks).
+  // useSizeQuizContext throws if provider is missing, so we use the safe version.
+  const sizeQuizContext = useSizeQuizContextSafe();
   
   // Track if we've already prompted for quiz this session
   const hasPromptedQuizRef = useRef(false);
