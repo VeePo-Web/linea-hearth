@@ -298,6 +298,7 @@ export const useSizeMemory = (): UseSizeMemoryReturn => {
       console.warn('Error syncing with database:', e);
     } finally {
       setIsLoading(false);
+      isSyncingRef.current = false;
     }
   }, [mergePreferences, upsertToDatabase, fetchSizeConfidence, toast]);
 
