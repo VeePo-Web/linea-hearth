@@ -349,14 +349,16 @@ const Navigation = () => {
       <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
 
       {/* Favorites Drawer */}
-      <FavoritesDrawer 
-        isOpen={offCanvasType === 'favorites'} 
-        onClose={() => setOffCanvasType(null)} 
-        onAuthRequired={() => {
-          setOffCanvasType(null);
-          setIsAuthModalOpen(true);
-        }}
-      />
+      <ErrorBoundary>
+        <FavoritesDrawer 
+          isOpen={offCanvasType === 'favorites'} 
+          onClose={() => setOffCanvasType(null)} 
+          onAuthRequired={() => {
+            setOffCanvasType(null);
+            setIsAuthModalOpen(true);
+          }}
+        />
+      </ErrorBoundary>
     </nav>
   );
 };
