@@ -137,7 +137,7 @@ const MobileMenu = ({
         <>
           {/* Backdrop */}
           <motion.div
-            className="fixed inset-0 bg-black/80 z-40"
+            className="fixed inset-0 bg-black/80 z-40 touch-none"
             variants={backdropVariants}
             initial="hidden"
             animate="visible"
