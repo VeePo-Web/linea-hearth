@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import FooterEmailCapture from "./FooterEmailCapture";
+import veepoLogo from "@/assets/veepo-logo.png";
 
 const Footer = () => {
   return (
