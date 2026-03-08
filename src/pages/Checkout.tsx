@@ -1011,7 +1011,7 @@ const Checkout = () => {
                         )}
                         <div className="flex justify-between text-sm">
                           <span className="text-muted-foreground">Shipping</span>
-                          <span className={shipping === 0 ? "text-emerald-600" : "text-foreground"}>
+                          <span className={shipping === 0 ? "text-champagne-600" : "text-foreground"}>
                             {shipping === 0 ? "FREE" : `$${shipping}`}
                           </span>
                         </div>
