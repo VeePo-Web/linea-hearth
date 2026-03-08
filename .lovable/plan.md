@@ -1,52 +1,37 @@
 
 
-# Navigation Bar: Full Audit Results and Remaining Fixes
+# Round 24 — iOS Drawer Height Consistency + SearchOverlay Double-Unlock Cleanup
 
-## What Was Already Fixed (Previous Diff)
-- Community page: StoryFilters bar removed, `immersiveHero` removed -- content now clears header correctly
-- Header animation: Spring replaced with editorial tween (0.4s, custom ease)
-- Scroll threshold: Increased from 50 to 80 to prevent micro-scroll flickering
+## Issues Found
 
-## Issue Found: Lookbook Page Regression
+### 1. Three Drawers Still Use `h-screen` Instead of `h-[100dvh]` (iOS Safari Glitch)
+**Problem:** In Round 23, we fixed the CartDrawer to use `h-[100dvh]` instead of `h-screen` / `min-h-screen` to prevent iOS Safari's browser chrome from making the drawer taller than the visual viewport. Three other drawer/panel components still use `h-screen`, creating the same subtle scroll bug on mobile Safari:
 
-The previous change to Lookbook.tsx introduced a bug by switching `marginTop` to `paddingTop`. Here's why:
+- **FavoritesDrawer** (line 250): `h-screen`
+- **MobileMenu** (line 151): `h-screen`
+- **AuthModal** (line 81): `h-screen`
 
-The Lookbook uses a **custom scroll container** (not `<Layout>`). Its `height` is set to `calc(100dvh - var(--header-height))`. With `marginTop`, the container is positioned below the fixed header and sized correctly. With `paddingTop`, the container starts behind the header and the internal padding eats into the already-reduced height, effectively stealing ~100px from the bottom of the page.
+**Fix:** Replace `h-screen` with `h-[100dvh]` on the drawer panel div in all three components. This is a one-word class change per file — no layout or visual change on non-Safari browsers.
 
-**Fix:** Revert `paddingTop` back to `marginTop` on the Lookbook scroll container. The original `marginTop` was correct -- the scroll container already starts below the header, so no content overlaps.
+| File | Change |
+|------|--------|
+| `src/components/favorites/FavoritesDrawer.tsx` | Line 250: `h-screen` → `h-[100dvh]` |
+| `src/components/header/MobileMenu.tsx` | Line 151: `h-screen` → `h-[100dvh]` |
+| `src/components/auth/AuthModal.tsx` | Line 81: `h-screen` → `h-[100dvh]` |
 
-### File: `src/pages/Lookbook.tsx`
-- Line 187: Change `paddingTop: 'var(--header-height)'` back to `marginTop: 'var(--header-height)'`
+### 2. SearchOverlay Calls `unlockScroll()` Twice on Close (Code Smell)
+**Problem:** The SearchOverlay's `useEffect` (lines 231-243) calls `unlockScroll()` in the `else` branch when `isOpen` becomes false, AND in the cleanup function. When closing, both fire: the cleanup from the previous render and the `else` branch of the new render. The reference counter prevents actual breakage (`Math.max(0, ...)`), but the redundant call is sloppy and could mask bugs if the locking system changes.
 
-## Full Audit: All Pages Checked
+**Fix:** Remove the `unlockScroll()` from the `else` branch. The cleanup function already handles it correctly. Keep `setSearchValue("")` and `setDebouncedSearch("")` in the else branch — those are state resets, not scroll management.
 
-| Page | Header Approach | Status |
-|------|----------------|--------|
-| `/` (Landing) | No header, no Layout | OK -- cinematic portal, no nav |
-| `/home` (Index) | Layout + `immersiveHero` | OK -- header hidden until scroll-up, hero is full-bleed |
-| `/community` | Layout (standard) | OK after previous fix -- `immersiveHero` removed, hero has `pt-20 lg:pt-0` + Layout padding |
-| `/lookbook` | Raw `<Header />` + custom scroll | NEEDS FIX -- revert `paddingTop` to `marginTop` |
-| `/about/our-story` | Layout (standard) | OK -- `pt-[var(--header-height)]` applied |
-| `/category/:slug` | Layout (standard) | OK |
-| `/product/:slug` | Layout (standard) | OK |
-| `/checkout` | CheckoutHeader (different component) | OK -- separate header system |
-| `/contact`, `/faq`, `/returns`, `/shipping` | ServicePageLayout | OK -- has its own header offset |
-| `/ambassador` | Layout (standard) | OK |
-| `/try-on` | Raw `<Header />` + `pt-[var(--header-height)]` | OK |
-| Legal pages | LegalPageLayout | OK -- uses `pt-[calc(var(--header-height)+2rem)]` |
+| File | Change |
+|------|--------|
+| `src/components/header/SearchOverlay.tsx` | Lines 231-243: Remove `unlockScroll()` from the `else` branch. Keep the cleanup return as the sole unlock path. |
 
-## Header Animation Quality Check
-
-The current tween config is correct:
-```
-type: "tween"
-duration: 0.4
-ease: [0.25, 0.46, 0.45, 0.94]
-```
-
-This matches the project's `editorialEase` standard documented in animation-standards memory. No further changes needed.
-
-## Summary
-
-Only one fix needed: revert the Lookbook `paddingTop` back to `marginTop`. Everything else is working correctly after the previous changes.
+## What Is NOT Changed
+- No layout, typography, or spacing changes
+- No database changes
+- No visual design changes
+- Auth flow logic unchanged
+- Admin dashboard unchanged
 
