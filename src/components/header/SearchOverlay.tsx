@@ -229,14 +229,14 @@ const SearchOverlay = ({ isOpen, onClose }: SearchOverlayProps) => {
 
   useEffect(() => {
     if (isOpen) {
-      document.body.style.overflow = 'hidden';
+      document.documentElement.classList.add('scroll-locked');
       setTimeout(() => inputRef.current?.focus(), 100);
     } else {
       setSearchValue("");
       setDebouncedSearch("");
     }
     return () => {
-      document.body.style.overflow = '';
+      document.documentElement.classList.remove('scroll-locked');
     };
   }, [isOpen]);
 
