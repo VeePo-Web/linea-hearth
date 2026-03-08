@@ -281,7 +281,7 @@ const MobileMenu = ({
                   className="flex-1 flex items-center justify-center gap-2 py-3 border border-border hover:border-foreground hover:bg-muted/50 transition-all text-sm"
                   onClick={() => {
                     onClose();
-                    setTimeout(onSearchOpen, 300);
+                    setTimeout(onSearchOpen, 150);
                   }}
                   aria-label="Search"
                 >
@@ -292,7 +292,7 @@ const MobileMenu = ({
                   className="flex-1 flex items-center justify-center gap-2 py-3 border border-border hover:border-foreground hover:bg-muted/50 transition-all text-sm"
                   onClick={() => {
                     onClose();
-                    setTimeout(onFavoritesOpen, 300);
+                    setTimeout(onFavoritesOpen, 150);
                   }}
                   aria-label="Favorites"
                 >
@@ -326,7 +326,7 @@ const MobileMenu = ({
                     className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
                     onClick={() => {
                       onClose();
-                      setTimeout(onAuthOpen, 300);
+                      setTimeout(onAuthOpen, 150);
                     }}
                   >
                     <User size={16} strokeWidth={1.5} />

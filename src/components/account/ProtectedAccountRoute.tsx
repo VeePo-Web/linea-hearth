@@ -16,7 +16,7 @@ export default function ProtectedAccountRoute({ children }: ProtectedAccountRout
       // Store the intended destination
       sessionStorage.setItem('authRedirect', location.pathname);
       // Navigate to home with auth modal trigger
-      navigate('/?auth=true');
+      navigate('/home?auth=true');
     }
   }, [user, loading, navigate, location]);
 
