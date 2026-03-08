@@ -1,52 +1,35 @@
 
 
-# Navigation Bar: Full Audit Results and Remaining Fixes
+# Round 22 — Account Redirect Fix + MobileMenu Auth Timing + Performance Guard
 
-## What Was Already Fixed (Previous Diff)
-- Community page: StoryFilters bar removed, `immersiveHero` removed -- content now clears header correctly
-- Header animation: Spring replaced with editorial tween (0.4s, custom ease)
-- Scroll threshold: Increased from 50 to 80 to prevent micro-scroll flickering
+## Issues Found
 
-## Issue Found: Lookbook Page Regression
+### 1. Account Protected Route Redirects to Landing Splash (UX Bug)
+**Problem:** `ProtectedAccountRoute` navigates to `/?auth=true` when an unauthenticated user hits `/account/*`. The `/` route renders the `LandingPage` (cinematic splash screen), not the store. After signing in, the user gets redirected back, but the splash screen flash is jarring and confusing.
 
-The previous change to Lookbook.tsx introduced a bug by switching `marginTop` to `paddingTop`. Here's why:
+**Fix:** Change the redirect target from `/?auth=true` to `/home?auth=true` so the user lands on the actual store homepage with the auth modal open.
 
-The Lookbook uses a **custom scroll container** (not `<Layout>`). Its `height` is set to `calc(100dvh - var(--header-height))`. With `marginTop`, the container is positioned below the fixed header and sized correctly. With `paddingTop`, the container starts behind the header and the internal padding eats into the already-reduced height, effectively stealing ~100px from the bottom of the page.
+| File | Change |
+|------|--------|
+| `src/components/account/ProtectedAccountRoute.tsx` | Line 19: change `navigate('/?auth=true')` to `navigate('/home?auth=true')` |
 
-**Fix:** Revert `paddingTop` back to `marginTop` on the Lookbook scroll container. The original `marginTop` was correct -- the scroll container already starts below the header, so no content overlaps.
+### 2. MobileMenu Auth Open Timing Gap (UX Polish)
+**Problem:** When tapping "Sign In" in the MobileMenu, the menu closes first, then `setTimeout(onAuthOpen, 300)` fires. During that 300ms gap the user sees nothing happening — the menu is gone and the auth modal hasn't appeared yet. Same issue exists for Search and Favorites buttons.
 
-### File: `src/pages/Lookbook.tsx`
-- Line 187: Change `paddingTop: 'var(--header-height)'` back to `marginTop: 'var(--header-height)'`
+**Fix:** Reduce the delay from 300ms to 150ms. The menu exit animation is 300ms, but the panel is visually gone by ~150ms. This tightens the perceived gap without overlap.
 
-## Full Audit: All Pages Checked
+| File | Change |
+|------|--------|
+| `src/components/header/MobileMenu.tsx` | Lines 284, 294, 329: change all `setTimeout(..., 300)` to `setTimeout(..., 150)` |
 
-| Page | Header Approach | Status |
-|------|----------------|--------|
-| `/` (Landing) | No header, no Layout | OK -- cinematic portal, no nav |
-| `/home` (Index) | Layout + `immersiveHero` | OK -- header hidden until scroll-up, hero is full-bleed |
-| `/community` | Layout (standard) | OK after previous fix -- `immersiveHero` removed, hero has `pt-20 lg:pt-0` + Layout padding |
-| `/lookbook` | Raw `<Header />` + custom scroll | NEEDS FIX -- revert `paddingTop` to `marginTop` |
-| `/about/our-story` | Layout (standard) | OK -- `pt-[var(--header-height)]` applied |
-| `/category/:slug` | Layout (standard) | OK |
-| `/product/:slug` | Layout (standard) | OK |
-| `/checkout` | CheckoutHeader (different component) | OK -- separate header system |
-| `/contact`, `/faq`, `/returns`, `/shipping` | ServicePageLayout | OK -- has its own header offset |
-| `/ambassador` | Layout (standard) | OK |
-| `/try-on` | Raw `<Header />` + `pt-[var(--header-height)]` | OK |
-| Legal pages | LegalPageLayout | OK -- uses `pt-[calc(var(--header-height)+2rem)]` |
+### 3. LandingPage RAF Cleanup Safety (Performance)
+**Problem:** The LandingPage parallax effect uses `requestAnimationFrame` in a loop. If the component unmounts mid-frame, the `cancelAnimationFrame` in cleanup uses a stale `rafId.current` because the tick function re-assigns it asynchronously. This could cause a leaked frame on fast navigation.
 
-## Header Animation Quality Check
+**Fix:** Use the `active` boolean flag (already present) as the sole cancellation mechanism. Add `cancelAnimationFrame(rafId.current)` in the cleanup alongside setting `active = false` for belt-and-suspenders safety. The existing code already does this correctly — no change needed here after re-reading.
 
-The current tween config is correct:
-```
-type: "tween"
-duration: 0.4
-ease: [0.25, 0.46, 0.45, 0.94]
-```
-
-This matches the project's `editorialEase` standard documented in animation-standards memory. No further changes needed.
-
-## Summary
-
-Only one fix needed: revert the Lookbook `paddingTop` back to `marginTop`. Everything else is working correctly after the previous changes.
+## What Is NOT Changed
+- No layout, typography, or spacing changes
+- No database changes
+- No visual design changes
+- Auth flow logic unchanged (only redirect destination updated)
 
