@@ -146,9 +146,9 @@ const BundleProgress = ({ bundle, variant = "drawer" }: BundleProgressProps) => 
             <p className={cn(
               "text-xs font-medium",
               isComplete
-                ? "text-emerald-700 dark:text-emerald-400"
+                ? "text-champagne-700 dark:text-champagne-400"
                 : hasDiscount 
-                  ? "text-emerald-700 dark:text-emerald-400" 
+                  ? "text-champagne-700 dark:text-champagne-400" 
                   : "text-champagne-700 dark:text-champagne-400"
             )}>
               {headline}
