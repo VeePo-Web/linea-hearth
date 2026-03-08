@@ -146,6 +146,7 @@ const AUTH_SAFE_DEFAULTS: AuthContextType = {
   user: null,
   session: null,
   isAdmin: false,
+  adminLoading: true,
   loading: true,
   signIn: async () => ({ error: new Error('Auth not ready') }),
   signUp: async () => ({ data: null, error: new Error('Auth not ready') }),
