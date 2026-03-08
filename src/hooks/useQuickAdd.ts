@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback, useRef } from 'react';
 import { useCart } from '@/hooks/useCart';
 import { useSizeMemory } from '@/hooks/useSizeMemory';
-import { useSizeQuizContext } from '@/contexts/SizeQuizContext';
+import { useSizeQuizContextSafe } from '@/contexts/SizeQuizContext';
 import { showAddedToast } from '@/lib/toastUtils';
 import { toast } from 'sonner';
 import { 
