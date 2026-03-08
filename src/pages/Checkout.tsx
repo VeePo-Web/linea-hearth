@@ -18,8 +18,6 @@ import { useAuth } from "@/hooks/useAuth";
 import CheckoutProgress from "@/components/checkout/CheckoutProgress";
 import SavingsSummary from "@/components/checkout/SavingsSummary";
 import UrgencyTimer from "@/components/checkout/UrgencyTimer";
-import RewardsProgress from "@/components/checkout/RewardsProgress";
-import MiniTestimonial from "@/components/checkout/MiniTestimonial";
 
 import OrderConfirmation from "@/components/checkout/OrderConfirmation";
 import PostPurchaseOffer from "@/components/checkout/PostPurchaseOffer";
@@ -469,9 +467,6 @@ const Checkout = () => {
                   )}
                 </div>
 
-                {/* Rewards Progress */}
-                <RewardsProgress />
-
                 {/* Price Breakdown */}
                 <div className="border-t border-muted-foreground/20 pt-4 space-y-2">
                   <div className="flex justify-between text-sm">
@@ -496,8 +491,6 @@ const Checkout = () => {
                   </div>
                 </div>
 
-                {/* Mini Testimonial */}
-                <MiniTestimonial />
               </div>
             </div>
 
@@ -1037,7 +1030,7 @@ const Checkout = () => {
                         >
                           {isProcessing || isStripeLoading ? (
                             <>
-                              <span className="animate-spin mr-2">⏳</span>
+                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                               Preparing Checkout...
                             </>
                           ) : (
