@@ -76,7 +76,7 @@ const FlashSaleTimer = ({
             : isUrgent 
               ? "bg-amber-500 text-white" 
               : "bg-amber-400 text-amber-900",
-          !prefersReducedMotion && isVeryUrgent && "animate-pulse",
+          
           className
         )}
       >
