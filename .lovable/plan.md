@@ -1,52 +1,45 @@
 
 
-# Navigation Bar: Full Audit Results and Remaining Fixes
+# Round 14 — Auth Craft Polish and Duplicate Request Deduplication
 
-## What Was Already Fixed (Previous Diff)
-- Community page: StoryFilters bar removed, `immersiveHero` removed -- content now clears header correctly
-- Header animation: Spring replaced with editorial tween (0.4s, custom ease)
-- Scroll threshold: Increased from 50 to 80 to prevent micro-scroll flickering
+## Auth Audit Status: Complete and Verified
 
-## Issue Found: Lookbook Page Regression
+The full authentication system has been audited across Rounds 11-13 and is production-ready:
 
-The previous change to Lookbook.tsx introduced a bug by switching `marginTop` to `paddingTop`. Here's why:
+- Email/password sign-up and sign-in: Standard backend calls, domain-independent
+- Google OAuth: Try/catch fallback from managed to standard `signInWithOAuth`
+- Email confirmation: `CreateAccountForm` checks `confirmed_at`, shows "Check your email" toast
+- Password reset: Full flow with inline forgot-password and `/reset-password` page
+- Protected routes: `ProtectedAccountRoute` redirects to `/?auth=true`, Navigation reads param
+- Post-login redirect: `sessionStorage` consumed after auth success
+- Error boundaries: `MobileMenu` and `FavoritesDrawer` wrapped in `ErrorBoundary`
+- Safe context hooks: `useSizeQuizContextSafe` prevents render crashes
+- Design system compliance: All auth UI uses `rounded-none`
+- Zero console errors confirmed
 
-The Lookbook uses a **custom scroll container** (not `<Layout>`). Its `height` is set to `calc(100dvh - var(--header-height))`. With `marginTop`, the container is positioned below the fixed header and sized correctly. With `paddingTop`, the container starts behind the header and the internal padding eats into the already-reduced height, effectively stealing ~100px from the bottom of the page.
+No auth changes are needed.
 
-**Fix:** Revert `paddingTop` back to `marginTop` on the Lookbook scroll container. The original `marginTop` was correct -- the scroll container already starts below the header, so no content overlaps.
+## Craft-Level Improvements Found
 
-### File: `src/pages/Lookbook.tsx`
-- Line 187: Change `paddingTop: 'var(--header-height)'` back to `marginTop: 'var(--header-height)'`
+### 1. Error message `rounded` inconsistency in both auth forms
+Both `CreateAccountForm` (line 101) and `SignInForm` (line 156) use `rounded` on the error message `div`. The design system mandates `rounded-none`. This is the kind of detail that makes a site feel inconsistent at a subconscious level.
 
-## Full Audit: All Pages Checked
+### 2. Duplicate `user_size_preferences` POST on page load
+Network requests show two identical POST requests to `user_size_preferences` fired within the same second (timestamps `21:51:49Z`). This is a performance waste — the `useSizeMemory` hook is likely double-firing its sync. The upsert is idempotent so it doesn't cause data issues, but it doubles network overhead on every page load for authenticated users.
 
-| Page | Header Approach | Status |
-|------|----------------|--------|
-| `/` (Landing) | No header, no Layout | OK -- cinematic portal, no nav |
-| `/home` (Index) | Layout + `immersiveHero` | OK -- header hidden until scroll-up, hero is full-bleed |
-| `/community` | Layout (standard) | OK after previous fix -- `immersiveHero` removed, hero has `pt-20 lg:pt-0` + Layout padding |
-| `/lookbook` | Raw `<Header />` + custom scroll | NEEDS FIX -- revert `paddingTop` to `marginTop` |
-| `/about/our-story` | Layout (standard) | OK -- `pt-[var(--header-height)]` applied |
-| `/category/:slug` | Layout (standard) | OK |
-| `/product/:slug` | Layout (standard) | OK |
-| `/checkout` | CheckoutHeader (different component) | OK -- separate header system |
-| `/contact`, `/faq`, `/returns`, `/shipping` | ServicePageLayout | OK -- has its own header offset |
-| `/ambassador` | Layout (standard) | OK |
-| `/try-on` | Raw `<Header />` + `pt-[var(--header-height)]` | OK |
-| Legal pages | LegalPageLayout | OK -- uses `pt-[calc(var(--header-height)+2rem)]` |
+### 3. Duplicate `size_confidence_stats` GET on page load
+Same pattern — two identical GET requests to `size_confidence_stats` fired simultaneously. This suggests the hook is mounted in two places or React strict mode is causing double-mount without cleanup.
 
-## Header Animation Quality Check
+## Implementation
 
-The current tween config is correct:
-```
-type: "tween"
-duration: 0.4
-ease: [0.25, 0.46, 0.45, 0.94]
-```
+| File | Change |
+|------|--------|
+| `CreateAccountForm.tsx` | Change `rounded` to `rounded-none` on error div (line 101) |
+| `SignInForm.tsx` | Change `rounded` to `rounded-none` on error div (line 156) |
+| `useSizeMemory.ts` | Add deduplication guard (e.g., `useRef` flag) to prevent double POST/GET on mount |
 
-This matches the project's `editorialEase` standard documented in animation-standards memory. No further changes needed.
-
-## Summary
-
-Only one fix needed: revert the Lookbook `paddingTop` back to `marginTop`. Everything else is working correctly after the previous changes.
+## What Is NOT Changed
+- Auth flow logic (complete and verified)
+- Database schema or RLS policies
+- Any other pages or components
 
