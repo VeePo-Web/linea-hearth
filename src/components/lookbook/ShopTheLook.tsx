@@ -104,7 +104,7 @@ function LookProductCard({
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-               className="absolute inset-0 bg-green-600/90 
+               className="absolute inset-0 bg-foreground/90 
                            flex flex-col items-center justify-center gap-2"
               >
                 <DrawCheckIcon size="lg" color="white" animate delay={0.1} />
