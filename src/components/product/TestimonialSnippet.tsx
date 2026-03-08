@@ -27,17 +27,12 @@ const TestimonialSnippet = ({ productId }: TestimonialSnippetProps) => {
     },
   });
 
-  // Fallback testimonial if no featured review exists
-  const testimonial = review || {
-    review_text: "Changed how I start my day. Wearing my faith boldly.",
-    customer_name: "Marcus T.",
-    customer_location: "Calgary",
-  };
+  if (!review) return null;
 
   // Truncate to a snippet
-  const snippet = testimonial.review_text.length > 60 
-    ? testimonial.review_text.substring(0, 60).trim() + "..."
-    : testimonial.review_text;
+  const snippet = review.review_text.length > 60 
+    ? review.review_text.substring(0, 60).trim() + "..."
+    : review.review_text;
 
   return (
     <div className="flex items-start gap-2 py-3">
@@ -45,8 +40,8 @@ const TestimonialSnippet = ({ productId }: TestimonialSnippetProps) => {
       <p className="text-sm font-light text-muted-foreground italic">
         "{snippet}"
         <span className="not-italic text-foreground ml-2">
-          — {testimonial.customer_name}
-          {testimonial.customer_location && `, ${testimonial.customer_location}`}
+          — {review.customer_name}
+          {review.customer_location && `, ${review.customer_location}`}
         </span>
       </p>
     </div>

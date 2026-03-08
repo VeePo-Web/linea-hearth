@@ -13,7 +13,7 @@ import LookbookLookSection from "../components/product/LookbookLookSection";
 import GuaranteeBadge from "../components/product/GuaranteeBadge";
 import MobileStickyATC from "../components/product/MobileStickyATC";
 import ProductCarousel from "../components/content/ProductCarousel";
-import HighIntentPrompt from "../components/product/HighIntentPrompt";
+
 import RecentlyViewed from "../components/homepage/RecentlyViewed";
 import { 
   Breadcrumb, 
@@ -199,15 +199,6 @@ const ProductDetail = () => {
             />
           </div>
         </div>
-      </section>
-
-      {/* High Intent Prompt - shows when behavioral signals indicate purchase intent */}
-      <section className="w-full px-6 mt-4">
-        <HighIntentPrompt
-          isVisible={isHighIntent()}
-          viewCount={getViewCount()}
-          onAddToCart={() => quickAdd.handleQuickAdd({ preventDefault: () => {}, stopPropagation: () => {} } as React.MouseEvent)}
-        />
       </section>
 
       {/* How It Ministers - Faith-based storytelling */}
