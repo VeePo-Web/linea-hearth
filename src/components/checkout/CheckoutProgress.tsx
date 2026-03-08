@@ -24,7 +24,7 @@ const CheckoutProgress = ({ currentStep }: CheckoutProgressProps) => {
                 className={cn(
                   "w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium transition-all duration-300",
                   currentStep > step.id
-                    ? "bg-emerald-500 text-white"
+                    ? "bg-foreground text-background"
                     : currentStep === step.id
                     ? "bg-foreground text-background"
                     : "bg-muted text-muted-foreground"
