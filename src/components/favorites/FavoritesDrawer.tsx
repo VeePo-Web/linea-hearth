@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { lockScroll, unlockScroll } from '@/lib/scrollLock';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ShoppingBag, Heart, Trash2, Check } from 'lucide-react';
 import { Link } from 'react-router-dom';
