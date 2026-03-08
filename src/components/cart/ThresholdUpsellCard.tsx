@@ -153,7 +153,7 @@ const ThresholdUpsellCard = ({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-emerald-500/90 flex items-center justify-center"
+              className="absolute inset-0 bg-foreground/90 flex items-center justify-center"
             >
               <Check className="w-5 h-5 text-white" />
             </motion.div>
