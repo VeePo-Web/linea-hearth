@@ -261,7 +261,7 @@ const MissingProductCard = ({
               <Button 
                 size="icon" 
                 variant="outline" 
-                className="w-7 h-7 rounded-full hover:bg-emerald-500/10 hover:border-emerald-500/50 hover:text-emerald-600 transition-colors"
+                className="w-7 h-7 rounded-full hover:bg-foreground/5 hover:border-foreground/30 hover:text-foreground transition-colors"
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();

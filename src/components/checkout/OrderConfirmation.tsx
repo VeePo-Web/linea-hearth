@@ -90,8 +90,8 @@ const OrderConfirmation = ({
         </div>
         <div className="flex justify-between text-sm">
           <span className="text-muted-foreground">Shipping</span>
-          <span className="text-emerald-600 dark:text-emerald-400">
-            {hasFreeShipping ? "FREE ✓" : "Calculated"}
+          <span className="text-foreground">
+            {hasFreeShipping ? "Free" : "Calculated"}
           </span>
         </div>
         <div className="flex justify-between text-sm pt-3 border-t border-muted-foreground/20">

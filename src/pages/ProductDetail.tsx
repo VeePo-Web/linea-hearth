@@ -201,15 +201,6 @@ const ProductDetail = () => {
         </div>
       </section>
 
-      {/* High Intent Prompt - shows when behavioral signals indicate purchase intent */}
-      <section className="w-full px-6 mt-4">
-        <HighIntentPrompt
-          isVisible={isHighIntent()}
-          viewCount={getViewCount()}
-          onAddToCart={() => quickAdd.handleQuickAdd({ preventDefault: () => {}, stopPropagation: () => {} } as React.MouseEvent)}
-        />
-      </section>
-
       {/* How It Ministers - Faith-based storytelling */}
       <HowItMinisters 
         ministryStatement={product.ministry_statement}

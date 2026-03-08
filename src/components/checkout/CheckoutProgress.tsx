@@ -53,7 +53,7 @@ const CheckoutProgress = ({ currentStep }: CheckoutProgressProps) => {
               <div
                 className={cn(
                   "w-12 sm:w-16 h-0.5 mx-2 transition-colors duration-500",
-                  currentStep > step.id ? "bg-emerald-500" : "bg-muted"
+                  currentStep > step.id ? "bg-foreground" : "bg-muted"
                 )}
               />
             )}
