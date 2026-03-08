@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import SignInForm from './SignInForm';
 import CreateAccountForm from './CreateAccountForm';
+import { lockScroll, unlockScroll } from '@/lib/scrollLock';
 
 interface AuthModalProps {
   isOpen: boolean;
