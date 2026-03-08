@@ -112,7 +112,7 @@ const BundleProgress = ({ bundle, variant = "drawer" }: BundleProgressProps) => 
             animate={{ opacity: [0, 0.3, 0] }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.6 }}
-            className="absolute inset-0 bg-emerald-400 rounded-none pointer-events-none"
+            className="absolute inset-0 bg-champagne-400 rounded-none pointer-events-none"
           />
         )}
       </AnimatePresence>
