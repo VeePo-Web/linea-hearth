@@ -175,7 +175,7 @@ const ThresholdUpsellCard = ({
         </div>
         
         {willUnlockShipping && (
-          <p className="text-xs text-emerald-600 mt-0.5 font-medium">
+          <p className="text-xs text-champagne-600 mt-0.5 font-medium">
             + Unlocks free shipping!
           </p>
         )}
