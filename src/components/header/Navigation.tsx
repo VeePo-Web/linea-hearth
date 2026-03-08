@@ -223,7 +223,7 @@ const Navigation = () => {
               />
               <User className="w-5 h-5 relative z-10" strokeWidth={1.5} />
             </motion.button>
-            {user && <AccountDropdown isOpen={isAccountDropdownOpen} onClose={() => setIsAccountDropdownOpen(false)} />}
+            {user && <ErrorBoundary><AccountDropdown isOpen={isAccountDropdownOpen} onClose={() => setIsAccountDropdownOpen(false)} /></ErrorBoundary>}
           </div>
           
           {/* Favorites */}
