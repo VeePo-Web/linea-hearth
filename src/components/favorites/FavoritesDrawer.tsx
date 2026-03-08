@@ -219,13 +219,13 @@ export default function FavoritesDrawer({ isOpen, onClose, onAuthRequired }: Fav
   // Scroll lock + Escape key handler
   useEffect(() => {
     if (!isOpen) return;
-    document.body.style.overflow = 'hidden';
+    document.documentElement.classList.add('scroll-locked');
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
     };
     document.addEventListener('keydown', handleEscape);
     return () => {
-      document.body.style.overflow = '';
+      document.documentElement.classList.remove('scroll-locked');
       document.removeEventListener('keydown', handleEscape);
     };
   }, [isOpen, onClose]);
