@@ -230,7 +230,7 @@ const BundleProgress = ({ bundle, variant = "drawer" }: BundleProgressProps) => 
                 </p>
                 {bundle.itemsInCart.map((item) => (
                   <div key={item.id} className="flex items-center gap-2 text-xs">
-                    <Check className="w-3 h-3 text-emerald-500 flex-shrink-0" />
+                    <Check className="w-3 h-3 text-champagne-600 flex-shrink-0" />
                     <span className="text-foreground/80 truncate flex-1">{item.name}</span>
                     <span className="text-muted-foreground flex-shrink-0">Size {item.size}</span>
                   </div>
