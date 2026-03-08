@@ -43,9 +43,9 @@ const BundleSavingsRow = ({ variant = "drawer" }: BundleSavingsRowProps) => {
               repeatDelay: 3 
             }}
           >
-            <Gift className="w-4 h-4 text-emerald-500" />
+            <Gift className="w-4 h-4 text-champagne-600" />
           </motion.div>
-          <span className="text-sm text-emerald-600 dark:text-emerald-400 font-medium">
+          <span className="text-sm text-champagne-700 dark:text-champagne-400 font-medium">
             {bundleLabel}
           </span>
           <motion.div
