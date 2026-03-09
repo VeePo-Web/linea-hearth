@@ -192,7 +192,7 @@ const Lookbook = () => {
 
         {/* Look Sections */}
         {isLoading ? (
-          <section className="h-screen w-full snap-start flex items-center justify-center bg-stone-900">
+          <section className="h-[100dvh] w-full snap-start flex items-center justify-center bg-stone-900">
             <div className="animate-pulse text-white/50 font-light">
               Loading looks...
             </div>

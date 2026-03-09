@@ -277,7 +277,7 @@ const Checkout = () => {
 
   const handleAddPostPurchaseItem = () => {
     // Add the upsell item to cart
-    console.log("Post-purchase item added");
+    // TODO: Add upsell item to cart
   };
 
   // Scroll to payment section for mobile sticky bar
