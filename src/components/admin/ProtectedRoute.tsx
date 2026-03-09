@@ -33,12 +33,12 @@ const ProtectedRoute = ({ children, requireAdmin = false }: ProtectedRouteProps)
           <p className="text-sm text-muted-foreground mb-6">
             You don't have permission to access this area.
           </p>
-          <a
-            href="/"
+          <Link
+            to="/"
             className="text-xs text-muted-foreground hover:text-foreground transition-colors uppercase tracking-wider"
           >
             ← Back to Store
-          </a>
+          </Link>
         </div>
       </div>
     );
