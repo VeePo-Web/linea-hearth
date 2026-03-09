@@ -1,52 +1,23 @@
 
 
-# Navigation Bar: Full Audit Results and Remaining Fixes
+# Round 28 — SearchOverlay Mobile dvh Fix
 
-## What Was Already Fixed (Previous Diff)
-- Community page: StoryFilters bar removed, `immersiveHero` removed -- content now clears header correctly
-- Header animation: Spring replaced with editorial tween (0.4s, custom ease)
-- Scroll threshold: Increased from 50 to 80 to prevent micro-scroll flickering
+## Issue Found
 
-## Issue Found: Lookbook Page Regression
+### SearchOverlay Mobile Missing `h-[100dvh]` (iOS Safari Height Glitch)
+**File:** `src/components/header/SearchOverlay.tsx`, line 315
 
-The previous change to Lookbook.tsx introduced a bug by switching `marginTop` to `paddingTop`. Here's why:
+The mobile full-screen search overlay uses `fixed inset-0` without `h-[100dvh]`. On iOS Safari, this causes the overlay to extend behind the URL bar, creating a visible gap or allowing background scroll bleed when the browser chrome animates in/out. Every other overlay (CartDrawer, FavoritesDrawer, MobileMenu, AuthModal, FullScreenNav) already has this fix applied in rounds 23-27.
 
-The Lookbook uses a **custom scroll container** (not `<Layout>`). Its `height` is set to `calc(100dvh - var(--header-height))`. With `marginTop`, the container is positioned below the fixed header and sized correctly. With `paddingTop`, the container starts behind the header and the internal padding eats into the already-reduced height, effectively stealing ~100px from the bottom of the page.
+**Fix:** Add `h-[100dvh]` to the mobile overlay's className on line 315.
 
-**Fix:** Revert `paddingTop` back to `marginTop` on the Lookbook scroll container. The original `marginTop` was correct -- the scroll container already starts below the header, so no content overlaps.
+| File | Line | Change |
+|------|------|--------|
+| `src/components/header/SearchOverlay.tsx` | 315 | Add `h-[100dvh]` to className |
 
-### File: `src/pages/Lookbook.tsx`
-- Line 187: Change `paddingTop: 'var(--header-height)'` back to `marginTop: 'var(--header-height)'`
-
-## Full Audit: All Pages Checked
-
-| Page | Header Approach | Status |
-|------|----------------|--------|
-| `/` (Landing) | No header, no Layout | OK -- cinematic portal, no nav |
-| `/home` (Index) | Layout + `immersiveHero` | OK -- header hidden until scroll-up, hero is full-bleed |
-| `/community` | Layout (standard) | OK after previous fix -- `immersiveHero` removed, hero has `pt-20 lg:pt-0` + Layout padding |
-| `/lookbook` | Raw `<Header />` + custom scroll | NEEDS FIX -- revert `paddingTop` to `marginTop` |
-| `/about/our-story` | Layout (standard) | OK -- `pt-[var(--header-height)]` applied |
-| `/category/:slug` | Layout (standard) | OK |
-| `/product/:slug` | Layout (standard) | OK |
-| `/checkout` | CheckoutHeader (different component) | OK -- separate header system |
-| `/contact`, `/faq`, `/returns`, `/shipping` | ServicePageLayout | OK -- has its own header offset |
-| `/ambassador` | Layout (standard) | OK |
-| `/try-on` | Raw `<Header />` + `pt-[var(--header-height)]` | OK |
-| Legal pages | LegalPageLayout | OK -- uses `pt-[calc(var(--header-height)+2rem)]` |
-
-## Header Animation Quality Check
-
-The current tween config is correct:
-```
-type: "tween"
-duration: 0.4
-ease: [0.25, 0.46, 0.45, 0.94]
-```
-
-This matches the project's `editorialEase` standard documented in animation-standards memory. No further changes needed.
-
-## Summary
-
-Only one fix needed: revert the Lookbook `paddingTop` back to `marginTop`. Everything else is working correctly after the previous changes.
+## What Is NOT Changed
+- No layout, typography, or spacing changes
+- No database changes
+- Desktop search overlay unaffected (it's a different element)
+- All other overlays already patched
 
