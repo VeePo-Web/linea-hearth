@@ -24,6 +24,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [adminLoading, setAdminLoading] = useState(true);
   const [loading, setLoading] = useState(true);
 
+  const ensureProfile = async (u: User) => {
+    try {
+      await supabase.from('profiles').upsert({
+        id: u.id,
+        email: u.email,
+        full_name: u.user_metadata?.full_name || '',
+      }, { onConflict: 'id', ignoreDuplicates: true });
+    } catch (err) {
+      console.error('ensureProfile error:', err);
+    }
+  };
+
   const checkAdminRole = async (userId: string) => {
     try {
       const { data, error } = await supabase
