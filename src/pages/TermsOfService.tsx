@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { Link } from "react-router-dom";
 import LegalPageLayout from "@/components/legal/LegalPageLayout";
 import { LegalSection, ImportantCallout } from "@/components/legal/LegalSection";
 
