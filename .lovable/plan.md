@@ -1,52 +1,46 @@
 
 
-# Navigation Bar: Full Audit Results and Remaining Fixes
+# Round 27 — Console.log Pollution Cleanup + Lookbook/Hero dvh Consistency
 
-## What Was Already Fixed (Previous Diff)
-- Community page: StoryFilters bar removed, `immersiveHero` removed -- content now clears header correctly
-- Header animation: Spring replaced with editorial tween (0.4s, custom ease)
-- Scroll threshold: Increased from 50 to 80 to prevent micro-scroll flickering
+## Issues Found
 
-## Issue Found: Lookbook Page Regression
+### 1. Debug `console.log` Spam in `useFabricMaterial.tsx` (Performance + Professionalism)
+**Problem:** The `useFabricMaterial` hook has 7 `console.log` statements that fire on every render of any 3D garment. These run outside `useMemo`, meaning they execute on every re-render — polluting the console, degrading performance in the try-on room, and looking unprofessional if a user opens DevTools.
 
-The previous change to Lookbook.tsx introduced a bug by switching `marginTop` to `paddingTop`. Here's why:
+**Fix:** Remove all 7 `console.log` calls from `src/components/try-on/hooks/useFabricMaterial.tsx` (lines 54-58, 63, 70-71).
 
-The Lookbook uses a **custom scroll container** (not `<Layout>`). Its `height` is set to `calc(100dvh - var(--header-height))`. With `marginTop`, the container is positioned below the fixed header and sized correctly. With `paddingTop`, the container starts behind the header and the internal padding eats into the already-reduced height, effectively stealing ~100px from the bottom of the page.
+### 2. Stale `console.log` in Checkout, Returns, and ReviewProduct
+**Problem:** Three more files have leftover debug/TODO logs:
+- `src/pages/Checkout.tsx` line 280: `console.log("Post-purchase item added")`
+- `src/pages/ReturnsExchanges.tsx` line 75: `console.log("Return initiated for order:", orderNumber)`
+- `src/components/product/ReviewProduct.tsx` line 29: `console.log("Review submitted:", ...)`
 
-**Fix:** Revert `paddingTop` back to `marginTop` on the Lookbook scroll container. The original `marginTop` was correct -- the scroll container already starts below the header, so no content overlaps.
+**Fix:** Remove all three. The TryOnCanvas `console.log` on line 87 is a WebGL context recovery diagnostic — keep it (it only fires on rare GPU crashes).
 
-### File: `src/pages/Lookbook.tsx`
-- Line 187: Change `paddingTop: 'var(--header-height)'` back to `marginTop: 'var(--header-height)'`
+### 3. Lookbook Loading Skeleton Uses `h-screen` (iOS Safari)
+**Problem:** `src/pages/Lookbook.tsx` line 195 uses `h-screen` for the loading skeleton. On iOS Safari, this causes the skeleton to be taller than the visual viewport, creating a flash of scroll before content loads.
 
-## Full Audit: All Pages Checked
+**Fix:** Replace `h-screen` with `h-[100dvh]` on line 195.
 
-| Page | Header Approach | Status |
-|------|----------------|--------|
-| `/` (Landing) | No header, no Layout | OK -- cinematic portal, no nav |
-| `/home` (Index) | Layout + `immersiveHero` | OK -- header hidden until scroll-up, hero is full-bleed |
-| `/community` | Layout (standard) | OK after previous fix -- `immersiveHero` removed, hero has `pt-20 lg:pt-0` + Layout padding |
-| `/lookbook` | Raw `<Header />` + custom scroll | NEEDS FIX -- revert `paddingTop` to `marginTop` |
-| `/about/our-story` | Layout (standard) | OK -- `pt-[var(--header-height)]` applied |
-| `/category/:slug` | Layout (standard) | OK |
-| `/product/:slug` | Layout (standard) | OK |
-| `/checkout` | CheckoutHeader (different component) | OK -- separate header system |
-| `/contact`, `/faq`, `/returns`, `/shipping` | ServicePageLayout | OK -- has its own header offset |
-| `/ambassador` | Layout (standard) | OK |
-| `/try-on` | Raw `<Header />` + `pt-[var(--header-height)]` | OK |
-| Legal pages | LegalPageLayout | OK -- uses `pt-[calc(var(--header-height)+2rem)]` |
+### 4. HeroBlock Uses `h-screen` (iOS Safari)
+**Problem:** `src/components/homepage/HeroBlock.tsx` line 14 uses `h-screen`. Same iOS Safari issue — hero extends behind the URL bar.
 
-## Header Animation Quality Check
+**Fix:** Replace `h-screen` with `h-[100dvh]` on line 14. The `min-h-[600px] max-h-[900px]` constraints remain.
 
-The current tween config is correct:
-```
-type: "tween"
-duration: 0.4
-ease: [0.25, 0.46, 0.45, 0.94]
-```
+## Summary Table
 
-This matches the project's `editorialEase` standard documented in animation-standards memory. No further changes needed.
+| File | Change |
+|------|--------|
+| `src/components/try-on/hooks/useFabricMaterial.tsx` | Remove 7 console.log calls |
+| `src/pages/Checkout.tsx` | Remove console.log on line 280 |
+| `src/pages/ReturnsExchanges.tsx` | Remove console.log on line 75 |
+| `src/components/product/ReviewProduct.tsx` | Remove console.log on line 29 |
+| `src/pages/Lookbook.tsx` | Line 195: `h-screen` → `h-[100dvh]` |
+| `src/components/homepage/HeroBlock.tsx` | Line 14: `h-screen` → `h-[100dvh]` |
 
-## Summary
-
-Only one fix needed: revert the Lookbook `paddingTop` back to `marginTop`. Everything else is working correctly after the previous changes.
+## What Is NOT Changed
+- No layout, typography, or spacing changes
+- No database changes
+- TryOnCanvas WebGL recovery log kept (legitimate diagnostic)
+- All `min-h-screen` usages on page wrappers are correct (they set minimum, not fixed height) and are left as-is
 
