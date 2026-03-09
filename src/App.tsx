@@ -67,6 +67,7 @@ const AnimatedRoutes = () => {
   
   return (
     <AnimatePresence mode="wait">
+      <Suspense fallback={<div className="min-h-screen bg-background" />}>
       <Routes location={location} key={location.pathname}>
         <Route path="/" element={<PageTransition><LandingPage /></PageTransition>} />
         <Route path="/home" element={<PageTransition><Index /></PageTransition>} />
