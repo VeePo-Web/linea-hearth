@@ -1,52 +1,72 @@
 
 
-# Navigation Bar: Full Audit Results and Remaining Fixes
+# Round 29 — Critical: Missing Signup Trigger + Profile Upsert Safety Net
 
-## What Was Already Fixed (Previous Diff)
-- Community page: StoryFilters bar removed, `immersiveHero` removed -- content now clears header correctly
-- Header animation: Spring replaced with editorial tween (0.4s, custom ease)
-- Scroll threshold: Increased from 50 to 80 to prevent micro-scroll flickering
+## Critical Issue
 
-## Issue Found: Lookbook Page Regression
+The `handle_new_user` trigger on `auth.users` does **not exist** in the live database. The migration file created the `FUNCTION` but the `CREATE TRIGGER ... ON auth.users` statement was silently rejected because Lovable Cloud migrations cannot modify the `auth` schema.
 
-The previous change to Lookbook.tsx introduced a bug by switching `marginTop` to `paddingTop`. Here's why:
+**Impact:** Every new user signup (email or Google OAuth) fails to create a `profiles` row. This breaks:
+- Account dashboard (profile page shows nothing)
+- Mobile menu greeting (useProfile returns null)
+- Account profile updates (UPDATE on non-existent row = silent failure)
+- Any feature querying the profiles table for the logged-in user
 
-The Lookbook uses a **custom scroll container** (not `<Layout>`). Its `height` is set to `calc(100dvh - var(--header-height))`. With `marginTop`, the container is positioned below the fixed header and sized correctly. With `paddingTop`, the container starts behind the header and the internal padding eats into the already-reduced height, effectively stealing ~100px from the bottom of the page.
+Only 1 profile row exists in the database (likely the original admin, manually inserted).
 
-**Fix:** Revert `paddingTop` back to `marginTop` on the Lookbook scroll container. The original `marginTop` was correct -- the scroll container already starts below the header, so no content overlaps.
+## Fix Strategy
 
-### File: `src/pages/Lookbook.tsx`
-- Line 187: Change `paddingTop: 'var(--header-height)'` back to `marginTop: 'var(--header-height)'`
+Since we cannot create triggers on `auth.users` via migrations in Lovable Cloud, we implement an **application-level upsert safety net** — the same pattern used by production Supabase apps when triggers aren't available.
 
-## Full Audit: All Pages Checked
+### Change 1: Add profile upsert to `useAuth.tsx` on auth state change
 
-| Page | Header Approach | Status |
-|------|----------------|--------|
-| `/` (Landing) | No header, no Layout | OK -- cinematic portal, no nav |
-| `/home` (Index) | Layout + `immersiveHero` | OK -- header hidden until scroll-up, hero is full-bleed |
-| `/community` | Layout (standard) | OK after previous fix -- `immersiveHero` removed, hero has `pt-20 lg:pt-0` + Layout padding |
-| `/lookbook` | Raw `<Header />` + custom scroll | NEEDS FIX -- revert `paddingTop` to `marginTop` |
-| `/about/our-story` | Layout (standard) | OK -- `pt-[var(--header-height)]` applied |
-| `/category/:slug` | Layout (standard) | OK |
-| `/product/:slug` | Layout (standard) | OK |
-| `/checkout` | CheckoutHeader (different component) | OK -- separate header system |
-| `/contact`, `/faq`, `/returns`, `/shipping` | ServicePageLayout | OK -- has its own header offset |
-| `/ambassador` | Layout (standard) | OK |
-| `/try-on` | Raw `<Header />` + `pt-[var(--header-height)]` | OK |
-| Legal pages | LegalPageLayout | OK -- uses `pt-[calc(var(--header-height)+2rem)]` |
+When `onAuthStateChange` fires with a valid session, upsert a profile row. This is idempotent (uses `ON CONFLICT DO NOTHING` semantics via `.upsert()`) so it's safe for existing users.
 
-## Header Animation Quality Check
+**File:** `src/hooks/useAuth.tsx`
 
-The current tween config is correct:
-```
-type: "tween"
-duration: 0.4
-ease: [0.25, 0.46, 0.45, 0.94]
+In the `onAuthStateChange` callback (line 54 block), after setting user state, call a helper that upserts the profile:
+
+```typescript
+const ensureProfile = async (user: User) => {
+  await supabase.from('profiles').upsert({
+    id: user.id,
+    email: user.email,
+    full_name: user.user_metadata?.full_name || '',
+  }, { onConflict: 'id', ignoreDuplicates: true });
+};
 ```
 
-This matches the project's `editorialEase` standard documented in animation-standards memory. No further changes needed.
+Call `ensureProfile(session.user)` inside the `setTimeout` block alongside `checkAdminRole`, and also in the `getSession` block. This runs once per login/page-load — negligible cost.
 
-## Summary
+### Change 2: Add profile upsert fallback to `useProfile.ts`
 
-Only one fix needed: revert the Lookbook `paddingTop` back to `marginTop`. Everything else is working correctly after the previous changes.
+If `fetchProfile` returns a `PGRST116` (no rows) error, create the profile row on the spot using auth user data, then re-fetch. This catches edge cases where the auth state change fires before the component mounts.
+
+**File:** `src/hooks/useProfile.ts`
+
+In the `fetchProfile` function, after the `.single()` call, if error code is `PGRST116`:
+
+```typescript
+if (error?.code === 'PGRST116') {
+  // Profile doesn't exist yet — create it
+  await supabase.from('profiles').upsert({
+    id: user.id,
+    email: user.email,
+    full_name: user.user_metadata?.full_name || '',
+  }, { onConflict: 'id', ignoreDuplicates: true });
+  // Re-fetch
+  const { data: retryData } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+  if (retryData) setProfile(retryData);
+  return;
+}
+```
+
+### What Is NOT Changed
+- No layout, typography, or visual changes
+- No database schema changes (profiles table already exists with correct structure and RLS)
+- Admin dashboard, cart, checkout logic untouched
+- No new dependencies
+
+### Why This Is Critical
+Without this fix, **every new user who signs up will have a broken account experience**. The profile page, order history greeting, and preference sync all depend on the profiles row existing.
 
