@@ -24,6 +24,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [adminLoading, setAdminLoading] = useState(true);
   const [loading, setLoading] = useState(true);
 
+  const ensureProfile = async (u: User) => {
+    try {
+      await supabase.from('profiles').upsert({
+        id: u.id,
+        email: u.email,
+        full_name: u.user_metadata?.full_name || '',
+      }, { onConflict: 'id', ignoreDuplicates: true });
+    } catch (err) {
+      console.error('ensureProfile error:', err);
+    }
+  };
+
   const checkAdminRole = async (userId: string) => {
     try {
       const { data, error } = await supabase
@@ -54,6 +66,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (session?.user) {
           setAdminLoading(true);
           setTimeout(() => {
+            ensureProfile(session.user);
             checkAdminRole(session.user.id).then((val) => {
               setIsAdmin(val);
               setAdminLoading(false);
@@ -75,6 +88,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       
       if (session?.user) {
         setAdminLoading(true);
+        ensureProfile(session.user);
         checkAdminRole(session.user.id).then((val) => {
           setIsAdmin(val);
           setAdminLoading(false);

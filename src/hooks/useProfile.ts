@@ -23,10 +23,26 @@ export function useProfile() {
           .from('profiles')
           .select('*')
           .eq('id', user.id)
-          .single();
+          .maybeSingle();
 
         if (error) {
           console.error('Error fetching profile:', error);
+          return;
+        }
+
+        // Profile missing — create it on the fly
+        if (!data) {
+          await supabase.from('profiles').upsert({
+            id: user.id,
+            email: user.email,
+            full_name: user.user_metadata?.full_name || '',
+          }, { onConflict: 'id', ignoreDuplicates: true });
+          const { data: retryData } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', user.id)
+            .maybeSingle();
+          if (retryData) setProfile(retryData);
           return;
         }
 
