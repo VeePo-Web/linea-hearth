@@ -230,9 +230,9 @@ const ContactForm = () => {
       
       <p className="text-xs text-muted-foreground text-center">
         By submitting, you agree to our{" "}
-        <a href="/privacy-policy" className="underline hover:text-foreground">
+        <Link to="/privacy-policy" className="underline hover:text-foreground">
           Privacy Policy
-        </a>
+        </Link>
         . We'll never share your information.
       </p>
     </form>
