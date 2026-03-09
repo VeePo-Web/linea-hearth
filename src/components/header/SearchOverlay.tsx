@@ -312,7 +312,7 @@ const SearchOverlay = ({ isOpen, onClose }: SearchOverlayProps) => {
         <>
           {/* Mobile: Full-screen overlay */}
           <motion.div
-            className="fixed inset-0 bg-background z-50 md:hidden flex flex-col overscroll-contain"
+            className="fixed inset-0 h-[100dvh] bg-background z-50 md:hidden flex flex-col overscroll-contain"
             variants={containerVariants}
             initial="hidden"
             animate="visible"
