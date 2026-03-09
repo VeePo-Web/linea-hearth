@@ -1,52 +1,75 @@
 
 
-# Navigation Bar: Full Audit Results and Remaining Fixes
+# Round 31 — Remove Lovable Managed Auth from Google OAuth + Polish
 
-## What Was Already Fixed (Previous Diff)
-- Community page: StoryFilters bar removed, `immersiveHero` removed -- content now clears header correctly
-- Header animation: Spring replaced with editorial tween (0.4s, custom ease)
-- Scroll threshold: Increased from 50 to 80 to prevent micro-scroll flickering
+## Critical Issue: Google OAuth Routes Through Lovable Infrastructure
 
-## Issue Found: Lookbook Page Regression
+**File:** `src/hooks/useAuth.tsx`, lines 130-145
 
-The previous change to Lookbook.tsx introduced a bug by switching `marginTop` to `paddingTop`. Here's why:
+The `signInWithGoogle` function currently tries `lovable.auth.signInWithOAuth("google", ...)` first, which routes through `@lovable.dev/cloud-auth-js` — an external Lovable-hosted OAuth proxy. The standard Supabase OAuth is only a catch fallback. This creates a dependency on Lovable's infrastructure for every Google sign-in attempt.
 
-The Lookbook uses a **custom scroll container** (not `<Layout>`). Its `height` is set to `calc(100dvh - var(--header-height))`. With `marginTop`, the container is positioned below the fixed header and sized correctly. With `paddingTop`, the container starts behind the header and the internal padding eats into the already-reduced height, effectively stealing ~100px from the bottom of the page.
+**Fix:** Reverse the logic. Use standard `supabase.auth.signInWithOAuth` as the primary path. Remove the `lovable` import from `useAuth.tsx` entirely so there is zero dependency on Lovable managed auth for authentication flows.
 
-**Fix:** Revert `paddingTop` back to `marginTop` on the Lookbook scroll container. The original `marginTop` was correct -- the scroll container already starts below the header, so no content overlaps.
+The `src/integrations/lovable/index.ts` file is auto-generated and will remain untouched — we simply stop importing it in `useAuth.tsx`.
 
-### File: `src/pages/Lookbook.tsx`
-- Line 187: Change `paddingTop: 'var(--header-height)'` back to `marginTop: 'var(--header-height)'`
+**Important caveat:** Standard Supabase Google OAuth requires Google OAuth credentials (Client ID + Secret) configured in the backend auth settings. If these aren't configured, Google sign-in will fail gracefully — the `GoogleAuthButton` component already handles errors with a toast: "Google sign-in is unavailable. Please use email and password to sign in." This is the correct UX.
 
-## Full Audit: All Pages Checked
+### Change 1: Simplify `signInWithGoogle` in `useAuth.tsx`
 
-| Page | Header Approach | Status |
-|------|----------------|--------|
-| `/` (Landing) | No header, no Layout | OK -- cinematic portal, no nav |
-| `/home` (Index) | Layout + `immersiveHero` | OK -- header hidden until scroll-up, hero is full-bleed |
-| `/community` | Layout (standard) | OK after previous fix -- `immersiveHero` removed, hero has `pt-20 lg:pt-0` + Layout padding |
-| `/lookbook` | Raw `<Header />` + custom scroll | NEEDS FIX -- revert `paddingTop` to `marginTop` |
-| `/about/our-story` | Layout (standard) | OK -- `pt-[var(--header-height)]` applied |
-| `/category/:slug` | Layout (standard) | OK |
-| `/product/:slug` | Layout (standard) | OK |
-| `/checkout` | CheckoutHeader (different component) | OK -- separate header system |
-| `/contact`, `/faq`, `/returns`, `/shipping` | ServicePageLayout | OK -- has its own header offset |
-| `/ambassador` | Layout (standard) | OK |
-| `/try-on` | Raw `<Header />` + `pt-[var(--header-height)]` | OK |
-| Legal pages | LegalPageLayout | OK -- uses `pt-[calc(var(--header-height)+2rem)]` |
+| File | Lines | Change |
+|------|-------|--------|
+| `src/hooks/useAuth.tsx` | 4 | Remove `import { lovable }` |
+| `src/hooks/useAuth.tsx` | 130-145 | Replace with direct `supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin } })` — no try/catch needed, single clean path |
 
-## Header Animation Quality Check
-
-The current tween config is correct:
-```
-type: "tween"
-duration: 0.4
-ease: [0.25, 0.46, 0.45, 0.94]
+Before:
+```typescript
+import { lovable } from '@/integrations/lovable/index';
+// ...
+const signInWithGoogle = async () => {
+  try {
+    const result = await lovable.auth.signInWithOAuth("google", { ... });
+    // ...
+  } catch {
+    const { error } = await supabase.auth.signInWithOAuth({ ... });
+    return { error };
+  }
+};
 ```
 
-This matches the project's `editorialEase` standard documented in animation-standards memory. No further changes needed.
+After:
+```typescript
+// No lovable import
+const signInWithGoogle = async () => {
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: window.location.origin },
+  });
+  return { error };
+};
+```
 
-## Summary
+## What Is NOT Changed
+- `src/integrations/lovable/index.ts` — auto-generated, untouched
+- `supabase/functions/generate-avatar-config/index.ts` — AI avatar generation still uses Lovable API (not auth-related)
+- No layout, typography, or spacing changes
+- No database changes
+- Admin dashboard, cart, checkout logic untouched
+- All scroll lock, dvh, and overlay fixes from rounds 23-30 preserved
 
-Only one fix needed: revert the Lookbook `paddingTop` back to `marginTop`. Everything else is working correctly after the previous changes.
+## Audit Summary — Verified Clean
+
+| Area | Status |
+|------|--------|
+| Email/password sign-up (CreateAccountForm) | Zod validation, typo detection, confirmation handling — solid |
+| Email/password sign-in (SignInForm) | Error handling, forgot password flow — solid |
+| Password reset (ResetPassword page) | Session validation, redirectTo configured — solid |
+| Admin login (AdminLogin) | Role check post-auth, non-admin rejection — solid |
+| Admin protected route | Loading state, redirect, access denied — solid |
+| Profile upsert (useAuth + useProfile) | Application-level safety net — solid |
+| Cart drawer scroll lock | lockScroll/unlockScroll + overscroll-contain — solid |
+| Mobile menu scroll lock | Same pattern — solid |
+| Auth modal scroll lock | Same pattern — solid |
+| FullScreenNav scroll lock | Same pattern + touch-none — solid |
+| FavoritesDrawer scroll lock | Same pattern — solid |
+| All overlays h-[100dvh] | Applied consistently — solid |
 
