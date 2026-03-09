@@ -11,7 +11,7 @@ const HeroBlock = () => {
   }, []);
 
   return (
-    <section className="relative w-full h-screen min-h-[600px] max-h-[900px] overflow-hidden">
+    <section className="relative w-full h-[100dvh] min-h-[600px] max-h-[900px] overflow-hidden">
       {/* Background Image/Video */}
       <div className="absolute inset-0">
         <div 

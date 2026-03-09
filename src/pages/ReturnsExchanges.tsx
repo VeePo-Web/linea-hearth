@@ -72,7 +72,7 @@ const ReturnsExchanges = () => {
   }, []);
 
   const handleReturnSubmit = (orderNumber: string) => {
-    console.log("Return initiated for order:", orderNumber);
+    
     // TODO: Implement return flow
   };
 

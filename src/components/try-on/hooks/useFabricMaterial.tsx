@@ -62,8 +62,6 @@ export const useFabricMaterial = ({ type, color, imageUrl, garmentType = 'hoodie
     // When no texture, use the provided color
     const baseColor = texture ? '#ffffff' : color;
     
-    console.log('[Material] Final base color:', baseColor);
-    console.log('[Material] Using texture map:', texture ? 'YES' : 'NO');
     
     return (
       <meshPhysicalMaterial
