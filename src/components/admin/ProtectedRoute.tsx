@@ -1,4 +1,4 @@
-import { Navigate, useLocation } from 'react-router-dom';
+import { Navigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Loader2 } from 'lucide-react';
 
@@ -33,12 +33,12 @@ const ProtectedRoute = ({ children, requireAdmin = false }: ProtectedRouteProps)
           <p className="text-sm text-muted-foreground mb-6">
             You don't have permission to access this area.
           </p>
-          <a
-            href="/"
+          <Link
+            to="/"
             className="text-xs text-muted-foreground hover:text-foreground transition-colors uppercase tracking-wider"
           >
             ← Back to Store
-          </a>
+          </Link>
         </div>
       </div>
     );
