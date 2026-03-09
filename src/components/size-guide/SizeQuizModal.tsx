@@ -7,7 +7,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
+import { ChevronLeft, ChevronRight, Lightbulb, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // ============= Type Definitions =============
