@@ -51,11 +51,6 @@ const fabricPresets = {
 export const useFabricMaterial = ({ type, color, imageUrl, garmentType = 'hoodie' }: FabricMaterialProps) => {
   const preset = fabricPresets[type];
   
-  console.log('[Material] ===== CREATING MATERIAL =====');
-  console.log('[Material] Type:', type);
-  console.log('[Material] Color:', color);
-  console.log('[Material] ImageUrl:', imageUrl || 'NONE');
-  console.log('[Material] GarmentType:', garmentType);
   
   // Load texture if imageUrl is provided
   const texture = useGarmentTexture(imageUrl, garmentType);
