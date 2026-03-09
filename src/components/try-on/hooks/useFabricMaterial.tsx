@@ -55,7 +55,7 @@ export const useFabricMaterial = ({ type, color, imageUrl, garmentType = 'hoodie
   // Load texture if imageUrl is provided
   const texture = useGarmentTexture(imageUrl, garmentType);
   
-  console.log('[Material] Texture loaded:', texture ? '✅ YES' : '❌ NO');
+  
 
   const material = useMemo(() => {
     // When texture is available, use white base color so texture shows true colors
