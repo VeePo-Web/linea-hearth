@@ -66,6 +66,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (session?.user) {
           setAdminLoading(true);
           setTimeout(() => {
+            ensureProfile(session.user);
             checkAdminRole(session.user.id).then((val) => {
               setIsAdmin(val);
               setAdminLoading(false);
