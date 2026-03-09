@@ -258,7 +258,8 @@ const SizeQuizModal = ({
         {/* Gamification message */}
         <div className="px-6 pb-4 text-center">
           <p className="text-xs text-muted-foreground">
-            💡 You'll save 12 seconds on every future purchase
+            <Lightbulb className="w-3 h-3 inline-block mr-1 align-[-2px]" />
+            You'll save 12 seconds on every future purchase
           </p>
         </div>
       </DialogContent>
