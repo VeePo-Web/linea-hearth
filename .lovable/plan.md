@@ -1,52 +1,52 @@
 
 
-# Round 32 — Performance: Lazy-Load Heavy Route Components
+# Navigation Bar: Full Audit Results and Remaining Fixes
 
-## Issue Found
+## What Was Already Fixed (Previous Diff)
+- Community page: StoryFilters bar removed, `immersiveHero` removed -- content now clears header correctly
+- Header animation: Spring replaced with editorial tween (0.4s, custom ease)
+- Scroll threshold: Increased from 50 to 80 to prevent micro-scroll flickering
 
-Every route in `App.tsx` is eagerly imported — all 30+ page components are bundled into the initial JavaScript payload. This includes heavy pages like `TryOnRoom` (Three.js + R3F), `Lookbook` (complex gallery), and all admin pages that most users never visit. This directly impacts:
+## Issue Found: Lookbook Page Regression
 
-- First Contentful Paint (FCP) — user waits for admin code they'll never use
-- Time to Interactive (TTI) — cart/checkout responsiveness is delayed by parsing unused code
-- Mobile performance — critical on slower connections
+The previous change to Lookbook.tsx introduced a bug by switching `marginTop` to `paddingTop`. Here's why:
 
-The Three.js dependency alone (`three`, `@react-three/fiber`, `@react-three/drei`) adds ~500KB+ of parsed JavaScript that loads for every single page view, even the homepage.
+The Lookbook uses a **custom scroll container** (not `<Layout>`). Its `height` is set to `calc(100dvh - var(--header-height))`. With `marginTop`, the container is positioned below the fixed header and sized correctly. With `paddingTop`, the container starts behind the header and the internal padding eats into the already-reduced height, effectively stealing ~100px from the bottom of the page.
 
-## Fix
+**Fix:** Revert `paddingTop` back to `marginTop` on the Lookbook scroll container. The original `marginTop` was correct -- the scroll container already starts below the header, so no content overlaps.
 
-Convert all route imports in `App.tsx` from static `import` to `React.lazy()` with dynamic `import()`. Wrap the `AnimatedRoutes` content in a `<Suspense>` boundary with a minimal loading state.
+### File: `src/pages/Lookbook.tsx`
+- Line 187: Change `paddingTop: 'var(--header-height)'` back to `marginTop: 'var(--header-height)'`
 
-### Change: `src/App.tsx`
+## Full Audit: All Pages Checked
 
-1. Replace all 30+ static page imports (lines 18-56) with `React.lazy()` calls:
+| Page | Header Approach | Status |
+|------|----------------|--------|
+| `/` (Landing) | No header, no Layout | OK -- cinematic portal, no nav |
+| `/home` (Index) | Layout + `immersiveHero` | OK -- header hidden until scroll-up, hero is full-bleed |
+| `/community` | Layout (standard) | OK after previous fix -- `immersiveHero` removed, hero has `pt-20 lg:pt-0` + Layout padding |
+| `/lookbook` | Raw `<Header />` + custom scroll | NEEDS FIX -- revert `paddingTop` to `marginTop` |
+| `/about/our-story` | Layout (standard) | OK -- `pt-[var(--header-height)]` applied |
+| `/category/:slug` | Layout (standard) | OK |
+| `/product/:slug` | Layout (standard) | OK |
+| `/checkout` | CheckoutHeader (different component) | OK -- separate header system |
+| `/contact`, `/faq`, `/returns`, `/shipping` | ServicePageLayout | OK -- has its own header offset |
+| `/ambassador` | Layout (standard) | OK |
+| `/try-on` | Raw `<Header />` + `pt-[var(--header-height)]` | OK |
+| Legal pages | LegalPageLayout | OK -- uses `pt-[calc(var(--header-height)+2rem)]` |
 
-```typescript
-const LandingPage = lazy(() => import("./pages/LandingPage"));
-const Index = lazy(() => import("./pages/Index"));
-const Category = lazy(() => import("./pages/Category"));
-// ... all pages
+## Header Animation Quality Check
+
+The current tween config is correct:
+```
+type: "tween"
+duration: 0.4
+ease: [0.25, 0.46, 0.45, 0.94]
 ```
 
-2. Add `Suspense` with a minimal loader inside `AnimatedRoutes`, wrapping the `<Routes>` block:
+This matches the project's `editorialEase` standard documented in animation-standards memory. No further changes needed.
 
-```typescript
-<Suspense fallback={<div className="min-h-screen bg-background" />}>
-  <Routes>...</Routes>
-</Suspense>
-```
+## Summary
 
-3. Keep `ScrollToTop`, `PageTransition`, `ProtectedRoute`, and `ProtectedAccountRoute` as static imports — they're lightweight and needed on every route.
-
-### What This Achieves
-- Initial bundle shrinks significantly (Three.js/admin/lookbook deferred)
-- Homepage loads faster for first-time visitors
-- Cart drawer, auth modal, and checkout become interactive sooner
-- Zero visual change — the empty `min-h-screen bg-background` fallback matches the page background
-
-### What Is NOT Changed
-- No layout, typography, or spacing changes
-- No auth logic changes
-- No database changes
-- All scroll lock, overlay, and UX fixes from rounds 23-31 preserved
-- `useAuth`, `useCart`, and other providers remain eagerly loaded (they must be)
+Only one fix needed: revert the Lookbook `paddingTop` back to `marginTop`. Everything else is working correctly after the previous changes.
 

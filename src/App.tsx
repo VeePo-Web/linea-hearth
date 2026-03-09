@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation, Navigate } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
+import { lazy, Suspense } from "react";
 import { AuthProvider } from "@/hooks/useAuth";
 import { CartProvider } from "@/hooks/useCart";
 import { SizeQuizProvider } from "@/contexts/SizeQuizContext";
@@ -15,46 +16,48 @@ import { migrateLocalStorage } from "@/lib/storageMigration";
 migrateLocalStorage();
 import ScrollToTop from "./components/ScrollToTop";
 import PageTransition from "./components/motion/PageTransition";
-import LandingPage from "./pages/LandingPage";
-import Index from "./pages/Index";
-import Category from "./pages/Category";
-import ProductDetail from "./pages/ProductDetail";
-import Checkout from "./pages/Checkout";
-import CheckoutSuccess from "./pages/CheckoutSuccess";
-import NotFound from "./pages/NotFound";
-import OurStory from "./pages/about/OurStory";
-import OurMission from "./pages/about/OurMission";
-import SizeGuide from "./pages/about/SizeGuide";
-import Contact from "./pages/Contact";
-import PrivacyPolicy from "./pages/PrivacyPolicy";
-import TermsOfService from "./pages/TermsOfService";
-import Community from "./pages/Community";
-import FAQ from "./pages/FAQ";
-import ReturnsExchanges from "./pages/ReturnsExchanges";
-import ShippingInfo from "./pages/ShippingInfo";
-import Accessibility from "./pages/Accessibility";
-import Lookbook from "./pages/Lookbook";
-import TryOnRoom from "./pages/TryOnRoom";
-import Ambassador from "./pages/Ambassador";
-import RecoverCart from "./pages/RecoverCart";
-import ResetPassword from "./pages/ResetPassword";
-import AdminLogin from "./pages/admin/AdminLogin";
-import AdminDashboard from "./pages/admin/AdminDashboard";
-import AdminProducts from "./pages/admin/AdminProducts";
-import AdminProductForm from "./pages/admin/AdminProductForm";
-import AdminOrders from "./pages/admin/AdminOrders";
-import AdminOrderDetail from "./pages/admin/AdminOrderDetail";
-import AdminCategories from "./pages/admin/AdminCategories";
-import AdminDiscounts from "./pages/admin/AdminDiscounts";
 import ProtectedRoute from "./components/admin/ProtectedRoute";
-import AccountLayout from "./pages/account/AccountLayout";
-import AccountDashboard from "./pages/account/AccountDashboard";
-import AccountOrders from "./pages/account/AccountOrders";
-import AccountOrderDetail from "./pages/account/AccountOrderDetail";
-import AccountProfile from "./pages/account/AccountProfile";
-import AccountAddresses from "./pages/account/AccountAddresses";
-import AccountFavorites from "./pages/account/AccountFavorites";
 import ProtectedAccountRoute from "./components/account/ProtectedAccountRoute";
+
+// Lazy-loaded pages — each becomes its own chunk
+const LandingPage = lazy(() => import("./pages/LandingPage"));
+const Index = lazy(() => import("./pages/Index"));
+const Category = lazy(() => import("./pages/Category"));
+const ProductDetail = lazy(() => import("./pages/ProductDetail"));
+const Checkout = lazy(() => import("./pages/Checkout"));
+const CheckoutSuccess = lazy(() => import("./pages/CheckoutSuccess"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+const OurStory = lazy(() => import("./pages/about/OurStory"));
+const OurMission = lazy(() => import("./pages/about/OurMission"));
+const SizeGuide = lazy(() => import("./pages/about/SizeGuide"));
+const Contact = lazy(() => import("./pages/Contact"));
+const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
+const TermsOfService = lazy(() => import("./pages/TermsOfService"));
+const Community = lazy(() => import("./pages/Community"));
+const FAQ = lazy(() => import("./pages/FAQ"));
+const ReturnsExchanges = lazy(() => import("./pages/ReturnsExchanges"));
+const ShippingInfo = lazy(() => import("./pages/ShippingInfo"));
+const Accessibility = lazy(() => import("./pages/Accessibility"));
+const Lookbook = lazy(() => import("./pages/Lookbook"));
+const TryOnRoom = lazy(() => import("./pages/TryOnRoom"));
+const Ambassador = lazy(() => import("./pages/Ambassador"));
+const RecoverCart = lazy(() => import("./pages/RecoverCart"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
+const AdminLogin = lazy(() => import("./pages/admin/AdminLogin"));
+const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
+const AdminProducts = lazy(() => import("./pages/admin/AdminProducts"));
+const AdminProductForm = lazy(() => import("./pages/admin/AdminProductForm"));
+const AdminOrders = lazy(() => import("./pages/admin/AdminOrders"));
+const AdminOrderDetail = lazy(() => import("./pages/admin/AdminOrderDetail"));
+const AdminCategories = lazy(() => import("./pages/admin/AdminCategories"));
+const AdminDiscounts = lazy(() => import("./pages/admin/AdminDiscounts"));
+const AccountLayout = lazy(() => import("./pages/account/AccountLayout"));
+const AccountDashboard = lazy(() => import("./pages/account/AccountDashboard"));
+const AccountOrders = lazy(() => import("./pages/account/AccountOrders"));
+const AccountOrderDetail = lazy(() => import("./pages/account/AccountOrderDetail"));
+const AccountProfile = lazy(() => import("./pages/account/AccountProfile"));
+const AccountAddresses = lazy(() => import("./pages/account/AccountAddresses"));
+const AccountFavorites = lazy(() => import("./pages/account/AccountFavorites"));
 
 const queryClient = new QueryClient();
 
@@ -64,6 +67,7 @@ const AnimatedRoutes = () => {
   
   return (
     <AnimatePresence mode="wait">
+      <Suspense fallback={<div className="min-h-screen bg-background" />}>
       <Routes location={location} key={location.pathname}>
         <Route path="/" element={<PageTransition><LandingPage /></PageTransition>} />
         <Route path="/home" element={<PageTransition><Index /></PageTransition>} />
@@ -111,6 +115,7 @@ const AnimatedRoutes = () => {
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
       </Routes>
+      </Suspense>
     </AnimatePresence>
   );
 };
