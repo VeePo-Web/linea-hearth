@@ -1,85 +1,176 @@
 
 
-# Round 33 — Replace Placeholder Social Proof with "Coming soon..." + Hide Products
+# Round 34 — Performance Optimization (Zero UX/Design Change)
 
-## Overview
+All animations, scroll behaviors, parallax, and visual design remain exactly as they are. These changes are purely under-the-hood optimizations.
 
-Two changes:
-1. Replace all hardcoded fake reviews, testimonials, social posts, and ambassador content with clean "Coming soon..." placeholder states
-2. Set the 3 existing products to `draft` status so they no longer appear on the storefront
+---
 
-## Database Change
+## 1. Optimize QueryClient Configuration
 
-Use the insert tool to update the 3 products to draft status:
+**File:** `src/App.tsx`
 
-```sql
-UPDATE products SET status = 'draft' WHERE slug IN ('stay-holy-hoodie', 'heavenly-crewneck', 'stay-holy');
+The current `new QueryClient()` uses defaults (0ms stale time, refetch on window focus). Configure it for an e-commerce site:
+
+```typescript
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000,    // 5 min — avoid re-fetching on every route change
+      gcTime: 10 * 60 * 1000,      // 10 min garbage collection
+      refetchOnWindowFocus: false,  // Don't refetch when user tabs back
+      retry: 1,                     // Fail faster
+    },
+  },
+});
 ```
 
-This hides them from the storefront (RLS policy filters on `status = 'active'`) but preserves all data for later use.
+This prevents unnecessary Supabase queries when navigating between pages.
 
-## Component Changes
+---
 
-### 1. MarqueeStrip.tsx (Homepage review marquee)
-Replace the entire review array + marquee animation with a single centered line:
+## 2. Add Resource Hints to `index.html`
+
+**File:** `index.html`
+
+Add `<link rel="preload">` for the hero image (LCP element) and `dns-prefetch` for Supabase:
+
+```html
+<link rel="preload" as="image" href="/products/stay-holy-hoodie/male-model.png" fetchpriority="high">
+<link rel="dns-prefetch" href="https://harckavibhmimndfvnyo.supabase.co">
+<link rel="preconnect" href="https://harckavibhmimndfvnyo.supabase.co">
 ```
-Coming soon...
+
+This starts downloading the hero image and resolving the API domain before JS even loads.
+
+---
+
+## 3. Add `loading="lazy"` to All Below-Fold Images
+
+**Files:** `CategoryTiles.tsx`, `FeaturedDrop.tsx`, `MissionBlock.tsx` (via `ParallaxImage.tsx`)
+
+Most images already have `loading="lazy"`. Verify and ensure consistency across all homepage sections. The hero image already has `loading="eager"` + `fetchpriority="high"` — correct.
+
+---
+
+## 4. Debounce `MobileStickyBar` Scroll Handler
+
+**File:** `src/components/homepage/MobileStickyBar.tsx`
+
+Currently reads `scrollY` and queries the DOM for `footer` on every scroll frame. Wrap in `requestAnimationFrame` with a ticking guard (same pattern as `useScrollDirection`):
+
+```typescript
+useEffect(() => {
+  let ticking = false;
+  const onScroll = () => {
+    if (!ticking) {
+      requestAnimationFrame(() => {
+        setIsVisible(window.scrollY > 500);
+        const footer = document.querySelector('footer');
+        if (footer) {
+          setIsFooterVisible(footer.getBoundingClientRect().top < window.innerHeight);
+        }
+        ticking = false;
+      });
+      ticking = true;
+    }
+  };
+  window.addEventListener('scroll', onScroll, { passive: true });
+  return () => window.removeEventListener('scroll', onScroll);
+}, []);
 ```
-Keep the same section wrapper and background styling. Remove the star rendering, pause handlers, and duplicated array logic.
 
-### 2. ReviewsCarousel.tsx (Homepage testimonials carousel)
-Replace the full carousel (mock reviews, auto-scroll, arrows, dots) with a centered "Coming soon..." message inside the existing dark `bg-stone-900` section. Keep the section header ("Testimonials" / "What Our Community Says").
+---
 
-### 3. TestimonySpotlight.tsx (Homepage large testimonial block)
-Keep the left image (`/products/stay-holy-hoodie/female-model-2.png`) as requested. Replace the right-side quote content (fake "Marcus T." testimonial) with "Coming soon..." centered in the text area. Keep the "Read More Stories" CTA link.
+## 5. Memoize Homepage Section Components
 
-### 4. InstagramFeed.tsx (Homepage Instagram grid)
-Replace the image grid with a single "Coming soon..." message. Keep the header with the Instagram icon, `@lineofjudahwear` handle, and "Follow" link. Remove the mobile/desktop image grids.
+**File:** `src/pages/Index.tsx`
 
-### 5. SocialFeed.tsx (Community page social grid)
-Replace the entire post grid (8 fake social cards) with a centered "Coming soon..." message. Keep the section header (`#LineOfJudah`, "Join The Movement") and the "Follow @lineofjudah" CTA button.
+Wrap static homepage sections in `React.memo` imports to prevent re-renders when parent state (cart, auth) changes. Sections like `EditorialHero`, `ValueStackBanner`, `CategoryTiles`, `MissionBlock`, `MarqueeStrip`, `InstagramFeed` take no props or only static props — they should never re-render.
 
-### 6. CurrentAmbassadors.tsx (Ambassador page)
-Replace the 6 fake ambassador avatars with a centered "Coming soon..." message. Keep the "Meet the tribe" header. Remove the "You?" dashed circle.
+Add `memo()` wrapping to these components at their export:
 
-### 7. StoryCommunityStats.tsx (Our Story page)
-Replace the testimonial marquee at the bottom with "Coming soon..." text. **Keep the stats** (10K+, 45, 5) and the section header — those are marketing copy, not social proof.
+- `EditorialHero.tsx` — `export default memo(EditorialHero)`
+- `ValueStackBanner.tsx` — `export default memo(ValueStackBanner)`
+- `CategoryTiles.tsx` — `export default memo(CategoryTiles)`
+- `MissionBlock.tsx` — `export default memo(MissionBlock)`
+- `MarqueeStrip.tsx` — `export default memo(MarqueeStrip)`
+- `InstagramFeed.tsx` — `export default memo(InstagramFeed)`
+- `TestimonySpotlight.tsx` — `export default memo(TestimonySpotlight)`
+- `FeaturedDrop.tsx` — `export default memo(FeaturedDrop)`
 
-### 8. StoryGrid.tsx (Community page) — Fallback array
-Replace the 6-item hardcoded fallback array with a "Coming soon..." empty state when no DB data exists.
+---
 
-### 9. CommunityHero.tsx — Fallback story
-Replace the hardcoded "Marcus T." fallback with a "Coming soon..." state when no featured story exists in DB.
+## 6. Optimize `useScrollDirection` — Reduce State Updates
 
-### 10. StyledByTribe.tsx (PDP UGC section) — Fallback
-Replace the 4-item mock UGC fallback with a "Coming soon..." empty state.
+**File:** `src/hooks/useScrollDirection.ts`
 
-### 11. MinistryInMotion.tsx (Our Story UGC) — Fallback
-Replace the 6-item placeholder fallback with a "Coming soon..." empty state.
+Currently updates state on every scroll frame even when values haven't changed. Add an equality check to prevent unnecessary re-renders:
 
-### 12. FeaturedCollection.tsx + DropGrid.tsx — Product fallbacks
-Replace the hardcoded placeholder product arrays with a "Coming soon..." empty state when DB returns no active products (which it will after we set products to draft).
+```typescript
+setState((prev) => {
+  if (prev.direction === direction && prev.isAtTop === isAtTop && prev.scrollY === scrollY) {
+    return prev; // No change — skip re-render
+  }
+  return { scrollY, direction, isAtTop, isScrolled };
+});
+```
 
-## Styling Pattern for "Coming soon..."
+---
 
-Every "Coming soon..." state uses this consistent pattern — no new CSS, just existing Tailwind classes:
+## 7. Lazy-Load `AnimatePresence` from Route Wrapper
+
+**File:** `src/App.tsx`
+
+`AnimatePresence` with `mode="wait"` forces exit animations to complete before mounting the next route — this adds latency to every navigation. Change to `mode="popLayout"` which allows instant mounting while exit animations play underneath:
+
+```typescript
+<AnimatePresence mode="popLayout">
+```
+
+This makes route transitions feel instant while preserving the fade-out animation.
+
+---
+
+## 8. Font Loading Optimization
+
+**File:** `index.html`
+
+The Google Fonts link currently loads all weights of DM Sans (100-1000, italic). Limit to only the weights actually used:
+
+```html
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+```
+
+This cuts the font CSS payload significantly and speeds up text rendering.
+
+---
+
+## 9. Add `will-change` Cleanup to Scroll-Driven Animations
+
+**File:** `src/components/motion/ParallaxImage.tsx`
+
+The parallax `motion.img` applies continuous transforms. The `style={{ y, scale: 1.1 }}` already hints the GPU, but add `will-change: transform` via Tailwind class `will-change-transform` to the motion.img to ensure compositing:
 
 ```tsx
-<div className="flex items-center justify-center py-16">
-  <p className="text-sm text-muted-foreground font-light tracking-wide">
-    Coming soon...
-  </p>
-</div>
+className="w-full h-full object-cover will-change-transform"
 ```
 
-Adapts background color to match the existing section (e.g., `text-white/40` on dark sections).
+---
 
-## What Is NOT Changed
-- Hero images, lookbook images, product photography — all kept
-- EditorialHero drop badge ("Drop 001") — editorial content, kept
-- FeaturedDrop section — editorial content, kept
-- Marketing stats (10K+ Believers, 45 Cities) — kept as aspirational copy
-- No layout, typography, or spacing changes to surrounding sections
-- No database schema changes
-- No auth or admin logic changes
+## Summary
+
+| Change | Impact | Risk |
+|--------|--------|------|
+| QueryClient staleTime | Fewer API calls on navigation | None |
+| Preload hero image | Faster LCP | None |
+| DNS prefetch Supabase | Faster first API call | None |
+| RAF debounce MobileStickyBar | Less main-thread work on scroll | None |
+| `React.memo` on static sections | Fewer re-renders | None |
+| `useScrollDirection` equality check | Fewer header re-renders | None |
+| `AnimatePresence mode="popLayout"` | Faster perceived navigation | Exit anims overlap with enter |
+| Font subset | Smaller font download | None if unused weights confirmed |
+| `will-change-transform` on parallax | GPU compositing hint | None |
+
+**Zero visual or behavioral changes.** All animations, scrolls, parallax, and design elements remain identical.
 
