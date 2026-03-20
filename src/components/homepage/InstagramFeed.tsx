@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { motion } from "framer-motion";
 import { Instagram } from "lucide-react";
 import ScrollReveal from "@/components/motion/ScrollReveal";
