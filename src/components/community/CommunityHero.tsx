@@ -42,14 +42,7 @@ export default function CommunityHero() {
     },
   });
 
-  const displayStory = featuredStory || {
-    customer_name: "Marcus T.",
-    customer_location: "Calgary, AB",
-    headline: "This Hoodie Changed My Train Ride",
-    story_text: "A stranger asked about my hoodie on the C-Train. Twenty minutes later, we were praying together. That's when I knew — this isn't just apparel, it's armor.",
-    customer_photo_url: null,
-    video_url: null,
-  };
+  const displayStory = featuredStory;
 
   return (
     <>
@@ -173,127 +166,71 @@ export default function CommunityHero() {
       {/* Industrial divider */}
       <div className="h-px bg-border" />
 
-      {/* SECTION 2: Featured Story - Tighter padding */}
+      {/* SECTION 2: Featured Story */}
       <section className="relative bg-background pt-16 lg:pt-24 pb-10 lg:pb-16">
-        <div className="absolute left-0 top-1/2 -translate-y-1/2 hidden lg:block">
-          <p className="text-[10px] uppercase tracking-[0.4em] text-champagne-500 font-medium -rotate-90 origin-left whitespace-nowrap">
-            01 — Featured Story
-          </p>
-        </div>
-
         <div className="container mx-auto px-4 lg:px-8">
-          <div className="grid lg:grid-cols-5 gap-8 lg:gap-16 items-center">
-            {/* Left: Large Portrait Image (60%) */}
-            <motion.div 
-              initial={{ opacity: 0, x: -40 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
-              className="lg:col-span-3 relative"
-            >
-              <div className="aspect-[3/4] rounded-sm overflow-hidden bg-muted relative group">
-                {displayStory.video_url && !isVideoPlaying ? (
-                  <>
-                    <div className="absolute inset-0 bg-gradient-to-t from-stone-900/60 to-transparent z-10" />
-                    <button
-                      onClick={() => setIsVideoPlaying(true)}
-                      className="absolute inset-0 z-20 flex items-center justify-center"
-                      aria-label="Play video"
-                    >
-                      <motion.div 
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.95 }}
-                        className="w-24 h-24 rounded-full bg-champagne-500 flex items-center justify-center"
-                      >
-                        <Play className="w-10 h-10 text-stone-900 ml-1" fill="currentColor" />
-                      </motion.div>
-                    </button>
-                    <img
-                      src={displayStory.customer_photo_url || "/founders.png"}
-                      alt="Featured story"
-                      className="w-full h-full object-cover md:grayscale md:group-hover:grayscale-0 transition-all duration-700"
-                    />
-                  </>
-                ) : displayStory.video_url && isVideoPlaying ? (
-                  <iframe
-                    src={displayStory.video_url}
-                    className="w-full h-full"
-                    allow="autoplay; fullscreen"
-                    allowFullScreen
-                  />
-                ) : (
+          {displayStory ? (
+            <div className="grid lg:grid-cols-5 gap-8 lg:gap-16 items-center">
+              <motion.div 
+                initial={{ opacity: 0, x: -40 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
+                className="lg:col-span-3 relative"
+              >
+                <div className="aspect-[3/4] rounded-sm overflow-hidden bg-muted relative group">
                   <img
                     src={displayStory.customer_photo_url || "/founders.png"}
                     alt="Featured story"
                     className="w-full h-full object-cover md:grayscale md:group-hover:grayscale-0 transition-all duration-700"
                   />
-                )}
-              </div>
+                </div>
+                <div className="absolute -bottom-3 left-4 lg:hidden bg-champagne-500 px-4 py-2">
+                  <p className="text-stone-900 font-medium text-xs uppercase tracking-wider">Featured Story</p>
+                </div>
+              </motion.div>
 
-              <div className="absolute -bottom-3 left-4 lg:hidden bg-champagne-500 px-4 py-2">
-                <p className="text-stone-900 font-medium text-xs uppercase tracking-wider">Featured Story</p>
-              </div>
-            </motion.div>
-
-            {/* Right: Story Content (40%) -- no floating quote marks */}
-            <motion.div 
-              initial={{ opacity: 0, x: 40 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
-              className="lg:col-span-2 space-y-8"
-            >
-              <div className="space-y-6">
-                <p className="text-[10px] uppercase tracking-[0.3em] text-champagne-500 font-medium">
-                  ——— Featured
-                </p>
-                <h2 className="text-3xl lg:text-4xl xl:text-5xl font-light leading-[1.15] italic">
-                  "{displayStory.headline}"
-                </h2>
-              </div>
-
-              <blockquote className="text-lg text-muted-foreground font-light leading-relaxed">
-                {displayStory.story_text}
-              </blockquote>
-
-              <div className="flex items-center gap-4 pt-4">
-                {displayStory.customer_photo_url ? (
-                  <img
-                    src={displayStory.customer_photo_url}
-                    alt={displayStory.customer_name}
-                    className="w-14 h-14 rounded-full object-cover grayscale"
-                  />
-                ) : (
-                   <div className="w-14 h-14 rounded-full bg-champagne-500/20 flex items-center justify-center">
+              <motion.div 
+                initial={{ opacity: 0, x: 40 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8, delay: 0.2 }}
+                className="lg:col-span-2 space-y-8"
+              >
+                <div className="space-y-6">
+                  <p className="text-[10px] uppercase tracking-[0.3em] text-champagne-500 font-medium">——— Featured</p>
+                  <h2 className="text-3xl lg:text-4xl xl:text-5xl font-light leading-[1.15] italic">
+                    "{displayStory.headline}"
+                  </h2>
+                </div>
+                <blockquote className="text-lg text-muted-foreground font-light leading-relaxed">
+                  {displayStory.story_text}
+                </blockquote>
+                <div className="flex items-center gap-4 pt-4">
+                  <div className="w-14 h-14 rounded-full bg-champagne-500/20 flex items-center justify-center">
                     <span className="text-champagne-500 font-medium text-xl">
                       {displayStory.customer_name.charAt(0)}
                     </span>
                   </div>
-                )}
-                <div>
-                  <p className="font-medium text-lg">{displayStory.customer_name}</p>
-                  {displayStory.customer_location && (
-                    <p className="text-muted-foreground text-sm flex items-center gap-1.5">
-                      <MapPin className="w-3.5 h-3.5" />
-                      {displayStory.customer_location}
-                    </p>
-                  )}
+                  <div>
+                    <p className="font-medium text-lg">{displayStory.customer_name}</p>
+                    {displayStory.customer_location && (
+                      <p className="text-muted-foreground text-sm flex items-center gap-1.5">
+                        <MapPin className="w-3.5 h-3.5" />
+                        {displayStory.customer_location}
+                      </p>
+                    )}
+                  </div>
                 </div>
-              </div>
-
-              {displayStory.video_url && !isVideoPlaying && (
-                <motion.button
-                  whileHover={{ x: 4 }}
-                  onClick={() => setIsVideoPlaying(true)}
-                  className="text-champagne-500 text-sm uppercase tracking-[0.2em] font-medium flex items-center gap-2 group"
-                >
-                  <Play className="w-4 h-4" />
-                  Watch Video
-                  <span className="group-hover:translate-x-1 transition-transform">→</span>
-                </motion.button>
-              )}
-            </motion.div>
-          </div>
+              </motion.div>
+            </div>
+          ) : (
+            <div className="flex items-center justify-center py-16">
+              <p className="text-sm text-muted-foreground font-light tracking-wide">
+                Coming soon...
+              </p>
+            </div>
+          )}
         </div>
       </section>
     </>

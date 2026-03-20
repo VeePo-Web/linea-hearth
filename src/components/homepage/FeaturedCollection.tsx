@@ -66,15 +66,27 @@ const FeaturedCollection = () => {
     fetchProducts();
   }, []);
 
-  // Placeholder products
-  const placeholderProducts: Product[] = [
-    { id: '1', name: 'Stay Holy Hoodie', slug: 'stay-holy-hoodie', price: 79, category_name: 'Hoodies', is_on_sale: false, sale_price: null },
-    { id: '2', name: 'Heavenly Crewneck', slug: 'heavenly-crewneck', price: 65, category_name: 'Tops', is_on_sale: false, sale_price: null },
-    { id: '3', name: 'Faith Over Fear Tee', slug: 'faith-over-fear-tee', price: 45, category_name: 'T-Shirts', is_on_sale: true, sale_price: 35 },
-    { id: '4', name: 'Kingdom Joggers', slug: 'kingdom-joggers', price: 75, category_name: 'Bottoms', is_on_sale: false, sale_price: null },
-  ];
+  if (products.length === 0) {
+    return (
+      <section className="w-full py-12 md:py-16 lg:py-24 bg-white">
+        <div className="max-w-7xl mx-auto px-4 xs:px-6">
+          <div className="flex justify-between items-end mb-6 md:mb-8">
+            <div>
+              <p className="text-eyebrow text-stone-500 mb-2">Community picks</p>
+              <h2 className="text-section text-stone-950">Tribe Approved</h2>
+            </div>
+          </div>
+          <div className="flex items-center justify-center py-16">
+            <p className="text-sm text-muted-foreground font-light tracking-wide">
+              Coming soon...
+            </p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
-  const displayProducts = products.length > 0 ? products : placeholderProducts;
+  const displayProducts = products;
 
   return (
     <section className="w-full py-12 md:py-16 lg:py-24 bg-white">

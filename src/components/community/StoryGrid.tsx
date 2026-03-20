@@ -137,62 +137,21 @@ export default function StoryGrid({
     );
   }
 
-  const displayStories = visibleStories.length > 0 ? visibleStories : [
-    {
-      id: "placeholder-1",
-      type: "story" as const,
-      customer_name: "Sarah M.",
-      customer_location: "Toronto, ON",
-      headline: "My coworker asked about my shirt",
-      story_text: "I was nervous to wear faith-based apparel to my corporate job. But the design was subtle enough to start a conversation. My coworker asked, and I got to share my testimony.",
-      is_contactable: true,
-    },
-    {
-      id: "placeholder-2",
-      type: "review" as const,
-      customer_name: "James K.",
-      customer_location: "Vancouver, BC",
-      story_text: "Quality is insane. I've washed this hoodie 50+ times and it still looks brand new. The print hasn't cracked at all.",
-      rating: 5,
-      product_name: "Lion Hoodie",
-    },
-    {
-      id: "placeholder-3",
-      type: "story" as const,
-      customer_name: "Priya D.",
-      customer_location: "Calgary, AB",
-      headline: "Wore it to campus every day",
-      story_text: "As a university student, I wanted something that represented my faith without being preachy. Line of Judah gets it. People ask about the lion all the time.",
-      is_contactable: false,
-    },
-    {
-      id: "placeholder-4",
-      type: "review" as const,
-      customer_name: "Michael R.",
-      customer_location: "Edmonton, AB",
-      story_text: "Best Christian streetwear I've found. The fit is perfect, the message is bold but not obnoxious. Exactly what I was looking for.",
-      rating: 5,
-      product_name: "Crown Tee",
-    },
-    {
-      id: "placeholder-5",
-      type: "story" as const,
-      customer_name: "Destiny W.",
-      customer_location: "Los Angeles, CA",
-      headline: "Wore it to the studio",
-      story_text: "I'm a worship leader and I wore the Tribe hoodie to a recording session. The producer noticed it and we ended up talking about faith for an hour. Music hit different after that.",
-      is_contactable: true,
-    },
-    {
-      id: "placeholder-6",
-      type: "review" as const,
-      customer_name: "André F.",
-      customer_location: "Montreal, QC",
-      story_text: "Shipping was fast, fabric is heavyweight, and the embroidery is clean. This brand understands quality. Already ordered two more.",
-      rating: 5,
-      product_name: "Stay Holy Hoodie",
-    },
-  ];
+  const displayStories = visibleStories;
+
+  if (!isLoading && displayStories.length === 0) {
+    return (
+      <section className="py-12 lg:py-16 bg-background">
+        <div className="container mx-auto px-4 lg:px-8">
+          <div className="flex items-center justify-center py-16">
+            <p className="text-sm text-muted-foreground font-light tracking-wide">
+              Coming soon...
+            </p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="py-12 lg:py-16 bg-background">

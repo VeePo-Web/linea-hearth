@@ -25,17 +25,7 @@ const MinistryInMotion = () => {
     },
   });
 
-  // Placeholder data for demo - i-D style bento layout
-  const placeholderPhotos = [
-    { id: '1', customer_name: 'Marcus T.', instagram_handle: '@marcust', image_url: '/founders.png', caption: 'Wearing my faith on campus', featured: true },
-    { id: '2', customer_name: 'Sarah M.', instagram_handle: '@sarahm', image_url: '/founders.png', caption: 'Sunday service vibes', featured: false },
-    { id: '3', customer_name: 'David K.', instagram_handle: '@davidk', image_url: '/founders.png', caption: 'Mission trip ready', featured: false },
-    { id: '4', customer_name: 'Grace L.', instagram_handle: '@gracel', image_url: '/founders.png', caption: 'Bold faith, bold style', featured: true },
-    { id: '5', customer_name: 'James R.', instagram_handle: '@jamesr', image_url: '/founders.png', caption: 'Representing the Kingdom', featured: false },
-    { id: '6', customer_name: 'Faith W.', instagram_handle: '@faithw', image_url: '/founders.png', caption: 'Walking in purpose', featured: false },
-  ];
-
-  const photos = ugcPhotos?.length ? ugcPhotos : placeholderPhotos;
+  const photos = ugcPhotos;
 
   // Grid layout classes for bento/masonry effect
   const getGridClass = (index: number) => {
@@ -95,14 +85,13 @@ const MinistryInMotion = () => {
           className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 auto-rows-[200px] md:auto-rows-[220px]"
         >
           {isLoading ? (
-            // Loading skeletons
             Array.from({ length: 6 }).map((_, i) => (
               <div 
                 key={i}
                 className={`bg-muted animate-pulse ${getGridClass(i)}`}
               />
             ))
-          ) : (
+          ) : photos && photos.length > 0 ? (
             <>
               {photos.slice(0, 6).map((photo, index) => (
                 <motion.div
@@ -115,15 +104,6 @@ const MinistryInMotion = () => {
                     alt={`${photo.customer_name} wearing Line of Judah`}
                     className="w-full h-full object-cover md:grayscale md:group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105"
                   />
-                  
-                  {/* Featured badge */}
-                  {'featured' in photo && photo.featured && (
-                    <div className="absolute top-3 left-3 bg-champagne-500 text-stone-950 px-2 py-1">
-                      <span className="text-[9px] uppercase tracking-[0.15em] font-medium">Featured</span>
-                    </div>
-                  )}
-                  
-                  {/* Hover Overlay */}
                   <div className="absolute inset-0 bg-gradient-to-t from-stone-950/90 via-stone-950/40 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 flex flex-col justify-end p-4 md:p-6">
                     <p className="font-light text-lg text-white mb-1">{photo.customer_name}</p>
                     {photo.instagram_handle && (
@@ -140,28 +120,13 @@ const MinistryInMotion = () => {
                   </div>
                 </motion.div>
               ))}
-
-              {/* CTA Card in grid */}
-              <motion.div
-                variants={staggerItem}
-                 className="col-span-2 bg-stone-950 text-white flex flex-col items-center justify-center p-8 group hover:bg-champagne-500 transition-colors duration-500"
-               >
-                 <Instagram className="h-8 w-8 mb-4 text-champagne-500 group-hover:text-stone-950 transition-colors" />
-                <p className="text-lg font-light mb-2 group-hover:text-stone-950 transition-colors">Join the Tribe</p>
-                <p className="text-sm text-white/60 group-hover:text-stone-950/70 text-center mb-4 transition-colors">
-                  Tag @lineofjudah for a chance to be featured
-                </p>
-                <a 
-                  href="https://instagram.com" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-sm text-champagne-500 group-hover:text-stone-950 transition-colors"
-                >
-                  <span className="underline underline-offset-4">Submit Your Story</span>
-                  <ArrowUpRight className="h-4 w-4" />
-                </a>
-              </motion.div>
             </>
+          ) : (
+            <div className="col-span-full flex items-center justify-center py-16">
+              <p className="text-sm text-muted-foreground font-light tracking-wide">
+                Coming soon...
+              </p>
+            </div>
           )}
         </motion.div>
 
