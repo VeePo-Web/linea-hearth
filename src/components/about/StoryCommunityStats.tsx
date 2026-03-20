@@ -7,14 +7,6 @@ const stats = [
   { value: 5, suffix: "", label: "Countries Strong" },
 ];
 
-const testimonials = [
-  "Wearing my armor everywhere I go. — Marcus, Atlanta",
-  "They ask about my shirt. I tell them about my King. — Aaliyah, Toronto",
-  "Finally, faith fashion that feels like a weapon. — Devon, Calgary",
-  "Not just clothes. A declaration. — Sarah, Houston",
-  "The lion walks with me now. — James, London",
-  "Suited up and ready for battle. — Priya, Vancouver",
-];
 
 interface CountUpNumberProps {
   target: number;

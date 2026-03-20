@@ -37,15 +37,26 @@ const StyledByTribe = ({ productId }: StyledByTribeProps) => {
     },
   });
 
-  // Mock data for display when no UGC exists
-  const mockUGC = [
-    { id: "1", customer_name: "Marcus T.", instagram_handle: "@marcust_faith", image_url: "", caption: "Walking in purpose daily" },
-    { id: "2", customer_name: "Sarah W.", instagram_handle: "@sarahworship", image_url: "", caption: "Sunday best" },
-    { id: "3", customer_name: "David K.", instagram_handle: "@davidkingdom", image_url: "", caption: "Bold and blessed" },
-    { id: "4", customer_name: "Grace M.", instagram_handle: "@gracemoves", image_url: "", caption: "Faith over fear" },
-  ];
+  if (!isLoading && ugcImages.length === 0) {
+    return (
+      <section className="w-full py-12 lg:py-16">
+        <div className="px-6 mb-6">
+          <div className="max-w-6xl mx-auto">
+            <h2 className="text-xs font-light text-muted-foreground uppercase tracking-[0.2em] mb-2">
+              Styled By The Tribe
+            </h2>
+          </div>
+        </div>
+        <div className="flex items-center justify-center py-16">
+          <p className="text-sm text-muted-foreground font-light tracking-wide">
+            Coming soon...
+          </p>
+        </div>
+      </section>
+    );
+  }
 
-  const displayImages = ugcImages.length > 0 ? ugcImages : mockUGC;
+  const displayImages = ugcImages;
 
   const containerVariants = {
     hidden: { opacity: 0 },

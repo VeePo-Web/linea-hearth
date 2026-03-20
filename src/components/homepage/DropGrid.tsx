@@ -66,15 +66,31 @@ const DropGrid = () => {
     fetchProducts();
   }, []);
 
-  // Placeholder products with apparel focus
-  const placeholderProducts: Product[] = [
-    { id: '1', name: 'Grace Oversized Tee', slug: 'grace-oversized-tee', price: 48, category_name: 'T-Shirts', is_on_sale: false, sale_price: null },
-    { id: '2', name: 'Covenant Joggers', slug: 'covenant-joggers', price: 75, category_name: 'Pants', is_on_sale: false, sale_price: null },
-    { id: '3', name: 'Psalms Beanie', slug: 'psalms-beanie', price: 28, category_name: 'Accessories', is_on_sale: true, sale_price: 22 },
-    { id: '4', name: 'Glory Bomber Jacket', slug: 'glory-bomber-jacket', price: 120, category_name: 'Jackets', is_on_sale: false, sale_price: null },
-  ];
+  if (products.length === 0) {
+    return (
+      <section className="w-full py-12 md:py-16 lg:py-24 bg-background">
+        <div className="max-w-7xl mx-auto px-4 xs:px-6">
+          <div className="flex justify-between items-end mb-6 md:mb-8">
+            <div>
+              <div className="flex items-center gap-3 mb-2">
+                <span className="bg-destructive text-destructive-foreground text-[10px] font-bold tracking-wider uppercase px-2 py-0.5">
+                  Just Dropped
+                </span>
+              </div>
+              <h2 className="text-section text-foreground">New Arrivals</h2>
+            </div>
+          </div>
+          <div className="flex items-center justify-center py-16">
+            <p className="text-sm text-muted-foreground font-light tracking-wide">
+              Coming soon...
+            </p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
-  const displayProducts = products.length > 0 ? products : placeholderProducts;
+  const displayProducts = products;
 
   return (
     <section className="w-full py-12 md:py-16 lg:py-24 bg-background">
