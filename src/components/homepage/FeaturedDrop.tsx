@@ -94,4 +94,4 @@ const FeaturedDrop = () => {
   );
 };
 
-export default FeaturedDrop;
+export default memo(FeaturedDrop);

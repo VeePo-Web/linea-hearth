@@ -272,4 +272,4 @@ const CategoryTile = ({ category, prefersReducedMotion, isWide = false, isMobile
   );
 };
 
-export default CategoryTiles;
+export default memo(CategoryTiles);

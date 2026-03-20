@@ -42,4 +42,4 @@ const InstagramFeed = () => {
   );
 };
 
-export default InstagramFeed;
+export default memo(InstagramFeed);

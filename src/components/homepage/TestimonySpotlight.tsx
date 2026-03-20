@@ -43,4 +43,4 @@ const TestimonySpotlight = () => {
   );
 };
 
-export default TestimonySpotlight;
+export default memo(TestimonySpotlight);

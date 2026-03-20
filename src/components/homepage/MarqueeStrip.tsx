@@ -12,4 +12,4 @@ const MarqueeStrip = () => {
   );
 };
 
-export default MarqueeStrip;
+export default memo(MarqueeStrip);

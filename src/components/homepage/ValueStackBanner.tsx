@@ -54,4 +54,4 @@ const ValueStackBanner = () => {
   );
 };
 
-export default ValueStackBanner;
+export default memo(ValueStackBanner);

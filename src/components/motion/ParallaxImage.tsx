@@ -41,7 +41,7 @@ const ParallaxImage = ({
       <motion.img
         src={src}
         alt={alt}
-        className="w-full h-full object-cover"
+        className="w-full h-full object-cover will-change-transform"
         style={{ y, scale: 1.1 }}
       />
     </div>

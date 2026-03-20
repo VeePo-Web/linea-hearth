@@ -27,21 +27,16 @@ export const useScrollDirection = (threshold = 10) => {
 
       // Only update if we've scrolled more than threshold
       if (Math.abs(scrollY - lastScrollY) >= threshold) {
-        setState({
-          scrollY,
-          direction,
-          isAtTop,
-          isScrolled,
+        setState((prev) => {
+          if (prev.direction === direction && prev.isAtTop === isAtTop && prev.scrollY === scrollY) return prev;
+          return { scrollY, direction, isAtTop, isScrolled };
         });
         lastScrollY = scrollY > 0 ? scrollY : 0;
       } else {
-        // Still update isAtTop and isScrolled for edge cases
-        setState((prev) => ({
-          ...prev,
-          scrollY,
-          isAtTop,
-          isScrolled,
-        }));
+        setState((prev) => {
+          if (prev.isAtTop === isAtTop && prev.isScrolled === isScrolled && prev.scrollY === scrollY) return prev;
+          return { ...prev, scrollY, isAtTop, isScrolled };
+        });
       }
 
       ticking = false;

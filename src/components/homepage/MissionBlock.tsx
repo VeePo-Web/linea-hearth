@@ -90,4 +90,4 @@ const MissionBlock = () => {
   );
 };
 
-export default MissionBlock;
+export default memo(MissionBlock);
