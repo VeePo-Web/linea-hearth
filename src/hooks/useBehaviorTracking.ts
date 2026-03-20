@@ -74,7 +74,7 @@ export function useBehaviorTracking(productId: string | undefined): UseBehaviorT
   const sessionId = useRef(getSessionId());
   const viewStartTime = useRef<number | null>(null);
   const behaviorCache = useRef<BehaviorCache>(loadBehaviorCache());
-  const syncTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const syncTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const hasTrackedView = useRef(false);
 
   // Get current signal for this product

@@ -19,7 +19,7 @@ const CartItem = ({ item }: CartItemProps) => {
   const [isRemoving, setIsRemoving] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const prefersReducedMotion = useReducedMotion();
   
   const isJustAdded = lastAddedItem?.id === item.id;
