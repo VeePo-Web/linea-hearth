@@ -25,17 +25,7 @@ const MinistryInMotion = () => {
     },
   });
 
-  // Placeholder data for demo - i-D style bento layout
-  const placeholderPhotos = [
-    { id: '1', customer_name: 'Marcus T.', instagram_handle: '@marcust', image_url: '/founders.png', caption: 'Wearing my faith on campus', featured: true },
-    { id: '2', customer_name: 'Sarah M.', instagram_handle: '@sarahm', image_url: '/founders.png', caption: 'Sunday service vibes', featured: false },
-    { id: '3', customer_name: 'David K.', instagram_handle: '@davidk', image_url: '/founders.png', caption: 'Mission trip ready', featured: false },
-    { id: '4', customer_name: 'Grace L.', instagram_handle: '@gracel', image_url: '/founders.png', caption: 'Bold faith, bold style', featured: true },
-    { id: '5', customer_name: 'James R.', instagram_handle: '@jamesr', image_url: '/founders.png', caption: 'Representing the Kingdom', featured: false },
-    { id: '6', customer_name: 'Faith W.', instagram_handle: '@faithw', image_url: '/founders.png', caption: 'Walking in purpose', featured: false },
-  ];
-
-  const photos = ugcPhotos?.length ? ugcPhotos : placeholderPhotos;
+  const photos = ugcPhotos;
 
   // Grid layout classes for bento/masonry effect
   const getGridClass = (index: number) => {
