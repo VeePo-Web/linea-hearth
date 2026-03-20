@@ -240,4 +240,4 @@ const EditorialHero = () => {
   );
 };
 
-export default EditorialHero;
+export default memo(EditorialHero);
