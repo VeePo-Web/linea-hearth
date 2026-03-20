@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import TextReveal from "@/components/motion/TextReveal";
@@ -271,4 +272,4 @@ const CategoryTile = ({ category, prefersReducedMotion, isWide = false, isMobile
   );
 };
 
-export default CategoryTiles;
+export default memo(CategoryTiles);

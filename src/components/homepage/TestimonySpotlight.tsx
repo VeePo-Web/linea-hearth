@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import ImageReveal from "@/components/motion/ImageReveal";
@@ -42,4 +43,4 @@ const TestimonySpotlight = () => {
   );
 };
 
-export default TestimonySpotlight;
+export default memo(TestimonySpotlight);

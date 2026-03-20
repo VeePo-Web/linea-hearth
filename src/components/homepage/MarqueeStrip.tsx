@@ -1,3 +1,5 @@
+import { memo } from "react";
+
 const MarqueeStrip = () => {
   return (
     <section className="w-full py-5 md:py-6 bg-background">
@@ -10,4 +12,4 @@ const MarqueeStrip = () => {
   );
 };
 
-export default MarqueeStrip;
+export default memo(MarqueeStrip);

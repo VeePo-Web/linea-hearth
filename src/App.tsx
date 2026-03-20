@@ -59,14 +59,23 @@ const AccountProfile = lazy(() => import("./pages/account/AccountProfile"));
 const AccountAddresses = lazy(() => import("./pages/account/AccountAddresses"));
 const AccountFavorites = lazy(() => import("./pages/account/AccountFavorites"));
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000,
+      gcTime: 10 * 60 * 1000,
+      refetchOnWindowFocus: false,
+      retry: 1,
+    },
+  },
+});
 
 // Animated Routes component that uses location for AnimatePresence
 const AnimatedRoutes = () => {
   const location = useLocation();
   
   return (
-    <AnimatePresence mode="wait">
+    <AnimatePresence mode="popLayout">
       <Suspense fallback={<div className="min-h-screen bg-background" />}>
       <Routes location={location} key={location.pathname}>
         <Route path="/" element={<PageTransition><LandingPage /></PageTransition>} />

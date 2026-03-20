@@ -8,24 +8,22 @@ const MobileStickyBar = () => {
   const [isFooterVisible, setIsFooterVisible] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => {
-      // Show after scrolling past hero (approximately 500px)
-      if (window.scrollY > 500) {
-        setIsVisible(true);
-      } else {
-        setIsVisible(false);
-      }
-
-      // Hide when footer is visible
-      const footer = document.querySelector('footer');
-      if (footer) {
-        const footerRect = footer.getBoundingClientRect();
-        setIsFooterVisible(footerRect.top < window.innerHeight);
+    let ticking = false;
+    const onScroll = () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          setIsVisible(window.scrollY > 500);
+          const footer = document.querySelector('footer');
+          if (footer) {
+            setIsFooterVisible(footer.getBoundingClientRect().top < window.innerHeight);
+          }
+          ticking = false;
+        });
+        ticking = true;
       }
     };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
   // Haptic feedback on tap
