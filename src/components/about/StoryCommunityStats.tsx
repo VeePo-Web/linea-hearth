@@ -124,29 +124,10 @@ const StoryCommunityStats = () => {
           ))}
         </div>
 
-        {/* Testimonial marquee */}
-        <div className="relative overflow-hidden">
-          <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-stone-950 to-transparent z-10" />
-          <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-stone-950 to-transparent z-10" />
-
-          <motion.div
-            className="flex gap-12 whitespace-nowrap"
-            animate={{ x: [0, -1500] }}
-            transition={{
-              duration: 30,
-              repeat: Infinity,
-              ease: "linear",
-            }}
-          >
-            {[...testimonials, ...testimonials].map((testimonial, index) => (
-              <span
-                key={index}
-                className="text-lg md:text-xl font-light text-white/30 italic"
-              >
-                "{testimonial}"
-              </span>
-            ))}
-          </motion.div>
+        <div className="flex items-center justify-center py-8">
+          <p className="text-sm text-white/40 font-light tracking-wide">
+            Coming soon...
+          </p>
         </div>
       </div>
     </section>
