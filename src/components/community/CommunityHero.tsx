@@ -42,14 +42,7 @@ export default function CommunityHero() {
     },
   });
 
-  const displayStory = featuredStory || {
-    customer_name: "Marcus T.",
-    customer_location: "Calgary, AB",
-    headline: "This Hoodie Changed My Train Ride",
-    story_text: "A stranger asked about my hoodie on the C-Train. Twenty minutes later, we were praying together. That's when I knew — this isn't just apparel, it's armor.",
-    customer_photo_url: null,
-    video_url: null,
-  };
+  const displayStory = featuredStory;
 
   return (
     <>
