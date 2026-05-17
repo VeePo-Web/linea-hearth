@@ -93,7 +93,7 @@ const internationalRegions = [
   },
   {
     icon: MapPin,
-    title: "WORLDWIDE",
+    title: "BEYOND CANADA",
     description: "Rest of world: 14-25 business days. Contact us for specific regions."
   }
 ];
@@ -112,7 +112,7 @@ const ShippingInfo = () => {
   return (
     <ServicePageLayout
       title="Reliable Delivery. Every Order."
-      subtitle="Free shipping on orders over $99. Full tracking included. Worldwide delivery to 50+ countries."
+      subtitle="Free shipping on orders over $99. Full tracking included. Designed in Calgary, delivered worldwide."
       eyebrow="SHIPPING & DELIVERY"
       heroAlignment="center"
       heroValueProps={heroValueProps}
