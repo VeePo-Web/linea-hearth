@@ -51,6 +51,8 @@ const AdminOrders = lazy(() => import("./pages/admin/AdminOrders"));
 const AdminOrderDetail = lazy(() => import("./pages/admin/AdminOrderDetail"));
 const AdminCategories = lazy(() => import("./pages/admin/AdminCategories"));
 const AdminDiscounts = lazy(() => import("./pages/admin/AdminDiscounts"));
+const AdminLookbook = lazy(() => import("./pages/admin/AdminLookbook"));
+const AdminLookbookForm = lazy(() => import("./pages/admin/AdminLookbookForm"));
 const AccountLayout = lazy(() => import("./pages/account/AccountLayout"));
 const AccountDashboard = lazy(() => import("./pages/account/AccountDashboard"));
 const AccountOrders = lazy(() => import("./pages/account/AccountOrders"));
@@ -119,6 +121,9 @@ const AnimatedRoutes = () => {
         <Route path="/ops-portal/products/:productId/edit" element={<ProtectedRoute requireAdmin><PageTransition><AdminProductForm /></PageTransition></ProtectedRoute>} />
         <Route path="/ops-portal/categories" element={<ProtectedRoute requireAdmin><PageTransition><AdminCategories /></PageTransition></ProtectedRoute>} />
         <Route path="/ops-portal/discounts" element={<ProtectedRoute requireAdmin><PageTransition><AdminDiscounts /></PageTransition></ProtectedRoute>} />
+        <Route path="/ops-portal/lookbook" element={<ProtectedRoute requireAdmin><PageTransition><AdminLookbook /></PageTransition></ProtectedRoute>} />
+        <Route path="/ops-portal/lookbook/new" element={<ProtectedRoute requireAdmin><PageTransition><AdminLookbookForm /></PageTransition></ProtectedRoute>} />
+        <Route path="/ops-portal/lookbook/:lookId/edit" element={<ProtectedRoute requireAdmin><PageTransition><AdminLookbookForm /></PageTransition></ProtectedRoute>} />
         <Route path="/ops-portal/orders" element={<ProtectedRoute requireAdmin><PageTransition><AdminOrders /></PageTransition></ProtectedRoute>} />
         <Route path="/ops-portal/orders/:orderId" element={<ProtectedRoute requireAdmin><PageTransition><AdminOrderDetail /></PageTransition></ProtectedRoute>} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
