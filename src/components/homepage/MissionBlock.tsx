@@ -15,8 +15,8 @@ const MissionBlock = () => {
     <section className="relative w-full min-h-[60vh] md:min-h-[70vh] overflow-hidden">
       {/* Full-bleed Background with Parallax - Disabled on mobile for performance */}
       <ParallaxImage 
-        src="/products/stay-holy-hoodie/female-model-1.png"
-        alt="Line of Judah Community"
+        src="/products/stay-holy-hoodie/flat-front.png"
+        alt="Line of Judah"
         className="absolute inset-0"
         speed={isMobile ? 0 : 0.2}
       />

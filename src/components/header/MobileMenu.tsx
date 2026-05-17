@@ -156,7 +156,11 @@ const MobileMenu = ({
           >
             {/* Header with logo and close */}
             <div className="flex items-center justify-between px-6 py-5 border-b border-border">
-              <img src="/logo.png" alt="Line of Judah" className="h-5 w-auto" />
+              <Link to="/home" onClick={onClose} className="block">
+                <span className="text-[0.7rem] sm:text-xs font-light tracking-[0.35em] text-foreground uppercase whitespace-nowrap">
+                  LINE OF JUDAH
+                </span>
+              </Link>
               <motion.button
                 className="p-2 text-foreground hover:text-muted-foreground transition-colors relative group"
                 onClick={onClose}

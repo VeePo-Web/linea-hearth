@@ -72,7 +72,7 @@ const MinistryInMotion = () => {
               <span className="text-muted-foreground">Motion</span>
             </h2>
             <p className="text-muted-foreground font-light max-w-sm md:text-right">
-              See our community wearing the mission worldwide. Tag @lineofjudah to be featured.
+              See our Calgary community wearing the mission. Tag @lineofjudah to be featured.
             </p>
           </div>
         </motion.div>

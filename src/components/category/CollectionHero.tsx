@@ -160,6 +160,11 @@ const collectionData: Record<string, CollectionContent> = {
     tagline: "Same message. Better price.",
     bgClass: "bg-gradient-to-br from-red-900/40 to-stone-900",
   },
+  "shop": {
+    title: "The Full Collection",
+    tagline: "Every piece. One catalog.",
+    bgClass: "bg-gradient-to-br from-stone-800 to-stone-950",
+  },
 };
 
 const defaultContent: CollectionContent = {

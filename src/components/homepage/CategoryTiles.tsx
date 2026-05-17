@@ -25,7 +25,7 @@ const CategoryTiles = () => {
       name: "Hoodies",
       slug: "hoodies",
       subtitle: "PREMIUM WEIGHT. BOLD STATEMENTS.",
-      image: "/products/stay-holy-hoodie/male-model.png",
+      image: "/products/stay-holy-hoodie/flat-front.png",
       index: "01",
       layout: "hero"
     },
@@ -33,7 +33,7 @@ const CategoryTiles = () => {
       name: "Tops",
       slug: "tops",
       subtitle: "ELEVATED ESSENTIALS.",
-      image: "/products/heavenly-crewneck/front-model.png",
+      image: "/products/heavenly-crewneck/flat-front.png",
       index: "02",
       layout: "standard"
     },
@@ -41,7 +41,7 @@ const CategoryTiles = () => {
       name: "Tees",
       slug: "tees",
       subtitle: "START CONVERSATIONS.",
-      image: "/products/heavenly-crewneck/female-model.png",
+      image: "/products/heavenly-crewneck/flat-back.png",
       index: "03",
       layout: "standard"
     },
@@ -49,7 +49,7 @@ const CategoryTiles = () => {
       name: "Accessories",
       slug: "accessories",
       subtitle: "FINISHING TOUCHES.",
-      image: "/products/stay-holy-hoodie/female-model-2.png",
+      image: "/products/stay-holy-hoodie/flat-back.png",
       index: "04",
       layout: "wide"
     }

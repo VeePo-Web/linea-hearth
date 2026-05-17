@@ -35,9 +35,9 @@ const faqData: FAQItem[] = [
   {
     id: "ship-3",
     question: "Do you ship internationally?",
-    answer: "Yes, we ship to over 50 countries worldwide. International shipping typically takes 7-14 business days. Duties and taxes are the responsibility of the customer.",
+    answer: "Designed in Calgary, we ship across Canada and to 50+ countries beyond. International shipping typically takes 7-14 business days. Duties and taxes are the responsibility of the customer.",
     category: "shipping",
-    keywords: ["international", "worldwide", "global", "overseas", "country"]
+    keywords: ["international", "calgary", "canada", "overseas", "country"]
   },
   {
     id: "ship-4",

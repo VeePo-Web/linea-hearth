@@ -85,7 +85,7 @@ const StoryWorldwideTribe = () => {
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ delay: 0.3, duration: 0.8 }}
           >
-            Deployed Worldwide<span className="text-champagne-500">.</span>
+            Rooted in Calgary<span className="text-champagne-500">.</span>
           </motion.h2>
           <motion.p
             className="text-lg md:text-xl font-light text-white/50 max-w-xl"
@@ -93,7 +93,7 @@ const StoryWorldwideTribe = () => {
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ delay: 0.4, duration: 0.8 }}
           >
-            From Calgary to Cape Town. From Houston to Hong Kong. The tribe is everywhere.
+            Built in Calgary. Worn by the tribe across the city and beyond.
           </motion.p>
         </div>
 
