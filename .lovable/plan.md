@@ -1,35 +1,20 @@
 ## Goal
-Give your friend admin access to the ops portal at a shareable URL.
+Replace the leftover "Linea" jewelry social/thumbnail assets with the Line of Judah hero hoodie (the Stay Holy hoodie with the lion graphic) so link previews and the browser tab show the right brand.
 
-## What I'll do
+## Changes (all in `index.html`)
 
-### 1. Confirm the shareable URL
-The ops portal already lives at a clean subdirectory route:
-```
-https://line-of-judah.vercel.app/ops-portal/login
-```
-No code change needed for the URL — it works on any computer, just requires login.
+1. **Favicon** (`<link rel="icon">`)
+   - Currently: external Google Storage URL pointing to old Linea logo
+   - Change to: `/logo.svg` (existing Line of Judah logo in `public/`)
 
-### 2. Create the new admin account
-Create a one-time edge function `create-admin-user` that uses the service role to:
-- Create the auth user `1.LineOfJudah.1@gmail.com` with password `jesusislord#1` (email pre-confirmed so no verification email needed)
-- Insert a `profiles` row
-- Grant the `admin` role in `user_roles`
+2. **Open Graph image** (`<meta property="og:image">`)
+   - Currently: `social-1758825622907-Linea OG Image.png`
+   - Change to: `https://lineofjudah.clothing/products/stay-holy-hoodie/male-model.png` (the lion hoodie hero shot)
 
-Then I'll invoke it once and delete the function so the credentials aren't sitting in deployable code.
+3. **Twitter image** (`<meta name="twitter:image">`)
+   - Same swap as og:image.
 
-### 3. Display the credentials in chat for you to forward
-Since you chose to skip the email setup, I'll show you a clean copy-paste block at the end with:
-- Portal URL
-- Email
-- Password
-- A note reminding your friend to change the password after first login (optional — they can use the "Forgot password?" link on the portal)
+No component code changes — the homepage hero already uses this image. No new assets need to be uploaded; we're pointing at files already in `public/`.
 
-## What's NOT changing
-- No design/UI changes
-- No changes to existing admin (`parker@veepo.ca` stays owner with permanent privileges)
-- No public sign-up exposure — account is provisioned server-side only
-- No email infrastructure setup
-
-## Security note
-The password `jesusislord#1` will be set exactly as given. Please rotate it after your friend signs in for the first time — sending passwords over chat/email is generally risky.
+## Note
+Social platforms (iMessage, WhatsApp, Facebook) cache link previews aggressively. After deploy, your friend may still see the old Linea thumbnail for ~24h unless they clear cache or you re-scrape via Facebook's Sharing Debugger.
