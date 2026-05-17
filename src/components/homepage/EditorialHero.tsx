@@ -56,9 +56,9 @@ const EditorialHero = () => {
           className="absolute inset-0"
         >
           <img
-            src="/products/stay-holy-hoodie/male-model.png"
-            alt="Stay Holy Hoodie - Male Model"
-            className="w-full h-full object-cover object-top hero-image-grayscale"
+            src="/products/stay-holy-hoodie/flat-front.png"
+            alt="Stay Holy Hoodie - Product"
+            className="w-full h-full object-contain object-center hero-image-grayscale opacity-80"
             loading="eager"
             /* @ts-ignore — valid HTML attribute, not a React prop */
             fetchpriority="high"
@@ -69,25 +69,7 @@ const EditorialHero = () => {
         </motion.div>
       </motion.div>
 
-      {/* Secondary Image - Offset Collage Layer */}
-      <motion.div
-        className="absolute bottom-[10%] right-[5%] w-[35vw] max-w-[400px] h-[45vh] z-[5] hidden lg:block"
-        style={{ y: shouldAnimate ? secondaryImageY : 0 }}
-      >
-        <motion.div
-          initial={{ clipPath: "inset(0% 100% 0% 0%)" }}
-          animate={{ clipPath: "inset(0% 0% 0% 0%)" }}
-          transition={{ delay: 0.5, duration: 1, ease: [0.25, 0.46, 0.45, 0.94] }}
-          className="w-full h-full"
-        >
-          <img
-            src="/products/stay-holy-hoodie/female-model-1.png"
-            alt="Stay Holy Hoodie - Female Model"
-            className="w-full h-full object-cover object-center hero-image-grayscale"
-            loading="lazy"
-          />
-        </motion.div>
-      </motion.div>
+      {/* Secondary collage layer removed — product-first homepage */}
 
       {/* Floating Product - Small Detail Layer */}
       <motion.div
