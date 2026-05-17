@@ -166,7 +166,7 @@ const ShippingInfo = () => {
       {/* International Shipping */}
       <ServiceSection id="international" title="International Shipping">
         <p className="text-muted-foreground font-light mb-6">
-          We ship to over 50 countries worldwide. All international shipments include full tracking and delivery confirmation.
+          Designed in Calgary, we ship across Canada and to 50+ countries beyond. All international shipments include full tracking and delivery confirmation.
         </p>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
