@@ -52,6 +52,7 @@ const AdminOrders = lazy(() => import("./pages/admin/AdminOrders"));
 const AdminOrderDetail = lazy(() => import("./pages/admin/AdminOrderDetail"));
 const AdminCategories = lazy(() => import("./pages/admin/AdminCategories"));
 const AdminDiscounts = lazy(() => import("./pages/admin/AdminDiscounts"));
+const Catalogue = lazy(() => import("./pages/Catalogue"));
 const AdminLookbook = lazy(() => import("./pages/admin/AdminLookbook"));
 const AdminLookbookForm = lazy(() => import("./pages/admin/AdminLookbookForm"));
 const AccountLayout = lazy(() => import("./pages/account/AccountLayout"));
@@ -98,6 +99,7 @@ const AnimatedRoutes = () => {
         <Route path="/returns" element={<PageTransition><ReturnsExchanges /></PageTransition>} />
         <Route path="/shipping" element={<PageTransition><ShippingInfo /></PageTransition>} />
         <Route path="/accessibility" element={<PageTransition><Accessibility /></PageTransition>} />
+        <Route path="/catalogue" element={<PageTransition><Catalogue /></PageTransition>} />
         <Route path="/community" element={<PageTransition><Community /></PageTransition>} />
         <Route path="/lookbook" element={<PageTransition><Lookbook /></PageTransition>} />
         <Route path="/try-on" element={<PageTransition><TryOnRoom /></PageTransition>} />

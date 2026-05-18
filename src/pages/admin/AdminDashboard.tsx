@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import {
   Package, Tags, TrendingUp, Eye, ShoppingBag, AlertTriangle,
   DollarSign, RefreshCw, Users, Megaphone, CheckCircle2, ArrowRight,
-  Clock,
+  Clock, Images,
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { format, formatDistanceToNow, startOfDay, startOfWeek, startOfMonth } from 'date-fns';
@@ -371,6 +371,13 @@ const AdminDashboard = () => {
                   View Orders
                 </div>
                 <div className="text-xs text-muted-foreground mt-1">Track and fulfill customer orders</div>
+              </Link>
+              <Link to="/ops-portal/lookbook" className="block p-3 rounded-md bg-secondary hover:bg-secondary/80 transition-colors">
+                <div className="text-sm font-medium flex items-center gap-2">
+                  <Images className="h-4 w-4" />
+                  Manage Lookbook
+                </div>
+                <div className="text-xs text-muted-foreground mt-1">Add, edit, and reorder lookbook sections</div>
               </Link>
             </CardContent>
           </Card>

@@ -54,7 +54,7 @@ const LandingPage = () => {
     setIsExiting(true);
     cancelAnimationFrame(rafId.current);
     const delay = prefersReducedMotion ? 300 : 1000;
-    setTimeout(() => navigate('/category/shop'), delay);
+    setTimeout(() => navigate('/catalogue'), delay);
   }, [isExiting, navigate, prefersReducedMotion]);
 
   // --- ENTRANCE VARIANTS ---
