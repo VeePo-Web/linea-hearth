@@ -1,40 +1,29 @@
-# Public Ops-Portal Access Plan
-
 ## Goal
-Anyone with the link `lineofjudah.clothing/ops-portal/login` can reach the admin login, but only after passing a shared gate password (`JESUS`). Then they sign in with the provisioned admin account.
+Purge any remaining Lovable-default branding (favicon, og/twitter images, meta tags, placeholder asset) and replace with Line of Judah equivalents.
 
-## 1. Gate Screen (frontend only)
-Create `src/components/admin/OpsPortalGate.tsx`:
-- Full-screen minimal screen matching `AdminLogin` aesthetic (Shield icon, tracking-wider uppercase).
-- Single password input + "Enter" button.
-- On submit: if value === `"JESUS"` (case-insensitive trim), set `sessionStorage.setItem('ops_gate_passed', '1')` and render children.
-- Shake/error state on wrong password.
-- Note: This is a soft gate (client-side obfuscation), not real security. Real security = Supabase auth + admin role check, which already exists. The gate just hides the existence of the portal from casual visitors.
+## Audit findings
+- `index.html` — favicon already `/logo.svg` (LOJ wordmark) ✓, but `<meta name="author" content="Lovable" />` still present. OG/Twitter image uses `/products/stay-holy-hoodie/male-model.png` (person model — conflicts with the "no people on homepage" preference).
+- `public/placeholder.svg` — the generic gray Lovable placeholder. Used as fallback in 12+ components (cart, favorites, search, etc.).
+- `public/favicon.ico` — already deleted in earlier turn ✓.
+- No other Lovable thumbnail assets found in `public/`.
 
-Wrap all `/ops-portal/*` routes in `App.tsx` with `<OpsPortalGate>`. Mount it ABOVE `ProtectedRoute` so it gates `/ops-portal/login` too.
+## Changes
 
-## 2. Provision Admin Account
-Via edge function (one-shot) OR direct SQL migration using Supabase admin API. Cleanest path:
+### 1. `index.html`
+- Remove `<meta name="author" content="Lovable" />` → replace with `content="Line of Judah"`.
+- Swap OG + Twitter `og:image` / `twitter:image` from `male-model.png` → `/products/stay-holy-hoodie/flat-front.png` (the hoodie flat — same product-first image used as homepage hero, no people).
+- Add `<link rel="apple-touch-icon" href="/logo.png">` so iOS bookmarks/share sheets show the LOJ mark instead of a screenshot.
 
-Create edge function `supabase/functions/provision-admin/index.ts` (one-time use, manually invoked):
-- Uses `SUPABASE_SERVICE_ROLE_KEY`.
-- Calls `supabase.auth.admin.createUser({ email: '1.lineofjudah.1@gmail.com', password: 'jesusislord#1', email_confirm: true })`.
-- Inserts row into `user_roles` with `role='admin'`.
-- Idempotent: if user exists, just upsert the admin role.
-- I will `curl` it once after deploy, then it can stay (protected by service role).
+### 2. `public/placeholder.svg`
+Replace the Lovable gray-square-with-image-icon SVG with a minimal LOJ-branded placeholder: off-white background (`#f5f3ee` Paper & Ink token), centered "LINE OF JUDAH" wordmark in light tracked uppercase, subtle hairline border. 1200×1200 to keep dimensions identical so every existing `<img src="/placeholder.svg">` fallback gets the new look automatically — no component edits needed.
 
-## 3. Files
-**Create**
-- `src/components/admin/OpsPortalGate.tsx`
-- `supabase/functions/provision-admin/index.ts`
+### 3. (Optional, ask) `public/logo.png`
+Current `logo.png` exists and is what would be used for apple-touch-icon. If it isn't square/LOJ-branded I'll regenerate; otherwise reuse as-is.
 
-**Modify**
-- `src/App.tsx` — wrap ops-portal routes with `<OpsPortalGate>`
-- `supabase/config.toml` — add `[functions.provision-admin] verify_jwt = false`
+## Files touched
+- `index.html` (edit)
+- `public/placeholder.svg` (overwrite)
 
-## Technical Notes
-- Gate persists per browser session (sessionStorage) so they don't re-enter on every nav.
-- The login page itself remains unchanged — sign-in still requires the real admin credentials + admin role check.
-- Custom domain `lineofjudah.clothing` already routes to the published app, so once you publish, the link `https://lineofjudah.clothing/ops-portal/login` works immediately.
-
-Approve and I'll implement + run the provision function.
+## Out of scope
+- Component fallback paths (`'/placeholder.svg'`) — no edits required, they auto-pick up the new asset.
+- `src/integrations/lovable/index.ts` — auto-generated infra file, not user-facing branding, must not be edited.
