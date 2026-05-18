@@ -17,6 +17,7 @@ migrateLocalStorage();
 import ScrollToTop from "./components/ScrollToTop";
 import PageTransition from "./components/motion/PageTransition";
 import ProtectedRoute from "./components/admin/ProtectedRoute";
+import OpsPortalGate from "./components/admin/OpsPortalGate";
 import ProtectedAccountRoute from "./components/account/ProtectedAccountRoute";
 
 // Lazy-loaded pages — each becomes its own chunk
@@ -113,19 +114,19 @@ const AnimatedRoutes = () => {
           <Route path="profile" element={<AccountProfile />} />
           <Route path="addresses" element={<AccountAddresses />} />
         </Route>
-        {/* Admin Routes — obscured path */}
-        <Route path="/ops-portal/login" element={<PageTransition><AdminLogin /></PageTransition>} />
-        <Route path="/ops-portal" element={<ProtectedRoute requireAdmin><PageTransition><AdminDashboard /></PageTransition></ProtectedRoute>} />
-        <Route path="/ops-portal/products" element={<ProtectedRoute requireAdmin><PageTransition><AdminProducts /></PageTransition></ProtectedRoute>} />
-        <Route path="/ops-portal/products/new" element={<ProtectedRoute requireAdmin><PageTransition><AdminProductForm /></PageTransition></ProtectedRoute>} />
-        <Route path="/ops-portal/products/:productId/edit" element={<ProtectedRoute requireAdmin><PageTransition><AdminProductForm /></PageTransition></ProtectedRoute>} />
-        <Route path="/ops-portal/categories" element={<ProtectedRoute requireAdmin><PageTransition><AdminCategories /></PageTransition></ProtectedRoute>} />
-        <Route path="/ops-portal/discounts" element={<ProtectedRoute requireAdmin><PageTransition><AdminDiscounts /></PageTransition></ProtectedRoute>} />
-        <Route path="/ops-portal/lookbook" element={<ProtectedRoute requireAdmin><PageTransition><AdminLookbook /></PageTransition></ProtectedRoute>} />
-        <Route path="/ops-portal/lookbook/new" element={<ProtectedRoute requireAdmin><PageTransition><AdminLookbookForm /></PageTransition></ProtectedRoute>} />
-        <Route path="/ops-portal/lookbook/:lookId/edit" element={<ProtectedRoute requireAdmin><PageTransition><AdminLookbookForm /></PageTransition></ProtectedRoute>} />
-        <Route path="/ops-portal/orders" element={<ProtectedRoute requireAdmin><PageTransition><AdminOrders /></PageTransition></ProtectedRoute>} />
-        <Route path="/ops-portal/orders/:orderId" element={<ProtectedRoute requireAdmin><PageTransition><AdminOrderDetail /></PageTransition></ProtectedRoute>} />
+        {/* Admin Routes — obscured path, gated by shared passphrase */}
+        <Route path="/ops-portal/login" element={<OpsPortalGate><PageTransition><AdminLogin /></PageTransition></OpsPortalGate>} />
+        <Route path="/ops-portal" element={<OpsPortalGate><ProtectedRoute requireAdmin><PageTransition><AdminDashboard /></PageTransition></ProtectedRoute></OpsPortalGate>} />
+        <Route path="/ops-portal/products" element={<OpsPortalGate><ProtectedRoute requireAdmin><PageTransition><AdminProducts /></PageTransition></ProtectedRoute></OpsPortalGate>} />
+        <Route path="/ops-portal/products/new" element={<OpsPortalGate><ProtectedRoute requireAdmin><PageTransition><AdminProductForm /></PageTransition></ProtectedRoute></OpsPortalGate>} />
+        <Route path="/ops-portal/products/:productId/edit" element={<OpsPortalGate><ProtectedRoute requireAdmin><PageTransition><AdminProductForm /></PageTransition></ProtectedRoute></OpsPortalGate>} />
+        <Route path="/ops-portal/categories" element={<OpsPortalGate><ProtectedRoute requireAdmin><PageTransition><AdminCategories /></PageTransition></ProtectedRoute></OpsPortalGate>} />
+        <Route path="/ops-portal/discounts" element={<OpsPortalGate><ProtectedRoute requireAdmin><PageTransition><AdminDiscounts /></PageTransition></ProtectedRoute></OpsPortalGate>} />
+        <Route path="/ops-portal/lookbook" element={<OpsPortalGate><ProtectedRoute requireAdmin><PageTransition><AdminLookbook /></PageTransition></ProtectedRoute></OpsPortalGate>} />
+        <Route path="/ops-portal/lookbook/new" element={<OpsPortalGate><ProtectedRoute requireAdmin><PageTransition><AdminLookbookForm /></PageTransition></ProtectedRoute></OpsPortalGate>} />
+        <Route path="/ops-portal/lookbook/:lookId/edit" element={<OpsPortalGate><ProtectedRoute requireAdmin><PageTransition><AdminLookbookForm /></PageTransition></ProtectedRoute></OpsPortalGate>} />
+        <Route path="/ops-portal/orders" element={<OpsPortalGate><ProtectedRoute requireAdmin><PageTransition><AdminOrders /></PageTransition></ProtectedRoute></OpsPortalGate>} />
+        <Route path="/ops-portal/orders/:orderId" element={<OpsPortalGate><ProtectedRoute requireAdmin><PageTransition><AdminOrderDetail /></PageTransition></ProtectedRoute></OpsPortalGate>} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
       </Routes>
