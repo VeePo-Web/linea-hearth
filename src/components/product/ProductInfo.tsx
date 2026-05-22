@@ -276,7 +276,7 @@ const ProductInfo = ({ product, variants = [], onColorChange, onAuthRequired, on
             className="w-full justify-center"
           />
 
-          <TryItOnButton productId={product?.id || ""} productSlug={product?.slug || ""} productName={productName} productPrice={displayPrice} categorySlug={categorySlug} />
+          {/* TryItOnButton hidden until try-on room is ready */}
 
           <div className="flex items-center justify-center gap-6 py-3 text-xs font-light text-muted-foreground">
             {trustSignals.map(({ icon: Icon, label }) => (
@@ -490,13 +490,7 @@ const ProductInfo = ({ product, variants = [], onColorChange, onAuthRequired, on
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.7, duration: 0.4 }}
         >
-          <TryItOnButton
-            productId={product?.id || ""}
-            productSlug={product?.slug || ""}
-            productName={productName}
-            productPrice={displayPrice}
-            categorySlug={categorySlug}
-          />
+          {/* TryItOnButton hidden until try-on room is ready */}
         </motion.div>
 
         {/* Trust Row with stagger */}

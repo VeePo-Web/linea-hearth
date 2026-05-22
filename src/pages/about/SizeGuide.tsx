@@ -147,15 +147,13 @@ const SizeGuide = () => {
         title="PERSONALIZED FIT"
         subtitle="Let our AI calibrate your exact measurements."
       >
-        <Link to="/try-on" className="block">
-          <InfoCard
-            icon={Sparkles}
-            title="GET YOUR AI FIT RECOMMENDATION"
-            description="Enter your measurements and body type. Our system analyzes thousands of data points to recommend your ideal size with 95%+ accuracy."
-            variant="accent"
-            className="cursor-pointer hover:border-champagne-300 transition-colors"
-          />
-        </Link>
+        {/* Try-On Room link hidden until feature is ready */}
+        <InfoCard
+          icon={Sparkles}
+          title="AI FIT RECOMMENDATION — COMING SOON"
+          description="Our AI fit finder will analyze your measurements and body type to recommend your ideal size. Check back soon."
+          variant="default"
+        />
       </ServiceSection>
 
       {/* Contact CTA */}

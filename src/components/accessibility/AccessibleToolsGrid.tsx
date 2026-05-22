@@ -8,7 +8,7 @@ interface Tool {
   icon: React.ElementType;
   title: string;
   description: string;
-  link: string;
+  link: string | null;
   linkText: string;
 }
 
@@ -17,8 +17,8 @@ const tools: Tool[] = [
     icon: Ruler,
     title: "AI FIT FINDER",
     description: "Get personalized size recommendations based on your measurements. Works with screen readers.",
-    link: "/try-on",
-    linkText: "ENTER TRY-ON ROOM"
+    link: null,
+    linkText: "COMING SOON"
   },
   {
     icon: Volume2,
@@ -60,8 +60,8 @@ const AccessibleToolsGrid = () => {
     >
       {tools.map((tool) => {
         const Icon = tool.icon;
-        const isInternalLink = tool.link.startsWith('/');
-        
+        const isInternalLink = tool.link !== null && tool.link.startsWith('/');
+
         const content = (
           <motion.div
             variants={staggerItem}
@@ -98,10 +98,14 @@ const AccessibleToolsGrid = () => {
           </motion.div>
         );
 
+        if (tool.link === null) {
+          return <div key={tool.title} className="opacity-60 cursor-default">{content}</div>;
+        }
+
         if (isInternalLink) {
           return (
-            <Link 
-              key={tool.title} 
+            <Link
+              key={tool.title}
               to={tool.link}
               className="block focus:outline-none focus-visible:ring-2 focus-visible:ring-champagne-500 focus-visible:ring-offset-2"
             >
@@ -113,7 +117,7 @@ const AccessibleToolsGrid = () => {
         return (
           <button
             key={tool.title}
-            onClick={(e) => handleShortcutsClick(e, tool.link)}
+            onClick={(e) => handleShortcutsClick(e, tool.link!)}
             className="block w-full text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-champagne-500 focus-visible:ring-offset-2"
           >
             {content}

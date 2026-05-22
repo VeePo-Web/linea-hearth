@@ -291,13 +291,7 @@ const Accessibility = () => {
             description={
               <div className="space-y-3">
                 <p>Our virtual try-on room is keyboard navigable and screen reader compatible.</p>
-                <Link 
-                  to="/try-on"
-                  className="inline-flex items-center gap-2 text-champagne-600 hover:text-champagne-700 transition-colors text-sm font-medium focus:outline-none focus-visible:underline"
-                >
-                  Enter Try-On Room
-                  <ArrowRight className="w-3 h-3" aria-hidden="true" />
-                </Link>
+                {/* Try-On Room link hidden until feature is ready */}
               </div>
             }
             variant="accent"
