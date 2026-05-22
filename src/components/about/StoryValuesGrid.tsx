@@ -26,7 +26,7 @@ const StoryValuesGrid = () => {
   return (
     <section
       ref={sectionRef}
-      className="relative bg-white text-stone-950 py-32 md:py-48 overflow-hidden"
+      className="relative bg-stone-100 text-stone-950 py-32 md:py-48 overflow-hidden"
     >
       {/* Grid pattern background */}
       <div 

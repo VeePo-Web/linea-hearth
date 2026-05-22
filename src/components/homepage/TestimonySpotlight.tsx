@@ -22,7 +22,7 @@ const TestimonySpotlight = () => {
           </div>
         </div>
 
-        <div className="flex items-center p-6 xs:p-8 md:p-12 lg:p-16 bg-white text-stone-950">
+        <div className="flex items-center p-6 xs:p-8 md:p-12 lg:p-16 bg-stone-100 text-stone-950">
           <div className="max-w-lg w-full">
             <ScrollReveal variant="fadeUp" delay={0.1}>
               <p className="text-xs uppercase tracking-[0.2em] text-accent mb-6">From the tribe</p>

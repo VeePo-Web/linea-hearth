@@ -28,7 +28,7 @@ const ValueStackBanner = () => {
     <Link to="/shipping">
       <section 
         ref={sectionRef}
-        className={`w-full py-3 md:py-4 bg-white border-y border-stone-200 transition-opacity duration-700 group ${
+        className={`w-full py-3 md:py-4 bg-stone-100 border-y border-stone-200 transition-opacity duration-700 group ${
           isVisible ? 'opacity-100' : 'opacity-0'
         }`}
       >

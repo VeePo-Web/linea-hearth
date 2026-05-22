@@ -8,7 +8,7 @@ const FounderLetter = () => {
   return (
     <section 
       ref={sectionRef}
-      className="relative bg-white overflow-hidden"
+      className="relative bg-stone-100 overflow-hidden"
     >
       {/* Index watermark */}
       <motion.span

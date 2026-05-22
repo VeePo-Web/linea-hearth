@@ -68,7 +68,7 @@ const FeaturedCollection = () => {
 
   if (products.length === 0) {
     return (
-      <section className="w-full py-12 md:py-16 lg:py-24 bg-white">
+      <section className="w-full py-12 md:py-16 lg:py-24 bg-stone-100">
         <div className="max-w-7xl mx-auto px-4 xs:px-6">
           <div className="flex justify-between items-end mb-6 md:mb-8">
             <div>
@@ -89,7 +89,7 @@ const FeaturedCollection = () => {
   const displayProducts = products;
 
   return (
-    <section className="w-full py-12 md:py-16 lg:py-24 bg-white">
+    <section className="w-full py-12 md:py-16 lg:py-24 bg-stone-100">
       <div className="max-w-7xl mx-auto px-4 xs:px-6">
         {/* Section Header - Editorial minimal */}
         <ScrollReveal variant="fadeUp">

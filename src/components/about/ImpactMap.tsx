@@ -91,8 +91,19 @@ const ImpactMap = () => {
     { top: '32%', left: '8%' },    // Portland
   ];
 
+  // — COMING SOON — remove this block to restore the full map
   return (
-    <section 
+    <section ref={sectionRef} className="relative py-24 md:py-32 bg-stone-950 overflow-hidden flex items-center justify-center">
+      <p className="text-white/40 font-light tracking-[0.3em] text-sm uppercase">
+        Our Reach: Coming soon...
+      </p>
+    </section>
+  );
+  // — END COMING SOON —
+
+  /* Full impact map — restore by removing the coming soon block above
+  return (
+    <section
       ref={sectionRef}
       className="relative py-24 md:py-32 bg-stone-950 overflow-hidden"
     >
@@ -210,6 +221,7 @@ const ImpactMap = () => {
       `}</style>
     </section>
   );
+  */
 };
 
 export default ImpactMap;
