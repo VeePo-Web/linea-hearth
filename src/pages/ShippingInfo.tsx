@@ -14,7 +14,7 @@ const heroValueProps = [
   { icon: Truck, text: "Free Over $99" },
   { icon: Clock, text: "2-5 Days Production" },
   { icon: Package, text: "Full Tracking" },
-  { icon: Globe, text: "50+ Countries" },
+  { icon: Globe, text: "Canada & Beyond" },
 ];
 
 const orderJourneySteps = [
@@ -122,7 +122,7 @@ const ShippingInfo = () => {
         <div className="flex items-center justify-center gap-3">
           <CheckCircle className="w-5 h-5 text-foreground flex-shrink-0" />
           <p className="text-sm font-medium text-foreground/80 tracking-wide">
-            98% of orders delivered on time — Over 10,000 packages shipped this year
+            Proudly shipped from Calgary — every order packed with care
           </p>
         </div>
       </div>
@@ -153,7 +153,7 @@ const ShippingInfo = () => {
               />
               <span className={`absolute top-4 right-4 text-xs font-medium tracking-wide ${
                 option.variant === 'accent' 
-                  ? 'text-champagne-600 dark:text-champagne-500' 
+                  ? 'text-white'
                   : 'text-muted-foreground'
               }`}>
                 {option.badge}

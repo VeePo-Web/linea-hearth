@@ -132,8 +132,8 @@ const Catalogue = () => {
           </motion.p>
         </div>
 
-        {/* Sticky Toolbar */}
-        <div className="sticky top-[var(--header-height)] z-20 bg-background/95 backdrop-blur-sm border-b border-border">
+        {/* Toolbar */}
+        <div className="bg-background border-b border-border">
           <div className="px-4 xs:px-6 md:px-12 lg:px-16 flex items-center justify-between h-12 gap-4">
             {/* Category pills — desktop */}
             <div className="hidden md:flex items-center gap-1 overflow-x-auto scrollbar-none">

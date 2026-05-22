@@ -57,7 +57,7 @@ const StoryHero = () => {
       >
         {/* Eyebrow */}
         <motion.p
-          className="text-[10px] tracking-[0.4em] text-champagne-500 mb-8"
+          className="text-[10px] tracking-[0.4em] text-white mb-8"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, duration: 0.8 }}
@@ -70,7 +70,7 @@ const StoryHero = () => {
           {headline.split("").map((char, index) => (
             <motion.span
               key={index}
-              className={char === "." ? "text-champagne-500" : ""}
+              className={char === "." ? "text-white" : ""}
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{

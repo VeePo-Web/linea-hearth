@@ -175,55 +175,47 @@ const Lookbook = () => {
   // Use demo looks if no data from database
   const displayLooks = looks.length > 0 ? looks : demoLooks;
 
+  // — COMING SOON — remove this block to restore the full lookbook
+  return (
+    <div className="min-h-screen bg-stone-900 flex items-center justify-center">
+      <Header />
+      <p className="text-white/50 font-light tracking-[0.3em] text-sm uppercase mt-[var(--header-height)]">
+        Lookbook coming soon...
+      </p>
+    </div>
+  );
+  // — END COMING SOON —
+
+  /* Full lookbook — restore by removing the coming soon block above
   return (
     <div className="min-h-screen bg-stone-900">
       <Header />
-      
-      {/* Main Scroll Container - offset by header height */}
-      <main 
+      <main
         className="lookbook-scroll-container snap-y snap-mandatory overflow-y-auto scroll-smooth overscroll-y-contain"
-        style={{ 
+        style={{
           height: 'calc(100dvh - var(--header-height))',
-          marginTop: 'var(--header-height)' 
+          marginTop: 'var(--header-height)'
         }}
       >
-        {/* Hero Section */}
         <LookbookHero />
-
-        {/* Look Sections */}
         {isLoading ? (
           <section className="h-[100dvh] w-full snap-start flex items-center justify-center bg-stone-900">
-            <div className="animate-pulse text-white/50 font-light">
-              Loading looks...
-            </div>
+            <div className="animate-pulse text-white/50 font-light">Loading looks...</div>
           </section>
         ) : (
           displayLooks.map((look, index) => (
             <LookSection key={look.id} look={look} index={index} />
           ))
         )}
-
-        {/* Fit Guide Section */}
         <FitGuideSection />
-
-        {/* CTA Section */}
-        <section className="snap-start">
-          <WearTheMissionCTA />
-        </section>
-
-        {/* Footer */}
-        <section className="snap-start">
-          <Footer />
-        </section>
+        <section className="snap-start"><WearTheMissionCTA /></section>
+        <section className="snap-start"><Footer /></section>
       </main>
-
-      {/* Fixed Navigation - Desktop */}
       <LookNavigation looks={displayLooks} />
-      
-      {/* Fixed Navigation - Mobile */}
       <LookNavigationMobile looks={displayLooks} />
     </div>
   );
+  */
 };
 
 export default Lookbook;

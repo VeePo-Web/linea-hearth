@@ -81,7 +81,7 @@ const BrandFilmHero = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-[10px] uppercase tracking-[0.4em] text-champagne-500 mb-8"
+            className="text-[10px] uppercase tracking-[0.4em] text-white mb-8"
           >
             Born From The Lion
           </motion.p>
@@ -114,7 +114,7 @@ const BrandFilmHero = () => {
             />
             <CharacterReveal 
               text="STATEMENTS."
-              className="block text-[12vw] md:text-[10vw] lg:text-[8vw] font-light text-champagne-500 leading-[0.85] tracking-tight"
+              className="block text-[12vw] md:text-[10vw] lg:text-[8vw] font-light text-white leading-[0.85] tracking-tight"
               as="span"
               delay={1.2}
               staggerDelay={0.02}

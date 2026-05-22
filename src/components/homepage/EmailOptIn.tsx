@@ -157,7 +157,7 @@ const EmailOptIn = ({ variant = "default" }: EmailOptInProps) => {
                     initial="hidden"
                     animate={isInView ? "visible" : "hidden"}
                     className={`text-[12vw] xs:text-[11vw] sm:text-[10vw] md:text-[9vw] lg:text-[7vw] font-extralight leading-[0.85] tracking-[-0.04em] ${
-                      word === "FRONT" ? "text-champagne-400" : "text-foreground"
+                      word === "FRONT" ? "text-white" : "text-foreground"
                     }`}
                   >
                     {prefersReducedMotion ? (

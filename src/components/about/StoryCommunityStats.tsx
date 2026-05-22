@@ -1,10 +1,10 @@
 import { motion, useInView } from "framer-motion";
 import { useRef, useState, useEffect } from "react";
 
-const stats = [
-  { value: 10, suffix: "K+", label: "Believers Armed" },
-  { value: 45, suffix: "", label: "Cities Deployed" },
-  { value: 5, suffix: "", label: "Countries Strong" },
+const pillars = [
+  { label: "Calgary, AB", sublabel: "Where It Started" },
+  { label: "2024", sublabel: "Year Founded" },
+  { label: "Faith-Forward", sublabel: "The Standard" },
 ];
 
 
@@ -75,7 +75,7 @@ const StoryCommunityStats = () => {
         {/* Section header */}
         <div className="text-center mb-16 lg:mb-20 xl:mb-24">
           <motion.p
-            className="text-[10px] tracking-[0.4em] text-champagne-500 mb-6"
+            className="text-[10px] tracking-[0.4em] text-white mb-6"
             initial={{ opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ delay: 0.2, duration: 0.8 }}
@@ -88,29 +88,25 @@ const StoryCommunityStats = () => {
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ delay: 0.3, duration: 0.8 }}
           >
-            The Movement Grows<span className="text-champagne-500">.</span>
+            The Movement Grows<span className="text-white">.</span>
           </motion.h2>
         </div>
 
-        {/* Stats row */}
+        {/* Pillars row */}
         <div className="grid grid-cols-3 gap-6 md:gap-12 lg:gap-16 mb-24 md:mb-32">
-          {stats.map((stat, index) => (
+          {pillars.map((pillar, index) => (
             <motion.div
-              key={stat.label}
+              key={pillar.label}
               className="text-center"
               initial={{ opacity: 0, y: 30 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ delay: 0.4 + index * 0.1, duration: 0.8 }}
             >
-              <span className="block text-5xl md:text-7xl lg:text-7xl xl:text-8xl font-light tracking-tight mb-2">
-                <CountUpNumber
-                  target={stat.value}
-                  suffix={stat.suffix}
-                  isInView={isInView}
-                />
+              <span className="block text-2xl md:text-4xl lg:text-5xl font-light tracking-tight mb-2">
+                {pillar.label}
               </span>
               <span className="text-[10px] md:text-xs tracking-[0.15em] lg:tracking-[0.2em] text-white/40 uppercase">
-                {stat.label}
+                {pillar.sublabel}
               </span>
             </motion.div>
           ))}

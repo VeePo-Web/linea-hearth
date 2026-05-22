@@ -182,7 +182,7 @@ const OriginStory = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
               transition={{ duration: 0.6, delay: 0.3 }}
-              className="text-[10px] uppercase tracking-[0.4em] text-champagne-500"
+              className="text-[10px] uppercase tracking-[0.4em] text-white"
             >
               The Name
             </motion.p>
@@ -195,7 +195,7 @@ const OriginStory = () => {
               className="text-5xl md:text-6xl lg:text-7xl font-light tracking-tight"
             >
               Line of
-              <span className="block text-champagne-500">Judah</span>
+              <span className="block text-white">Judah</span>
             </motion.h2>
 
             {/* Body */}
@@ -206,7 +206,7 @@ const OriginStory = () => {
               className="space-y-6 text-white/70 font-light leading-relaxed text-lg"
             >
               <p>
-                <span className="text-champagne-500 font-medium">Judah</span> means "praise." 
+                <span className="text-white font-medium">Judah</span> means "praise." 
                 The lion is the symbol of the tribe of Judah — from which the Messiah descended. 
                 Genesis 49:9 declares:
               </p>
@@ -225,9 +225,9 @@ const OriginStory = () => {
               initial={{ opacity: 0, x: -30 }}
               animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -30 }}
               transition={{ duration: 0.8, delay: 0.9 }}
-              className="relative pl-8 border-l-4 border-champagne-500"
+              className="relative pl-8 border-l-4 border-white/40"
             >
-              <p className="text-2xl md:text-3xl font-light text-champagne-500 italic leading-relaxed">
+              <p className="text-2xl md:text-3xl font-light text-white italic leading-relaxed">
                 "The Lion of the tribe of Judah has triumphed."
               </p>
               <cite className="text-sm text-white/50 not-italic mt-4 block uppercase tracking-[0.2em]">

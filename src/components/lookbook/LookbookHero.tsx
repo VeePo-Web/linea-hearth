@@ -51,7 +51,7 @@ const LookbookHero = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: timing.slow, ease: easing.editorial, delay: 0.2 }}
       >
-        <p className="text-[10px] uppercase tracking-[0.4em] text-champagne-500 font-light">
+        <p className="text-[10px] uppercase tracking-[0.4em] text-white font-light">
           Line of Judah
         </p>
       </motion.div>

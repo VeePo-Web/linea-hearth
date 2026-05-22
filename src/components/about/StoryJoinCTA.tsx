@@ -43,7 +43,7 @@ const StoryJoinCTA = () => {
         <div className="flex items-center px-8 md:px-12 lg:px-16 xl:px-24 py-20 lg:py-32">
           <div className="max-w-md lg:max-w-lg">
             <motion.p
-              className="text-[10px] tracking-[0.4em] text-champagne-500 mb-6"
+              className="text-[10px] tracking-[0.4em] text-white mb-6"
               initial={{ opacity: 0, y: 20 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ delay: 0.3, duration: 0.8 }}
@@ -57,7 +57,7 @@ const StoryJoinCTA = () => {
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ delay: 0.4, duration: 0.8 }}
             >
-              Ready to Suit Up<span className="text-champagne-500">?</span>
+              Ready to Suit Up<span className="text-white">?</span>
             </motion.h2>
 
             <motion.p
@@ -104,7 +104,7 @@ const StoryJoinCTA = () => {
               animate={isInView ? { opacity: 1 } : {}}
               transition={{ delay: 0.8, duration: 0.8 }}
             >
-              Join 10,000+ believers who wear their faith daily.
+              Join believers across Calgary wearing their faith daily.
             </motion.p>
           </div>
         </div>
