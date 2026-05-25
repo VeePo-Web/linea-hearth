@@ -437,14 +437,14 @@ const QuickViewModal = ({ product, open, onClose, onAuthRequired }: QuickViewMod
         </VisuallyHidden>
 
         {/* Close button */}
-        <Button
-          variant="ghost"
-          size="icon"
-          className="absolute right-3 top-3 md:right-4 md:top-4 z-modal bg-white/80 hover:bg-white rounded-full w-10 h-10 md:w-auto md:h-auto"
+        <button
+          type="button"
+          aria-label="Close"
           onClick={onClose}
+          className="absolute right-3 top-3 md:right-4 md:top-4 z-modal inline-flex items-center justify-center w-9 h-9 rounded-none bg-white text-black border border-black/80 shadow-[0_1px_2px_rgba(0,0,0,0.08)] transition-colors duration-150 hover:bg-black hover:text-white hover:border-black focus:outline-none focus-visible:ring-2 focus-visible:ring-black/60"
         >
-          <X className="h-5 w-5 md:h-4 md:w-4" />
-        </Button>
+          <X className="h-4 w-4" strokeWidth={1.75} />
+        </button>
 
         <div className="flex flex-col md:grid md:grid-cols-2 gap-0 overflow-y-auto">
           <QuickViewContent />
