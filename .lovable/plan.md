@@ -1,109 +1,64 @@
-# Sticky Nav & Overlay Audit — Fix Plan
+## Goal
+Eliminate two trust-breaking visual defects:
+1. **Black redaction box** over the model's face on PDP (the "Tap to zoom" hint).
+2. **Dead white bars** on every PLP product card (persistent mobile Quick View + Plus pills).
 
-## The disconnect bug (root cause)
+Replace with quiet-luxury overlays in the SSENSE / Aimé Leon Dore vocabulary: dark glass + chrome hairlines, sharp edges, hover-revealed on desktop, minimal on mobile.
 
-`src/components/category/FilterSortBar.tsx:176`
-```
-isSticky && "sticky top-[var(--header-height)] z-30 bg-background/95 backdrop-blur-sm shadow-sm pt-4 -mt-4"
-```
-Three faults:
-1. **Translucent bg** (`/95` + `backdrop-blur-sm`) lets product imagery bleed through → the bar visually merges with cards behind it.
-2. **`-mt-4 pt-4` hack** = layout jump the instant it engages.
-3. **`top-[var(--header-height)]`** is hard-pinned to 100px even when the global header has hidden itself (translateY -100) on scroll-down → a 100px empty band sits above the bar.
+---
 
-## Inventory (every sticky/fixed surface found)
+## Defect 1 — Black box on PDP hero
+**File:** `src/components/product/ProductImageGallery.tsx` (lines 267–283)
 
-| Surface | File | Position | z | Bg |
-|---|---|---|---|---|
-| Global header | `header/Header.tsx` | fixed top | **50** | opaque |
-| Status bar promo | `homepage/SecondaryCTAStrip.tsx` | fixed top | 40 | opaque |
-| Search overlay | `header/SearchOverlay.tsx` | fixed inset / abs | 50 | opaque |
-| Mega menu | `header/MegaMenu.tsx` | absolute | 50 | opaque |
-| Mobile menu drawer | `header/MobileMenu.tsx` | fixed | 50 / 40 backdrop | opaque |
-| Full screen nav | `header/FullScreenNav.tsx` | fixed inset | 50 | opaque |
-| Cart drawer | `cart/CartDrawer.tsx` | sheet | 50 | opaque |
-| Favorites drawer | `favorites/FavoritesDrawer.tsx` | fixed | 50 / 40 | opaque |
-| **Shop filter bar** | `category/FilterSortBar.tsx` | sticky | **30** | **/95 blur** ⚠ |
-| Story filters | `community/StoryFilters.tsx` | sticky | 30 | /95 blur ⚠ |
-| Legal/Service/About sidebars (TOC) | `legal/TableOfContents.tsx`, `service/ServiceSidebar.tsx`, `about/AboutSidebar.tsx`, `legal/LegalSidebar.tsx` | sticky | — | — |
-| Mobile sticky ATC (PDP) | `product/MobileStickyATC.tsx` | fixed bottom | 50 | /95 blur |
-| Mobile sticky shop bar (home) | `homepage/MobileStickyBar.tsx` | fixed bottom | **40** | opaque |
-| Mobile sticky checkout | `checkout/MobileStickyCheckout.tsx` | fixed bottom | — | — |
-| Try-on mobile bar | `try-on/MobileTryOnBar.tsx` | fixed | — | — |
-| Lookbook dot nav (desk/mob) | `lookbook/LookNavigation*.tsx` | fixed | 40 | — |
-| Catalogue filter sheet | `pages/Catalogue.tsx` | fixed | 50 / 40 | opaque |
-| Quick view modal | `category/QuickViewModal.tsx` | dialog | 50 | opaque |
-| Fit guide modal | `lookbook/FitGuideModal.tsx` | fixed | 50 | opaque |
-| Image zoom (PDP) | `product/ImageZoom.tsx` | fixed | 50 | opaque |
-| About scroll progress | `about/ScrollProgress.tsx` | fixed | **50** ⚠ same as header |
-| Admin chrome | `admin/AdminLayout.tsx` | sticky/fixed | 50 | opaque |
-| Toaster | `ui/toast.tsx` | fixed | [100] | opaque |
-| shadcn Dialog/Sheet/AlertDialog/Drawer | `ui/*` | fixed | 50 | opaque |
+The "Tap to zoom" hint renders as `bg-background/80 backdrop-blur-sm` pinned at `top-4 left-1/2`. In the dark theme, `bg-background` is near-black, so it lands as a censored-bar over the model's forehead.
 
-## Findings
+**Fix:** Move it to bottom-right corner, shrink it, restyle as chrome-glass:
+- Position: `absolute bottom-3 right-3`
+- Style: `bg-black/25 backdrop-blur-md border border-white/15 text-white/80`
+- Type: `text-[9px] tracking-[0.2em] uppercase` (editorial micro-label)
+- Auto-fade after 2.5s, pointer-events-none
 
-- **F1 (THE bug)** — Shop filter bar translucent + low z; product card chrome (Quick View pills, +, NEW badges, heart) and thumbnails bleed through. **User-visible.**
-- **F2** — Story filters has the same translucent pattern. Will exhibit the same bleed on Community page.
-- **F3** — `top-[var(--header-height)]` ignores header auto-hide; gap when header retracts.
-- **F4** — `-mt-4 pt-4` causes 16px jump at the sticky engage moment.
-- **F5** — `ScrollProgress` (About) sits at z-50 alongside the fixed header; if the header re-reveals they collide in the same plane.
-- **F6** — `SecondaryCTAStrip` (z-40) is **below** Header (z-50) but both occupy `top:0`. When both render, Strip is covered. Intentional but undocumented.
-- **F7** — Bottom-fixed bars are mixed: `MobileStickyATC` z-50, `MobileStickyBar` z-40, `LookNavigationMobile` z-40. Toasts z-[100] sit above all (correct), but bars can co-exist on PDP if both mount — no coordination.
-- **F8** — No central z token. Every component invents its own number.
+---
 
-## Fix — single source of truth
+## Defect 2 — White Quick View / Plus bars on PLP
+**File:** `src/components/category/ProductCard.tsx`
 
-**New file `src/lib/zLayers.ts`** (tailwind-arbitrary-value friendly tokens, mirrored in `tailwind.config.ts`):
+Currently `showActions = isMobile || isHovered` forces a permanent `bg-white/95` Quick View pill + `bg-foreground/95` Plus pill across the bottom of every mobile card. Looks like a placeholder slab, eats ~40px of product imagery.
 
-```text
-base          0    page content
-card-chrome   10   NEW badge, heart, Quick View, +
-sticky-sub    30   shop filter bar, story filter bar, TOC sub-nav
-banner        35   promo strip (SecondaryCTAStrip)
-header        40   global ImmersiveHeader
-fixed-bar     45   bottom mobile bars (ATC, sticky shop, lookbook nav)
-overlay       60   backdrops
-drawer        70   cart / favorites / mobile menu
-modal         80   dialogs, quick view, fit guide, image zoom
-toast         90   toaster
-portal        100  brand gate / loading boot
-```
+**New pattern (matches Aimé Leon Dore / SSENSE / Fear of God):**
 
-Re-key existing usages to these tokens. (Header moved from 50 → 40 since modals at 80 still cover it; bumps Header above ScrollProgress which becomes `sticky-sub`.)
+### Mobile (touch)
+- **No persistent Quick View bar.** Tapping the card navigates to PDP (primary intent).
+- **Single floating `+` button** in bottom-right corner of the image: 40×40, `bg-black/40 backdrop-blur-md border border-white/20 text-white`, sharp edges, 12px inset. Triggers the inline size picker.
+- **Heart** stays top-right but restyled: `w-10 h-10 bg-black/30 backdrop-blur-md border border-white/20 text-white`, sharp edges, no white pill.
+- **Bottom scrim** gradient `bg-gradient-to-t from-black/40 via-transparent to-transparent` on bottom 30% so the floating chrome reads against any photo.
 
-## Rules enforced
+### Desktop (hover)
+- On hover, reveal a single integrated dark-glass strip across the bottom: `bg-black/55 backdrop-blur-md border-t border-white/15`, containing ghost-styled Quick View (left) and Plus (right). Translate-up + fade in 200ms with `editorialEase`.
+- Heart top-right uses the same chrome-glass treatment.
+- 8px corner inset on the strip so it floats inside the image.
 
-1. Every sticky/fixed element MUST use a **fully opaque** background (`bg-background`, `bg-nav`, or a solid hex). Translucency only with `backdrop-blur-xl` *and* a z above any underlying interactive chrome. Filter bars → flip to opaque `bg-background`.
-2. Sticky elements span full viewport width with internal padding (no negative margin hacks). Remove `-mt-4 pt-4` from FilterSortBar; replace with proper `py-4`.
-3. Sticky `top` value tracks header reveal state via a CSS var. Add `--sticky-top` written by `Header.tsx` (0px when hidden, `var(--header-height)` when revealed) and consume it in FilterSortBar + StoryFilters.
-4. Sharp edges only (`rounded-none`) — already compliant; verify.
-5. `scroll-margin-top: var(--header-height)` already on `<main>`; confirm anchor sections inherit it.
-6. `prefers-reduced-motion`: sticky engage/retract uses `transition-none`; verify Header tween is already gated (it isn't currently — add).
-7. Mobile bottom-bar coordination: introduce simple context `useBottomBarSlot` so only one of {MobileStickyATC, MobileStickyBar, LookNavigationMobile} is visible at a time per route (out of scope to fully implement here — flagged).
+### InlineQuickSizePicker (when open)
+- Switch the ProductCard call from `variant="light"` to `variant="dark"` so the picker matches the new chrome-glass language instead of flashing a near-black slab via `bg-background`.
 
-## Changes (files touched)
+### CartQuantityBadge (`badge` variant)
+- Keep top-left position but tighten to chrome-hairline aesthetic: `bg-black/40 backdrop-blur-md border border-white/15 text-white` instead of solid `bg-foreground`.
 
-1. **Create** `src/lib/zLayers.ts` — token export + JSDoc table.
-2. **Edit** `tailwind.config.ts` — add `zIndex` scale keyed to tokens (`'card-chrome': 10`, `'sticky-sub': 30`, `banner: 35`, `header: 40`, `'fixed-bar': 45`, `overlay: 60`, `drawer: 70`, `modal: 80`, `toast: 90`, `portal: 100`).
-3. **Edit** `src/index.css` — add `--sticky-top: var(--header-height);` default; Header toggles it via inline style on hide.
-4. **Edit** `src/components/header/Header.tsx` — write `--sticky-top` on hide/reveal; switch `z-50` → `z-header`; respect reduced-motion.
-5. **Edit** `src/components/category/FilterSortBar.tsx` — `z-sticky-sub`, `bg-background` (opaque), drop `-mt-4 pt-4`, use `top-[var(--sticky-top)]`.
-6. **Edit** `src/components/community/StoryFilters.tsx` — same opacity + token treatment.
-7. **Edit** `src/components/homepage/SecondaryCTAStrip.tsx` — `z-banner`; document that it sits below header by design.
-8. **Edit** bottom-fixed bars (`MobileStickyATC`, `MobileStickyBar`, `MobileStickyCheckout`, `MobileTryOnBar`, `LookNavigationMobile`) — unify on `z-fixed-bar`; ATC keeps opaque bg (drop `/95`).
-9. **Edit** `about/ScrollProgress.tsx` — demote to `z-sticky-sub`.
-10. **Edit** shadcn primitives (`dialog`, `sheet`, `alert-dialog`, `drawer`, `toast`) — swap `z-50`/`z-[100]` for `z-modal`/`z-toast`.
-11. **Edit** drawers (`CartDrawer`, `FavoritesDrawer`, `MobileMenu`, `FullScreenNav`, `SearchOverlay`, `Catalogue` filter sheet) — `z-drawer` (+ `z-overlay` backdrop).
-12. **Edit** `admin/AdminLayout.tsx` — `z-header` for top, `z-fixed-bar` for bottom nav.
+---
 
-## Out of scope (flagged, not done)
+## Files to edit
+1. `src/components/product/ProductImageGallery.tsx` — rewrite the "Tap to zoom" hint block (lines 267–283).
+2. `src/components/category/ProductCard.tsx` — replace the mobile/desktop action overlay logic (favorite button block, quick actions block, picker variant prop).
+3. `src/components/category/CartQuantityBadge.tsx` — restyle `badge` variant container (lines 68–74) to chrome-glass.
 
-- Bottom-bar mutual-exclusion context (F7) — note added, separate task.
-- Visual regression screenshots at 375 / 768 / 1440 across 3 scroll states — manual QA after build.
+## Acceptance criteria
+- Zero solid white rectangles visible at rest on mobile PLP cards.
+- Zero solid black rectangle over model faces on PDP.
+- Product photography fills 100% of the card visually; any chrome floats as glass + hairline.
+- Desktop hover still reveals Quick View + Plus, but as one integrated strip.
+- Mobile users still get one-tap add via the floating `+` (picker if no remembered size, instant add if remembered).
+- Sharp edges (`rounded-none`) preserved throughout — no rounded pills.
+- No regressions to favorites, cart badge, success-overlay, NEW/SALE badges.
 
-## Deliverables
-
-- New `zLayers.ts` + tailwind tokens.
-- 11 component edits (above).
-- Inventory table (this doc) committed at top of `zLayers.ts` as JSDoc.
-- Before/after screenshot of Shop filter bar bug (manual).
+## Memory
+Add `mem://design/plp-pdp/overlay-rules`: "No solid fills over product photography. Overlays must use dark glass (`bg-black/25–55 backdrop-blur-md`) + white chrome hairline (`border-white/15–20`). Mobile PLP has no persistent Quick View bar — single floating `+` bottom-right + tap-card-to-PDP."
