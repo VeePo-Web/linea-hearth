@@ -40,6 +40,30 @@ const SHIPPING_RATES = {
 
 const FREE_SHIPPING_THRESHOLD_CENTS = 9900;
 
+let cachedGstTaxRateId: string | null = null;
+async function getOrCreateGstTaxRate(
+  stripe: ReturnType<typeof createStripeClient>,
+): Promise<string> {
+  if (cachedGstTaxRateId) return cachedGstTaxRateId;
+  const existing = await stripe.taxRates.list({ active: true, limit: 100 });
+  const match = existing.data.find((r) => r.metadata?.kind === "linea_gst_5");
+  if (match) {
+    cachedGstTaxRateId = match.id;
+    return match.id;
+  }
+  const created = await stripe.taxRates.create({
+    display_name: "GST",
+    description: "Canadian GST",
+    jurisdiction: "CA",
+    country: "CA",
+    percentage: 5,
+    inclusive: false,
+    metadata: { kind: "linea_gst_5" },
+  });
+  cachedGstTaxRateId = created.id;
+  return created.id;
+}
+
 async function resolveOrCreateCustomer(
   stripe: ReturnType<typeof createStripeClient>,
   options: { email?: string; userId?: string },
@@ -115,6 +139,8 @@ Deno.serve(async (req) => {
       }
     }
 
+    const gstTaxRateId = await getOrCreateGstTaxRate(stripe);
+
     // Build Stripe line items using inline price_data (apparel = tangible goods)
     const lineItems = body.items.map((item) => {
       const unitAmount = Math.round(item.price * 100);
@@ -126,7 +152,6 @@ Deno.serve(async (req) => {
           product_data: {
             name: item.name + (descriptionBits ? ` (${descriptionBits})` : ""),
             ...(item.image && { images: [item.image] }),
-            tax_code: "txcd_99999999", // general tangible goods
             metadata: {
               ...(item.productId && { productId: item.productId }),
               ...(item.variantId && { variantId: item.variantId }),
@@ -136,6 +161,7 @@ Deno.serve(async (req) => {
           },
         },
         quantity: item.quantity,
+        tax_rates: [gstTaxRateId],
       };
     });
 
@@ -212,7 +238,6 @@ Deno.serve(async (req) => {
       ui_mode: "embedded_page",
       return_url: body.returnUrl,
       ...(customerId && { customer: customerId }),
-      automatic_tax: { enabled: true },
       shipping_address_collection: { allowed_countries: ["CA", "US"] },
       shipping_options: [
         {
@@ -227,6 +252,7 @@ Deno.serve(async (req) => {
                   ? "Express (2-3 days)"
                   : "Overnight",
             tax_behavior: "exclusive",
+            tax_rates: [gstTaxRateId],
           },
         },
       ],
