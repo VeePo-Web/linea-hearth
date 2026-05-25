@@ -70,14 +70,14 @@ const ImageZoom = ({ images, initialIndex, isOpen, onClose }: ImageZoomProps) =>
             exit={{ opacity: 0, scale: 0.8 }}
             transition={{ delay: prefersReducedMotion ? 0 : 0.2, duration: 0.3 }}
           >
-            <Button
-              variant="ghost"
-              size="sm"
+            <button
+              type="button"
+              aria-label="Close zoom"
               onClick={onClose}
-              className="absolute top-6 right-6 z-10 hover:bg-transparent text-white border-none p-2"
+              className="absolute top-6 right-6 z-10 inline-flex items-center justify-center w-11 h-11 rounded-none bg-white text-black border border-black/80 shadow-[0_1px_2px_rgba(0,0,0,0.12)] transition-colors duration-150 hover:bg-black hover:text-white hover:border-black focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
             >
-              <X className="h-8 w-8" />
-            </Button>
+              <X className="h-5 w-5" strokeWidth={1.75} />
+            </button>
           </motion.div>
 
           {/* Scrollable image container */}
