@@ -1,59 +1,76 @@
-import { memo } from "react";
+import { memo, useMemo } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import TextReveal from "@/components/motion/TextReveal";
 import StaggerContainer from "@/components/motion/StaggerContainer";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { staggerItem } from "@/lib/animations";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Category {
   name: string;
   slug: string;
   subtitle: string;
-  image: string;
+  image: string | null;
   index: string;
   layout: "hero" | "standard" | "wide";
 }
+
+const CATEGORY_DEFS: Omit<Category, "image">[] = [
+  { name: "Hoodies", slug: "hoodies", subtitle: "PREMIUM WEIGHT. BOLD STATEMENTS.", index: "01", layout: "hero" },
+  { name: "Tops", slug: "tops", subtitle: "ELEVATED ESSENTIALS.", index: "02", layout: "standard" },
+  { name: "Tees", slug: "tees", subtitle: "START CONVERSATIONS.", index: "03", layout: "standard" },
+  { name: "Accessories", slug: "accessories", subtitle: "FINISHING TOUCHES.", index: "04", layout: "wide" },
+];
 
 const CategoryTiles = () => {
   const prefersReducedMotion = useReducedMotion();
   const isMobile = useIsMobile();
 
-  const categories: Category[] = [
-    {
-      name: "Hoodies",
-      slug: "hoodies",
-      subtitle: "PREMIUM WEIGHT. BOLD STATEMENTS.",
-      image: "/products/stay-holy-hoodie/flat-front.png",
-      index: "01",
-      layout: "hero"
+  const slugs = CATEGORY_DEFS.map((c) => c.slug);
+
+  const { data: imageBySlug } = useQuery({
+    queryKey: ["category-tile-images"],
+    staleTime: 5 * 60 * 1000,
+    queryFn: async () => {
+      const { data: cats } = await supabase
+        .from("categories")
+        .select("slug, image_url")
+        .in("slug", slugs);
+
+      const { data: products } = await supabase
+        .from("products")
+        .select("id, created_at, categories:category_id(slug), product_images(image_url, is_primary, display_order)")
+        .eq("status", "active")
+        .order("created_at", { ascending: false });
+
+      const map: Record<string, string | null> = {};
+      slugs.forEach((slug) => {
+        const catImg = cats?.find((c) => c.slug === slug)?.image_url;
+        if (catImg) {
+          map[slug] = catImg;
+          return;
+        }
+        const prod = products?.find((p: any) => p.categories?.slug === slug);
+        const primary =
+          prod?.product_images?.find((i: any) => i.is_primary) ||
+          prod?.product_images?.[0];
+        map[slug] = primary?.image_url ?? null;
+      });
+      return map;
     },
-    {
-      name: "Tops",
-      slug: "tops",
-      subtitle: "ELEVATED ESSENTIALS.",
-      image: "/products/heavenly-crewneck/flat-front.png",
-      index: "02",
-      layout: "standard"
-    },
-    {
-      name: "Tees",
-      slug: "tees",
-      subtitle: "START CONVERSATIONS.",
-      image: "/products/heavenly-crewneck/flat-back.png",
-      index: "03",
-      layout: "standard"
-    },
-    {
-      name: "Accessories",
-      slug: "accessories",
-      subtitle: "FINISHING TOUCHES.",
-      image: "/products/stay-holy-hoodie/flat-back.png",
-      index: "04",
-      layout: "wide"
-    }
-  ];
+  });
+
+  const categories: Category[] = useMemo(
+    () =>
+      CATEGORY_DEFS.map((c) => ({
+        ...c,
+        image: imageBySlug?.[c.slug] ?? null,
+      })),
+    [imageBySlug]
+  );
 
   const heroCategory = categories.find(c => c.layout === "hero")!;
   const standardCategories = categories.filter(c => c.layout === "standard");
@@ -164,7 +181,6 @@ interface CategoryTileProps {
 }
 
 const CategoryTile = ({ category, prefersReducedMotion, isWide = false, isMobile = false }: CategoryTileProps) => {
-  // Mobile: use consistent aspect ratios instead of vh units
   const getMobileAspect = () => {
     if (category.layout === "hero") return "aspect-[3/4]";
     if (category.layout === "wide") return "aspect-[16/9]";
@@ -198,7 +214,7 @@ const CategoryTile = ({ category, prefersReducedMotion, isWide = false, isMobile
   return (
     <Link
       to={`/category/${category.slug}`}
-      className={`group block relative ${aspectClass} overflow-hidden bg-muted tap-feedback active:scale-[0.99] transition-transform duration-150`}
+      className={`group block relative ${aspectClass} overflow-hidden bg-stone-900 tap-feedback active:scale-[0.99] transition-transform duration-150`}
     >
       {/* Image with Grayscale → Color Transition */}
       <motion.div
@@ -206,12 +222,16 @@ const CategoryTile = ({ category, prefersReducedMotion, isWide = false, isMobile
         whileHover={prefersReducedMotion ? {} : { scale: 1.03 }}
         transition={{ duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }}
       >
-        <img 
-          src={category.image}
-          alt={category.name}
-          className="w-full h-full object-cover md:grayscale md:contrast-110 md:group-hover:grayscale-0 md:group-hover:contrast-100 group-active:grayscale-0 group-active:contrast-100 transition-all duration-700"
-          loading="lazy"
-        />
+        {category.image ? (
+          <img 
+            src={category.image}
+            alt={category.name}
+            className="w-full h-full object-cover md:grayscale md:contrast-110 md:group-hover:grayscale-0 md:group-hover:contrast-100 group-active:grayscale-0 group-active:contrast-100 transition-all duration-700"
+            loading="lazy"
+          />
+        ) : (
+          <div className="w-full h-full bg-gradient-to-br from-stone-800 to-stone-950" />
+        )}
       </motion.div>
       
       {/* Overlay Gradient */}
@@ -236,19 +256,16 @@ const CategoryTile = ({ category, prefersReducedMotion, isWide = false, isMobile
 
       {/* Content Overlay */}
       <div className="absolute bottom-0 left-0 right-0 p-4 xs:p-6 md:p-10">
-        {/* Category Name - Massive Typography */}
         <h3 className={`${titleSize} font-extralight text-foreground uppercase tracking-[-0.04em] leading-[0.85] group-hover:tracking-[-0.02em] transition-all duration-500`}>
           {category.name}
         </h3>
         
-        {/* Subtitle - Visible by default on mobile, appears on hover for desktop */}
         <div className={`overflow-hidden mt-2 ${isMobile ? 'h-6' : 'h-0 group-hover:h-6'} transition-all duration-500`}>
           <p className={`text-[10px] md:text-xs uppercase tracking-[0.2em] text-foreground/70 ${isMobile ? '' : 'transform translate-y-full group-hover:translate-y-0'} transition-transform duration-500 delay-100`}>
             {category.subtitle}
           </p>
         </div>
 
-        {/* CTA - Editorial Underline Style - Always visible on mobile */}
         <div className={`mt-3 md:mt-4 lg:mt-6 ${isMobile ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'} transition-opacity duration-500 delay-200`}>
           <span className="text-[10px] md:text-xs uppercase tracking-[0.2em] text-foreground inline-flex items-center gap-2 touch-target-sm">
             Shop {category.name}

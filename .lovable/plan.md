@@ -1,41 +1,50 @@
-# Fix Product Pagination — Holistic Decision
+## What I found
 
-## The Picture
+**1. Collection cards (homepage)** — `src/components/homepage/CategoryTiles.tsx` hardcodes 4 tiles (Hoodies / Tops / Tees / Accessories) to images of just two old products (`stay-holy-hoodie`, `heavenly-crewneck`). These don't update when you add new products.
 
-Looking across the shopping flow:
+The `categories` table already has an `image_url` column, and `products` + `product_images` are populated per category. Two places that drive collection imagery from the DB already exist as patterns: `FeaturedCollection.tsx` and `DropGrid.tsx`.
 
-- **Category/Shop page** (`/shop`, `/category/:slug`) — uses URL `?page=2` as source of truth via `useSearchParams` in `Category.tsx`. Pagination is currently broken (no-op handler).
-- **Product detail page** (`/product/:slug`) — no pagination needed.
-- **Cart drawer** — no pagination (single scrollable list).
-- **Account orders, favorites, admin tables** — separate concerns, not affected.
+**2. "Our Reach"** — only appears in `src/components/about/ImpactMap.tsx` (lines 100 and 136).
 
-So pagination is really only a Category-page problem. The cleanest fix aligns with what's already there.
+**3. Champagne/silver accents** in the footer + community page:
+- `src/components/footer/Footer.tsx` — `text-champagne-500` on the brand "JUDAH" word and on every link hover state (Shop / Support / About / social / legal).
+- `src/components/community/CommunityHero.tsx` — "Tribe" headline word, eyebrow label, italic line, featured-story badge, avatar circle.
+- `src/components/community/StoryGrid.tsx` — "02" eyebrow number.
+- `src/components/community/SubmitStoryCTA.tsx` — "Testimony?" headline word.
 
-## Decision: Option A (URL-driven, lift handler)
+---
 
-`Category.tsx` already owns `page` state, syncs it to `?page=` in the URL, and scrolls to top. `ProductGrid.tsx` just needs to forward click events up — not own state.
+## Plan
 
-Why this wins over the alternatives:
-- **Shareable/bookmarkable URLs** — `/shop?page=3` works on refresh, back button, and shared links. Already half-built.
-- **Single source of truth** — filters, sort, and page all live in URL via `Category.tsx`. Splitting page state into `ProductGrid` would fragment that.
-- **Minimal change** — 3 lines. No refactor of query keys or filter logic.
-- **Filters already reset page to 1** in `handleFilterChange` / `handleSortChange` — that wiring stays intact.
+### A. Collection cards → live from database
+Refactor `CategoryTiles.tsx` to fetch its 4 tile images from Supabase instead of hardcoded paths.
 
-## Changes
+For each tile slug (`hoodies`, `tops`, `tees`, `accessories`):
+1. Look up the category row by slug — use `categories.image_url` if set.
+2. Otherwise pull the newest active product in that category and use its primary `product_images.image_url`.
+3. If neither exists, render a neutral dark stone tile (no broken image).
 
-1. **`src/components/category/ProductGrid.tsx`**
-   - Add `onPageChange: (page: number) => void` to `ProductGridProps`.
-   - Pass it to `<Pagination onPageChange={onPageChange} />` instead of `() => {}`.
+One `useQuery` call with a 5-min staleTime, joined query, mapped onto the existing 4 tiles. Keep all current layout/animation/copy untouched — only the `image` source changes.
 
-2. **`src/pages/Category.tsx`**
-   - Pass `onPageChange={handlePageChange}` to `<ProductGrid />`. The handler already exists and does the right thing (state + URL + scroll-to-top).
+Result: as soon as you publish a product in the admin CMS, that category's tile updates automatically. No more stale "stay-holy-hoodie" everywhere.
 
-## Out of Scope (noted, not fixing now)
+### B. "Our Reach" → "Outreach"
+Two string swaps in `src/components/about/ImpactMap.tsx`. Nothing else changes.
 
-- `totalPages` is computed from server `count`, but size/color/price filters run client-side after the query. On heavily filtered views, page count can be slightly misleading. Proper fix is server-side variant filtering — separate task. Tell me if you want it bundled in.
+### C. Footer + Community: champagne → white
+Replace `text-champagne-500` with `text-white` (and `bg-champagne-500` / `bg-champagne-500/20` with `bg-white` / `bg-white/10`) in:
+- `Footer.tsx` — "JUDAH" word + all link hover states + Contact email hover + social links hover + legal links hover.
+- `CommunityHero.tsx` — "Tribe" word, eyebrow, italic line, featured badge bg, avatar circle bg + text.
+- `StoryGrid.tsx` — "02" eyebrow.
+- `SubmitStoryCTA.tsx` — "Testimony?" word.
 
-## Verification
+No layout, copy, spacing, or animation changes — purely color token swaps.
 
-- Click page 2 → URL becomes `?page=2`, grid refetches, page scrolls to top.
-- Refresh on `?page=2` → loads page 2 directly.
-- Change a filter on page 3 → resets to page 1, URL clears `page`.
+### Technical notes
+- `CategoryTiles` becomes a client component using `@tanstack/react-query` + `supabase` (same pattern as `FeaturedCollection.tsx`).
+- All other files: search-and-replace level edits.
+- Memory note `color-palette` says Silver Chrome & Forest Green, no gold — champagne accents were drift from that. Switching to white aligns with the core aesthetic.
+
+### Out of scope
+- No new product photos are being uploaded in this pass — the live-DB wire-up means the tiles will reflect whatever product images already exist in your catalog.
+- Other champagne accents elsewhere on the site (e.g. About pages, ambassador, cart) are untouched unless you ask.
