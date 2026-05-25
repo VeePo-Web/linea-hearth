@@ -78,7 +78,7 @@ export default function CommunityHero() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="text-[10px] uppercase tracking-[0.4em] text-champagne-500 font-medium mb-8"
+              className="text-[10px] uppercase tracking-[0.4em] text-white font-medium mb-8"
             >
               Not For Everyone
             </motion.p>
@@ -91,7 +91,7 @@ export default function CommunityHero() {
             >
               <h1 className="text-[18vw] md:text-[12vw] lg:text-[10vw] font-extralight text-white leading-[0.85] tracking-[-0.04em] uppercase">
                 <motion.span variants={wordItem} className="block">The</motion.span>
-                <motion.span variants={wordItem} className="block text-champagne-500">Tribe</motion.span>
+                <motion.span variants={wordItem} className="block text-white">Tribe</motion.span>
               </h1>
             </motion.div>
 
@@ -118,7 +118,7 @@ export default function CommunityHero() {
               ))}
               <motion.p 
                 variants={staggerItem}
-                className="text-champagne-500 text-xl md:text-2xl font-light italic pt-6"
+                className="text-white text-xl md:text-2xl font-light italic pt-6"
               >
                 You belong here.
               </motion.p>
@@ -185,7 +185,7 @@ export default function CommunityHero() {
                     className="w-full h-full object-cover md:grayscale md:group-hover:grayscale-0 transition-all duration-700"
                   />
                 </div>
-                <div className="absolute -bottom-3 left-4 lg:hidden bg-champagne-500 px-4 py-2">
+                <div className="absolute -bottom-3 left-4 lg:hidden bg-white px-4 py-2">
                   <p className="text-stone-900 font-medium text-xs uppercase tracking-wider">Featured Story</p>
                 </div>
               </motion.div>
@@ -198,7 +198,7 @@ export default function CommunityHero() {
                 className="lg:col-span-2 space-y-8"
               >
                 <div className="space-y-6">
-                  <p className="text-[10px] uppercase tracking-[0.3em] text-champagne-500 font-medium">——— Featured</p>
+                  <p className="text-[10px] uppercase tracking-[0.3em] text-white font-medium">——— Featured</p>
                   <h2 className="text-3xl lg:text-4xl xl:text-5xl font-light leading-[1.15] italic">
                     "{displayStory.headline}"
                   </h2>
@@ -207,8 +207,8 @@ export default function CommunityHero() {
                   {displayStory.story_text}
                 </blockquote>
                 <div className="flex items-center gap-4 pt-4">
-                  <div className="w-14 h-14 rounded-full bg-champagne-500/20 flex items-center justify-center">
-                    <span className="text-champagne-500 font-medium text-xl">
+                  <div className="w-14 h-14 rounded-full bg-white/10 flex items-center justify-center">
+                    <span className="text-white font-medium text-xl">
                       {displayStory.customer_name.charAt(0)}
                     </span>
                   </div>

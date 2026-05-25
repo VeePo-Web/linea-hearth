@@ -97,7 +97,7 @@ const ImpactMap = () => {
     return (
       <section ref={sectionRef} className="relative py-24 md:py-32 bg-stone-950 overflow-hidden flex items-center justify-center">
         <p className="text-white/40 font-light tracking-[0.3em] text-sm uppercase">
-          Our Reach: Coming soon...
+          Outreach: Coming soon...
         </p>
       </section>
     );
@@ -133,7 +133,7 @@ const ImpactMap = () => {
           className="text-center mb-16 md:mb-24"
         >
           <p className="text-[10px] uppercase tracking-[0.4em] text-white mb-4">
-            Our Reach
+            Outreach
           </p>
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-light text-white tracking-tight">
             The Mission<br />
