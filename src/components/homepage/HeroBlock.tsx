@@ -2,9 +2,11 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Play } from "lucide-react";
+import { useCategoryHeroImage } from "@/hooks/useCategoryHeroImage";
 
 const HeroBlock = () => {
   const [isLoaded, setIsLoaded] = useState(false);
+  const heroImage = useCategoryHeroImage("hoodies", "/products/stay-holy-hoodie/male-model.png");
 
   useEffect(() => {
     setIsLoaded(true);
@@ -17,11 +19,11 @@ const HeroBlock = () => {
         <div 
           className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/60 z-10"
         />
-        {/* Hero Background - Using a gradient placeholder, can be replaced with video/image */}
+        {/* Hero Background - Pulls newest hoodie product image from catalog */}
         <div 
           className="w-full h-full bg-gradient-to-br from-stone-900 via-stone-800 to-stone-800"
           style={{
-            backgroundImage: `url('/products/stay-holy-hoodie/male-model.png')`,
+            backgroundImage: `url('${heroImage}')`,
             backgroundSize: 'cover',
             backgroundPosition: 'center top',
           }}

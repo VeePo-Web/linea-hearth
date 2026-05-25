@@ -3,10 +3,12 @@ import { useRef } from "react";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { useCategoryHeroImage } from "@/hooks/useCategoryHeroImage";
 
 const StoryJoinCTA = () => {
   const sectionRef = useRef<HTMLElement>(null);
   const isInView = useInView(sectionRef, { once: true, margin: "-100px" });
+  const ctaImage = useCategoryHeroImage("hoodies", "/products/stay-holy-hoodie/male-model.png");
 
   return (
     <section
@@ -32,7 +34,7 @@ const StoryJoinCTA = () => {
           transition={{ delay: 0.2, duration: 1 }}
         >
           <img
-            src="/products/stay-holy-hoodie/male-model.png"
+            src={ctaImage}
             alt="Join the Line of Judah movement"
             className="w-full h-full object-cover"
           />
