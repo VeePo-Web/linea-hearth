@@ -40,6 +40,30 @@ const SHIPPING_RATES = {
 
 const FREE_SHIPPING_THRESHOLD_CENTS = 9900;
 
+let cachedGstTaxRateId: string | null = null;
+async function getOrCreateGstTaxRate(
+  stripe: ReturnType<typeof createStripeClient>,
+): Promise<string> {
+  if (cachedGstTaxRateId) return cachedGstTaxRateId;
+  const existing = await stripe.taxRates.list({ active: true, limit: 100 });
+  const match = existing.data.find((r) => r.metadata?.kind === "linea_gst_5");
+  if (match) {
+    cachedGstTaxRateId = match.id;
+    return match.id;
+  }
+  const created = await stripe.taxRates.create({
+    display_name: "GST",
+    description: "Canadian GST",
+    jurisdiction: "CA",
+    country: "CA",
+    percentage: 5,
+    inclusive: false,
+    metadata: { kind: "linea_gst_5" },
+  });
+  cachedGstTaxRateId = created.id;
+  return created.id;
+}
+
 async function resolveOrCreateCustomer(
   stripe: ReturnType<typeof createStripeClient>,
   options: { email?: string; userId?: string },
