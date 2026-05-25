@@ -202,7 +202,7 @@ const ProductCard = ({ product, onQuickView, index = 0, onAuthRequired }: Produc
               </div>
             )}
 
-            {/* Favorite Button - Always visible on mobile */}
+            {/* Favorite Button — chrome-glass treatment, always visible on mobile */}
             <div className={`absolute top-3 right-3 transition-opacity duration-200 ${
               isMobile ? "opacity-100" : isHovered ? "opacity-100" : "opacity-0"
             } md:group-hover:opacity-100`}>
@@ -210,7 +210,7 @@ const ProductCard = ({ product, onQuickView, index = 0, onAuthRequired }: Produc
                 productId={product.id}
                 size="sm"
                 onAuthRequired={onAuthRequired}
-                className="bg-white/90 backdrop-blur-sm hover:bg-white"
+                className="bg-black/30 backdrop-blur-md border border-white/20 text-white hover:bg-black/50 hover:text-white rounded-none"
               />
             </div>
 
@@ -237,49 +237,76 @@ const ProductCard = ({ product, onQuickView, index = 0, onAuthRequired }: Produc
               )}
             </AnimatePresence>
 
-            {/* Quick Actions - Always visible on mobile, hover on desktop */}
+            {/* Bottom scrim so floating chrome reads against any photo */}
+            <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
+
+            {/* MOBILE: single floating + button, bottom-right */}
+            {showMobileFab && (
+              <motion.button
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 6 }}
+                whileTap={prefersReducedMotion ? {} : { scale: 0.92 }}
+                transition={springConfig}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  quickAdd.handleQuickAdd(e);
+                }}
+                disabled={quickAdd.isAdding}
+                aria-label={quickAdd.canOneTap ? `Add size ${quickAdd.rememberedSize} to bag` : "Choose size"}
+                className={`absolute bottom-3 right-3 w-10 h-10 flex items-center justify-center rounded-none backdrop-blur-md border ${
+                  quickAdd.canOneTap
+                    ? 'bg-champagne-500/90 border-white/30 text-white'
+                    : 'bg-black/40 border-white/20 text-white hover:bg-black/60'
+                }`}
+              >
+                {quickAdd.isAdding ? (
+                  <span className="animate-pulse text-sm">…</span>
+                ) : (
+                  <Plus className="w-4 h-4" strokeWidth={1.75} />
+                )}
+              </motion.button>
+            )}
+
+            {/* DESKTOP: integrated dark-glass action strip on hover */}
             <div
-              className={`absolute bottom-3 left-3 right-3 flex gap-2 transition-all duration-300 ${
-                showActions ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
+              className={`hidden md:flex absolute bottom-2 left-2 right-2 gap-px transition-all duration-300 ease-out bg-black/55 backdrop-blur-md border border-white/15 ${
+                showDesktopActions ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2 pointer-events-none"
               }`}
             >
               <Button
-                variant="secondary"
+                variant="ghost"
                 size="sm"
-                className="flex-1 bg-white/95 hover:bg-white text-foreground text-xs h-10 md:h-9"
+                className="flex-1 rounded-none bg-transparent hover:bg-white/10 text-white text-[11px] tracking-[0.12em] uppercase h-9 font-light"
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
                   onQuickView?.(product);
                 }}
               >
-                <Eye className="w-4 h-4 md:w-3.5 md:h-3.5 mr-1.5" />
+                <Eye className="w-3.5 h-3.5 mr-1.5" strokeWidth={1.5} />
                 Quick View
               </Button>
               {quickAdd.totalStock > 0 && (
-                <motion.div
-                  whileHover={prefersReducedMotion ? {} : { scale: 1.05 }}
-                  whileTap={prefersReducedMotion ? {} : { scale: 0.95 }}
-                  transition={springConfig}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className={`rounded-none h-9 px-4 border-l border-white/15 ${
+                    quickAdd.canOneTap
+                      ? 'bg-champagne-500/80 hover:bg-champagne-500 text-white'
+                      : 'bg-transparent hover:bg-white/10 text-white'
+                  }`}
+                  onClick={quickAdd.handleQuickAdd}
+                  disabled={quickAdd.isAdding}
+                  aria-label="Add to bag"
                 >
-                  <Button
-                    variant="default"
-                    size="sm"
-                    className={`text-xs h-10 md:h-9 px-4 md:px-3 ${
-                      quickAdd.canOneTap 
-                        ? 'bg-champagne-500 hover:bg-champagne-400 text-white' 
-                        : 'bg-foreground/95 hover:bg-foreground text-background'
-                    }`}
-                    onClick={quickAdd.handleQuickAdd}
-                    disabled={quickAdd.isAdding}
-                  >
-                    {quickAdd.isAdding ? (
-                      <span className="animate-pulse">...</span>
-                    ) : (
-                      <Plus className="w-4 h-4 md:w-3.5 md:h-3.5" />
-                    )}
-                  </Button>
-                </motion.div>
+                  {quickAdd.isAdding ? (
+                    <span className="animate-pulse">…</span>
+                  ) : (
+                    <Plus className="w-3.5 h-3.5" strokeWidth={1.75} />
+                  )}
+                </Button>
               )}
             </div>
 
@@ -292,7 +319,7 @@ const ProductCard = ({ product, onQuickView, index = 0, onAuthRequired }: Produc
                   onSelect={quickAdd.handleSizeSelect}
                   onClose={quickAdd.hideSizePicker}
                   getStockForSize={(size) => quickAdd.getStockForVariant(size)}
-                  variant="light"
+                  variant="dark"
                 />
               )}
             </AnimatePresence>
