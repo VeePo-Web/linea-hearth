@@ -20,6 +20,7 @@ interface ProductGridProps {
   pageSize?: number;
   onTotalCountChange?: (count: number) => void;
   onClearFilters?: () => void;
+  onPageChange?: (page: number) => void;
 }
 
 const ProductGrid = ({
@@ -30,6 +31,7 @@ const ProductGrid = ({
   pageSize = 12,
   onTotalCountChange,
   onClearFilters,
+  onPageChange,
 }: ProductGridProps) => {
   const [quickViewProduct, setQuickViewProduct] = useState<ProductCardData | null>(null);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
@@ -244,7 +246,7 @@ const ProductGrid = ({
         <Pagination
           currentPage={page}
           totalPages={totalPages}
-          onPageChange={() => {}}
+          onPageChange={onPageChange ?? (() => {})}
         />
       )}
 

@@ -132,6 +132,7 @@ const Category = () => {
           pageSize={12}
           onTotalCountChange={setTotalCount}
           onClearFilters={handleClearFilters}
+          onPageChange={handlePageChange}
         />
       </div>
     </Layout>
