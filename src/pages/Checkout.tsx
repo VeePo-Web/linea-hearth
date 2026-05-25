@@ -22,7 +22,7 @@ import UrgencyTimer from "@/components/checkout/UrgencyTimer";
 import OrderConfirmation from "@/components/checkout/OrderConfirmation";
 import PostPurchaseOffer from "@/components/checkout/PostPurchaseOffer";
 import MobileStickyCheckout from "@/components/checkout/MobileStickyCheckout";
-import ExpressCheckout from "@/components/checkout/ExpressCheckout";
+import StripeEmbeddedCheckout from "@/components/checkout/StripeEmbeddedCheckout";
 import SavedAddressSelector from "@/components/checkout/SavedAddressSelector";
 import FreeShippingBar from "@/components/cart/FreeShippingBar";
 import EmailTypoSuggestion from "@/components/ui/EmailTypoSuggestion";
@@ -223,12 +223,6 @@ const Checkout = () => {
         postalCode: shippingAddress.postalCode,
         country: shippingAddress.country,
       },
-      billingAddress: hasSeparateBilling ? {
-        address: billingDetails.address,
-        city: billingDetails.city,
-        postalCode: billingDetails.postalCode,
-        country: billingDetails.country,
-      } : undefined,
       shippingMethod: shippingOption as "standard" | "express" | "overnight",
       discountCodeId: appliedDiscount?.codeId || undefined,
       abandonedCartId: cartId || undefined,
@@ -237,14 +231,14 @@ const Checkout = () => {
     if (!result.success) {
       setIsProcessing(false);
       setCurrentStep(2);
-      
+
       if (result.configured === false) {
         toast.error(result.message || "Payment processing is not configured yet");
       } else {
         toast.error(result.error || "Checkout failed. Please try again.");
       }
     }
-    // If successful, user will be redirected to Stripe
+    // On success the embedded checkout modal mounts via `clientSecret`.
   };
 
   // Fallback simulated payment handler (when Stripe not configured)
@@ -905,14 +899,8 @@ const Checkout = () => {
                     </RadioGroup>
                   </div>
 
-                  {/* Express Checkout - Apple Pay / Google Pay */}
-                  <ExpressCheckout 
-                    variant="checkout"
-                    onSuccess={() => {
-                      // Cart will be cleared and redirect handled by the hook
-                    }}
-                    className="rounded-none"
-                  />
+                  {/* Embedded Stripe Checkout opens in modal below on submit */}
+
 
                   {/* Payment Section */}
                   <div id="payment-section" className="bg-muted/20 p-6 lg:p-8 rounded-none">
