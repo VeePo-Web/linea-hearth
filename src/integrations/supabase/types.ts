@@ -1010,6 +1010,7 @@ export type Database = {
           sale_price: number | null
           slug: string
           status: Database["public"]["Enums"]["product_status"]
+          stripe_price_id: string | null
           updated_at: string
           weight_gsm: number | null
         }
@@ -1033,6 +1034,7 @@ export type Database = {
           sale_price?: number | null
           slug: string
           status?: Database["public"]["Enums"]["product_status"]
+          stripe_price_id?: string | null
           updated_at?: string
           weight_gsm?: number | null
         }
@@ -1056,6 +1058,7 @@ export type Database = {
           sale_price?: number | null
           slug?: string
           status?: Database["public"]["Enums"]["product_status"]
+          stripe_price_id?: string | null
           updated_at?: string
           weight_gsm?: number | null
         }
