@@ -440,7 +440,7 @@ const QuickViewModal = ({ product, open, onClose, onAuthRequired }: QuickViewMod
         <Button
           variant="ghost"
           size="icon"
-          className="absolute right-3 top-3 md:right-4 md:top-4 z-50 bg-white/80 hover:bg-white rounded-full w-10 h-10 md:w-auto md:h-auto"
+          className="absolute right-3 top-3 md:right-4 md:top-4 z-modal bg-white/80 hover:bg-white rounded-full w-10 h-10 md:w-auto md:h-auto"
           onClick={onClose}
         >
           <X className="h-5 w-5 md:h-4 md:w-4" />
