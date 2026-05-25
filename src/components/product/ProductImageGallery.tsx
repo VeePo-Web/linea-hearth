@@ -265,17 +265,18 @@ const ProductImageGallery = ({ images, selectedColor }: ProductImageGalleryProps
             </AnimatePresence>
           </div>
           
-          {/* Tap to zoom hint - auto-fade after 3 seconds */}
-          <motion.div 
-            initial={{ opacity: 0, y: 10 }}
+          {/* Tap to zoom hint — chrome hairline, bottom-right, auto-fade */}
+          <motion.div
+            initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.8, duration: 0.4 }}
-            className="absolute top-4 left-1/2 -translate-x-1/2 text-xs font-light text-muted-foreground/80 bg-background/80 backdrop-blur-sm px-3 py-1.5"
+            className="absolute bottom-3 right-3 pointer-events-none"
           >
             <motion.span
               initial={{ opacity: 1 }}
               animate={{ opacity: 0 }}
-              transition={{ delay: 3, duration: 0.5 }}
+              transition={{ delay: 2.5, duration: 0.6 }}
+              className="inline-block text-[9px] font-light tracking-[0.2em] uppercase text-white/80 bg-black/30 backdrop-blur-md border border-white/15 px-2 py-1"
             >
               Tap to zoom
             </motion.span>

@@ -68,8 +68,8 @@ const CartQuantityBadge = ({
           className={cn(
             "absolute top-3 left-3 z-10",
             "flex items-center gap-1 px-2 py-1",
-            "bg-foreground text-background text-[10px] font-medium",
-            "shadow-sm",
+            "bg-black/40 backdrop-blur-md border border-white/15",
+            "text-white text-[10px] font-light tracking-[0.1em] uppercase",
             className
           )}
         >
