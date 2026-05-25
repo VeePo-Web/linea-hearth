@@ -1095,7 +1095,7 @@ const Checkout = () => {
 
       {/* Stripe Embedded Checkout overlay */}
       {clientSecret && (
-        <div className="fixed inset-0 z-50 bg-background/95 backdrop-blur-sm overflow-y-auto">
+        <div className="fixed inset-0 z-modal bg-background backdrop-blur-sm overflow-y-auto">
           <div className="max-w-2xl mx-auto py-8 px-4">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-light tracking-wide">Complete payment</h2>

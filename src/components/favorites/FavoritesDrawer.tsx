@@ -237,7 +237,7 @@ export default function FavoritesDrawer({ isOpen, onClose, onAuthRequired }: Fav
         <>
           {/* Backdrop */}
           <motion.div
-            className="fixed inset-0 z-50 bg-black/50 touch-none"
+            className="fixed inset-0 z-overlay bg-black/50 touch-none"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -247,7 +247,7 @@ export default function FavoritesDrawer({ isOpen, onClose, onAuthRequired }: Fav
           
           {/* Drawer */}
           <motion.div
-            className="fixed right-0 top-0 h-[100dvh] w-full max-w-md bg-background border-l border-border z-50 flex flex-col shadow-2xl overscroll-contain"
+            className="fixed right-0 top-0 h-[100dvh] w-full max-w-md bg-background border-l border-border z-drawer flex flex-col shadow-2xl overscroll-contain"
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}

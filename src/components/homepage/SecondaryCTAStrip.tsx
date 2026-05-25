@@ -36,8 +36,9 @@ const SecondaryCTAStrip = () => {
   if (isDismissed) return null;
 
   return (
+    // z-banner sits below z-header by design (header covers it when reveling)
     <div 
-      className={`fixed top-0 left-0 right-0 z-40 bg-champagne-500 transition-all duration-500 hidden md:block ${
+      className={`fixed top-0 left-0 right-0 z-banner bg-champagne-500 transition-all duration-500 hidden md:block ${
         isVisible 
           ? 'translate-y-0 opacity-100' 
           : '-translate-y-full opacity-0'

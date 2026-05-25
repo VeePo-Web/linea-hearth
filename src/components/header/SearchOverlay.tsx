@@ -312,7 +312,7 @@ const SearchOverlay = ({ isOpen, onClose }: SearchOverlayProps) => {
         <>
           {/* Mobile: Full-screen overlay */}
           <motion.div
-            className="fixed inset-0 h-[100dvh] bg-background z-50 md:hidden flex flex-col overscroll-contain"
+            className="fixed inset-0 h-[100dvh] bg-background z-drawer md:hidden flex flex-col overscroll-contain"
             variants={containerVariants}
             initial="hidden"
             animate="visible"
@@ -345,7 +345,7 @@ const SearchOverlay = ({ isOpen, onClose }: SearchOverlayProps) => {
 
           {/* Desktop: Dropdown overlay */}
           <motion.div
-            className="hidden md:block absolute top-full left-0 right-0 bg-background border-b border-border z-50 shadow-lg"
+            className="hidden md:block absolute top-full left-0 right-0 bg-background border-b border-border z-drawer shadow-lg"
             variants={containerVariants}
             initial="hidden"
             animate="visible"

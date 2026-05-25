@@ -60,7 +60,7 @@ const LookNavigationMobile = ({ looks }: LookNavigationMobileProps) => {
 
   return (
     <motion.nav 
-      className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 lg:hidden safe-area-bottom"
+      className="fixed bottom-4 left-1/2 -translate-x-1/2 z-fixed-bar lg:hidden safe-area-bottom"
       initial={prefersReducedMotion ? {} : { opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 1.5 }}

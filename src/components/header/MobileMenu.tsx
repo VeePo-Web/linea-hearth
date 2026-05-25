@@ -138,7 +138,7 @@ const MobileMenu = ({
         <>
           {/* Backdrop */}
           <motion.div
-            className="fixed inset-0 bg-black/80 z-40 touch-none"
+            className="fixed inset-0 bg-black/80 z-overlay touch-none"
             variants={backdropVariants}
             initial="hidden"
             animate="visible"
@@ -148,7 +148,7 @@ const MobileMenu = ({
 
           {/* Panel */}
           <motion.div
-            className="fixed right-0 top-0 h-[100dvh] w-full max-w-md bg-background z-50 flex flex-col shadow-2xl overscroll-contain"
+            className="fixed right-0 top-0 h-[100dvh] w-full max-w-md bg-background z-drawer flex flex-col shadow-2xl overscroll-contain"
             variants={panelVariants}
             initial="hidden"
             animate="visible"
