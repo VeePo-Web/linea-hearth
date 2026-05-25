@@ -34,7 +34,7 @@ const Checkout = () => {
   const [searchParams] = useSearchParams();
   const { items, subtotal, hasFreeShipping, updateQuantity, removeItem, clearCart, itemCount } = useCart();
   const { syncCart, markConverted, email: savedEmail, isSynced, cartId } = useAbandonedCart();
-  const { initiateCheckout, isLoading: isStripeLoading, error: stripeError } = useStripeCheckout();
+  const { initiateCheckout, isLoading: isStripeLoading, error: stripeError, clientSecret, resetCheckout } = useStripeCheckout();
   const { 
     validateCode, 
     appliedDiscount, 
