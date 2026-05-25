@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import { useCart } from "./useCart";
-import { useBundleDiscounts } from "./useBundleDiscounts";
 import { supabase } from "@/integrations/supabase/client";
+import { getStripeEnvironment, isPaymentsConfigured } from "@/lib/stripe";
 
 interface ShippingAddress {
   address: string;
@@ -10,131 +10,107 @@ interface ShippingAddress {
   country: string;
 }
 
-interface BundleDiscountClaim {
-  bundleRuleId: string;
-  lookId: string;
-  itemProductIds: string[];
-  claimedSavings: number;
-}
-
 interface CheckoutData {
   customerEmail: string;
   customerFirstName: string;
   customerLastName: string;
   customerPhone?: string;
   shippingAddress: ShippingAddress;
-  billingAddress?: ShippingAddress;
   shippingMethod: "standard" | "express" | "overnight";
   discountCodeId?: string;
   abandonedCartId?: string;
-  bundleDiscounts?: BundleDiscountClaim[];
 }
 
 interface CheckoutResult {
   success: boolean;
-  checkoutUrl?: string;
+  clientSecret?: string;
   orderId?: string;
   sessionId?: string;
+  error?: string;
   configured?: boolean;
   message?: string;
-  error?: string;
 }
 
 export const useStripeCheckout = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [orderId, setOrderId] = useState<string | null>(null);
   const { items } = useCart();
-  const { bundleDataForCheckout } = useBundleDiscounts();
 
   const initiateCheckout = useCallback(
     async (data: CheckoutData): Promise<CheckoutResult> => {
       setIsLoading(true);
       setError(null);
 
+      if (!isPaymentsConfigured()) {
+        const msg = "Payments are not configured.";
+        setError(msg);
+        setIsLoading(false);
+        return { success: false, configured: false, message: msg };
+      }
+
       try {
-        // Transform cart items to checkout format
         const checkoutItems = items.map((item) => ({
           productId: item.productId || item.id?.toString() || "",
           variantId: undefined,
           name: item.name,
-          image: item.image.startsWith("http") 
-            ? item.image 
-            : `${window.location.origin}${item.image}`,
+          image: item.image?.startsWith("http")
+            ? item.image
+            : `${window.location.origin}${item.image ?? ""}`,
           price: item.price,
           quantity: item.quantity,
           size: item.size,
           color: item.color,
         }));
 
-        // Get auth token if available
-        const { data: { session } } = await supabase.auth.getSession();
-        const headers: Record<string, string> = {
-          "Content-Type": "application/json",
-        };
-        if (session?.access_token) {
-          headers["Authorization"] = `Bearer ${session.access_token}`;
-        }
+        const returnUrl = `${window.location.origin}/checkout/success?session_id={CHECKOUT_SESSION_ID}`;
 
-        const response = await fetch(
-          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-checkout-session`,
+        const { data: result, error: invokeErr } = await supabase.functions.invoke(
+          "create-checkout-session",
           {
-            method: "POST",
-            headers,
-            body: JSON.stringify({
+            body: {
               items: checkoutItems,
               ...data,
-              // Include bundle discounts for server-side validation
-              bundleDiscounts: bundleDataForCheckout,
-            }),
-          }
+              returnUrl,
+              environment: getStripeEnvironment(),
+            },
+          },
         );
 
-        const result: CheckoutResult = await response.json();
-
-        if (!response.ok || !result.success) {
-          // Handle Stripe not configured
-          if (result.configured === false) {
-            setError(result.message || "Payment processing is not configured");
-            return result;
-          }
-          
-          const errorMessage = result.error || "Checkout failed";
-          setError(errorMessage);
-          return { success: false, error: errorMessage };
+        if (invokeErr || !result?.success || !result?.clientSecret) {
+          const msg = result?.error || invokeErr?.message || "Checkout failed";
+          setError(msg);
+          return { success: false, error: msg };
         }
 
-        // Redirect to Stripe Checkout
-        if (result.checkoutUrl) {
-          window.location.href = result.checkoutUrl;
-        }
-
-        return result;
+        setClientSecret(result.clientSecret);
+        setOrderId(result.orderId ?? null);
+        return result as CheckoutResult;
       } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : "An error occurred";
-        setError(errorMessage);
-        return { success: false, error: errorMessage };
+        const msg = err instanceof Error ? err.message : "An error occurred";
+        setError(msg);
+        return { success: false, error: msg };
       } finally {
         setIsLoading(false);
       }
     },
-    [items, bundleDataForCheckout]
+    [items],
   );
 
-  const checkStripeConfigured = useCallback(async (): Promise<boolean> => {
-    try {
-      // We can't check directly, but we can try a minimal request
-      // For now, assume it's configured and handle errors gracefully
-      return true;
-    } catch {
-      return false;
-    }
+  const resetCheckout = useCallback(() => {
+    setClientSecret(null);
+    setOrderId(null);
+    setError(null);
   }, []);
 
   return {
     initiateCheckout,
-    checkStripeConfigured,
+    resetCheckout,
     isLoading,
     error,
+    clientSecret,
+    orderId,
     clearError: () => setError(null),
   };
 };

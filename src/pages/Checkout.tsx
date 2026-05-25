@@ -22,7 +22,7 @@ import UrgencyTimer from "@/components/checkout/UrgencyTimer";
 import OrderConfirmation from "@/components/checkout/OrderConfirmation";
 import PostPurchaseOffer from "@/components/checkout/PostPurchaseOffer";
 import MobileStickyCheckout from "@/components/checkout/MobileStickyCheckout";
-import ExpressCheckout from "@/components/checkout/ExpressCheckout";
+import StripeEmbeddedCheckout from "@/components/checkout/StripeEmbeddedCheckout";
 import SavedAddressSelector from "@/components/checkout/SavedAddressSelector";
 import FreeShippingBar from "@/components/cart/FreeShippingBar";
 import EmailTypoSuggestion from "@/components/ui/EmailTypoSuggestion";
@@ -34,7 +34,7 @@ const Checkout = () => {
   const [searchParams] = useSearchParams();
   const { items, subtotal, hasFreeShipping, updateQuantity, removeItem, clearCart, itemCount } = useCart();
   const { syncCart, markConverted, email: savedEmail, isSynced, cartId } = useAbandonedCart();
-  const { initiateCheckout, isLoading: isStripeLoading, error: stripeError } = useStripeCheckout();
+  const { initiateCheckout, isLoading: isStripeLoading, error: stripeError, clientSecret, resetCheckout } = useStripeCheckout();
   const { 
     validateCode, 
     appliedDiscount, 
@@ -223,12 +223,6 @@ const Checkout = () => {
         postalCode: shippingAddress.postalCode,
         country: shippingAddress.country,
       },
-      billingAddress: hasSeparateBilling ? {
-        address: billingDetails.address,
-        city: billingDetails.city,
-        postalCode: billingDetails.postalCode,
-        country: billingDetails.country,
-      } : undefined,
       shippingMethod: shippingOption as "standard" | "express" | "overnight",
       discountCodeId: appliedDiscount?.codeId || undefined,
       abandonedCartId: cartId || undefined,
@@ -237,14 +231,14 @@ const Checkout = () => {
     if (!result.success) {
       setIsProcessing(false);
       setCurrentStep(2);
-      
+
       if (result.configured === false) {
         toast.error(result.message || "Payment processing is not configured yet");
       } else {
         toast.error(result.error || "Checkout failed. Please try again.");
       }
     }
-    // If successful, user will be redirected to Stripe
+    // On success the embedded checkout modal mounts via `clientSecret`.
   };
 
   // Fallback simulated payment handler (when Stripe not configured)
@@ -905,14 +899,8 @@ const Checkout = () => {
                     </RadioGroup>
                   </div>
 
-                  {/* Express Checkout - Apple Pay / Google Pay */}
-                  <ExpressCheckout 
-                    variant="checkout"
-                    onSuccess={() => {
-                      // Cart will be cleared and redirect handled by the hook
-                    }}
-                    className="rounded-none"
-                  />
+                  {/* Embedded Stripe Checkout opens in modal below on submit */}
+
 
                   {/* Payment Section */}
                   <div id="payment-section" className="bg-muted/20 p-6 lg:p-8 rounded-none">
@@ -1104,6 +1092,25 @@ const Checkout = () => {
         onClose={() => setShowPostPurchaseOffer(false)}
         onAddToOrder={handleAddPostPurchaseItem}
       />
+
+      {/* Stripe Embedded Checkout overlay */}
+      {clientSecret && (
+        <div className="fixed inset-0 z-50 bg-background/95 backdrop-blur-sm overflow-y-auto">
+          <div className="max-w-2xl mx-auto py-8 px-4">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-light tracking-wide">Complete payment</h2>
+              <button
+                type="button"
+                onClick={() => { resetCheckout(); setIsProcessing(false); setCurrentStep(2); }}
+                className="text-sm text-muted-foreground hover:text-foreground underline"
+              >
+                Cancel
+              </button>
+            </div>
+            <StripeEmbeddedCheckout clientSecret={clientSecret} />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

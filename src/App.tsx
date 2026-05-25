@@ -9,7 +9,7 @@ import { AuthProvider } from "@/hooks/useAuth";
 import { CartProvider } from "@/hooks/useCart";
 import { SizeQuizProvider } from "@/contexts/SizeQuizContext";
 import { RecentlyViewedProvider } from "@/contexts/RecentlyViewedContext";
-import { StripeProvider } from "@/components/checkout/StripeProvider";
+import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
 import { migrateLocalStorage } from "@/lib/storageMigration";
 
 // Run localStorage migration on app load (before React renders)
@@ -171,16 +171,15 @@ const App = () => (
       <CartProvider>
         <RecentlyViewedProvider>
           <SizeQuizProvider>
-            <StripeProvider>
-              <TooltipProvider>
-                <Toaster />
-                <Sonner />
-                <BrowserRouter>
-                  <ScrollToTop />
-                  <AnimatedRoutes />
-                </BrowserRouter>
-              </TooltipProvider>
-            </StripeProvider>
+            <TooltipProvider>
+              <PaymentTestModeBanner />
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
+                <ScrollToTop />
+                <AnimatedRoutes />
+              </BrowserRouter>
+            </TooltipProvider>
           </SizeQuizProvider>
         </RecentlyViewedProvider>
       </CartProvider>

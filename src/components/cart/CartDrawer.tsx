@@ -17,7 +17,7 @@ import BundleProgress from "./BundleProgress";
 import BundleSavingsRow from "./BundleSavingsRow";
 import SavedForLaterShelf from "./SavedForLaterShelf";
 import ContinueShopping from "./ContinueShopping";
-import ExpressCheckout from "@/components/checkout/ExpressCheckout";
+
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 
@@ -453,11 +453,6 @@ const CartDrawer = ({ onViewFavorites }: CartDrawerProps) => {
                     Shipping and taxes calculated at checkout
                   </p>
 
-                  {/* Express Checkout - Apple Pay / Google Pay */}
-                  <ExpressCheckout 
-                    variant="cart"
-                    onSuccess={closeCart}
-                  />
 
                   <motion.div
                     whileHover={{ scale: 1.01 }}
