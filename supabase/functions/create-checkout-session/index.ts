@@ -238,7 +238,6 @@ Deno.serve(async (req) => {
       ui_mode: "embedded_page",
       return_url: body.returnUrl,
       ...(customerId && { customer: customerId }),
-      automatic_tax: { enabled: true },
       shipping_address_collection: { allowed_countries: ["CA", "US"] },
       shipping_options: [
         {
@@ -253,6 +252,7 @@ Deno.serve(async (req) => {
                   ? "Express (2-3 days)"
                   : "Overnight",
             tax_behavior: "exclusive",
+            tax_rates: [gstTaxRateId],
           },
         },
       ],
