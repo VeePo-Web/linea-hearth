@@ -1,50 +1,40 @@
-## What I found
+Three scoped changes, no business logic.
 
-**1. Collection cards (homepage)** — `src/components/homepage/CategoryTiles.tsx` hardcodes 4 tiles (Hoodies / Tops / Tees / Accessories) to images of just two old products (`stay-holy-hoodie`, `heavenly-crewneck`). These don't update when you add new products.
+## 1. Add Mission section to About page (third section)
 
-The `categories` table already has an `image_url` column, and `products` + `product_images` are populated per category. Two places that drive collection imagery from the DB already exist as patterns: `FeaturedCollection.tsx` and `DropGrid.tsx`.
+Create `src/components/about/MissionStatement.tsx` and insert it as the third section in `src/pages/about/OurStory.tsx`, right after `StoryCallingSection`. Style matches the existing dark-stone editorial sections (same `bg-stone-950`, same eyebrow + serif headline + body rhythm used in `StoryCallingSection` / `OriginStory`, chrome hairline divider top and bottom, numeric watermark `03`).
 
-**2. "Our Reach"** — only appears in `src/components/about/ImpactMap.tsx` (lines 100 and 136).
+Draft mission copy (placeholder — you can swap later in admin or tell me to rewrite):
 
-**3. Champagne/silver accents** in the footer + community page:
-- `src/components/footer/Footer.tsx` — `text-champagne-500` on the brand "JUDAH" word and on every link hover state (Shop / Support / About / social / legal).
-- `src/components/community/CommunityHero.tsx` — "Tribe" headline word, eyebrow label, italic line, featured-story badge, avatar circle.
-- `src/components/community/StoryGrid.tsx` — "02" eyebrow number.
-- `src/components/community/SubmitStoryCTA.tsx` — "Testimony?" headline word.
+> **Eyebrow:** THE MISSION
+> **Headline:** Wear what you believe. Carry it with you.
+> **Body:** Line of Judah exists to put sacred conviction onto everyday armor — pieces engineered to outlast trend, built for the believer who refuses to whisper. Every drop is a quiet declaration: that craft can be ministry, that clothing can be testimony, and that *"for glory and for beauty"* (Exodus 28:2) is not a relic — it's a standard.
 
----
+Updated OurStory order becomes: Hero → Calling → **Mission** → Origin → Founder Letter → Values → Impact → Tribe → Join.
 
-## Plan
+## 2. Rename founder → "Olliver Abbey"
 
-### A. Collection cards → live from database
-Refactor `CategoryTiles.tsx` to fetch its 4 tile images from Supabase instead of hardcoded paths.
+Single hardcoded reference: `src/components/about/FounderLetter.tsx:76` — change `Jordan Williams` → `Olliver Abbey`. No other "Jordan Williams" strings exist in the codebase. Spot-check `FounderLetter.tsx` for any signature/avatar alt text and update those too.
 
-For each tile slug (`hoodies`, `tops`, `tees`, `accessories`):
-1. Look up the category row by slug — use `categories.image_url` if set.
-2. Otherwise pull the newest active product in that category and use its primary `product_images.image_url`.
-3. If neither exists, render a neutral dark stone tile (no broken image).
+## 3. Replace Stay Holy male-model photo with live category-appropriate product images
 
-One `useQuery` call with a 5-min staleTime, joined query, mapped onto the existing 4 tiles. Keep all current layout/animation/copy untouched — only the `image` source changes.
+The image you uploaded is `/products/stay-holy-hoodie/male-model.png`. It's hardcoded in 6 locations. Each will be refactored to pull the newest active product's primary image from the relevant category in the database (same pattern as CategoryTiles), with the existing hardcoded path as fallback so nothing breaks if the DB is empty.
 
-Result: as soon as you publish a product in the admin CMS, that category's tile updates automatically. No more stale "stay-holy-hoodie" everywhere.
+| Location | Category to pull from | Why |
+|---|---|---|
+| `HeroBlock.tsx` (homepage hero bg) | hoodies | Hero showcases flagship hoodie product |
+| `FiftyFiftySection.tsx` | hoodies | Editorial spread |
+| `MissionBlock.tsx` | hoodies | Flat lay alongside copy |
+| `StoryWorldwideTribe.tsx` (3 slots referencing male/female stay-holy) | hoodies / tops mix — pull newest from each | Tribe wall needs visual variety |
+| `StoryJoinCTA.tsx` | hoodies | Section CTA backdrop |
+| `LargeHero.tsx` | hoodies | Editorial hero |
 
-### B. "Our Reach" → "Outreach"
-Two string swaps in `src/components/about/ImpactMap.tsx`. Nothing else changes.
+Query pattern (one shared hook `useCategoryHeroImage(slug)`): `products` joined `product_images` where `categories.slug = $1` AND `products.status = 'active'`, ordered by `created_at desc`, limit 1, returns `product_images.image_url` where `is_primary = true` (fallback to first image). 5-min `staleTime`. New components stay otherwise visually identical — same layout, same animation, same copy — only the `src` / `backgroundImage` source changes.
 
-### C. Footer + Community: champagne → white
-Replace `text-champagne-500` with `text-white` (and `bg-champagne-500` / `bg-champagne-500/20` with `bg-white` / `bg-white/10`) in:
-- `Footer.tsx` — "JUDAH" word + all link hover states + Contact email hover + social links hover + legal links hover.
-- `CommunityHero.tsx` — "Tribe" word, eyebrow, italic line, featured badge bg, avatar circle bg + text.
-- `StoryGrid.tsx` — "02" eyebrow.
-- `SubmitStoryCTA.tsx` — "Testimony?" word.
+ProductCarousel.tsx (homepage carousel) keeps its hardcoded demo entries since it's already wired to a different demo system — leaving it untouched unless you want me to refactor it too.
 
-No layout, copy, spacing, or animation changes — purely color token swaps.
-
-### Technical notes
-- `CategoryTiles` becomes a client component using `@tanstack/react-query` + `supabase` (same pattern as `FeaturedCollection.tsx`).
-- All other files: search-and-replace level edits.
-- Memory note `color-palette` says Silver Chrome & Forest Green, no gold — champagne accents were drift from that. Switching to white aligns with the core aesthetic.
-
-### Out of scope
-- No new product photos are being uploaded in this pass — the live-DB wire-up means the tiles will reflect whatever product images already exist in your catalog.
-- Other champagne accents elsewhere on the site (e.g. About pages, ambassador, cart) are untouched unless you ask.
+## Out of scope
+- No copy/layout changes elsewhere
+- No new admin UI (you can already swap the underlying product image from the existing product admin)
+- ProductCarousel demo data untouched
+- The model in `StoryHero.tsx` and `BrandFilmHero.tsx` is `/founders.png` (the founders themselves, not the Stay Holy model) — left alone

@@ -3,48 +3,28 @@ import { useRef, useState } from "react";
 import { Instagram } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useCategoryImages } from "@/hooks/useCategoryHeroImage";
 
-const tribeMembers = [
-  {
-    image: "/products/stay-holy-hoodie/male-model.png",
-    username: "@marcus_faith",
-    location: "Atlanta, USA",
-  },
-  {
-    image: "/products/heavenly-crewneck/female-model.png",
-    username: "@aaliyah.believes",
-    location: "Toronto, Canada",
-  },
-  {
-    image: "/products/stay-holy-hoodie/female-model-1.png",
-    username: "@devon.warrior",
-    location: "Calgary, Canada",
-  },
-  {
-    image: "/products/heavenly-crewneck/front-model.png",
-    username: "@sarah.crowned",
-    location: "Houston, USA",
-  },
-  {
-    image: "/products/stay-holy-hoodie/female-model-2.png",
-    username: "@priya.kingdom",
-    location: "Vancouver, Canada",
-  },
-  {
-    image: "/products/heavenly-crewneck/lifestyle.png",
-    username: "@james.lion",
-    location: "London, UK",
-  },
-  {
-    image: "/products/stay-holy-hoodie/flat-front.png",
-    username: "@lineofjudah",
-    location: "Calgary, Canada",
-  },
-  {
-    image: "/products/heavenly-crewneck/side-view.png",
-    username: "@testimony.daily",
-    location: "Miami, USA",
-  },
+const FALLBACK_IMAGES = [
+  "/products/stay-holy-hoodie/male-model.png",
+  "/products/heavenly-crewneck/female-model.png",
+  "/products/stay-holy-hoodie/female-model-1.png",
+  "/products/heavenly-crewneck/front-model.png",
+  "/products/stay-holy-hoodie/female-model-2.png",
+  "/products/heavenly-crewneck/lifestyle.png",
+  "/products/stay-holy-hoodie/flat-front.png",
+  "/products/heavenly-crewneck/side-view.png",
+];
+
+const TRIBE_META = [
+  { username: "@marcus_faith", location: "Atlanta, USA" },
+  { username: "@aaliyah.believes", location: "Toronto, Canada" },
+  { username: "@devon.warrior", location: "Calgary, Canada" },
+  { username: "@sarah.crowned", location: "Houston, USA" },
+  { username: "@priya.kingdom", location: "Vancouver, Canada" },
+  { username: "@james.lion", location: "London, UK" },
+  { username: "@lineofjudah", location: "Calgary, Canada" },
+  { username: "@testimony.daily", location: "Miami, USA" },
 ];
 
 const StoryWorldwideTribe = () => {
@@ -52,6 +32,15 @@ const StoryWorldwideTribe = () => {
   const isInView = useInView(sectionRef, { once: true, margin: "-100px" });
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const isMobile = useIsMobile();
+
+  // Pull a mix from hoodies + tops categories for variety
+  const hoodieImages = useCategoryImages("hoodies", 4, FALLBACK_IMAGES.slice(0, 4));
+  const topsImages = useCategoryImages("tops", 4, FALLBACK_IMAGES.slice(4, 8));
+
+  const tribeMembers = TRIBE_META.map((meta, i) => ({
+    ...meta,
+    image: i % 2 === 0 ? hoodieImages[Math.floor(i / 2)] : topsImages[Math.floor(i / 2)],
+  }));
 
   return (
     <section

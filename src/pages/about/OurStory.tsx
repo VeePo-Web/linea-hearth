@@ -2,6 +2,7 @@ import { useRef } from "react";
 import Layout from "@/components/layout/Layout";
 import StoryHero from "@/components/about/StoryHero";
 import StoryCallingSection from "@/components/about/StoryCallingSection";
+import MissionStatement from "@/components/about/MissionStatement";
 import OriginStory from "@/components/about/OriginStory";
 import FounderLetter from "@/components/about/FounderLetter";
 import StoryValuesGrid from "@/components/about/StoryValuesGrid";
@@ -20,6 +21,8 @@ const OurStory = () => {
         <StoryHero />
         <div className="bg-stone-950 flex justify-center py-0"><div className="w-24 h-px bg-champagne-500/40" /></div>
         <StoryCallingSection />
+        <div className="bg-stone-950 flex justify-center py-0"><div className="w-24 h-px bg-champagne-500/40" /></div>
+        <MissionStatement />
         <div className="bg-stone-950 flex justify-center py-0"><div className="w-24 h-px bg-champagne-500/40" /></div>
         <OriginStory />
         <FounderLetter />

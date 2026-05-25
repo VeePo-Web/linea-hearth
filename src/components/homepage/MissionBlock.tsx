@@ -7,19 +7,22 @@ import ParallaxImage from "@/components/motion/ParallaxImage";
 import TextReveal from "@/components/motion/TextReveal";
 import { hoverScale, tapScale } from "@/lib/animations";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useCategoryHeroImage } from "@/hooks/useCategoryHeroImage";
 
 const MissionBlock = () => {
   const isMobile = useIsMobile();
+  const bgImage = useCategoryHeroImage("hoodies", "/products/stay-holy-hoodie/flat-front.png");
 
   return (
     <section className="relative w-full min-h-[60vh] md:min-h-[70vh] overflow-hidden">
       {/* Full-bleed Background with Parallax - Disabled on mobile for performance */}
       <ParallaxImage 
-        src="/products/stay-holy-hoodie/flat-front.png"
+        src={bgImage}
         alt="Line of Judah"
         className="absolute inset-0"
         speed={isMobile ? 0 : 0.2}
       />
+      
       
       <motion.div 
         className="absolute inset-0 bg-background/40"
