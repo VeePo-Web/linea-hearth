@@ -113,9 +113,11 @@ const ProductCard = ({ product, onQuickView, index = 0, onAuthRequired }: Produc
   }
 
   const springConfig = { type: "spring" as const, stiffness: 400, damping: 25 };
-  
-  // Show actions on mobile always, on desktop only on hover
-  const showActions = isMobile || (isHovered && !quickAdd.isPickerOpen && !quickAdd.isAdded);
+
+  // Mobile: no persistent overlay (single floating + button only).
+  // Desktop: full action strip on hover.
+  const showDesktopActions = !isMobile && isHovered && !quickAdd.isPickerOpen && !quickAdd.isAdded;
+  const showMobileFab = isMobile && !quickAdd.isPickerOpen && !quickAdd.isAdded && quickAdd.totalStock > 0;
 
   return (
     <Card
