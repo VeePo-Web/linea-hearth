@@ -31,6 +31,7 @@ const ProductGrid = ({
   pageSize = 12,
   onTotalCountChange,
   onClearFilters,
+  onPageChange,
 }: ProductGridProps) => {
   const [quickViewProduct, setQuickViewProduct] = useState<ProductCardData | null>(null);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
