@@ -172,8 +172,8 @@ const FilterSortBar = ({
       {/* Filter Bar */}
       <section 
         className={cn(
-          "w-full px-4 md:px-6 mb-6 md:mb-8 border-b border-border pb-4 transition-all duration-200",
-          isSticky && "sticky top-[var(--header-height)] z-30 bg-background/95 backdrop-blur-sm shadow-sm pt-4 -mt-4"
+          "w-full px-4 md:px-6 mb-6 md:mb-8 border-b border-border py-4",
+          isSticky && "sticky top-[var(--sticky-top)] z-sticky-sub bg-background shadow-sm"
         )}
       >
         {/* Accessibility announcement */}

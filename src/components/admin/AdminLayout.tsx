@@ -59,7 +59,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="h-14 border-b border-border bg-card px-6 flex items-center justify-between sticky top-0 z-50">
+      <header className="h-14 border-b border-border bg-card px-6 flex items-center justify-between sticky top-0 z-header">
         <div className="flex items-center gap-4">
           <Link to="/" className="text-sm font-medium tracking-wider text-foreground">
             LOJ
@@ -112,7 +112,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
         </aside>
 
         {/* Mobile bottom nav */}
-        <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border flex">
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 z-fixed-bar bg-card border-t border-border flex">
           {navItems.map((item) => {
             const isActive = location.pathname === item.href ||
               (item.href !== '/ops-portal' && location.pathname.startsWith(item.href));

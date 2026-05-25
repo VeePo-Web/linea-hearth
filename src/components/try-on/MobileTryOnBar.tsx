@@ -73,7 +73,7 @@ export const MobileTryOnBar = ({ onOpenSlot }: MobileTryOnBarProps) => {
 
   return (
     <>
-      <div className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border md:hidden pb-safe">
+      <div className="fixed bottom-0 left-0 right-0 z-fixed-bar bg-background border-t border-border md:hidden pb-safe">
         {/* Slot Quick Access */}
         <div className="flex items-center justify-around py-3 px-4 border-b border-border">
           {slots.map(({ id, icon }) => {

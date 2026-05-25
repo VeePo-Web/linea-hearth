@@ -37,7 +37,7 @@ const MobileStickyBar = () => {
 
   return (
     <div 
-      className={`fixed bottom-0 left-0 right-0 z-40 md:hidden transition-all duration-300 safe-area-bottom ${
+      className={`fixed bottom-0 left-0 right-0 z-fixed-bar md:hidden transition-all duration-300 safe-area-bottom ${
         shouldShow 
           ? 'translate-y-0 opacity-100' 
           : 'translate-y-full opacity-0'

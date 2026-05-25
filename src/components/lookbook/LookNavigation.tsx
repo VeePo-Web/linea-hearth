@@ -67,7 +67,7 @@ const LookNavigation = ({ looks, onNavigate }: LookNavigationProps) => {
 
   return (
     <motion.nav 
-      className="fixed right-6 top-1/2 -translate-y-1/2 z-40 hidden lg:flex flex-col items-end gap-4"
+      className="fixed right-6 top-1/2 -translate-y-1/2 z-fixed-bar hidden lg:flex flex-col items-end gap-4"
       initial={prefersReducedMotion ? {} : { opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.5, delay: 1.5 }}

@@ -4,12 +4,14 @@ import { motion } from "framer-motion";
 import StatusBar from "./StatusBar";
 import Navigation from "./Navigation";
 import { useScrollDirection } from "@/hooks/useScrollDirection";
+import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { cn } from "@/lib/utils";
 
 const Header = () => {
   const location = useLocation();
   const isHomePage = location.pathname === "/home";
   const { direction, isAtTop, isScrolled } = useScrollDirection(80);
+  const prefersReducedMotion = useReducedMotion();
   const shouldHide = direction === "down" && isScrolled && !isAtTop;
 
   const [hasRevealed, setHasRevealed] = useState(!isHomePage);
@@ -31,21 +33,34 @@ const Header = () => {
   }, [direction, isScrolled, hasRevealed]);
 
   // Determine y position
-  const yPosition = !hasRevealed ? -100 : shouldHide ? -100 : 0;
+  const isHidden = !hasRevealed || shouldHide;
+  const yPosition = isHidden ? -100 : 0;
+
+  // Write --sticky-top so sub-navs (filter bar, story filters) track header reveal
+  useEffect(() => {
+    document.documentElement.style.setProperty(
+      "--sticky-top",
+      isHidden ? "0px" : "var(--header-height)"
+    );
+  }, [isHidden]);
 
   return (
     <motion.header
       className={cn(
-        "w-full fixed top-0 left-0 right-0 z-50 transition-shadow duration-300",
+        "w-full fixed top-0 left-0 right-0 z-header transition-shadow duration-300",
         !isAtTop && hasRevealed && "shadow-sm"
       )}
       initial={{ y: isHomePage ? -100 : 0 }}
       animate={{ y: yPosition }}
-      transition={{
-        type: "tween",
-        duration: 0.4,
-        ease: [0.25, 0.46, 0.45, 0.94],
-      }}
+      transition={
+        prefersReducedMotion
+          ? { duration: 0 }
+          : {
+              type: "tween",
+              duration: 0.4,
+              ease: [0.25, 0.46, 0.45, 0.94],
+            }
+      }
     >
       <StatusBar />
       <Navigation />

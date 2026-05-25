@@ -27,6 +27,8 @@ html.scroll-locked body {
     --nav-height: 64px;
     --header-height: 100px;
     --header-height-scrolled: 64px;
+    /* Tracks header reveal state — sticky sub-nav consumes this */
+    --sticky-top: var(--header-height);
     
     /* Core palette - Dark editorial default */
     --background: 0 0% 4%;

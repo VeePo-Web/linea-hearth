@@ -151,7 +151,7 @@ const CartDrawer = ({ onViewFavorites }: CartDrawerProps) => {
   return (
     <AnimatePresence>
       {isCartOpen && (
-        <div className="fixed inset-0 z-50 h-[100dvh]">
+        <div className="fixed inset-0 z-drawer h-[100dvh]">
           {/* Backdrop */}
           <motion.div
             className="absolute inset-0 bg-black/50 h-[100dvh] touch-none"

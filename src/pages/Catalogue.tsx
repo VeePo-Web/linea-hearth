@@ -226,7 +226,7 @@ const Catalogue = () => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="fixed inset-0 bg-black/60 z-40"
+                className="fixed inset-0 bg-black/60 z-overlay"
                 onClick={() => setFiltersOpen(false)}
               />
               <motion.div
@@ -234,7 +234,7 @@ const Catalogue = () => {
                 animate={{ x: 0 }}
                 exit={{ x: "-100%" }}
                 transition={{ type: "tween", duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
-                className="fixed left-0 top-0 h-full w-72 bg-background z-50 flex flex-col shadow-2xl"
+                className="fixed left-0 top-0 h-full w-72 bg-background z-drawer flex flex-col shadow-2xl"
               >
                 <div className="flex items-center justify-between px-6 py-5 border-b border-border">
                   <span className="text-[11px] tracking-[0.3em] uppercase">Filter</span>

@@ -91,7 +91,7 @@ const MegaMenu = ({
     <AnimatePresence>
       {isOpen && items.length > 0 && (
         <motion.div
-          className="absolute top-full left-0 right-0 bg-background border-b border-border z-50 shadow-lg"
+          className="absolute top-full left-0 right-0 bg-background border-b border-border z-header shadow-lg"
           variants={containerVariants}
           initial="hidden"
           animate="visible"

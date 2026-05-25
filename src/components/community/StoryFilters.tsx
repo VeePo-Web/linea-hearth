@@ -69,7 +69,7 @@ export default function StoryFilters({
   };
 
   return (
-    <div className="sticky top-[var(--header-height)] z-30 bg-background/95 backdrop-blur-sm border-b border-border shadow-sm">
+    <div className="sticky top-[var(--sticky-top)] z-sticky-sub bg-background border-b border-border shadow-sm">
       <div className="container mx-auto px-4 lg:px-8">
         {/* Desktop: Magazine-style navigation */}
         <div className="hidden md:flex items-center justify-between py-3">
