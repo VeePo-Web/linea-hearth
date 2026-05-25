@@ -73,7 +73,7 @@ const FounderLetter = () => {
             <div className="flex items-center justify-center gap-4">
               <div className="w-16 h-px bg-champagne-500" />
               <p className="text-lg font-light text-stone-950 italic tracking-wide">
-                Jordan Williams
+                Olliver Abbey
               </p>
               <div className="w-16 h-px bg-champagne-500" />
             </div>
