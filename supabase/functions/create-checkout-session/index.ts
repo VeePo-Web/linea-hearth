@@ -139,6 +139,8 @@ Deno.serve(async (req) => {
       }
     }
 
+    const gstTaxRateId = await getOrCreateGstTaxRate(stripe);
+
     // Build Stripe line items using inline price_data (apparel = tangible goods)
     const lineItems = body.items.map((item) => {
       const unitAmount = Math.round(item.price * 100);
@@ -150,7 +152,6 @@ Deno.serve(async (req) => {
           product_data: {
             name: item.name + (descriptionBits ? ` (${descriptionBits})` : ""),
             ...(item.image && { images: [item.image] }),
-            tax_code: "txcd_99999999", // general tangible goods
             metadata: {
               ...(item.productId && { productId: item.productId }),
               ...(item.variantId && { variantId: item.variantId }),
@@ -160,6 +161,7 @@ Deno.serve(async (req) => {
           },
         },
         quantity: item.quantity,
+        tax_rates: [gstTaxRateId],
       };
     });
 
