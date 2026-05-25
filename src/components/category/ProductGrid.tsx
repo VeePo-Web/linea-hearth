@@ -20,6 +20,7 @@ interface ProductGridProps {
   pageSize?: number;
   onTotalCountChange?: (count: number) => void;
   onClearFilters?: () => void;
+  onPageChange?: (page: number) => void;
 }
 
 const ProductGrid = ({
