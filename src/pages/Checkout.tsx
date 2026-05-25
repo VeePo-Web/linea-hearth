@@ -1092,6 +1092,25 @@ const Checkout = () => {
         onClose={() => setShowPostPurchaseOffer(false)}
         onAddToOrder={handleAddPostPurchaseItem}
       />
+
+      {/* Stripe Embedded Checkout overlay */}
+      {clientSecret && (
+        <div className="fixed inset-0 z-50 bg-background/95 backdrop-blur-sm overflow-y-auto">
+          <div className="max-w-2xl mx-auto py-8 px-4">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-light tracking-wide">Complete payment</h2>
+              <button
+                type="button"
+                onClick={() => { resetCheckout(); setIsProcessing(false); setCurrentStep(2); }}
+                className="text-sm text-muted-foreground hover:text-foreground underline"
+              >
+                Cancel
+              </button>
+            </div>
+            <StripeEmbeddedCheckout clientSecret={clientSecret} />
+          </div>
+        </div>
+      )}
     </div>
   );
 };
