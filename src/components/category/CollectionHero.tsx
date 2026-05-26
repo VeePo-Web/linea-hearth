@@ -185,11 +185,22 @@ const CollectionHero = ({ category, productCount }: CollectionHeroProps) => {
     };
   }, [category]);
 
+  const prefersReducedMotion = useReducedMotion();
+  const editorialEase = [0.25, 0.46, 0.45, 0.94] as const;
+  const fade = (delay: number) =>
+    prefersReducedMotion
+      ? { initial: { opacity: 1, y: 0 }, animate: { opacity: 1, y: 0 } }
+      : {
+          initial: { opacity: 0, y: 12 },
+          animate: { opacity: 1, y: 0 },
+          transition: { duration: 0.9, delay, ease: editorialEase },
+        };
+
   return (
-    <section className={`collection-hero relative w-full h-[35dvh] md:h-[50vh] lg:h-[60vh] ${content.bgClass} overflow-hidden`}>
+    <section className={`collection-hero relative w-full h-[55dvh] md:h-[62vh] lg:h-[68vh] ${content.bgClass} overflow-hidden`}>
       {/* Subtle pattern overlay */}
       <div className="absolute inset-0 opacity-10">
-        <div 
+        <div
           className="absolute inset-0"
           style={{
             backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
@@ -197,8 +208,48 @@ const CollectionHero = ({ category, productCount }: CollectionHeroProps) => {
         />
       </div>
 
-      {/* Content */}
-      <div className="relative z-10 h-full flex flex-col justify-center items-center text-center px-4 md:px-6">
+      {/* Scripture layer — Genesis 49:9-10 */}
+      <div className="absolute inset-0 z-[5] pointer-events-none">
+        {/* Top-left eyebrow */}
+        <motion.div
+          {...fade(0.05)}
+          className="absolute top-6 left-4 md:top-10 md:left-10 text-[10px] tracking-[0.3em] text-white/40 uppercase"
+        >
+          Genesis 49:9–10 · ESV
+        </motion.div>
+
+        {/* Fragment A — large serif */}
+        <motion.p
+          {...fade(0.15)}
+          className="absolute top-[22%] left-4 right-4 md:left-10 md:right-auto md:max-w-[60%] text-white/35 font-light leading-[1.15] text-2xl sm:text-3xl md:text-5xl lg:text-6xl"
+          style={{ fontFamily: "'Instrument Serif', 'Cormorant Garamond', serif" }}
+        >
+          "Judah is a lion's cub; he stooped down, he crouched as a lion."
+        </motion.p>
+
+        {/* Fragment B — italic, offset right */}
+        <motion.p
+          {...fade(0.3)}
+          className="absolute top-[52%] right-4 md:right-10 md:top-[48%] text-white/55 italic text-lg md:text-2xl lg:text-3xl text-right max-w-[70%] md:max-w-none"
+          style={{ fontFamily: "'Instrument Serif', 'Cormorant Garamond', serif" }}
+        >
+          who dares rouse him?
+        </motion.p>
+
+        {/* Fragment C — tracked all-caps (desktop only to protect mobile fold) */}
+        <motion.p
+          {...fade(0.45)}
+          className="hidden md:block absolute md:bottom-[28%] lg:bottom-[26%] left-1/2 -translate-x-1/2 text-[11px] tracking-[0.25em] text-white/30 uppercase whitespace-nowrap"
+        >
+          The scepter shall not depart from Judah
+        </motion.p>
+
+        {/* Hairline divider above title block */}
+        <div className="absolute bottom-[34%] md:bottom-[36%] left-1/2 -translate-x-1/2 w-12 h-px bg-[hsl(var(--forest-500))]/30" />
+      </div>
+
+      {/* Content — existing title block (unchanged position semantics) */}
+      <div className="relative z-10 h-full flex flex-col justify-end items-center text-center px-4 md:px-6 pb-12 md:pb-16 lg:pb-20">
         <p className="text-white/70 text-sm md:text-sm uppercase tracking-[0.3em] mb-3 md:mb-4 animate-fade-in">
           {content.tagline}
         </p>
@@ -219,3 +270,4 @@ const CollectionHero = ({ category, productCount }: CollectionHeroProps) => {
 };
 
 export default CollectionHero;
+
