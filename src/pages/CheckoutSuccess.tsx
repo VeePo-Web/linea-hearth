@@ -24,8 +24,10 @@ interface OrderDetails {
   subtotal_cents: number;
   shipping_cents: number;
   discount_cents: number;
+  tax_cents: number;
   total_cents: number;
   shipping_method: string | null;
+  payment_status: string;
   created_at: string;
   user_id: string | null;
 }
@@ -55,6 +57,7 @@ const CheckoutSuccess = () => {
   const sessionId = searchParams.get("session_id");
 
   useEffect(() => {
+    let cancelled = false;
     const fetchOrder = async () => {
       if (!sessionId) {
         setError("No session ID provided");
@@ -62,70 +65,47 @@ const CheckoutSuccess = () => {
         return;
       }
 
-      try {
-        // Fetch order by Stripe session ID
-        const { data: orderData, error: orderError } = await supabase
+      // Poll up to ~12s for the webhook to mark the order paid
+      const maxAttempts = 6;
+      for (let attempt = 0; attempt < maxAttempts; attempt++) {
+        const { data: orderData } = await supabase
           .from("orders")
           .select("*")
           .eq("stripe_checkout_session_id", sessionId)
-          .single();
+          .maybeSingle();
 
-        if (orderError || !orderData) {
-          // Order might not be updated yet, wait and retry
-          await new Promise((resolve) => setTimeout(resolve, 2000));
-          
-          const { data: retryData, error: retryError } = await supabase
-            .from("orders")
-            .select("*")
-            .eq("stripe_checkout_session_id", sessionId)
-            .single();
+        if (cancelled) return;
 
-          if (retryError || !retryData) {
-            setError("Order not found. It may still be processing.");
-            setLoading(false);
-            return;
-          }
-
-          setOrder({
-            ...retryData,
-            shipping_address: (retryData.shipping_address as ShippingAddress) || {},
-          } as OrderDetails);
-        } else {
+        if (orderData && (orderData as any).payment_status === "paid") {
           setOrder({
             ...orderData,
-            shipping_address: (orderData.shipping_address as ShippingAddress) || {},
+            shipping_address: ((orderData as any).shipping_address as ShippingAddress) || {},
           } as OrderDetails);
-        }
 
-        // Fetch order items
-        const orderId = orderData?.id || (await supabase
-          .from("orders")
-          .select("id")
-          .eq("stripe_checkout_session_id", sessionId)
-          .single()).data?.id;
-
-        if (orderId) {
           const { data: items } = await supabase
             .from("order_items")
             .select("*")
-            .eq("order_id", orderId);
+            .eq("order_id", (orderData as any).id);
+          if (!cancelled && items) setOrderItems(items as OrderItem[]);
 
-          if (items) {
-            setOrderItems(items as OrderItem[]);
-          }
+          clearCart();
+          setLoading(false);
+          return;
         }
 
-        // Clear the cart after successful order
-        clearCart();
-      } catch (err) {
-        console.error("Error fetching order:", err);
-        setError("Failed to load order details");
-      } finally {
+        await new Promise((r) => setTimeout(r, 2000));
+      }
+
+      if (!cancelled) {
+        setError("Your payment is still being confirmed. Check your email — we'll send confirmation as soon as it clears.");
         setLoading(false);
       }
     };
 
     fetchOrder();
+    return () => {
+      cancelled = true;
+    };
   }, [sessionId, clearCart]);
 
   // Calculate estimated delivery
