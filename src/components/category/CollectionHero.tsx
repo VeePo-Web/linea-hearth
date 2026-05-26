@@ -1,9 +1,12 @@
 import { useMemo } from "react";
+import { motion } from "framer-motion";
+import { useReducedMotion } from "@/hooks/useReducedMotion";
 
 interface CollectionHeroProps {
   category: string;
   productCount?: number;
 }
+
 
 interface CollectionContent {
   title: string;
