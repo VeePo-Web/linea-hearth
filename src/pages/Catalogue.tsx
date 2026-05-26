@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Helmet } from "react-helmet-async";
 import { SlidersHorizontal, X, ChevronDown } from "lucide-react";
 import Layout from "@/components/layout/Layout";
+import CollectionHero from "@/components/category/CollectionHero";
 import { supabase } from "@/integrations/supabase/client";
 import { formatPrice } from "@/lib/currency";
 
