@@ -12,31 +12,6 @@ function getSupabase() {
   return _supabase;
 }
 
-async function decrementStock(orderId: string) {
-  const sb = getSupabase();
-  const { data: items } = await sb
-    .from("order_items")
-    .select("variant_id, quantity")
-    .eq("order_id", orderId);
-
-  if (!items) return;
-  for (const it of items as Array<{ variant_id: string | null; quantity: number }>) {
-    if (!it.variant_id) continue;
-    const { data: v } = await sb
-      .from("product_variants")
-      .select("stock_quantity")
-      .eq("id", it.variant_id)
-      .single();
-    if (v && typeof (v as any).stock_quantity === "number") {
-      const next = Math.max(0, (v as any).stock_quantity - it.quantity);
-      await sb
-        .from("product_variants")
-        .update({ stock_quantity: next })
-        .eq("id", it.variant_id);
-    }
-  }
-}
-
 async function sendConfirmationEmail(orderId: string) {
   try {
     const url = `${Deno.env.get("SUPABASE_URL")}/functions/v1/send-order-confirmation`;
@@ -50,6 +25,20 @@ async function sendConfirmationEmail(orderId: string) {
   }
 }
 
+// Stripe `Address` -> our jsonb shape
+function mapStripeAddress(
+  stripeAddr: { line1?: string | null; line2?: string | null; city?: string | null; postal_code?: string | null; country?: string | null; state?: string | null } | null | undefined,
+) {
+  if (!stripeAddr) return null;
+  return {
+    address: [stripeAddr.line1, stripeAddr.line2].filter(Boolean).join(", "),
+    city: stripeAddr.city ?? "",
+    postalCode: stripeAddr.postal_code ?? "",
+    state: stripeAddr.state ?? "",
+    country: stripeAddr.country ?? "",
+  };
+}
+
 async function handleCheckoutCompleted(session: any, env: StripeEnv) {
   const sb = getSupabase();
   const orderId = session.metadata?.orderId;
@@ -58,7 +47,7 @@ async function handleCheckoutCompleted(session: any, env: StripeEnv) {
     return;
   }
 
-  // Idempotency: skip if already paid
+  // Idempotency
   const { data: existing } = await sb
     .from("orders")
     .select("payment_status")
@@ -66,11 +55,14 @@ async function handleCheckoutCompleted(session: any, env: StripeEnv) {
     .single();
   if (existing && (existing as any).payment_status === "paid") return;
 
-  // Pull final amounts from Stripe (post-tax)
+  // Pull authoritative totals + address from Stripe (post-tax, post-discount)
   const stripe = createStripeClient(env);
   const full = await stripe.checkout.sessions.retrieve(session.id, {
-    expand: ["total_details", "shipping_cost"],
+    expand: ["total_details", "shipping_cost", "customer_details", "shipping_details"],
   });
+
+  const stripeShipping = mapStripeAddress((full as any).shipping_details?.address);
+  const stripeBilling = mapStripeAddress(full.customer_details?.address);
 
   await sb
     .from("orders")
@@ -80,13 +72,62 @@ async function handleCheckoutCompleted(session: any, env: StripeEnv) {
       stripe_payment_intent_id: (full.payment_intent as string) ?? null,
       stripe_customer_id: (full.customer as string) ?? null,
       tax_cents: full.total_details?.amount_tax ?? 0,
+      discount_cents: full.total_details?.amount_discount ?? 0,
       shipping_cents: (full.shipping_cost as any)?.amount_total ?? 0,
       total_cents: full.amount_total ?? 0,
+      ...(stripeShipping && { shipping_address: stripeShipping }),
+      ...(stripeBilling && { billing_address: stripeBilling }),
+      ...(full.customer_details?.phone && { customer_phone: full.customer_details.phone }),
     })
     .eq("id", orderId);
 
-  await decrementStock(orderId);
+  // Record discount redemption (if any)
+  if (
+    full.total_details?.amount_discount &&
+    full.total_details.amount_discount > 0
+  ) {
+    const { data: orderRow } = await sb
+      .from("orders")
+      .select("discount_id, customer_email")
+      .eq("id", orderId)
+      .single();
+    if (orderRow && (orderRow as any).discount_id) {
+      await sb.from("discount_code_redemptions").insert({
+        discount_code_id: (orderRow as any).discount_id,
+        order_id: orderId,
+        customer_email: (orderRow as any).customer_email,
+        discount_applied_cents: full.total_details.amount_discount,
+      });
+      // Bump usage_count
+      const { data: dc } = await sb
+        .from("discount_codes")
+        .select("usage_count")
+        .eq("id", (orderRow as any).discount_id)
+        .single();
+      if (dc) {
+        await sb
+          .from("discount_codes")
+          .update({ usage_count: ((dc as any).usage_count ?? 0) + 1 })
+          .eq("id", (orderRow as any).discount_id);
+      }
+    }
+  }
+
   await sendConfirmationEmail(orderId);
+}
+
+async function handlePaymentFailed(paymentIntent: any) {
+  const orderId = paymentIntent.metadata?.orderId;
+  if (!orderId) return;
+  await getSupabase()
+    .from("orders")
+    .update({
+      status: "cancelled",
+      payment_status: "unpaid",
+      notes: paymentIntent.last_payment_error?.message ?? "Payment failed",
+    })
+    .eq("id", orderId)
+    .neq("payment_status", "paid");
 }
 
 async function handleRefund(charge: any) {
@@ -110,10 +151,12 @@ Deno.serve(async (req) => {
 
     switch (event.type) {
       case "checkout.session.completed":
-        await handleCheckoutCompleted(event.data.object, env);
-        break;
       case "checkout.session.async_payment_succeeded":
         await handleCheckoutCompleted(event.data.object, env);
+        break;
+      case "checkout.session.async_payment_failed":
+      case "payment_intent.payment_failed":
+        await handlePaymentFailed(event.data.object);
         break;
       case "charge.refunded":
         await handleRefund(event.data.object);

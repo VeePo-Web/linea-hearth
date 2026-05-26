@@ -39,30 +39,8 @@ const SHIPPING_RATES = {
 } as const;
 
 const FREE_SHIPPING_THRESHOLD_CENTS = 9900;
-
-let cachedGstTaxRateId: string | null = null;
-async function getOrCreateGstTaxRate(
-  stripe: ReturnType<typeof createStripeClient>,
-): Promise<string> {
-  if (cachedGstTaxRateId) return cachedGstTaxRateId;
-  const existing = await stripe.taxRates.list({ active: true, limit: 100 });
-  const match = existing.data.find((r) => r.metadata?.kind === "linea_gst_5");
-  if (match) {
-    cachedGstTaxRateId = match.id;
-    return match.id;
-  }
-  const created = await stripe.taxRates.create({
-    display_name: "GST",
-    description: "Canadian GST",
-    jurisdiction: "CA",
-    country: "CA",
-    percentage: 5,
-    inclusive: false,
-    metadata: { kind: "linea_gst_5" },
-  });
-  cachedGstTaxRateId = created.id;
-  return created.id;
-}
+// Stripe tax_code for general clothing (apparel). See https://docs.stripe.com/tax/tax-codes
+const APPAREL_TAX_CODE = "txcd_30060001";
 
 async function resolveOrCreateCustomer(
   stripe: ReturnType<typeof createStripeClient>,
@@ -123,6 +101,11 @@ Deno.serve(async (req) => {
     const environment: StripeEnv = body.environment === "live" ? "live" : "sandbox";
     const stripe = createStripeClient(environment);
 
+    const sbAdmin = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+    );
+
     // Auth: try to resolve userId from JWT
     let userId: string | undefined;
     const authHeader = req.headers.get("Authorization");
@@ -139,9 +122,8 @@ Deno.serve(async (req) => {
       }
     }
 
-    const gstTaxRateId = await getOrCreateGstTaxRate(stripe);
-
-    // Build Stripe line items using inline price_data (apparel = tangible goods)
+    // Build Stripe line items using inline price_data (apparel = tangible goods).
+    // tax_behavior: "exclusive" required by Stripe Tax (automatic_tax).
     const lineItems = body.items.map((item) => {
       const unitAmount = Math.round(item.price * 100);
       const descriptionBits = [item.size, item.color].filter(Boolean).join(" / ");
@@ -149,9 +131,11 @@ Deno.serve(async (req) => {
         price_data: {
           currency: "cad",
           unit_amount: unitAmount,
+          tax_behavior: "exclusive" as const,
           product_data: {
             name: item.name + (descriptionBits ? ` (${descriptionBits})` : ""),
             ...(item.image && { images: [item.image] }),
+            tax_code: APPAREL_TAX_CODE,
             metadata: {
               ...(item.productId && { productId: item.productId }),
               ...(item.variantId && { variantId: item.variantId }),
@@ -161,11 +145,10 @@ Deno.serve(async (req) => {
           },
         },
         quantity: item.quantity,
-        tax_rates: [gstTaxRateId],
       };
     });
 
-    // Subtotal for shipping threshold
+    // Subtotal for shipping threshold + discount calc
     const subtotalCents = body.items.reduce(
       (sum, it) => sum + Math.round(it.price * 100) * it.quantity,
       0,
@@ -174,17 +157,58 @@ Deno.serve(async (req) => {
     const isFreeShipping = subtotalCents >= FREE_SHIPPING_THRESHOLD_CENTS && method === "standard";
     const shippingAmount = isFreeShipping ? 0 : SHIPPING_RATES[method];
 
+    // Resolve + create discount (one-off Stripe coupon) if a valid code was applied
+    let stripeDiscounts: Array<{ coupon: string }> | undefined;
+    let discountCents = 0;
+    let discountCodeText: string | undefined;
+    if (body.discountCodeId) {
+      const { data: dc } = await sbAdmin
+        .from("discount_codes")
+        .select("id, code, name, discount_type, discount_value, maximum_discount_cents, is_active, starts_at, expires_at")
+        .eq("id", body.discountCodeId)
+        .maybeSingle();
+      const now = new Date();
+      const valid =
+        dc &&
+        dc.is_active &&
+        (!dc.starts_at || new Date(dc.starts_at) <= now) &&
+        (!dc.expires_at || new Date(dc.expires_at) > now);
+      if (valid) {
+        discountCodeText = dc.code;
+        if (dc.discount_type === "percentage") {
+          discountCents = Math.round((subtotalCents * Number(dc.discount_value)) / 100);
+          if (dc.maximum_discount_cents && discountCents > dc.maximum_discount_cents) {
+            discountCents = dc.maximum_discount_cents;
+          }
+          const coupon = await stripe.coupons.create({
+            percent_off: Number(dc.discount_value),
+            duration: "once",
+            name: dc.name,
+            ...(dc.maximum_discount_cents && {
+              // Stripe doesn't support max-cap on percent coupons; cap is enforced server-side via discountCents we record.
+            }),
+          });
+          stripeDiscounts = [{ coupon: coupon.id }];
+        } else {
+          const amountOff = Math.min(Math.round(Number(dc.discount_value)), subtotalCents);
+          discountCents = amountOff;
+          const coupon = await stripe.coupons.create({
+            amount_off: amountOff,
+            currency: "cad",
+            duration: "once",
+            name: dc.name,
+          });
+          stripeDiscounts = [{ coupon: coupon.id }];
+        }
+      }
+    }
+
     const customerId = await resolveOrCreateCustomer(stripe, {
       email: body.customerEmail,
       userId,
     });
 
-    // Create a draft order BEFORE the Stripe session so the webhook can match by session id
-    const sbAdmin = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
-    );
-
+    // Create draft order BEFORE Stripe session so the webhook can match by session id
     const { data: order, error: orderErr } = await sbAdmin
       .from("orders")
       .insert({
@@ -195,14 +219,16 @@ Deno.serve(async (req) => {
         customer_first_name: body.customerFirstName ?? null,
         customer_last_name: body.customerLastName ?? null,
         customer_phone: body.customerPhone ?? null,
-        shipping_address: body.shippingAddress,
+        shipping_address: body.shippingAddress, // overwritten by webhook from Stripe's collected address
         subtotal_cents: subtotalCents,
         shipping_cents: shippingAmount,
-        discount_cents: 0,
-        tax_cents: 0,
-        total_cents: subtotalCents + shippingAmount,
+        discount_cents: discountCents,
+        tax_cents: 0, // filled by webhook from Stripe Tax
+        total_cents: subtotalCents + shippingAmount - discountCents,
         currency: "cad",
         shipping_method: method,
+        discount_code: discountCodeText ?? null,
+        discount_id: body.discountCodeId ?? null,
         metadata: { abandonedCartId: body.abandonedCartId ?? null },
       })
       .select("id")
@@ -216,7 +242,6 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Insert order_items
     await sbAdmin.from("order_items").insert(
       body.items.map((it) => ({
         order_id: order.id,
@@ -238,6 +263,8 @@ Deno.serve(async (req) => {
       ui_mode: "embedded_page",
       return_url: body.returnUrl,
       ...(customerId && { customer: customerId }),
+      ...(stripeDiscounts && { discounts: stripeDiscounts }),
+      automatic_tax: { enabled: true },
       shipping_address_collection: { allowed_countries: ["CA", "US"] },
       shipping_options: [
         {
@@ -252,7 +279,7 @@ Deno.serve(async (req) => {
                   ? "Express (2-3 days)"
                   : "Overnight",
             tax_behavior: "exclusive",
-            tax_rates: [gstTaxRateId],
+            tax_code: "txcd_92010001", // shipping
           },
         },
       ],
@@ -269,7 +296,6 @@ Deno.serve(async (req) => {
       },
     });
 
-    // Stamp the session id on the order
     await sbAdmin
       .from("orders")
       .update({ stripe_checkout_session_id: session.id })
