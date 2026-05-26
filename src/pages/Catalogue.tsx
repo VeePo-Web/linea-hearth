@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Helmet } from "react-helmet-async";
 import { SlidersHorizontal, X, ChevronDown } from "lucide-react";
 import Layout from "@/components/layout/Layout";
+import CollectionHero from "@/components/category/CollectionHero";
 import { supabase } from "@/integrations/supabase/client";
 import { formatPrice } from "@/lib/currency";
 
@@ -103,34 +104,9 @@ const Catalogue = () => {
         />
       </Helmet>
 
-      <div className="min-h-screen bg-background pt-20 md:pt-24">
-        {/* Page Header */}
-        <div className="px-4 xs:px-6 md:px-12 lg:px-16 pt-10 pb-8 border-b border-border">
-          <motion.p
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="text-[10px] tracking-[0.4em] text-muted-foreground uppercase mb-3"
-          >
-            The Full Drop
-          </motion.p>
-          <motion.h1
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-4xl md:text-6xl font-light tracking-tight text-foreground"
-          >
-            All Products
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.25 }}
-            className="mt-3 text-sm text-muted-foreground"
-          >
-            {isLoading ? "—" : `${filtered.length} piece${filtered.length !== 1 ? "s" : ""}`}
-          </motion.p>
-        </div>
+      <div className="min-h-screen bg-background">
+        <CollectionHero category="shop" productCount={isLoading ? 0 : filtered.length} />
+
 
         {/* Toolbar */}
         <div className="bg-background border-b border-border">
