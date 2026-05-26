@@ -1,5 +1,6 @@
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import { REAL_PRODUCT_IMAGES } from "@/lib/realProductImages";
 
 const EditorialSection = () => {
   return (
@@ -24,7 +25,7 @@ const EditorialSection = () => {
         <div className="order-first md:order-last">
           <div className="w-full aspect-square overflow-hidden">
             <img 
-              src="/products/heavenly-crewneck/lifestyle.png" 
+              src={REAL_PRODUCT_IMAGES.firstLoveSnow} 
               alt="Line of Judah lifestyle" 
               className="w-full h-full object-cover" 
             />

@@ -4,11 +4,12 @@ import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { useCategoryHeroImage } from "@/hooks/useCategoryHeroImage";
+import { REAL_PRODUCT_IMAGES } from "@/lib/realProductImages";
 
 const StoryJoinCTA = () => {
   const sectionRef = useRef<HTMLElement>(null);
   const isInView = useInView(sectionRef, { once: true, margin: "-100px" });
-  const ctaImage = useCategoryHeroImage("hoodies", "/products/stay-holy-hoodie/male-model.png");
+  const ctaImage = useCategoryHeroImage("hoodies", REAL_PRODUCT_IMAGES.youNeedJesus);
 
   return (
     <section

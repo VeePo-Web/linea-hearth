@@ -6,6 +6,7 @@ import ScrollReveal from "@/components/motion/ScrollReveal";
 import TextReveal from "@/components/motion/TextReveal";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { formatPrice } from "@/lib/currency";
+import { REAL_PRODUCT_IMAGES } from "@/lib/realProductImages";
 
 const FeaturedDrop = () => {
   const prefersReducedMotion = useReducedMotion();
@@ -21,8 +22,8 @@ const FeaturedDrop = () => {
         transition={{ duration: 1.2, ease: [0.25, 0.46, 0.45, 0.94] }}
       >
         <img 
-          src="/products/heavenly-crewneck/lifestyle.png"
-          alt="Heavenly Crewneck"
+          src={REAL_PRODUCT_IMAGES.ichthysFish}
+          alt="Ichthys Fish Sun-fade Hoodie"
           className="w-full h-full object-cover"
           loading="lazy"
         />
@@ -49,9 +50,9 @@ const FeaturedDrop = () => {
 
             {/* Product Name - Editorial oversized */}
             <h2 className="text-display-sm text-foreground mb-4 md:mb-6">
-              <TextReveal text="HEAVENLY" delay={0.2} />
+              <TextReveal text="ICHTHYS" delay={0.2} />
               <br />
-              <TextReveal text="CREWNECK" delay={0.4} />
+              <TextReveal text="HOODIE" delay={0.4} />
             </h2>
 
             {/* Description */}
@@ -65,13 +66,13 @@ const FeaturedDrop = () => {
             {/* Price & CTA */}
             <ScrollReveal variant="fadeUp" delay={0.6}>
               <div className="flex items-center gap-6 md:gap-8">
-                <span className="text-xl md:text-2xl font-light text-foreground">{formatPrice(65)}</span>
+                <span className="text-xl md:text-2xl font-light text-foreground">{formatPrice(95)}</span>
                 <motion.div
                   whileHover={{ x: 4 }}
                   transition={{ type: "spring", stiffness: 400, damping: 20 }}
                 >
                   <Link 
-                    to="/product/heavenly-crewneck"
+                    to="/product/ichthys-fish-oversized-sun-fade-hoodie"
                     className="inline-flex items-center gap-3 text-foreground text-sm font-medium tracking-wide hover:text-accent transition-colors group touch-target py-3"
                   >
                     Carry the Message

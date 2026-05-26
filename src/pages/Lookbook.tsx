@@ -35,27 +35,29 @@ interface Look {
   products: LookProduct[];
 }
 
-// Shared product definitions for demo fallback
+// Shared product definitions for demo fallback (real catalog products)
+import { REAL_PRODUCT_IMAGES as IMG } from "@/lib/realProductImages";
+
 const DEMO_PRODUCTS = {
   heavenlyCrewneck: {
-    id: 'bba1a982-f78e-4ec9-b5ed-91b5184e437c',
-    name: 'Heavenly Crewneck',
-    slug: 'heavenly-crewneck',
-    price: 69.99,
+    id: 'demo-adam-god',
+    name: '"Adam & God" Boxy Tee',
+    slug: 'adam-god-mineral-wash-cotton-boxy-tee-shirt',
+    price: 65,
     sale_price: null,
     is_on_sale: false,
     position: 'top' as const,
-    product_images: [{ image_url: '/products/heavenly-crewneck/front-model.png', is_primary: true }],
+    product_images: [{ image_url: IMG.adamGod, is_primary: true }],
   },
   stayHolyHoodie: {
-    id: '1b4823be-119b-4834-89f1-bb2d872a8636',
-    name: 'Stay Holy Hoodie',
-    slug: 'stay-holy-hoodie',
-    price: 79.99,
+    id: 'demo-you-need-jesus',
+    name: '"You Need Jesus" Hoodie',
+    slug: 'you-need-jesus-heavy-weight-sun-fade-oversized-hoodie',
+    price: 95,
     sale_price: null,
     is_on_sale: false,
     position: 'top' as const,
-    product_images: [{ image_url: '/products/stay-holy-hoodie/flat-front.png', is_primary: true }],
+    product_images: [{ image_url: IMG.youNeedJesus, is_primary: true }],
   },
 };
 

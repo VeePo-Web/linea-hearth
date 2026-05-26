@@ -5,12 +5,14 @@ import {
 } from "@/components/ui/carousel";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "react-router-dom";
+import { REAL_PRODUCT_IMAGES as IMG } from "@/lib/realProductImages";
+import { formatPrice } from "@/lib/currency";
 
 interface Product {
-  id: number;
+  slug: string;
   name: string;
   category: string;
-  price: string;
+  price: number;
   image: string;
   hoverImage: string;
   isNew?: boolean;
@@ -18,54 +20,54 @@ interface Product {
 
 const products: Product[] = [
   {
-    id: 1,
-    name: "Heavenly Crewneck",
-    category: "Tops",
-    price: "$65",
-    image: "/products/heavenly-crewneck/front-model.png",
-    hoverImage: "/products/heavenly-crewneck/flat-lay.png",
+    slug: "adam-god-mineral-wash-cotton-boxy-tee-shirt",
+    name: '"Adam & God" Boxy Tee',
+    category: "Tees",
+    price: 65,
+    image: IMG.adamGod,
+    hoverImage: IMG.adamGodAlt,
     isNew: true,
   },
   {
-    id: 2,
-    name: "Stay Holy Hoodie",
+    slug: "you-need-jesus-heavy-weight-sun-fade-oversized-hoodie",
+    name: '"You Need Jesus" Hoodie',
     category: "Hoodies",
-    price: "$85",
-    image: "/products/stay-holy-hoodie/male-model.png",
-    hoverImage: "/products/stay-holy-hoodie/flat-front.png",
+    price: 95,
+    image: IMG.youNeedJesus,
+    hoverImage: IMG.inJesusName,
     isNew: true,
   },
   {
-    id: 3,
-    name: "Heavenly Crewneck",
-    category: "Tops",
-    price: "$65",
-    image: "/products/heavenly-crewneck/female-model.png",
-    hoverImage: "/products/heavenly-crewneck/lifestyle.png",
+    slug: "burning-love-boxy-tee",
+    name: '"Burning Love" Boxy Tee',
+    category: "Tees",
+    price: 65,
+    image: IMG.burningLove,
+    hoverImage: IMG.burningLoveAlt,
   },
   {
-    id: 4,
-    name: "Stay Holy Hoodie",
+    slug: "ichthys-fish-oversized-sun-fade-hoodie",
+    name: '"Ichthys Fish" Sun-fade Hoodie',
     category: "Hoodies",
-    price: "$85",
-    image: "/products/stay-holy-hoodie/female-model-1.png",
-    hoverImage: "/products/stay-holy-hoodie/female-model-2.png",
+    price: 95,
+    image: IMG.ichthysFish,
+    hoverImage: IMG.firstLoveSnow,
   },
   {
-    id: 5,
-    name: "Heavenly Crewneck",
-    category: "Tops",
-    price: "$65",
-    image: "/products/heavenly-crewneck/side-view.png",
-    hoverImage: "/products/heavenly-crewneck/front-model.png",
+    slug: "faith-in-fear-boxy-tee",
+    name: '"Faith in Fear" Boxy Tee',
+    category: "Tees",
+    price: 65,
+    image: IMG.faithInFear,
+    hoverImage: IMG.namesOfGod,
   },
   {
-    id: 6,
-    name: "Stay Holy Hoodie",
-    category: "Hoodies",
-    price: "$85",
-    image: "/products/stay-holy-hoodie/flat-full.png",
-    hoverImage: "/products/stay-holy-hoodie/male-model.png",
+    slug: "god-bless-line-of-judah-sweater",
+    name: '"God Bless" Sweater',
+    category: "Sweaters",
+    price: 110,
+    image: IMG.godBlessSweater,
+    hoverImage: IMG.revelation320,
   },
 ];
 
@@ -82,10 +84,10 @@ const ProductCarousel = () => {
           <CarouselContent className="">
             {products.map((product) => (
                <CarouselItem
-                 key={product.id}
+                 key={product.slug}
                  className="basis-1/2 md:basis-1/3 lg:basis-1/4 pr-2 md:pr-4"
                >
-                 <Link to={`/product/${product.id}`}>
+                 <Link to={`/product/${product.slug}`}>
                   <Card className="border-none shadow-none bg-transparent group">
                     <CardContent className="p-0">
                       <div className="aspect-square mb-3 overflow-hidden bg-muted/10 relative">
@@ -115,7 +117,7 @@ const ProductCarousel = () => {
                            {product.name}
                          </h3>
                          <p className="text-sm font-light text-foreground">
-                           {product.price}
+                           {formatPrice(product.price)}
                          </p>
                        </div>
                      </div>

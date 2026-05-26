@@ -3,10 +3,11 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Play } from "lucide-react";
 import { useCategoryHeroImage } from "@/hooks/useCategoryHeroImage";
+import { REAL_PRODUCT_IMAGES } from "@/lib/realProductImages";
 
 const HeroBlock = () => {
   const [isLoaded, setIsLoaded] = useState(false);
-  const heroImage = useCategoryHeroImage("hoodies", "/products/stay-holy-hoodie/male-model.png");
+  const heroImage = useCategoryHeroImage("hoodies", REAL_PRODUCT_IMAGES.youNeedJesus);
 
   useEffect(() => {
     setIsLoaded(true);

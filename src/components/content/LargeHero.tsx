@@ -1,10 +1,12 @@
+import { REAL_PRODUCT_IMAGES } from "@/lib/realProductImages";
+
 const LargeHero = () => {
-  // Note: this component is currently unused on live pages; image path kept inline.
+  // Note: this component is currently unused on live pages; image kept inline.
   return (
     <section className="w-full mb-16 px-6">
       <div className="w-full aspect-[16/9] mb-3 overflow-hidden">
         <img 
-          src="/products/heavenly-crewneck/lifestyle.png" 
+          src={REAL_PRODUCT_IMAGES.godBlessSweater}
           alt="Faith-forward apparel collection" 
           className="w-full h-full object-cover"
         />

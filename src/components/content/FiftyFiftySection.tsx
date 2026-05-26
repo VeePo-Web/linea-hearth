@@ -1,9 +1,10 @@
 import { Link } from "react-router-dom";
 import { useCategoryHeroImage } from "@/hooks/useCategoryHeroImage";
+import { REAL_PRODUCT_IMAGES } from "@/lib/realProductImages";
 
 const FiftyFiftySection = () => {
-  const hoodieImage = useCategoryHeroImage("hoodies", "/products/stay-holy-hoodie/male-model.png");
-  const topsImage = useCategoryHeroImage("tops", "/products/heavenly-crewneck/front-model.png");
+  const hoodieImage = useCategoryHeroImage("hoodies", REAL_PRODUCT_IMAGES.youNeedJesus);
+  const topsImage = useCategoryHeroImage("tops", REAL_PRODUCT_IMAGES.adamGod);
 
   return (
     <section className="w-full mb-16 px-6">
