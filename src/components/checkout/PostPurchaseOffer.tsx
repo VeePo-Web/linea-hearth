@@ -7,6 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { REAL_PRODUCT_IMAGES } from "@/lib/realProductImages";
 
 interface PostPurchaseOfferProps {
   isOpen: boolean;
@@ -38,8 +39,8 @@ const PostPurchaseOffer = ({ isOpen, onClose, onAddToOrder }: PostPurchaseOfferP
   const minutes = Math.floor(timeLeft / 60);
   const seconds = timeLeft % 60;
 
-  const originalPrice = 85;
-  const discountedPrice = 68;
+  const originalPrice = 65;
+  const discountedPrice = 52;
   const discountPercent = 20;
 
   const handleAddToOrder = async () => {
@@ -75,15 +76,15 @@ const PostPurchaseOffer = ({ isOpen, onClose, onAddToOrder }: PostPurchaseOfferP
           <div className="flex gap-4">
             <div className="w-24 h-24 bg-muted overflow-hidden flex-shrink-0">
               <img
-                src="/products/stay-holy-hoodie/flat-front.png"
-                alt="Stay Holy Hoodie"
+                src={REAL_PRODUCT_IMAGES.adamGod}
+                alt='"Adam & God" Boxy Tee'
                 className="w-full h-full object-cover"
               />
             </div>
             <div className="flex-1">
-              <h3 className="font-medium text-foreground">Stay Holy Hoodie</h3>
+              <h3 className="font-medium text-foreground">"Adam &amp; God" Boxy Tee</h3>
               <p className="text-xs text-muted-foreground mt-1">
-                Premium heavyweight cotton blend
+                Mineral-wash cotton — built like armor
               </p>
               <div className="mt-2 flex items-baseline gap-2">
                 <span className="text-lg font-medium text-foreground">

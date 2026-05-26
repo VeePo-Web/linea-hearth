@@ -16,6 +16,7 @@ import MobileMenu from "./MobileMenu";
 import AuthModal from "@/components/auth/AuthModal";
 import AccountDropdown from "@/components/auth/AccountDropdown";
 import FavoritesDrawer from "@/components/favorites/FavoritesDrawer";
+import { REAL_PRODUCT_IMAGES } from "@/lib/realProductImages";
 
 const Navigation = () => {
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
@@ -58,8 +59,8 @@ const Navigation = () => {
 
   useEffect(() => {
     const imagesToPreload = [
-      "/products/stay-holy-hoodie/flat-front.png",
-      "/products/heavenly-crewneck/flat-lay.png",
+      REAL_PRODUCT_IMAGES.youNeedJesus,
+      REAL_PRODUCT_IMAGES.adamGod,
       "/founders.png"
     ];
     imagesToPreload.forEach(src => {
@@ -80,8 +81,8 @@ const Navigation = () => {
         { name: "Accessories", href: "/category/accessories", subcategories: [{ name: "Bags", href: "/category/bags" }, { name: "Socks", href: "/category/socks" }, { name: "Stickers", href: "/category/stickers" }] }
       ],
       images: [
-        { src: "/products/stay-holy-hoodie/flat-front.png", alt: "Hoodies Collection", label: "Hoodies" },
-        { src: "/products/heavenly-crewneck/flat-lay.png", alt: "Tees Collection", label: "Tees" }
+        { src: REAL_PRODUCT_IMAGES.youNeedJesus, alt: "Hoodies Collection", label: "Hoodies" },
+        { src: REAL_PRODUCT_IMAGES.adamGod, alt: "Tees Collection", label: "Tees" }
       ]
     },
     { name: "Lookbook", href: "/lookbook", submenuItems: [], images: [] },

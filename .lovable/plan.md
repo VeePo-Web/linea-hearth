@@ -1,33 +1,51 @@
 ## Goal
-Make the close X buttons on product overlays readable on any background (white product photo OR dark theme) by giving them a clean chrome-glass treatment with a thin dark hairline ring + opaque dark icon stroke.
+Eliminate every reference to the two ghost products (`heavenly-crewneck`, `stay-holy-hoodie`) — they are not in the database, so the cards in your screenshot are showing data with no destination. Replace the 35 hard-coded `/products/.../` paths with images from real products in the catalog (or remove the section entirely where the image was decorative filler).
 
-## What I'm changing
+## What's wrong today
+- `public/products/heavenly-crewneck/` and `public/products/stay-holy-hoodie/` hold 10 PNGs that don't correspond to any DB product.
+- 13 source files hard-code those paths (35 references). Some are editorial decoration, some are real "shop this" carousels that would 404 if clicked.
+- One DB product is `heavenly-khaki-low-profile-baseball-cap` (note: this is a real product — it stays. Only the old "Heavenly Crewneck" mockup gets purged.)
 
-### 1. `QuickViewModal.tsx` close button (line 440-447)
-Currently `bg-white/80 hover:bg-white rounded-full` with default-colored X — invisible on white product photography behind it.
+## Real-product image pool I'll draw from
+Pulled from `product_images.is_primary = true` in the DB. Hero candidates that fit each slot's vibe:
+- **Hoodie hero shots** → `you-need-jesus-heavy-weight-sun-fade-oversized-hoodie`, `in-jesus-name-oversized`, `ichthys-fish-oversized-sun-fade-hoodie`, `first-love-snow-washed-oversized-hoodie`
+- **Tee hero shots** → `adam-god-mineral-wash-cotton-boxy-tee-shirt`, `burning-love-boxy-tee`, `faith-in-fear-boxy-tee`, `revelation-3-20-sun-fade-boxy-waffle-tee-shirt`, `names-of-god-mineral-wash-cotton-tee-shirt`
+- **Sweater/crew** → `god-bless-line-of-judah-sweater`
+- **Hat/cap** → `heavenly-khaki-low-profile-baseball-cap`, `blessed-denim-baseball-cap-embroidered`, `salvation-belongs-unisex-corduroy-baseball-cap`
 
-**New:** Sharp-edged 36×36 square button with:
-- `bg-white border border-black/80` (white fill with thin black hairline ring)
-- `text-black` icon at stroke-width 1.75
-- `rounded-none` (matches editorial sharp-edge system)
-- `hover:bg-black hover:text-white hover:border-black` inversion on hover
-- Same z-modal token
+## File-by-file plan
 
-Result: black hairline ring keeps it crisp on white backgrounds; white fill + black icon keeps it readable on dark backgrounds.
+| File | Action |
+|---|---|
+| `public/products/heavenly-crewneck/` | **Delete entire folder** (5 files) |
+| `public/products/stay-holy-hoodie/` | **Delete entire folder** (5 files) |
+| `src/components/header/Navigation.tsx` (lines 61-68, 82-85) | Swap mega-menu preload + portrait image src to `you-need-jesus` (Hoodies card) + `adam-god-mineral-wash` (Tees card). Update labels to match. |
+| `src/components/content/ProductCarousel.tsx` | This file hard-codes a fake 4-product array. Replace its data with the real DB products listed above so cards link to live PDPs. |
+| `src/components/content/FiftyFiftySection.tsx` | Swap to one hoodie + one tee from real pool. |
+| `src/components/content/LargeHero.tsx` | Swap to `god-bless-line-of-judah-sweater` lifestyle image. |
+| `src/components/content/EditorialSection.tsx` | Swap to `first-love-snow-washed-oversized-hoodie`. |
+| `src/components/homepage/HeroBlock.tsx` | Swap to `you-need-jesus` hero. |
+| `src/components/homepage/FeaturedDrop.tsx` | Swap to `ichthys-fish-oversized-sun-fade-hoodie`. |
+| `src/components/homepage/MissionBlock.tsx` | Swap to `adam-god-mineral-wash-cotton-boxy-tee-shirt`. |
+| `src/components/about/StoryWorldwideTribe.tsx` (8 refs) | Rebuild collage from a mix of 8 real product hero shots. |
+| `src/components/about/StoryJoinCTA.tsx` | Swap to `you-need-jesus`. |
+| `src/components/checkout/PostPurchaseOffer.tsx` | This is the "You Might Also Like" surface from your screenshot. Replace hard-coded offer with a real DB-driven product (or two), e.g. `adam-god-mineral-wash` + `burning-love-boxy-tee`. Make the card link to the actual PDP. |
+| `src/pages/Lookbook.tsx` (lines 48, 58) | Swap to two real hero shots from the pool. |
+| `src/pages/admin/AdminProductForm.tsx` | Only references in a comment/placeholder string — safe to leave or remove if cosmetic. I'll inspect and clean if it's a real placeholder URL. |
 
-### 2. `ImageZoom.tsx` close X (line 79)
-Same treatment for the full-screen image zoom close button — currently a large floating X on photography.
+## Image source format
+I'll reference the real images via their Supabase storage public URLs (already used across the live PDPs), e.g.:
+`https://harckavibhmimndfvnyo.supabase.co/storage/v1/object/public/product-images/<uuid>/<file>.png`
 
-### 3. `dialog.tsx` shadcn primitive close X (line 45-48)
-Same hairline treatment so any modal across the app inherits the readable close button. Adds `border border-foreground/80 bg-background` to the close trigger and removes the rounded corners.
-
-## Files edited
-1. `src/components/category/QuickViewModal.tsx` — close button styling
-2. `src/components/product/ImageZoom.tsx` — close button styling
-3. `src/components/ui/dialog.tsx` — DialogPrimitive.Close styling
+No new uploads. No new DB rows. Pure swap-and-delete.
 
 ## Acceptance
-- Close X readable on pure white, pure black, and mixed photography
-- Sharp edges (`rounded-none`), matches editorial system
-- Thin dark hairline ring (1px black) provides the contrast guarantee
-- Hover state: clean color inversion (black fill, white icon)
+- Zero matches for `rg "heavenly-crewneck|stay-holy-hoodie" src/ public/`.
+- `public/products/` directory is empty (or removed).
+- Every former image slot renders a real product image whose card click lands on a live PDP.
+- The "You Might Also Like" surface in your screenshot now shows real, in-stock products.
+
+## Notes
+- Editorial layouts (collages, hero compositions) keep their grid; only the `src` paths change.
+- I won't touch product data or DB rows — only frontend asset references.
+- After the swap I'll re-grep to prove zero ghost-product references remain.

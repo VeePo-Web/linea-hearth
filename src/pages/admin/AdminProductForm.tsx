@@ -288,7 +288,7 @@ const AdminProductForm = () => {
 
                 <div className="space-y-2">
                   <Label className="text-xs uppercase tracking-wider">Slug</Label>
-                  <Input value={slug} onChange={(e) => setSlug(e.target.value)} placeholder="stay-holy-hoodie" />
+                  <Input value={slug} onChange={(e) => setSlug(e.target.value)} placeholder="adam-god-mineral-wash-cotton-boxy-tee-shirt" />
                   <p className="text-xs text-muted-foreground">/product/{slug || 'your-slug'}</p>
                 </div>
 

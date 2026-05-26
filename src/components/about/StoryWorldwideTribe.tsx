@@ -4,16 +4,17 @@ import { Instagram } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useCategoryImages } from "@/hooks/useCategoryHeroImage";
+import { REAL_PRODUCT_IMAGES as IMG } from "@/lib/realProductImages";
 
 const FALLBACK_IMAGES = [
-  "/products/stay-holy-hoodie/male-model.png",
-  "/products/heavenly-crewneck/female-model.png",
-  "/products/stay-holy-hoodie/female-model-1.png",
-  "/products/heavenly-crewneck/front-model.png",
-  "/products/stay-holy-hoodie/female-model-2.png",
-  "/products/heavenly-crewneck/lifestyle.png",
-  "/products/stay-holy-hoodie/flat-front.png",
-  "/products/heavenly-crewneck/side-view.png",
+  IMG.youNeedJesus,
+  IMG.adamGod,
+  IMG.ichthysFish,
+  IMG.burningLove,
+  IMG.inJesusName,
+  IMG.faithInFear,
+  IMG.firstLoveSnow,
+  IMG.namesOfGod,
 ];
 
 const TRIBE_META = [

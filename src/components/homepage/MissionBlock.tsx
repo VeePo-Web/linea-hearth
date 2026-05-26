@@ -8,10 +8,11 @@ import TextReveal from "@/components/motion/TextReveal";
 import { hoverScale, tapScale } from "@/lib/animations";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useCategoryHeroImage } from "@/hooks/useCategoryHeroImage";
+import { REAL_PRODUCT_IMAGES } from "@/lib/realProductImages";
 
 const MissionBlock = () => {
   const isMobile = useIsMobile();
-  const bgImage = useCategoryHeroImage("hoodies", "/products/stay-holy-hoodie/flat-front.png");
+  const bgImage = useCategoryHeroImage("hoodies", REAL_PRODUCT_IMAGES.inJesusName);
 
   return (
     <section className="relative w-full min-h-[60vh] md:min-h-[70vh] overflow-hidden">
