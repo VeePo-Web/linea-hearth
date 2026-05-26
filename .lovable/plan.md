@@ -1,51 +1,69 @@
-## Goal
-Eliminate every reference to the two ghost products (`heavenly-crewneck`, `stay-holy-hoodie`) — they are not in the database, so the cards in your screenshot are showing data with no destination. Replace the 35 hard-coded `/products/.../` paths with images from real products in the catalog (or remove the section entirely where the image was decorative filler).
 
-## What's wrong today
-- `public/products/heavenly-crewneck/` and `public/products/stay-holy-hoodie/` hold 10 PNGs that don't correspond to any DB product.
-- 13 source files hard-code those paths (35 references). Some are editorial decoration, some are real "shop this" carousels that would 404 if clicked.
-- One DB product is `heavenly-khaki-low-profile-baseball-cap` (note: this is a real product — it stays. Only the old "Heavenly Crewneck" mockup gets purged.)
+# Genesis 49:9-10 in the Category Hero
 
-## Real-product image pool I'll draw from
-Pulled from `product_images.is_primary = true` in the DB. Hero candidates that fit each slot's vibe:
-- **Hoodie hero shots** → `you-need-jesus-heavy-weight-sun-fade-oversized-hoodie`, `in-jesus-name-oversized`, `ichthys-fish-oversized-sun-fade-hoodie`, `first-love-snow-washed-oversized-hoodie`
-- **Tee hero shots** → `adam-god-mineral-wash-cotton-boxy-tee-shirt`, `burning-love-boxy-tee`, `faith-in-fear-boxy-tee`, `revelation-3-20-sun-fade-boxy-waffle-tee-shirt`, `names-of-god-mineral-wash-cotton-tee-shirt`
-- **Sweater/crew** → `god-bless-line-of-judah-sweater`
-- **Hat/cap** → `heavenly-khaki-low-profile-baseball-cap`, `blessed-denim-baseball-cap-embroidered`, `salvation-belongs-unisex-corduroy-baseball-cap`
+Fill the empty upper half of `CollectionHero` (the dark zone the user circled on `/category/shop`) with editorial fragments of Genesis 49:9-10 — the Lion of Judah passage. The verse becomes the atmosphere of the hero; the existing eyebrow ("THE FULL DROP" / tagline), title ("All Products"), and count stay exactly where they are.
 
-## File-by-file plan
+## Where it lands
 
-| File | Action |
-|---|---|
-| `public/products/heavenly-crewneck/` | **Delete entire folder** (5 files) |
-| `public/products/stay-holy-hoodie/` | **Delete entire folder** (5 files) |
-| `src/components/header/Navigation.tsx` (lines 61-68, 82-85) | Swap mega-menu preload + portrait image src to `you-need-jesus` (Hoodies card) + `adam-god-mineral-wash` (Tees card). Update labels to match. |
-| `src/components/content/ProductCarousel.tsx` | This file hard-codes a fake 4-product array. Replace its data with the real DB products listed above so cards link to live PDPs. |
-| `src/components/content/FiftyFiftySection.tsx` | Swap to one hoodie + one tee from real pool. |
-| `src/components/content/LargeHero.tsx` | Swap to `god-bless-line-of-judah-sweater` lifestyle image. |
-| `src/components/content/EditorialSection.tsx` | Swap to `first-love-snow-washed-oversized-hoodie`. |
-| `src/components/homepage/HeroBlock.tsx` | Swap to `you-need-jesus` hero. |
-| `src/components/homepage/FeaturedDrop.tsx` | Swap to `ichthys-fish-oversized-sun-fade-hoodie`. |
-| `src/components/homepage/MissionBlock.tsx` | Swap to `adam-god-mineral-wash-cotton-boxy-tee-shirt`. |
-| `src/components/about/StoryWorldwideTribe.tsx` (8 refs) | Rebuild collage from a mix of 8 real product hero shots. |
-| `src/components/about/StoryJoinCTA.tsx` | Swap to `you-need-jesus`. |
-| `src/components/checkout/PostPurchaseOffer.tsx` | This is the "You Might Also Like" surface from your screenshot. Replace hard-coded offer with a real DB-driven product (or two), e.g. `adam-god-mineral-wash` + `burning-love-boxy-tee`. Make the card link to the actual PDP. |
-| `src/pages/Lookbook.tsx` (lines 48, 58) | Swap to two real hero shots from the pool. |
-| `src/pages/admin/AdminProductForm.tsx` | Only references in a comment/placeholder string — safe to leave or remove if cosmetic. I'll inspect and clean if it's a real placeholder URL. |
+- File: `src/components/category/CollectionHero.tsx`
+- Affects every category route, with strongest editorial weight on `/category/shop` (the screenshot the user marked up). Subcategory pages inherit the same treatment but the verse stays universal — Judah is the brand's namesake, so the passage reads as house scripture, not category copy.
 
-## Image source format
-I'll reference the real images via their Supabase storage public URLs (already used across the live PDPs), e.g.:
-`https://harckavibhmimndfvnyo.supabase.co/storage/v1/object/public/product-images/<uuid>/<file>.png`
+## Composition
 
-No new uploads. No new DB rows. Pure swap-and-delete.
+```text
+┌─────────────────────────────────────────────┐
+│  GENESIS 49:9                               │  ← tiny eyebrow, top-left, 10px chrome
+│                                             │
+│  "Judah is a lion's cub..."                 │  ← fragment A, serif, large, faded
+│                                             │
+│         "who dares rouse him?"              │  ← fragment B, offset right, italic
+│                                             │
+│                  ✦                          │  ← hairline divider (forest-500/30)
+│                                             │
+│           THE FULL DROP                     │  ← existing eyebrow (unchanged)
+│           All Products                      │  ← existing H1 (unchanged)
+│              16 pieces                      │  ← existing count (unchanged)
+└─────────────────────────────────────────────┘
+```
+
+Three fragments, surfaced as floating editorial type — not one paragraph block:
+
+1. **Top-left, eyebrow micro-label:** `GENESIS 49:9–10 · ESV` — 10px, `tracking-[0.3em]`, `text-white/40`
+2. **Fragment A (large, serif, opacity 0.35):** *"Judah is a lion's cub; he stooped down, he crouched as a lion."*
+3. **Fragment B (smaller, italic, offset, opacity 0.5):** *"Who dares rouse him?"*
+4. **Fragment C (bottom of verse zone, all-caps tracked):** `THE SCEPTER SHALL NOT DEPART FROM JUDAH` — 11px, `tracking-[0.25em]`, `text-white/30`
+
+A thin forest-500/20 hairline separates the verse zone from the existing title block so the hero reads as two stacked acts: **Scripture → Drop.**
+
+## Visual treatment
+
+- Verse fragments use a serif (project already loads `Instrument Serif` / `Cormorant` via Google Fonts in `index.html` — reuse, do not add new).
+- Opacity tiers (0.30 / 0.45 / 0.30) so nothing competes with the H1.
+- Mobile (390px): stack fragments vertically, reduce fragment A to `text-2xl`, hide Fragment C if it would push the H1 below the fold. Hero height bumps from `h-[35dvh]` → `h-[55dvh]` on mobile to give the verse room without crushing "All Products".
+- Desktop: fragments anchored absolutely inside the hero so they read as found-typography, not centered marketing copy. Existing centered title block stays centered.
+- Subtle Framer Motion fade+rise on each fragment, staggered 80ms, editorialEase. Respects `useReducedMotion`.
+
+## Hero height adjustment
+
+| Breakpoint | Current | New |
+|---|---|---|
+| Mobile | `h-[35dvh]` | `h-[55dvh]` |
+| md | `h-[50vh]` | `h-[62vh]` |
+| lg | `h-[60vh]` | `h-[68vh]` |
+
+Enough vertical canvas to hold the verse without the user having to scroll past empty black.
+
+## Reduced scope guardrails
+
+- No changes to `ProductGrid`, `FilterSortBar`, or anything below the hero.
+- No new dependencies, no new fonts, no new images.
+- Existing `bgClass` gradients stay — verse layers *on top* of them.
+- `tagline` and `title` from `collectionData` are untouched, so subcategory taglines like *"Cover your head. Declare your King."* still render below the verse.
 
 ## Acceptance
-- Zero matches for `rg "heavenly-crewneck|stay-holy-hoodie" src/ public/`.
-- `public/products/` directory is empty (or removed).
-- Every former image slot renders a real product image whose card click lands on a live PDP.
-- The "You Might Also Like" surface in your screenshot now shows real, in-stock products.
 
-## Notes
-- Editorial layouts (collages, hero compositions) keep their grid; only the `src` paths change.
-- I won't touch product data or DB rows — only frontend asset references.
-- After the swap I'll re-grep to prove zero ghost-product references remain.
+- Verse fragments visible on `/category/shop` filling the previously-empty top zone the user circled.
+- H1 "All Products" + tagline + count still render in their current position, unchanged.
+- Mobile 390px: nothing clipped, everything above-the-scroll legible.
+- Reduced-motion users see static fragments, no animation.
+- `rg "Judah is a lion"` returns exactly one match (`CollectionHero.tsx`).
