@@ -252,6 +252,12 @@ const CheckoutSuccess = () => {
                 <span className="text-champagne-600">-{formatCents(order.discount_cents)}</span>
               </div>
             )}
+            {order.tax_cents > 0 && (
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Tax</span>
+                <span>{formatCents(order.tax_cents)}</span>
+              </div>
+            )}
             <div className="flex justify-between pt-3 border-t border-border font-medium">
               <span>Total</span>
               <span>{formatCents(order.total_cents)}</span>
