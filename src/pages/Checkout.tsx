@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
-import { Minus, Plus, CreditCard, Check, ExternalLink, AlertCircle, X, Loader2 } from "lucide-react";
+import { Minus, Plus, Check, ExternalLink, AlertCircle, X, Loader2 } from "lucide-react";
 import { formatPrice, CURRENCY } from "@/lib/currency";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import CheckoutHeader from "../components/header/CheckoutHeader";
@@ -70,12 +70,8 @@ const Checkout = () => {
     country: ""
   });
   const [shippingOption, setShippingOption] = useState("standard");
-  const [paymentDetails, setPaymentDetails] = useState({
-    cardNumber: "",
-    expiryDate: "",
-    cvv: "",
-    cardholderName: ""
-  });
+  // Card data is collected exclusively by Stripe's PCI-scoped iframe — never in React state.
+
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentComplete, setPaymentComplete] = useState(false);
   const [showPostPurchaseOffer, setShowPostPurchaseOffer] = useState(false);
@@ -193,9 +189,8 @@ const Checkout = () => {
     setShippingAddress(prev => ({ ...prev, [field]: value }));
   };
 
-  const handlePaymentDetailsChange = (field: string, value: string) => {
-    setPaymentDetails(prev => ({ ...prev, [field]: value }));
-  };
+
+
 
   // Stripe Checkout handler
   const handleStripeCheckout = async () => {
@@ -242,23 +237,8 @@ const Checkout = () => {
   };
 
   // Fallback simulated payment handler (when Stripe not configured)
-  const handleCompleteOrder = async () => {
-    setIsProcessing(true);
-    setCurrentStep(3); // Move to payment step
-    
-    // Simulate payment processing
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    // Generate order number
-    setOrderNumber(String(Math.floor(10000 + Math.random() * 90000)));
-    
-    // Mark abandoned cart as converted
-    await markConverted();
-    
-    setIsProcessing(false);
-    setPaymentComplete(true);
-    setCurrentStep(4); // Complete step
-  };
+
+
 
   const handleShowPostPurchaseOffer = useCallback(() => {
     setShowPostPurchaseOffer(true);
@@ -907,83 +887,8 @@ const Checkout = () => {
                     <h2 className="text-lg font-light text-foreground mb-6">Payment Details</h2>
                     
                     <div className="space-y-6">
-                      <div>
-                        <Label htmlFor="cardholderName" className="text-sm font-light text-foreground">
-                          Cardholder Name *
-                        </Label>
-                        <Input
-                          id="cardholderName"
-                          type="text"
-                          value={paymentDetails.cardholderName}
-                          onChange={(e) => handlePaymentDetailsChange("cardholderName", e.target.value)}
-                          className="mt-2 rounded-none"
-                          placeholder="Name on card"
-                        />
-                      </div>
+                      {/* PCI scope sits entirely inside Stripe's iframe — no raw card fields here. */}
 
-                      <div>
-                        <Label htmlFor="cardNumber" className="text-sm font-light text-foreground">
-                          Card Number *
-                        </Label>
-                        <div className="relative mt-2">
-                          <Input
-                            id="cardNumber"
-                            type="text"
-                            value={paymentDetails.cardNumber}
-                            onChange={(e) => {
-                              const value = e.target.value.replace(/\s/g, '').replace(/(.{4})/g, '$1 ').trim();
-                              if (value.length <= 19) {
-                                handlePaymentDetailsChange("cardNumber", value);
-                              }
-                            }}
-                            className="rounded-none pl-10"
-                            placeholder="4242 4242 4242 4242"
-                            maxLength={19}
-                          />
-                          <CreditCard className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <Label htmlFor="expiryDate" className="text-sm font-light text-foreground">
-                            Expiry Date *
-                          </Label>
-                          <Input
-                            id="expiryDate"
-                            type="text"
-                            value={paymentDetails.expiryDate}
-                            onChange={(e) => {
-                              const value = e.target.value.replace(/\D/g, '').replace(/(\d{2})(\d{2})/, '$1/$2');
-                              if (value.length <= 5) {
-                                handlePaymentDetailsChange("expiryDate", value);
-                              }
-                            }}
-                            className="mt-2 rounded-none"
-                            placeholder="MM/YY"
-                            maxLength={5}
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor="cvv" className="text-sm font-light text-foreground">
-                            CVV *
-                          </Label>
-                          <Input
-                            id="cvv"
-                            type="text"
-                            value={paymentDetails.cvv}
-                            onChange={(e) => {
-                              const value = e.target.value.replace(/\D/g, '');
-                              if (value.length <= 3) {
-                                handlePaymentDetailsChange("cvv", value);
-                              }
-                            }}
-                            className="mt-2 rounded-none"
-                            placeholder="123"
-                            maxLength={3}
-                          />
-                        </div>
-                      </div>
 
                       {/* Order Total Summary */}
                       <div className="bg-muted/10 p-6 rounded-none border border-muted-foreground/20 space-y-3">
@@ -1041,25 +946,8 @@ const Checkout = () => {
                         </p>
                       </div>
 
-                      {/* Divider */}
-                      <div className="relative py-2">
-                        <div className="absolute inset-0 flex items-center">
-                          <div className="w-full border-t border-muted-foreground/20" />
-                        </div>
-                        <div className="relative flex justify-center text-xs">
-                          <span className="bg-muted/20 px-4 text-muted-foreground">or test with simulated payment</span>
-                        </div>
-                      </div>
 
-                      {/* Fallback Simulated Payment Button */}
-                      <Button
-                        onClick={handleCompleteOrder}
-                        variant="outline"
-                        disabled={isProcessing || !paymentDetails.cardNumber || !paymentDetails.expiryDate || !paymentDetails.cvv || !paymentDetails.cardholderName}
-                        className="w-full rounded-none h-12 text-base"
-                      >
-                        {isProcessing ? "Processing..." : `Test Payment • $${total.toLocaleString()}`}
-                      </Button>
+
 
                       {/* Security assurance */}
                       <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">

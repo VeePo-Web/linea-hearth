@@ -1191,6 +1191,92 @@ export type Database = {
         }
         Relationships: []
       }
+      stripe_disputes: {
+        Row: {
+          amount_cents: number
+          created_at: string
+          currency: string
+          environment: string
+          evidence_due_by: string | null
+          id: string
+          order_id: string | null
+          raw: Json | null
+          reason: string | null
+          status: string
+          stripe_charge_id: string
+          stripe_dispute_id: string
+          stripe_payment_intent_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount_cents: number
+          created_at?: string
+          currency?: string
+          environment: string
+          evidence_due_by?: string | null
+          id?: string
+          order_id?: string | null
+          raw?: Json | null
+          reason?: string | null
+          status: string
+          stripe_charge_id: string
+          stripe_dispute_id: string
+          stripe_payment_intent_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount_cents?: number
+          created_at?: string
+          currency?: string
+          environment?: string
+          evidence_due_by?: string | null
+          id?: string
+          order_id?: string | null
+          raw?: Json | null
+          reason?: string | null
+          status?: string
+          stripe_charge_id?: string
+          stripe_dispute_id?: string
+          stripe_payment_intent_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stripe_disputes_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      stripe_webhook_events: {
+        Row: {
+          created_at: string
+          environment: string
+          event_id: string
+          payload: Json | null
+          processed_at: string
+          type: string
+        }
+        Insert: {
+          created_at?: string
+          environment: string
+          event_id: string
+          payload?: Json | null
+          processed_at?: string
+          type: string
+        }
+        Update: {
+          created_at?: string
+          environment?: string
+          event_id?: string
+          payload?: Json | null
+          processed_at?: string
+          type?: string
+        }
+        Relationships: []
+      }
       threshold_upsell_products: {
         Row: {
           created_at: string | null

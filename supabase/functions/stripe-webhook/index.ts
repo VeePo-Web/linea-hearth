@@ -47,7 +47,7 @@ async function handleCheckoutCompleted(session: any, env: StripeEnv) {
     return;
   }
 
-  // Idempotency
+  // Idempotency at the order level (belt-and-suspenders alongside event dedupe).
   const { data: existing } = await sb
     .from("orders")
     .select("payment_status")
@@ -55,7 +55,6 @@ async function handleCheckoutCompleted(session: any, env: StripeEnv) {
     .single();
   if (existing && (existing as any).payment_status === "paid") return;
 
-  // Pull authoritative totals + address from Stripe (post-tax, post-discount)
   const stripe = createStripeClient(env);
   const full = await stripe.checkout.sessions.retrieve(session.id, {
     expand: ["total_details", "shipping_cost", "customer_details", "shipping_details"],
@@ -81,7 +80,6 @@ async function handleCheckoutCompleted(session: any, env: StripeEnv) {
     })
     .eq("id", orderId);
 
-  // Record discount redemption (if any)
   if (
     full.total_details?.amount_discount &&
     full.total_details.amount_discount > 0
@@ -98,7 +96,6 @@ async function handleCheckoutCompleted(session: any, env: StripeEnv) {
         customer_email: (orderRow as any).customer_email,
         discount_applied_cents: full.total_details.amount_discount,
       });
-      // Bump usage_count
       const { data: dc } = await sb
         .from("discount_codes")
         .select("usage_count")
@@ -139,16 +136,97 @@ async function handleRefund(charge: any) {
     .eq("stripe_payment_intent_id", paymentIntentId);
 }
 
+async function handleDispute(dispute: any, env: StripeEnv) {
+  const sb = getSupabase();
+  const paymentIntentId = dispute.payment_intent ?? null;
+
+  let orderId: string | null = null;
+  if (paymentIntentId) {
+    const { data: order } = await sb
+      .from("orders")
+      .select("id")
+      .eq("stripe_payment_intent_id", paymentIntentId)
+      .maybeSingle();
+    if (order) orderId = (order as any).id;
+  }
+
+  await sb.from("stripe_disputes").upsert(
+    {
+      stripe_dispute_id: dispute.id,
+      stripe_charge_id: dispute.charge,
+      stripe_payment_intent_id: paymentIntentId,
+      order_id: orderId,
+      amount_cents: dispute.amount ?? 0,
+      currency: dispute.currency ?? "cad",
+      reason: dispute.reason ?? null,
+      status: dispute.status ?? "needs_response",
+      evidence_due_by: dispute.evidence_details?.due_by
+        ? new Date(dispute.evidence_details.due_by * 1000).toISOString()
+        : null,
+      environment: env,
+      raw: dispute,
+      updated_at: new Date().toISOString(),
+    },
+    { onConflict: "stripe_dispute_id" },
+  );
+
+  if (orderId) {
+    await sb
+      .from("orders")
+      .update({ status: "disputed", notes: `Dispute opened: ${dispute.reason ?? "unknown"}` })
+      .eq("id", orderId);
+  }
+}
+
 Deno.serve(async (req) => {
   if (req.method !== "POST") return new Response("Method not allowed", { status: 405 });
 
+  // HARD-FAIL on unknown env. Routing a live event to sandbox creds
+  // makes signature verification fail silently and Stripe retries for
+  // 3 days before giving up — losing the order.
   const rawEnv = new URL(req.url).searchParams.get("env");
-  const env: StripeEnv = rawEnv === "live" ? "live" : "sandbox";
+  if (rawEnv !== "live" && rawEnv !== "sandbox") {
+    console.error("Webhook rejected: missing/invalid ?env= query param", rawEnv);
+    return new Response("Invalid env", { status: 400 });
+  }
+  const env: StripeEnv = rawEnv;
+
+  let event: { type: string; data: { object: any }; id: string };
+  try {
+    event = await verifyWebhook(req, env);
+  } catch (e) {
+    console.error("Signature verification failed:", e);
+    return new Response("Webhook error", { status: 400 });
+  }
+
+  // === EVENT DEDUPE ===
+  // Stripe retries on any non-2xx for up to 3 days. We must not
+  // double-fulfill on a retry. Inserting first means a concurrent retry
+  // hits the PK conflict and short-circuits.
+  const sb = getSupabase();
+  const { error: dedupeErr } = await sb
+    .from("stripe_webhook_events")
+    .insert({
+      event_id: event.id,
+      type: event.type,
+      environment: env,
+      payload: event.data?.object ?? null,
+    });
+  if (dedupeErr) {
+    // Unique-violation → we've already processed this event. Ack 200.
+    if ((dedupeErr as any).code === "23505") {
+      return new Response(JSON.stringify({ received: true, deduped: true }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+    console.error("Failed to log webhook event", dedupeErr);
+    // Fall through — better to process than to drop.
+  }
+
+  console.log("Webhook:", event.type, event.id);
 
   try {
-    const event = await verifyWebhook(req, env);
-    console.log("Webhook:", event.type, event.id);
-
     switch (event.type) {
       case "checkout.session.completed":
       case "checkout.session.async_payment_succeeded":
@@ -159,18 +237,30 @@ Deno.serve(async (req) => {
         await handlePaymentFailed(event.data.object);
         break;
       case "charge.refunded":
+      case "charge.refund.updated":
         await handleRefund(event.data.object);
+        break;
+      case "charge.dispute.created":
+      case "charge.dispute.updated":
+      case "charge.dispute.funds_withdrawn":
+      case "charge.dispute.funds_reinstated":
+      case "charge.dispute.closed":
+        await handleDispute(event.data.object, env);
         break;
       default:
         console.log("Unhandled event:", event.type);
     }
-
-    return new Response(JSON.stringify({ received: true }), {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
-    });
   } catch (e) {
-    console.error("Webhook error:", e);
-    return new Response("Webhook error", { status: 400 });
+    console.error("Handler error:", e);
+    // Returning 500 lets Stripe retry the event. The dedupe row will
+    // still be there, so we'd skip it — fix: delete the row so retries
+    // re-process.
+    await sb.from("stripe_webhook_events").delete().eq("event_id", event.id);
+    return new Response("Handler error", { status: 500 });
   }
+
+  return new Response(JSON.stringify({ received: true }), {
+    status: 200,
+    headers: { "Content-Type": "application/json" },
+  });
 });
