@@ -421,12 +421,17 @@ Deno.serve(async (req) => {
         },
       ],
       payment_intent_data: {
-        description: `Linea Hearth order ${order.id}`,
+        description: `Line of Judah order ${order.id.slice(0, 8).toUpperCase()}`,
+        // Statement descriptor suffix surfaces on the customer's bank statement
+        // alongside the Stripe DBA. Recognizable descriptors are the #1
+        // chargeback preventer. Max 22 chars, no <>'"* characters.
+        statement_descriptor_suffix: "ORDER",
         metadata: {
           orderId: order.id,
           ...(userId && { userId }),
         },
       },
+
       metadata: {
         orderId: order.id,
         ...(userId && { userId }),
