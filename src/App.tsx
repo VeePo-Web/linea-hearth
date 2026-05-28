@@ -9,7 +9,9 @@ import { AuthProvider } from "@/hooks/useAuth";
 import { CartProvider } from "@/hooks/useCart";
 import { SizeQuizProvider } from "@/contexts/SizeQuizContext";
 import { RecentlyViewedProvider } from "@/contexts/RecentlyViewedContext";
+import { StickyCtaProvider } from "@/contexts/StickyCtaContext";
 import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
+
 import { migrateLocalStorage } from "@/lib/storageMigration";
 
 // Run localStorage migration on app load (before React renders)
@@ -169,20 +171,24 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
       <CartProvider>
-        <RecentlyViewedProvider>
-          <SizeQuizProvider>
-            <TooltipProvider>
-              <PaymentTestModeBanner />
-              <Toaster />
-              <Sonner />
-              <BrowserRouter>
-                <ScrollToTop />
-                <AnimatedRoutes />
-              </BrowserRouter>
-            </TooltipProvider>
-          </SizeQuizProvider>
-        </RecentlyViewedProvider>
+
+        <StickyCtaProvider>
+          <RecentlyViewedProvider>
+            <SizeQuizProvider>
+              <TooltipProvider>
+                <PaymentTestModeBanner />
+                <Toaster />
+                <Sonner />
+                <BrowserRouter>
+                  <ScrollToTop />
+                  <AnimatedRoutes />
+                </BrowserRouter>
+              </TooltipProvider>
+            </SizeQuizProvider>
+          </RecentlyViewedProvider>
+        </StickyCtaProvider>
       </CartProvider>
+
     </AuthProvider>
   </QueryClientProvider>
 );
