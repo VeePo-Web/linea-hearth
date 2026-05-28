@@ -22,11 +22,11 @@ interface Order {
   customer_first_name: string | null;
   customer_last_name: string | null;
   shipping_address: {
-    line1?: string;
-    line2?: string;
+    // Canonical app shape (written by stripe-webhook -> mapStripeAddress)
+    address?: string;
     city?: string;
     state?: string;
-    postal_code?: string;
+    postalCode?: string;
     country?: string;
   };
   subtotal_cents: number;
@@ -38,6 +38,7 @@ interface Order {
   created_at: string;
   currency: string;
 }
+
 
 // Format cents to currency display
 function formatCurrency(cents: number, currency: string = "cad"): string {
@@ -91,15 +92,15 @@ function buildOrderConfirmationHtml(order: Order, items: OrderItem[], siteUrl: s
   const delivery = getDeliveryWindow(order.shipping_method, orderDate);
   const isFreeShipping = order.shipping_cents === 0;
   
-  // Build address string
-  const addr = order.shipping_address;
+  // Build address string — canonical app shape: { address, city, state, postalCode, country }
+  const addr = order.shipping_address || {};
   const addressLines = [
     `${order.customer_first_name || ""} ${order.customer_last_name || ""}`.trim(),
-    addr.line1,
-    addr.line2,
-    `${addr.city}${addr.state ? `, ${addr.state}` : ""} ${addr.postal_code || ""}`.trim(),
+    addr.address,
+    `${addr.city || ""}${addr.state ? `, ${addr.state}` : ""} ${addr.postalCode || ""}`.trim(),
     addr.country,
-  ].filter(Boolean);
+  ].filter((l) => l && l.trim().length > 0);
+
   
   // Build items HTML
   const itemsHtml = items.map((item) => `
