@@ -70,12 +70,8 @@ const Checkout = () => {
     country: ""
   });
   const [shippingOption, setShippingOption] = useState("standard");
-  const [paymentDetails, setPaymentDetails] = useState({
-    cardNumber: "",
-    expiryDate: "",
-    cvv: "",
-    cardholderName: ""
-  });
+  // Card data is collected exclusively by Stripe's PCI-scoped iframe — never in React state.
+
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentComplete, setPaymentComplete] = useState(false);
   const [showPostPurchaseOffer, setShowPostPurchaseOffer] = useState(false);
