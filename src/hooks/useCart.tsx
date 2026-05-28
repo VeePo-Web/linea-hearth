@@ -20,10 +20,15 @@ export interface CartItem {
 
 
 export type ShippingProgressTier = 'start' | 'halfway' | 'almost' | 'unlocked';
-
 interface CartContextType {
   items: CartItem[];
   addItem: (item: Omit<CartItem, 'quantity'> & { quantity?: number }) => void;
+  /**
+   * Batch-add multiple items in a single state update.
+   * Used by Complete-the-Look bundles so we don't pop the drawer once per item
+   * and don't fire 4 toasts when the user taps "Add the Look".
+   */
+  addItems: (items: Array<Omit<CartItem, 'quantity'> & { quantity?: number }>, options?: { openDrawer?: boolean }) => void;
   removeItem: (id: number) => void;
   updateQuantity: (id: number, quantity: number) => void;
   clearCart: () => void;
@@ -40,6 +45,7 @@ interface CartContextType {
   toggleCart: () => void;
   lastAddedItem: CartItem | null;
 }
+
 
 const CART_STORAGE_KEY = 'loj-cart';
 const FREE_SHIPPING_THRESHOLD = 99; // $99 CAD for free shipping
@@ -108,6 +114,45 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     // Clear last added item after animation
     setTimeout(() => setLastAddedItem(null), 2000);
   }, []);
+
+  const addItems = useCallback((
+    newItems: Array<Omit<CartItem, 'quantity'> & { quantity?: number }>,
+    options: { openDrawer?: boolean } = {},
+  ) => {
+    if (!newItems.length) return;
+    const { openDrawer = true } = options;
+
+    setItems(currentItems => {
+      const merged = [...currentItems];
+      for (const incoming of newItems) {
+        const quantity = incoming.quantity || 1;
+        const existingIndex = merged.findIndex(
+          item => item.id === incoming.id && item.size === incoming.size && item.color === incoming.color
+        );
+        if (existingIndex > -1) {
+          merged[existingIndex] = {
+            ...merged[existingIndex],
+            quantity: merged[existingIndex].quantity + quantity,
+          };
+        } else {
+          merged.push({ ...incoming, quantity } as CartItem);
+        }
+      }
+      return merged;
+    });
+
+    // Use the last item as the "last added" reference for any peek UI
+    const last = newItems[newItems.length - 1];
+    setLastAddedItem({ ...last, quantity: last.quantity || 1 } as CartItem);
+    if (openDrawer) setIsCartOpen(true);
+
+    if (typeof navigator !== 'undefined' && navigator.vibrate) {
+      navigator.vibrate([10, 30, 10]); // bundle haptic = triple pulse
+    }
+
+    setTimeout(() => setLastAddedItem(null), 2000);
+  }, []);
+
 
   const removeItem = useCallback((id: number) => {
     setItems(currentItems => currentItems.filter(item => item.id !== id));
