@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { formatPrice } from "@/lib/currency";
+import { useStickyCtaOwner } from "@/contexts/StickyCtaContext";
+
 
 interface MobileStickyATCProps {
   price: number;
@@ -16,6 +18,9 @@ const MobileStickyATC = ({ price, salePrice, quantity, onAddToBag, disabled }: M
   const [isVisible, setIsVisible] = useState(false);
   const [isFooterVisible, setIsFooterVisible] = useState(false);
   const prefersReducedMotion = useReducedMotion();
+  // The global ATC yields to higher-priority sticky CTAs (e.g. the
+  // Complete-the-Look bundle bar) so the user never sees two stacked bars.
+  const { isOwner } = useStickyCtaOwner("atc");
 
   const displayPrice = salePrice ?? price;
   const totalPrice = displayPrice * quantity;
@@ -45,7 +50,8 @@ const MobileStickyATC = ({ price, salePrice, quantity, onAddToBag, disabled }: M
     return () => observer.disconnect();
   }, []);
 
-  const shouldShow = isVisible && !isFooterVisible;
+  const shouldShow = isVisible && !isFooterVisible && isOwner;
+
 
   if (prefersReducedMotion) {
     return (
