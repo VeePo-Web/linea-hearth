@@ -15,7 +15,9 @@ export interface CartItem {
   lookId?: string;
   lookName?: string;
   productId?: string;
+  variantId?: string;
 }
+
 
 export type ShippingProgressTier = 'start' | 'halfway' | 'almost' | 'unlocked';
 

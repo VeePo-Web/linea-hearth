@@ -53,7 +53,7 @@ export const useStripeCheckout = () => {
       try {
         const checkoutItems = items.map((item) => ({
           productId: item.productId || item.id?.toString() || "",
-          variantId: undefined,
+          variantId: item.variantId,
           name: item.name,
           image: item.image?.startsWith("http")
             ? item.image
@@ -63,6 +63,7 @@ export const useStripeCheckout = () => {
           size: item.size,
           color: item.color,
         }));
+
 
         const returnUrl = `${window.location.origin}/checkout/success?session_id={CHECKOUT_SESSION_ID}`;
 
