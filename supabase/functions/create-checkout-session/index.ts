@@ -263,15 +263,45 @@ Deno.serve(async (req) => {
     if (body.discountCodeId) {
       const { data: dc } = await sbAdmin
         .from("discount_codes")
-        .select("id, code, name, discount_type, discount_value, maximum_discount_cents, is_active, starts_at, expires_at")
+        .select("id, code, name, discount_type, discount_value, maximum_discount_cents, minimum_order_cents, usage_limit, usage_count, per_user_limit, is_active, starts_at, expires_at")
         .eq("id", body.discountCodeId)
         .maybeSingle();
       const now = new Date();
-      const valid =
-        dc &&
+      let valid =
+        !!dc &&
         dc.is_active &&
         (!dc.starts_at || new Date(dc.starts_at) <= now) &&
         (!dc.expires_at || new Date(dc.expires_at) > now);
+
+      // === RE-VALIDATE LIMITS AT CHECKOUT (race-window close) ===
+      if (valid && dc) {
+        if (dc.minimum_order_cents && subtotalCents < dc.minimum_order_cents) {
+          return new Response(
+            JSON.stringify({ success: false, error: `Discount requires a minimum order of $${(dc.minimum_order_cents / 100).toFixed(2)}` }),
+            { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+          );
+        }
+        if (dc.usage_limit !== null && dc.usage_count >= dc.usage_limit) {
+          return new Response(
+            JSON.stringify({ success: false, error: "This discount code has reached its usage limit." }),
+            { status: 409, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+          );
+        }
+        if (dc.per_user_limit) {
+          const { count: prior } = await sbAdmin
+            .from("discount_code_redemptions")
+            .select("*", { count: "exact", head: true })
+            .eq("discount_code_id", dc.id)
+            .ilike("customer_email", body.customerEmail.trim());
+          if (prior !== null && prior >= dc.per_user_limit) {
+            return new Response(
+              JSON.stringify({ success: false, error: "You've already used this discount code." }),
+              { status: 409, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+            );
+          }
+        }
+      }
+
       if (valid) {
         discountCodeText = dc.code;
         if (dc.discount_type === "percentage") {
