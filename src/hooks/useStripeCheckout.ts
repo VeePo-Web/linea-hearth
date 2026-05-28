@@ -50,6 +50,7 @@ export const useStripeCheckout = () => {
         return { success: false, configured: false, message: msg };
       }
 
+      try {
         const checkoutItems = items.map((item) => ({
           productId: item.productId || item.id?.toString() || "",
           variantId: item.variantId,
