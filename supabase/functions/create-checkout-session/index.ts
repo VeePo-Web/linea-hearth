@@ -122,15 +122,99 @@ Deno.serve(async (req) => {
       }
     }
 
-    // Build Stripe line items using inline price_data (apparel = tangible goods).
-    // tax_behavior: "exclusive" required by Stripe Tax (automatic_tax).
-    const lineItems = body.items.map((item) => {
-      const unitAmount = Math.round(item.price * 100);
+    // === SERVER-SIDE PRICE AUTHORITY ===
+    // Never trust client-provided prices. Rebuild every line item's unit_amount
+    // from the products / product_variants tables. Reject if a productId is
+    // missing, inactive, or if the client price diverges by >0¢.
+    const productIds = Array.from(new Set(body.items.map((it) => it.productId).filter(Boolean))) as string[];
+    if (productIds.length !== body.items.length) {
+      return new Response(
+        JSON.stringify({ success: false, error: "Every line item must reference a product." }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
+
+    const { data: dbProducts, error: prodErr } = await sbAdmin
+      .from("products")
+      .select("id, name, price, sale_price, is_on_sale, status")
+      .in("id", productIds);
+    if (prodErr || !dbProducts) {
+      console.error("Failed to load products for price authority", prodErr);
+      return new Response(
+        JSON.stringify({ success: false, error: "Could not validate cart" }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
+
+    const variantIds = Array.from(new Set(body.items.map((it) => it.variantId).filter(Boolean))) as string[];
+    const variantsById: Record<string, { id: string; product_id: string; price_adjustment: number | null }> = {};
+    if (variantIds.length) {
+      const { data: dbVariants } = await sbAdmin
+        .from("product_variants")
+        .select("id, product_id, price_adjustment")
+        .in("id", variantIds);
+      for (const v of dbVariants ?? []) variantsById[v.id] = v as any;
+    }
+
+    const productsById: Record<string, typeof dbProducts[number]> = {};
+    for (const p of dbProducts) productsById[p.id] = p;
+
+    type AuthorizedItem = { item: CheckoutItem; unitAmountCents: number };
+    const authorized: AuthorizedItem[] = [];
+    for (const item of body.items) {
+      const prod = productsById[item.productId!];
+      if (!prod || prod.status !== "active") {
+        return new Response(
+          JSON.stringify({ success: false, error: `Item unavailable: ${item.name}` }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        );
+      }
+      const basePrice = prod.is_on_sale && prod.sale_price != null
+        ? Number(prod.sale_price)
+        : Number(prod.price);
+      let variantAdjustment = 0;
+      if (item.variantId) {
+        const v = variantsById[item.variantId];
+        if (!v || v.product_id !== prod.id) {
+          return new Response(
+            JSON.stringify({ success: false, error: `Invalid variant for ${prod.name}` }),
+            { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+          );
+        }
+        variantAdjustment = Number(v.price_adjustment ?? 0);
+      }
+      const authorizedDollars = basePrice + variantAdjustment;
+      const unitAmountCents = Math.round(authorizedDollars * 100);
+      const clientCents = Math.round(item.price * 100);
+      if (clientCents !== unitAmountCents) {
+        console.warn("Price tampering blocked", {
+          productId: prod.id,
+          clientCents,
+          authorizedCents: unitAmountCents,
+        });
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: "Cart prices are out of date. Please refresh and try again.",
+          }),
+          { status: 409, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        );
+      }
+      if (item.quantity < 1 || item.quantity > 50) {
+        return new Response(
+          JSON.stringify({ success: false, error: "Invalid quantity" }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        );
+      }
+      authorized.push({ item, unitAmountCents });
+    }
+
+    const lineItems = authorized.map(({ item, unitAmountCents }) => {
       const descriptionBits = [item.size, item.color].filter(Boolean).join(" / ");
       return {
         price_data: {
           currency: "cad",
-          unit_amount: unitAmount,
+          unit_amount: unitAmountCents,
           tax_behavior: "exclusive" as const,
           product_data: {
             name: item.name + (descriptionBits ? ` (${descriptionBits})` : ""),
@@ -148,9 +232,9 @@ Deno.serve(async (req) => {
       };
     });
 
-    // Subtotal for shipping threshold + discount calc
-    const subtotalCents = body.items.reduce(
-      (sum, it) => sum + Math.round(it.price * 100) * it.quantity,
+    // Subtotal from SERVER-AUTHORIZED prices, not client input.
+    const subtotalCents = authorized.reduce(
+      (sum, { item, unitAmountCents }) => sum + unitAmountCents * item.quantity,
       0,
     );
     const method = body.shippingMethod ?? "standard";
@@ -176,18 +260,25 @@ Deno.serve(async (req) => {
       if (valid) {
         discountCodeText = dc.code;
         if (dc.discount_type === "percentage") {
-          discountCents = Math.round((subtotalCents * Number(dc.discount_value)) / 100);
-          if (dc.maximum_discount_cents && discountCents > dc.maximum_discount_cents) {
-            discountCents = dc.maximum_discount_cents;
-          }
-          const coupon = await stripe.coupons.create({
-            percent_off: Number(dc.discount_value),
-            duration: "once",
-            name: dc.name,
-            ...(dc.maximum_discount_cents && {
-              // Stripe doesn't support max-cap on percent coupons; cap is enforced server-side via discountCents we record.
-            }),
-          });
+          const rawPercentCents = Math.round((subtotalCents * Number(dc.discount_value)) / 100);
+          const capped = dc.maximum_discount_cents
+            ? Math.min(rawPercentCents, dc.maximum_discount_cents)
+            : rawPercentCents;
+          discountCents = capped;
+          // If a cap is set, pin Stripe to amount_off so the dashboard total
+          // matches our DB row. Otherwise let Stripe apply the percent natively.
+          const coupon = dc.maximum_discount_cents
+            ? await stripe.coupons.create({
+                amount_off: capped,
+                currency: "cad",
+                duration: "once",
+                name: dc.name,
+              })
+            : await stripe.coupons.create({
+                percent_off: Number(dc.discount_value),
+                duration: "once",
+                name: dc.name,
+              });
           stripeDiscounts = [{ coupon: coupon.id }];
         } else {
           const amountOff = Math.min(Math.round(Number(dc.discount_value)), subtotalCents);
@@ -198,6 +289,7 @@ Deno.serve(async (req) => {
             duration: "once",
             name: dc.name,
           });
+
           stripeDiscounts = [{ coupon: coupon.id }];
         }
       }
