@@ -189,9 +189,8 @@ const Checkout = () => {
     setShippingAddress(prev => ({ ...prev, [field]: value }));
   };
 
-  const handlePaymentDetailsChange = (field: string, value: string) => {
-    setPaymentDetails(prev => ({ ...prev, [field]: value }));
-  };
+
+
 
   // Stripe Checkout handler
   const handleStripeCheckout = async () => {
