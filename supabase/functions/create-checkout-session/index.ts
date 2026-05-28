@@ -350,8 +350,8 @@ Deno.serve(async (req) => {
           stripeDiscounts = [{ coupon: coupon.id }];
         }
       }
-      }
     }
+
 
     // === BUNDLE RE-VALIDATION (Complete-the-Look) ===
     // Server is the single source of truth for any bundle saving the client
