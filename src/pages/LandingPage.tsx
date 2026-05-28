@@ -150,11 +150,18 @@ const LandingPage = () => {
   return (
     <>
       <Helmet>
-        <title>Line of Judah | Premium Faith-Based Streetwear</title>
+        <title>Line of Judah — Make Holy Garments</title>
         <meta
           name="description"
-          content="Premium streetwear for those set apart. Holy garments for glory and for beauty. Enter the world of Line of Judah."
+          content="Make holy garments for your brother, for glory and for beauty. Enter the Line of Judah."
         />
+        <link rel="canonical" href="https://lineofjudah.clothing/" />
+        <meta property="og:title" content="Line of Judah — Make Holy Garments" />
+        <meta property="og:description" content="Make holy garments for your brother, for glory and for beauty. Enter the Line of Judah." />
+        <meta property="og:url" content="https://lineofjudah.clothing/" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:title" content="Line of Judah — Make Holy Garments" />
+        <meta name="twitter:description" content="Make holy garments for your brother, for glory and for beauty. Enter the Line of Judah." />
       </Helmet>
 
       <main className="fixed inset-0 h-[100dvh] overflow-hidden landing-abyss cursor-pointer" onClick={handleEnter} onMouseMove={!prefersReducedMotion ? handleMouseMove : undefined}>

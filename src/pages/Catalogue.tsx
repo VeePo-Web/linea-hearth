@@ -102,6 +102,9 @@ const Catalogue = () => {
           name="description"
           content="Browse the full Line of Judah catalogue — premium faith-based streetwear. Filter by category and find your fit."
         />
+        <link rel="canonical" href="https://lineofjudah.clothing/catalogue" />
+        <meta property="og:title" content="Shop All | Line of Judah" />
+        <meta property="og:url" content="https://lineofjudah.clothing/catalogue" />
       </Helmet>
 
       <div className="min-h-screen bg-background">
