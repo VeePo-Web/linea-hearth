@@ -1357,6 +1357,45 @@ export type Database = {
         }
         Relationships: []
       }
+      upsell_events: {
+        Row: {
+          anchor_product_id: string | null
+          created_at: string
+          discount_cents: number
+          event_type: string
+          id: string
+          items: Json
+          look_id: string | null
+          session_id: string
+          subtotal_cents: number
+          user_id: string | null
+        }
+        Insert: {
+          anchor_product_id?: string | null
+          created_at?: string
+          discount_cents?: number
+          event_type: string
+          id?: string
+          items?: Json
+          look_id?: string | null
+          session_id: string
+          subtotal_cents?: number
+          user_id?: string | null
+        }
+        Update: {
+          anchor_product_id?: string | null
+          created_at?: string
+          discount_cents?: number
+          event_type?: string
+          id?: string
+          items?: Json
+          look_id?: string | null
+          session_id?: string
+          subtotal_cents?: number
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       user_behavior_signals: {
         Row: {
           add_remove_count: number | null
