@@ -902,83 +902,8 @@ const Checkout = () => {
                     <h2 className="text-lg font-light text-foreground mb-6">Payment Details</h2>
                     
                     <div className="space-y-6">
-                      <div>
-                        <Label htmlFor="cardholderName" className="text-sm font-light text-foreground">
-                          Cardholder Name *
-                        </Label>
-                        <Input
-                          id="cardholderName"
-                          type="text"
-                          value={paymentDetails.cardholderName}
-                          onChange={(e) => handlePaymentDetailsChange("cardholderName", e.target.value)}
-                          className="mt-2 rounded-none"
-                          placeholder="Name on card"
-                        />
-                      </div>
+                      {/* PCI scope sits entirely inside Stripe's iframe — no raw card fields here. */}
 
-                      <div>
-                        <Label htmlFor="cardNumber" className="text-sm font-light text-foreground">
-                          Card Number *
-                        </Label>
-                        <div className="relative mt-2">
-                          <Input
-                            id="cardNumber"
-                            type="text"
-                            value={paymentDetails.cardNumber}
-                            onChange={(e) => {
-                              const value = e.target.value.replace(/\s/g, '').replace(/(.{4})/g, '$1 ').trim();
-                              if (value.length <= 19) {
-                                handlePaymentDetailsChange("cardNumber", value);
-                              }
-                            }}
-                            className="rounded-none pl-10"
-                            placeholder="4242 4242 4242 4242"
-                            maxLength={19}
-                          />
-                          <CreditCard className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <Label htmlFor="expiryDate" className="text-sm font-light text-foreground">
-                            Expiry Date *
-                          </Label>
-                          <Input
-                            id="expiryDate"
-                            type="text"
-                            value={paymentDetails.expiryDate}
-                            onChange={(e) => {
-                              const value = e.target.value.replace(/\D/g, '').replace(/(\d{2})(\d{2})/, '$1/$2');
-                              if (value.length <= 5) {
-                                handlePaymentDetailsChange("expiryDate", value);
-                              }
-                            }}
-                            className="mt-2 rounded-none"
-                            placeholder="MM/YY"
-                            maxLength={5}
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor="cvv" className="text-sm font-light text-foreground">
-                            CVV *
-                          </Label>
-                          <Input
-                            id="cvv"
-                            type="text"
-                            value={paymentDetails.cvv}
-                            onChange={(e) => {
-                              const value = e.target.value.replace(/\D/g, '');
-                              if (value.length <= 3) {
-                                handlePaymentDetailsChange("cvv", value);
-                              }
-                            }}
-                            className="mt-2 rounded-none"
-                            placeholder="123"
-                            maxLength={3}
-                          />
-                        </div>
-                      </div>
 
                       {/* Order Total Summary */}
                       <div className="bg-muted/10 p-6 rounded-none border border-muted-foreground/20 space-y-3">
