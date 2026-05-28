@@ -237,23 +237,8 @@ const Checkout = () => {
   };
 
   // Fallback simulated payment handler (when Stripe not configured)
-  const handleCompleteOrder = async () => {
-    setIsProcessing(true);
-    setCurrentStep(3); // Move to payment step
-    
-    // Simulate payment processing
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    // Generate order number
-    setOrderNumber(String(Math.floor(10000 + Math.random() * 90000)));
-    
-    // Mark abandoned cart as converted
-    await markConverted();
-    
-    setIsProcessing(false);
-    setPaymentComplete(true);
-    setCurrentStep(4); // Complete step
-  };
+
+
 
   const handleShowPostPurchaseOffer = useCallback(() => {
     setShowPostPurchaseOffer(true);
