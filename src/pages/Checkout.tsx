@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
-import { Minus, Plus, CreditCard, Check, ExternalLink, AlertCircle, X, Loader2 } from "lucide-react";
+import { Minus, Plus, Check, ExternalLink, AlertCircle, X, Loader2 } from "lucide-react";
 import { formatPrice, CURRENCY } from "@/lib/currency";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import CheckoutHeader from "../components/header/CheckoutHeader";
