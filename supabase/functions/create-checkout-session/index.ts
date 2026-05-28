@@ -18,6 +18,15 @@ interface CheckoutItem {
   color?: string;
 }
 
+interface ClientBundleClaim {
+  /** lookbook_looks.id this bundle is sourced from */
+  lookId: string;
+  /** product ids the client claims qualify for the bundle */
+  itemProductIds: string[];
+  /** display-only saving the client showed the user; we re-compute */
+  claimedSavingCents?: number;
+}
+
 interface RequestBody {
   items: CheckoutItem[];
   customerEmail: string;
@@ -27,10 +36,13 @@ interface RequestBody {
   shippingAddress: { address: string; city: string; postalCode: string; country: string };
   shippingMethod?: "standard" | "express" | "overnight";
   discountCodeId?: string;
+  /** Optional Complete-the-Look bundles to re-validate server-side. */
+  bundles?: ClientBundleClaim[];
   abandonedCartId?: string;
   returnUrl: string;
   environment?: StripeEnv;
 }
+
 
 const SHIPPING_RATES = {
   standard: 1000,
@@ -337,6 +349,100 @@ Deno.serve(async (req) => {
 
           stripeDiscounts = [{ coupon: coupon.id }];
         }
+      }
+      }
+    }
+
+    // === BUNDLE RE-VALIDATION (Complete-the-Look) ===
+    // Server is the single source of truth for any bundle saving the client
+    // displayed. We recompute against `bundle_discounts` rows, then stack
+    // the saving as an additional one-off Stripe coupon. Rejects silently
+    // (no error) if the claim doesn't qualify — UX continues, just without
+    // the bundle saving.
+    let bundleSavingCents = 0;
+    let bundleAppliedName: string | null = null;
+    if (body.bundles?.length) {
+      const lookIds = Array.from(new Set(body.bundles.map((b) => b.lookId).filter(Boolean)));
+      const { data: rules } = await sbAdmin
+        .from("bundle_discounts")
+        .select("id, name, source_type, source_id, discount_type, discount_value, min_items, max_items, priority, is_active, starts_at, expires_at, stacks_with_codes")
+        .eq("is_active", true)
+        .eq("source_type", "lookbook");
+      const { data: lookProductRows } = await sbAdmin
+        .from("lookbook_look_products")
+        .select("look_id, product_id")
+        .in("look_id", lookIds);
+      const lookMembership = new Map<string, Set<string>>();
+      for (const lp of lookProductRows || []) {
+        if (!lookMembership.has(lp.look_id)) lookMembership.set(lp.look_id, new Set());
+        lookMembership.get(lp.look_id)!.add(lp.product_id);
+      }
+      const nowMs = Date.now();
+      for (const claim of body.bundles) {
+        if (!claim.lookId || !claim.itemProductIds?.length) continue;
+        const members = lookMembership.get(claim.lookId);
+        if (!members) continue;
+        // Only items that are (a) actually in the look and (b) actually in the cart count
+        const cartProductIds = new Set(authorized.map(({ item }) => item.productId).filter(Boolean) as string[]);
+        const qualifying = claim.itemProductIds.filter(
+          (pid) => members.has(pid) && cartProductIds.has(pid),
+        );
+        if (qualifying.length < 2) continue;
+
+        // Score rules: look-specific first, then highest priority, then highest discount.
+        const applicable = (rules || []).filter((r: any) => {
+          if (r.starts_at && new Date(r.starts_at).getTime() > nowMs) return false;
+          if (r.expires_at && new Date(r.expires_at).getTime() <= nowMs) return false;
+          if (r.source_id && r.source_id !== claim.lookId) return false;
+          if (qualifying.length < (r.min_items ?? 0)) return false;
+          if (r.max_items && qualifying.length > r.max_items) return false;
+          return true;
+        });
+        const rule = applicable.sort((a: any, b: any) => {
+          const aSpec = a.source_id === claim.lookId ? 1 : 0;
+          const bSpec = b.source_id === claim.lookId ? 1 : 0;
+          if (aSpec !== bSpec) return bSpec - aSpec;
+          if ((b.priority ?? 0) !== (a.priority ?? 0)) return (b.priority ?? 0) - (a.priority ?? 0);
+          return Number(b.discount_value) - Number(a.discount_value);
+        })[0];
+        if (!rule) continue;
+        if (stripeDiscounts && !rule.stacks_with_codes) continue;
+
+        // Compute saving against the SERVER-AUTHORIZED sum of qualifying lines
+        const bundleSubtotalCents = authorized
+          .filter(({ item }) => qualifying.includes(item.productId!))
+          .reduce((sum, { item, unitAmountCents }) => sum + unitAmountCents * item.quantity, 0);
+        let savingCents = 0;
+        if (rule.discount_type === "percentage") {
+          savingCents = Math.round(bundleSubtotalCents * (Number(rule.discount_value) / 100));
+        } else {
+          savingCents = Math.min(Math.round(Number(rule.discount_value)), bundleSubtotalCents);
+        }
+        if (savingCents <= 0) continue;
+
+        // Reject obvious tampering: claimed saving must not exceed server amount by more than $0.50.
+        if (claim.claimedSavingCents && claim.claimedSavingCents > savingCents + 50) {
+          console.warn("bundle tampering blocked", {
+            lookId: claim.lookId,
+            claimed: claim.claimedSavingCents,
+            server: savingCents,
+          });
+          continue;
+        }
+
+        bundleSavingCents += savingCents;
+        bundleAppliedName = rule.name;
+      }
+
+      if (bundleSavingCents > 0) {
+        const bundleCoupon = await stripe.coupons.create({
+          amount_off: bundleSavingCents,
+          currency: "cad",
+          duration: "once",
+          name: bundleAppliedName ?? "Complete the Look saving",
+        });
+        stripeDiscounts = [...(stripeDiscounts || []), { coupon: bundleCoupon.id }];
+        discountCents += bundleSavingCents;
       }
     }
 
