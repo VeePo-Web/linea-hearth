@@ -961,25 +961,8 @@ const Checkout = () => {
                         </p>
                       </div>
 
-                      {/* Divider */}
-                      <div className="relative py-2">
-                        <div className="absolute inset-0 flex items-center">
-                          <div className="w-full border-t border-muted-foreground/20" />
-                        </div>
-                        <div className="relative flex justify-center text-xs">
-                          <span className="bg-muted/20 px-4 text-muted-foreground">or test with simulated payment</span>
-                        </div>
-                      </div>
 
-                      {/* Fallback Simulated Payment Button */}
-                      <Button
-                        onClick={handleCompleteOrder}
-                        variant="outline"
-                        disabled={isProcessing || !paymentDetails.cardNumber || !paymentDetails.expiryDate || !paymentDetails.cvv || !paymentDetails.cardholderName}
-                        className="w-full rounded-none h-12 text-base"
-                      >
-                        {isProcessing ? "Processing..." : `Test Payment • $${total.toLocaleString()}`}
-                      </Button>
+
 
                       {/* Security assurance */}
                       <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
