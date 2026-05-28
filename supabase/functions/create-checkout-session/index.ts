@@ -335,17 +335,17 @@ Deno.serve(async (req) => {
     }
 
     await sbAdmin.from("order_items").insert(
-      body.items.map((it) => ({
+      authorized.map(({ item, unitAmountCents }) => ({
         order_id: order.id,
-        product_id: it.productId || null,
-        variant_id: it.variantId || null,
-        product_name: it.name,
-        product_image_url: it.image || null,
-        variant_size: it.size || null,
-        variant_color: it.color || null,
-        unit_price_cents: Math.round(it.price * 100),
-        quantity: it.quantity,
-        total_cents: Math.round(it.price * 100) * it.quantity,
+        product_id: item.productId || null,
+        variant_id: item.variantId || null,
+        product_name: item.name,
+        product_image_url: item.image || null,
+        variant_size: item.size || null,
+        variant_color: item.color || null,
+        unit_price_cents: unitAmountCents,
+        quantity: item.quantity,
+        total_cents: unitAmountCents * item.quantity,
       })),
     );
 
