@@ -171,7 +171,7 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
       <CartProvider>
-      <CartProvider>
+
         <StickyCtaProvider>
           <RecentlyViewedProvider>
             <SizeQuizProvider>
