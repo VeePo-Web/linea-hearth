@@ -11,8 +11,8 @@ import {
   ChevronRight,
   Percent,
   Images,
-} from 'lucide-react';
-
+  Images,
+  Camera,
 interface AdminLayoutProps {
   children: ReactNode;
 }
@@ -26,7 +26,8 @@ const navItems = [
   { href: '/ops-portal/categories', label: 'Categories', icon: Tags },
   { href: '/ops-portal/lookbook', label: 'Lookbook', icon: Images },
   { href: '/ops-portal/discounts', label: 'Discounts', icon: Percent },
-];
+  { href: '/ops-portal/lookbook', label: 'Lookbook', icon: Images },
+  { href: '/ops-portal/worn-in-the-wild', label: 'Worn', icon: Camera },
 
 const AdminLayout = ({ children }: AdminLayoutProps) => {
   const { user, signOut } = useAuth();
