@@ -1,0 +1,429 @@
+import { useEffect, useRef, useState } from "react";
+import { useSearchParams, Link } from "react-router-dom";
+import { motion } from "framer-motion";
+import { supabase } from "@/integrations/supabase/client";
+import { Helmet } from "react-helmet-async";
+
+type State =
+  | { kind: "loading" }
+  | { kind: "invalid" }
+  | { kind: "expired" }
+  | { kind: "already" }
+  | { kind: "ready"; firstName: string | null; productName: string | null; productImage: string | null }
+  | { kind: "submitting"; progress: number }
+  | { kind: "done"; rewardCode: string; rewardPercent: number };
+
+const EASE = [0.25, 0.46, 0.45, 0.94] as const;
+const MAX_BYTES = 10 * 1024 * 1024;
+
+// Client-side resize + EXIF strip via canvas re-encode (canvas does not
+// preserve EXIF, so re-encoded output is automatically EXIF-free).
+async function resizeAndStrip(file: File): Promise<Blob> {
+  const dataUrl: string = await new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => res(r.result as string);
+    r.onerror = rej;
+    r.readAsDataURL(file);
+  });
+  const img: HTMLImageElement = await new Promise((res, rej) => {
+    const i = new Image();
+    i.onload = () => res(i);
+    i.onerror = rej;
+    i.src = dataUrl;
+  });
+  const MAX = 2400;
+  let w = img.width;
+  let h = img.height;
+  if (w > MAX || h > MAX) {
+    if (w >= h) {
+      h = Math.round((h * MAX) / w);
+      w = MAX;
+    } else {
+      w = Math.round((w * MAX) / h);
+      h = MAX;
+    }
+  }
+  const canvas = document.createElement("canvas");
+  canvas.width = w;
+  canvas.height = h;
+  const ctx = canvas.getContext("2d")!;
+  ctx.drawImage(img, 0, 0, w, h);
+  return new Promise((res) => {
+    canvas.toBlob((b) => res(b!), "image/jpeg", 0.85);
+  });
+}
+
+export default function WornInTheWildUpload() {
+  const [params] = useSearchParams();
+  const token = params.get("token");
+  const [state, setState] = useState<State>({ kind: "loading" });
+  const [file, setFile] = useState<File | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
+  const [caption, setCaption] = useState("");
+  const [city, setCity] = useState("");
+  const [consent, setConsent] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (!token) {
+      setState({ kind: "invalid" });
+      return;
+    }
+    (async () => {
+      try {
+        const { data, error } = await supabase.functions.invoke("validate-worn-token", {
+          method: "GET" as never,
+          headers: {},
+          body: undefined,
+          // @ts-ignore - pass token via query
+        });
+        // Fall back to direct fetch since invoke doesn't easily handle GET with query
+        const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/validate-worn-token?token=${encodeURIComponent(
+          token,
+        )}`;
+        const res = await fetch(url, {
+          headers: { apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY },
+        });
+        const json = await res.json();
+        void data; void error;
+        if (!json.valid) {
+          setState({ kind: json.reason === "invalid_or_expired" ? "expired" : "invalid" });
+          return;
+        }
+        if (json.alreadySubmitted) {
+          setState({ kind: "already" });
+          return;
+        }
+        setState({
+          kind: "ready",
+          firstName: json.firstName,
+          productName: json.productName,
+          productImage: json.productImage,
+        });
+      } catch (e) {
+        console.error(e);
+        setState({ kind: "invalid" });
+      }
+    })();
+  }, [token]);
+
+  const onPickFile = (f: File | null) => {
+    setError(null);
+    if (!f) return;
+    if (f.size > MAX_BYTES) {
+      setError("Photo is too large. Max 10MB.");
+      return;
+    }
+    setFile(f);
+    setPreview(URL.createObjectURL(f));
+  };
+
+  const onSubmit = async () => {
+    if (!file || !token || !consent) return;
+    setState({ kind: "submitting", progress: 0 });
+    try {
+      const stripped = await resizeAndStrip(file);
+      setState({ kind: "submitting", progress: 40 });
+
+      const form = new FormData();
+      form.append("token", token);
+      form.append("photo", stripped, "photo.jpg");
+      form.append("caption", caption.slice(0, 140));
+      form.append("city", city.slice(0, 80));
+      form.append("consent", "true");
+
+      const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/submit-worn-photo`;
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY },
+        body: form,
+      });
+      setState({ kind: "submitting", progress: 90 });
+      const json = await res.json();
+      if (!res.ok || !json.ok) {
+        setError(json.error || "Something went wrong. Try again.");
+        setState({
+          kind: "ready",
+          firstName: (state as any).firstName ?? null,
+          productName: (state as any).productName ?? null,
+          productImage: (state as any).productImage ?? null,
+        });
+        return;
+      }
+      setState({ kind: "done", rewardCode: json.rewardCode, rewardPercent: json.rewardPercent });
+    } catch (e) {
+      console.error(e);
+      setError("Upload failed. Try again.");
+      setState({
+        kind: "ready",
+        firstName: (state as any).firstName ?? null,
+        productName: (state as any).productName ?? null,
+        productImage: (state as any).productImage ?? null,
+      });
+    }
+  };
+
+  return (
+    <>
+      <Helmet>
+        <title>Worn in the Wild — Line of Judah</title>
+        <meta name="robots" content="noindex,nofollow" />
+      </Helmet>
+      <main className="min-h-[100dvh] bg-white text-black">
+        <div className="max-w-2xl mx-auto px-6 pt-24 pb-20 md:pt-32">
+          {state.kind === "loading" && (
+            <p className="font-serif text-sm text-neutral-500">Loading…</p>
+          )}
+
+          {state.kind === "invalid" && (
+            <FallbackBlock title="This link isn't valid." />
+          )}
+          {state.kind === "expired" && (
+            <FallbackBlock title="This invite has expired." sub="You can still share with us at @lineofjudah." />
+          )}
+          {state.kind === "already" && (
+            <FallbackBlock
+              title="Your submission is in review."
+              sub="Thank you. We'll be in touch if we feature it."
+              showGalleryLink
+            />
+          )}
+
+          {(state.kind === "ready" || state.kind === "submitting") && (
+            <UploadForm
+              state={state}
+              file={file}
+              preview={preview}
+              caption={caption}
+              city={city}
+              consent={consent}
+              error={error}
+              onPickFile={onPickFile}
+              onPickClick={() => fileRef.current?.click()}
+              fileRef={fileRef}
+              setCaption={setCaption}
+              setCity={setCity}
+              setConsent={setConsent}
+              onSubmit={onSubmit}
+            />
+          )}
+
+          {state.kind === "done" && (
+            <RewardReveal code={state.rewardCode} percent={state.rewardPercent} />
+          )}
+        </div>
+      </main>
+    </>
+  );
+}
+
+function FallbackBlock({ title, sub, showGalleryLink }: { title: string; sub?: string; showGalleryLink?: boolean }) {
+  return (
+    <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease: EASE }}>
+      <h1 className="font-serif text-3xl md:text-4xl font-normal leading-tight tracking-tight mb-4">{title}</h1>
+      <div className="w-[40%] h-px bg-neutral-400/60 mb-8" />
+      {sub && <p className="text-sm text-neutral-600 mb-8">{sub}</p>}
+      <Link to="/home" className="inline-block text-xs uppercase tracking-[0.18em] border-b border-neutral-400/60 pb-1">
+        Back to site
+      </Link>
+      {showGalleryLink && (
+        <Link
+          to="/worn-in-the-wild"
+          className="ml-6 inline-block text-xs uppercase tracking-[0.18em] border-b border-neutral-400/60 pb-1"
+        >
+          View the wall
+        </Link>
+      )}
+    </motion.div>
+  );
+}
+
+function UploadForm(props: {
+  state: State;
+  file: File | null;
+  preview: string | null;
+  caption: string;
+  city: string;
+  consent: boolean;
+  error: string | null;
+  onPickFile: (f: File | null) => void;
+  onPickClick: () => void;
+  fileRef: React.RefObject<HTMLInputElement>;
+  setCaption: (v: string) => void;
+  setCity: (v: string) => void;
+  setConsent: (v: boolean) => void;
+  onSubmit: () => void;
+}) {
+  const s = props.state as any;
+  const isSubmitting = props.state.kind === "submitting";
+  const progress = isSubmitting ? (props.state as any).progress : 0;
+
+  return (
+    <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease: EASE }}>
+      <p className="font-serif italic text-xs text-neutral-500 mb-2 tracking-wide">
+        {s.firstName ? `${s.firstName},` : "Welcome."}
+      </p>
+      <h1 className="font-serif text-4xl md:text-5xl font-normal leading-[1.05] tracking-[-0.01em] mb-3">
+        Worn in the wild.
+      </h1>
+      <div className="w-[40%] h-px bg-[#4CAF50]/80 mb-8" />
+
+      <p className="text-sm leading-relaxed text-neutral-700 mb-10 max-w-lg">
+        One photo of you in your {s.productName ? <strong className="font-normal text-black">{s.productName}</strong> : "piece"} —
+        that's the only ask. Worn somewhere it became part of you.
+      </p>
+
+      {/* Upload zone */}
+      <div className="mb-8">
+        <input
+          ref={props.fileRef}
+          type="file"
+          accept="image/jpeg,image/png,image/webp,image/heic,image/heif"
+          capture="environment"
+          className="hidden"
+          onChange={(e) => props.onPickFile(e.target.files?.[0] || null)}
+        />
+        {!props.preview ? (
+          <button
+            type="button"
+            onClick={props.onPickClick}
+            className="w-full aspect-[4/5] md:aspect-video border border-[#4CAF50]/60 hover:border-[#4CAF50] transition-colors flex flex-col items-center justify-center gap-3 group"
+          >
+            <span className="text-xs uppercase tracking-[0.2em] text-neutral-600 group-hover:text-black">
+              Tap to add photo
+            </span>
+            <span className="text-[10px] text-neutral-400 uppercase tracking-wider">JPG · PNG · HEIC · Max 10MB</span>
+          </button>
+        ) : (
+          <div className="relative">
+            <img src={props.preview} alt="Your submission" className="w-full max-h-[70vh] object-contain bg-neutral-50" />
+            <button
+              type="button"
+              onClick={props.onPickClick}
+              className="absolute top-3 right-3 bg-white/90 backdrop-blur px-3 py-2 text-[10px] uppercase tracking-[0.18em] border border-neutral-300"
+            >
+              Change
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Caption + city */}
+      <div className="space-y-4 mb-8">
+        <div>
+          <label className="block text-[10px] uppercase tracking-[0.2em] text-neutral-500 mb-2">
+            Where were you? <span className="text-neutral-400 normal-case tracking-normal">(optional)</span>
+          </label>
+          <input
+            type="text"
+            value={props.caption}
+            onChange={(e) => props.setCaption(e.target.value.slice(0, 140))}
+            maxLength={140}
+            placeholder="At the gym after Sunday service…"
+            className="w-full bg-transparent border-b border-neutral-300 focus:border-[#4CAF50] outline-none py-2 text-sm placeholder:text-neutral-400"
+          />
+          <p className="text-[10px] text-neutral-400 mt-1">{props.caption.length}/140</p>
+        </div>
+        <div>
+          <label className="block text-[10px] uppercase tracking-[0.2em] text-neutral-500 mb-2">
+            City <span className="text-neutral-400 normal-case tracking-normal">(optional)</span>
+          </label>
+          <input
+            type="text"
+            value={props.city}
+            onChange={(e) => props.setCity(e.target.value.slice(0, 80))}
+            maxLength={80}
+            placeholder="Toronto"
+            className="w-full bg-transparent border-b border-neutral-300 focus:border-[#4CAF50] outline-none py-2 text-sm placeholder:text-neutral-400"
+          />
+        </div>
+      </div>
+
+      {/* Consent */}
+      <label className="flex items-start gap-3 mb-8 cursor-pointer">
+        <input
+          type="checkbox"
+          checked={props.consent}
+          onChange={(e) => props.setConsent(e.target.checked)}
+          className="mt-1 accent-[#4CAF50]"
+        />
+        <span className="text-xs leading-relaxed text-neutral-600">
+          I grant Line of Judah permission to feature this photo on the site and in marketing. Revocable anytime by replying to the invite email.
+        </span>
+      </label>
+
+      {props.error && (
+        <p className="text-xs text-red-700 mb-4 font-medium">{props.error}</p>
+      )}
+
+      {/* Submit */}
+      <button
+        type="button"
+        disabled={!props.file || !props.consent || isSubmitting}
+        onClick={props.onSubmit}
+        className="w-full bg-[#4CAF50] text-white text-xs uppercase tracking-[0.2em] font-medium py-4 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#449e48] transition-colors relative overflow-hidden"
+      >
+        {isSubmitting ? (
+          <>
+            <span className="relative z-10">Sending…</span>
+            <span
+              className="absolute inset-y-0 left-0 bg-white/15 transition-all duration-300"
+              style={{ width: `${progress}%` }}
+            />
+          </>
+        ) : (
+          "Submit"
+        )}
+      </button>
+
+      <p className="text-[10px] text-neutral-400 text-center mt-6 uppercase tracking-[0.2em]">
+        One photo · One submission
+      </p>
+    </motion.div>
+  );
+}
+
+function RewardReveal({ code, percent }: { code: string; percent: number }) {
+  const [copied, setCopied] = useState(false);
+  const copy = async () => {
+    await navigator.clipboard.writeText(code);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+  return (
+    <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, ease: EASE }}>
+      <h1 className="font-serif text-5xl md:text-6xl font-normal leading-[1] tracking-[-0.02em] mb-4">Thank you.</h1>
+      <div className="w-[40%] h-px bg-[#4CAF50]/80 mb-8" />
+      <p className="text-sm leading-relaxed text-neutral-700 mb-10 max-w-lg">
+        Your photo is in review. As promised — here's something for your trouble.
+      </p>
+
+      <div className="border border-neutral-300 p-6 md:p-8 mb-8 bg-neutral-50/50">
+        <p className="text-[10px] uppercase tracking-[0.22em] text-neutral-500 mb-3">
+          {percent}% off your next order
+        </p>
+        <div className="flex items-center justify-between gap-4">
+          <code className="font-mono text-2xl md:text-3xl tracking-[0.1em] text-black">{code}</code>
+          <button
+            type="button"
+            onClick={copy}
+            className="text-[10px] uppercase tracking-[0.18em] border-b border-neutral-400/80 pb-1 hover:border-black transition-colors"
+          >
+            {copied ? "Copied" : "Copy"}
+          </button>
+        </div>
+        <p className="text-[10px] text-neutral-400 mt-4 uppercase tracking-wider">
+          Single use · Expires in 60 days
+        </p>
+      </div>
+
+      <Link
+        to={`/catalogue?promo=${code}`}
+        className="block w-full bg-[#4CAF50] text-white text-xs uppercase tracking-[0.2em] font-medium py-4 text-center hover:bg-[#449e48] transition-colors"
+      >
+        Use it now
+      </Link>
+    </motion.div>
+  );
+}
