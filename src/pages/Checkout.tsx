@@ -74,9 +74,8 @@ const Checkout = () => {
   // Card data is collected exclusively by Stripe's PCI-scoped iframe — never in React state.
 
   const [isProcessing, setIsProcessing] = useState(false);
+  const [paymentComplete, setPaymentComplete] = useState(false);
 
-
-  const [showPostPurchaseOffer, setShowPostPurchaseOffer] = useState(false);
   const [orderNumber, setOrderNumber] = useState("");
   const [selectedShippingAddressId, setSelectedShippingAddressId] = useState<string | undefined>();
   const [selectedBillingAddressId, setSelectedBillingAddressId] = useState<string | undefined>();
@@ -240,17 +239,12 @@ const Checkout = () => {
 
   // Fallback simulated payment handler (when Stripe not configured)
 
-
-  const handleShowPostPurchaseOffer = useCallback(() => {
-    setShowPostPurchaseOffer(true);
-  }, []);
-
-
+  const handleContinueShopping = () => {
+    clearCart();
+    navigate("/");
+  };
 
 
-  const handleAddPostPurchaseItem = () => {
-    // Add the upsell item to cart
-    // TODO: Add upsell item to cart
   };
 
   // Scroll to payment section for mobile sticky bar
