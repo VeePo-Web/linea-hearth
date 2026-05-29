@@ -945,12 +945,13 @@ const Checkout = () => {
                       {/* Security assurance */}
                       <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
                         <span className="inline-block w-2 h-2 bg-foreground rounded-full" />
-                        100% Secure Checkout • Your data is never stored
-                      </div>
-                    </div>
-                  </div>
                 </>
               )}
+            </div>
+          </div>
+        </div>
+      </main>
+
             </div>
           </div>
         </div>
