@@ -1079,6 +1079,7 @@ export type Database = {
           full_name: string | null
           id: string
           updated_at: string
+          worn_invites_opted_out: boolean
         }
         Insert: {
           created_at?: string
@@ -1086,6 +1087,7 @@ export type Database = {
           full_name?: string | null
           id: string
           updated_at?: string
+          worn_invites_opted_out?: boolean
         }
         Update: {
           created_at?: string
@@ -1093,6 +1095,7 @@ export type Database = {
           full_name?: string | null
           id?: string
           updated_at?: string
+          worn_invites_opted_out?: boolean
         }
         Relationships: []
       }
@@ -1500,6 +1503,111 @@ export type Database = {
           tops_updated_at?: string | null
           updated_at?: string | null
           user_id?: string
+        }
+        Relationships: []
+      }
+      worn_in_the_wild_invites: {
+        Row: {
+          clicked_at: string | null
+          created_at: string
+          customer_email: string
+          id: string
+          invited_at: string
+          opened_at: string | null
+          order_id: string
+          submitted_at: string | null
+          token_expires_at: string
+          upload_token_hash: string
+        }
+        Insert: {
+          clicked_at?: string | null
+          created_at?: string
+          customer_email: string
+          id?: string
+          invited_at?: string
+          opened_at?: string | null
+          order_id: string
+          submitted_at?: string | null
+          token_expires_at?: string
+          upload_token_hash: string
+        }
+        Update: {
+          clicked_at?: string | null
+          created_at?: string
+          customer_email?: string
+          id?: string
+          invited_at?: string
+          opened_at?: string | null
+          order_id?: string
+          submitted_at?: string | null
+          token_expires_at?: string
+          upload_token_hash?: string
+        }
+        Relationships: []
+      }
+      worn_in_the_wild_submissions: {
+        Row: {
+          caption: string | null
+          city: string | null
+          consent_granted_at: string
+          created_at: string
+          customer_email: string
+          customer_first_name: string | null
+          featured_at: string | null
+          id: string
+          order_id: string
+          photo_path: string
+          product_ids: string[]
+          rejection_reason: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          reward_code_id: string | null
+          soft_deleted_at: string | null
+          status: string
+          submitted_at: string
+          updated_at: string
+        }
+        Insert: {
+          caption?: string | null
+          city?: string | null
+          consent_granted_at?: string
+          created_at?: string
+          customer_email: string
+          customer_first_name?: string | null
+          featured_at?: string | null
+          id?: string
+          order_id: string
+          photo_path: string
+          product_ids?: string[]
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          reward_code_id?: string | null
+          soft_deleted_at?: string | null
+          status?: string
+          submitted_at?: string
+          updated_at?: string
+        }
+        Update: {
+          caption?: string | null
+          city?: string | null
+          consent_granted_at?: string
+          created_at?: string
+          customer_email?: string
+          customer_first_name?: string | null
+          featured_at?: string | null
+          id?: string
+          order_id?: string
+          photo_path?: string
+          product_ids?: string[]
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          reward_code_id?: string | null
+          soft_deleted_at?: string | null
+          status?: string
+          submitted_at?: string
+          updated_at?: string
         }
         Relationships: []
       }
