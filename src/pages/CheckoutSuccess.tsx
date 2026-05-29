@@ -109,7 +109,28 @@ const CheckoutSuccess = () => {
 
     fetchOrder();
     return () => {
-      cancelled = true;
+  // Grant a one-shot post-purchase upsell once the order is confirmed paid.
+  useEffect(() => {
+    if (!order || order.payment_status !== "paid") return;
+    if (upsellRequestedRef.current) return;
+    upsellRequestedRef.current = true;
+    (async () => {
+      try {
+        const { data } = await supabase.functions.invoke("grant-upsell-offer", {
+          body: { orderId: order.id },
+        });
+        const offer = (data as any)?.offer as UpsellOffer | null;
+        if (offer) {
+          setUpsellOffer(offer);
+          setTimeout(() => setUpsellOpen(true), 600);
+        }
+      } catch (_) {
+        // Silent — never block the success page on an upsell failure.
+      }
+    })();
+  }, [order]);
+
+
     };
   }, [sessionId, clearCart]);
 
