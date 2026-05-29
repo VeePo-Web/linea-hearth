@@ -463,8 +463,12 @@ const Checkout = () => {
             <div className="lg:col-span-2 lg:order-1">
                   </div>
                 </div>
+              </div>
+            </div>
 
+            <div className="lg:col-span-2 lg:order-1">
               {paymentComplete ? (
+
 
 
               ) : (
