@@ -26,4 +26,15 @@ verify_jwt = false
 verify_jwt = false
 
 [functions.provision-admin]
+[functions.provision-admin]
 verify_jwt = false
+
+[functions.process-worn-in-the-wild-invites]
+verify_jwt = false
+
+[functions.validate-worn-token]
+verify_jwt = false
+
+[functions.submit-worn-photo]
+verify_jwt = false
+
