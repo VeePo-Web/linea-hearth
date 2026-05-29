@@ -11,6 +11,7 @@ import {
   ChevronRight,
   Percent,
   Images,
+  Camera,
 } from 'lucide-react';
 
 interface AdminLayoutProps {
@@ -25,6 +26,7 @@ const navItems = [
   { href: '/ops-portal/products', label: 'Products', icon: Package },
   { href: '/ops-portal/categories', label: 'Categories', icon: Tags },
   { href: '/ops-portal/lookbook', label: 'Lookbook', icon: Images },
+  { href: '/ops-portal/worn-in-the-wild', label: 'Worn', icon: Camera },
   { href: '/ops-portal/discounts', label: 'Discounts', icon: Percent },
 ];
 

@@ -92,6 +92,9 @@ const AccountOrderDetail = lazyWithRetry(() => import("./pages/account/AccountOr
 const AccountProfile = lazyWithRetry(() => import("./pages/account/AccountProfile"));
 const AccountAddresses = lazyWithRetry(() => import("./pages/account/AccountAddresses"));
 const AccountFavorites = lazyWithRetry(() => import("./pages/account/AccountFavorites"));
+const WornInTheWildGallery = lazyWithRetry(() => import("./pages/WornInTheWildGallery"));
+const WornInTheWildUpload = lazyWithRetry(() => import("./pages/WornInTheWildUpload"));
+const AdminWornInTheWild = lazyWithRetry(() => import("./pages/admin/AdminWornInTheWild"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -137,6 +140,8 @@ const AnimatedRoutes = () => {
         <Route path="/ambassador" element={<PageTransition><Ambassador /></PageTransition>} />
         <Route path="/recover-cart" element={<PageTransition><RecoverCart /></PageTransition>} />
         <Route path="/reset-password" element={<PageTransition><ResetPassword /></PageTransition>} />
+        <Route path="/worn-in-the-wild" element={<PageTransition><WornInTheWildGallery /></PageTransition>} />
+        <Route path="/worn-in-the-wild/upload" element={<PageTransition><WornInTheWildUpload /></PageTransition>} />
         {/* Account Routes */}
         <Route path="/account" element={<ProtectedAccountRoute><PageTransition><AccountLayout /></PageTransition></ProtectedAccountRoute>}>
           <Route index element={<AccountDashboard />} />
@@ -159,6 +164,7 @@ const AnimatedRoutes = () => {
         <Route path="/ops-portal/lookbook/:lookId/edit" element={<OpsPortalGate><ProtectedRoute requireAdmin><PageTransition><AdminLookbookForm /></PageTransition></ProtectedRoute></OpsPortalGate>} />
         <Route path="/ops-portal/orders" element={<OpsPortalGate><ProtectedRoute requireAdmin><PageTransition><AdminOrders /></PageTransition></ProtectedRoute></OpsPortalGate>} />
         <Route path="/ops-portal/orders/:orderId" element={<OpsPortalGate><ProtectedRoute requireAdmin><PageTransition><AdminOrderDetail /></PageTransition></ProtectedRoute></OpsPortalGate>} />
+        <Route path="/ops-portal/worn-in-the-wild" element={<OpsPortalGate><ProtectedRoute requireAdmin><PageTransition><AdminWornInTheWild /></PageTransition></ProtectedRoute></OpsPortalGate>} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
       </Routes>

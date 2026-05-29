@@ -134,6 +134,11 @@ const Footer = () => {
                     Ambassadors
                   </Link>
                 </li>
+                <li>
+                  <Link to="/worn-in-the-wild" className="text-sm font-light text-white/70 hover:text-white transition-colors touch-target-sm py-2 inline-block">
+                    Worn in the Wild
+                  </Link>
+                </li>
               </ul>
             </div>
           </div>
