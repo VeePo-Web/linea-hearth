@@ -532,11 +532,15 @@ Deno.serve(async (req) => {
         // alongside the Stripe DBA. Recognizable descriptors are the #1
         // chargeback preventer. Max 22 chars, no <>'"* characters.
         statement_descriptor_suffix: "ORDER",
+        // Persist the PM on the Customer so the post-purchase one-click upsell
+        // can charge off_session within the 30-min eligibility window.
+        setup_future_usage: "off_session",
         metadata: {
           orderId: order.id,
           ...(userId && { userId }),
         },
       },
+
 
       metadata: {
         orderId: order.id,
