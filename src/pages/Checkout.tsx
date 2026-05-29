@@ -461,17 +461,8 @@ const Checkout = () => {
             </div>
 
             <div className="lg:col-span-2 lg:order-1">
-                  </div>
-                </div>
-              </div>
-            </div>
+              {paymentComplete ? null : (
 
-            <div className="lg:col-span-2 lg:order-1">
-              {paymentComplete ? (
-
-
-
-              ) : (
                 <>
                   {/* Customer Details Form */}
                   <div className="bg-muted/20 p-6 lg:p-8 rounded-none">
@@ -945,6 +936,10 @@ const Checkout = () => {
                       {/* Security assurance */}
                       <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
                         <span className="inline-block w-2 h-2 bg-foreground rounded-full" />
+                        <span>Secure checkout powered by Stripe</span>
+                      </div>
+                    </div>
+                  </div>
                 </>
               )}
             </div>
@@ -952,10 +947,6 @@ const Checkout = () => {
         </div>
       </main>
 
-            </div>
-          </div>
-        </div>
-      </main>
 
       <Footer />
 
