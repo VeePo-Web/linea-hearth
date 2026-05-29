@@ -463,8 +463,12 @@ const Checkout = () => {
                     <span className="text-foreground">${total.toLocaleString()}</span>
                   </div>
                 </div>
+              </div>
+            </div>
 
+            <div className="lg:col-span-2 lg:order-1">
               {paymentComplete ? (
+
                 <OrderConfirmation
                   orderNumber={orderNumber}
                   email={customerDetails.email}
