@@ -20,7 +20,8 @@ import SavingsSummary from "@/components/checkout/SavingsSummary";
 import UrgencyTimer from "@/components/checkout/UrgencyTimer";
 
 import OrderConfirmation from "@/components/checkout/OrderConfirmation";
-import PostPurchaseOffer from "@/components/checkout/PostPurchaseOffer";
+
+
 import MobileStickyCheckout from "@/components/checkout/MobileStickyCheckout";
 import StripeEmbeddedCheckout from "@/components/checkout/StripeEmbeddedCheckout";
 import SavedAddressSelector from "@/components/checkout/SavedAddressSelector";
@@ -974,12 +975,9 @@ const Checkout = () => {
         />
       )}
 
-      {/* Post-Purchase Offer Modal */}
-      <PostPurchaseOffer
-        isOpen={showPostPurchaseOffer}
-        onClose={() => setShowPostPurchaseOffer(false)}
-        onAddToOrder={handleAddPostPurchaseItem}
-      />
+      {/* Post-purchase upsell now lives on the CheckoutSuccess page, fired
+          after Stripe confirms payment server-side. */}
+
 
       {/* Stripe Embedded Checkout overlay */}
       {clientSecret && (
