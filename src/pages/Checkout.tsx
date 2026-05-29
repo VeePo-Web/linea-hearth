@@ -461,13 +461,11 @@ const Checkout = () => {
             </div>
 
             <div className="lg:col-span-2 lg:order-1">
+                  </div>
+                </div>
+
               {paymentComplete ? (
 
-                <OrderConfirmation
-                  orderNumber={orderNumber}
-                  email={customerDetails.email}
-                  onContinueShopping={handleContinueShopping}
-                />
 
               ) : (
                 <>
