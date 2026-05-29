@@ -20,7 +20,8 @@ import SavingsSummary from "@/components/checkout/SavingsSummary";
 import UrgencyTimer from "@/components/checkout/UrgencyTimer";
 
 import OrderConfirmation from "@/components/checkout/OrderConfirmation";
-import PostPurchaseOffer from "@/components/checkout/PostPurchaseOffer";
+
+
 import MobileStickyCheckout from "@/components/checkout/MobileStickyCheckout";
 import StripeEmbeddedCheckout from "@/components/checkout/StripeEmbeddedCheckout";
 import SavedAddressSelector from "@/components/checkout/SavedAddressSelector";
@@ -74,7 +75,7 @@ const Checkout = () => {
 
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentComplete, setPaymentComplete] = useState(false);
-  const [showPostPurchaseOffer, setShowPostPurchaseOffer] = useState(false);
+
   const [orderNumber, setOrderNumber] = useState("");
   const [selectedShippingAddressId, setSelectedShippingAddressId] = useState<string | undefined>();
   const [selectedBillingAddressId, setSelectedBillingAddressId] = useState<string | undefined>();
@@ -238,20 +239,12 @@ const Checkout = () => {
 
   // Fallback simulated payment handler (when Stripe not configured)
 
-
-
-  const handleShowPostPurchaseOffer = useCallback(() => {
-    setShowPostPurchaseOffer(true);
-  }, []);
-
   const handleContinueShopping = () => {
     clearCart();
     navigate("/");
   };
 
-  const handleAddPostPurchaseItem = () => {
-    // Add the upsell item to cart
-    // TODO: Add upsell item to cart
+
   };
 
   // Scroll to payment section for mobile sticky bar
@@ -464,20 +457,20 @@ const Checkout = () => {
                     <span className="text-foreground">${total.toLocaleString()}</span>
                   </div>
                 </div>
-
               </div>
             </div>
 
-            {/* Left Column - Forms */}
-            <div className="lg:col-span-2 lg:order-1 space-y-8">
+            <div className="lg:col-span-2 lg:order-1">
+                  </div>
+                </div>
+              </div>
+            </div>
 
+            <div className="lg:col-span-2 lg:order-1">
               {paymentComplete ? (
-                <OrderConfirmation
-                  orderNumber={orderNumber}
-                  email={customerDetails.email}
-                  onContinueShopping={handleContinueShopping}
-                  onShowPostPurchaseOffer={handleShowPostPurchaseOffer}
-                />
+
+
+
               ) : (
                 <>
                   {/* Customer Details Form */}
@@ -952,12 +945,13 @@ const Checkout = () => {
                       {/* Security assurance */}
                       <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
                         <span className="inline-block w-2 h-2 bg-foreground rounded-full" />
-                        100% Secure Checkout • Your data is never stored
-                      </div>
-                    </div>
-                  </div>
                 </>
               )}
+            </div>
+          </div>
+        </div>
+      </main>
+
             </div>
           </div>
         </div>
@@ -974,12 +968,9 @@ const Checkout = () => {
         />
       )}
 
-      {/* Post-Purchase Offer Modal */}
-      <PostPurchaseOffer
-        isOpen={showPostPurchaseOffer}
-        onClose={() => setShowPostPurchaseOffer(false)}
-        onAddToOrder={handleAddPostPurchaseItem}
-      />
+      {/* Post-purchase upsell now lives on the CheckoutSuccess page, fired
+          after Stripe confirms payment server-side. */}
+
 
       {/* Stripe Embedded Checkout overlay */}
       {clientSecret && (

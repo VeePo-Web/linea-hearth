@@ -822,6 +822,101 @@ export type Database = {
         }
         Relationships: []
       }
+      post_purchase_offers: {
+        Row: {
+          accepted_at: string | null
+          child_order_id: string | null
+          child_payment_intent_id: string | null
+          customer_email: string
+          discount_pct: number
+          expires_at: string
+          failure_reason: string | null
+          granted_at: string
+          id: string
+          original_unit_amount_cents: number
+          parent_order_id: string
+          parent_payment_intent_id: string | null
+          product_id: string
+          status: string
+          stripe_customer_id: string | null
+          token_hash: string
+          unit_amount_cents: number
+          updated_at: string
+          variant_id: string | null
+        }
+        Insert: {
+          accepted_at?: string | null
+          child_order_id?: string | null
+          child_payment_intent_id?: string | null
+          customer_email: string
+          discount_pct?: number
+          expires_at: string
+          failure_reason?: string | null
+          granted_at?: string
+          id?: string
+          original_unit_amount_cents: number
+          parent_order_id: string
+          parent_payment_intent_id?: string | null
+          product_id: string
+          status?: string
+          stripe_customer_id?: string | null
+          token_hash: string
+          unit_amount_cents: number
+          updated_at?: string
+          variant_id?: string | null
+        }
+        Update: {
+          accepted_at?: string | null
+          child_order_id?: string | null
+          child_payment_intent_id?: string | null
+          customer_email?: string
+          discount_pct?: number
+          expires_at?: string
+          failure_reason?: string | null
+          granted_at?: string
+          id?: string
+          original_unit_amount_cents?: number
+          parent_order_id?: string
+          parent_payment_intent_id?: string | null
+          product_id?: string
+          status?: string
+          stripe_customer_id?: string | null
+          token_hash?: string
+          unit_amount_cents?: number
+          updated_at?: string
+          variant_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_purchase_offers_child_order_id_fkey"
+            columns: ["child_order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "post_purchase_offers_parent_order_id_fkey"
+            columns: ["parent_order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "post_purchase_offers_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "post_purchase_offers_variant_id_fkey"
+            columns: ["variant_id"]
+            isOneToOne: false
+            referencedRelation: "product_variants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       product_3d_models: {
         Row: {
           created_at: string

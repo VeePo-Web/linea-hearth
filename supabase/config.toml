@@ -38,3 +38,9 @@ verify_jwt = false
 [functions.submit-worn-photo]
 verify_jwt = false
 
+[functions.grant-upsell-offer]
+verify_jwt = false
+
+[functions.accept-upsell-offer]
+verify_jwt = false
+
