@@ -342,7 +342,16 @@ const CheckoutSuccess = () => {
           </p>
         </div>
       </div>
+      {upsellOffer && (
+        <PostPurchaseOffer
+          isOpen={upsellOpen}
+          offer={upsellOffer}
+          customerEmail={order?.customer_email ?? ""}
+          onClose={() => setUpsellOpen(false)}
+        />
+      )}
     </Layout>
+
   );
 };
 
