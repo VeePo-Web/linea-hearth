@@ -464,19 +464,13 @@ const Checkout = () => {
                   </div>
                 </div>
 
+              {paymentComplete ? (
                 <OrderConfirmation
                   orderNumber={orderNumber}
                   email={customerDetails.email}
                   onContinueShopping={handleContinueShopping}
                 />
 
-              {paymentComplete ? (
-                <OrderConfirmation
-                  orderNumber={orderNumber}
-                  email={customerDetails.email}
-                  onContinueShopping={handleContinueShopping}
-                  onShowPostPurchaseOffer={handleShowPostPurchaseOffer}
-                />
               ) : (
                 <>
                   {/* Customer Details Form */}
