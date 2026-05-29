@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSearchParams, useNavigate, Link } from "react-router-dom";
 import { Package, Mail, CheckCircle, ArrowRight, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -7,6 +7,7 @@ import { useCart } from "@/hooks/useCart";
 import { useAuth } from "@/hooks/useAuth";
 import Layout from "@/components/layout/Layout";
 import PostPurchaseSignup from "@/components/checkout/PostPurchaseSignup";
+import PostPurchaseOffer, { type UpsellOffer } from "@/components/checkout/PostPurchaseOffer";
 
 interface ShippingAddress {
   address?: string;
@@ -53,6 +54,10 @@ const CheckoutSuccess = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showSignupPrompt, setShowSignupPrompt] = useState(true);
+  const [upsellOffer, setUpsellOffer] = useState<UpsellOffer | null>(null);
+  const [upsellOpen, setUpsellOpen] = useState(false);
+  const upsellRequestedRef = useRef(false);
+
 
   const sessionId = searchParams.get("session_id");
 
