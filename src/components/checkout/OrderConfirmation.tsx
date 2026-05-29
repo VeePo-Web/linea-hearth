@@ -8,29 +8,19 @@ interface OrderConfirmationProps {
   orderNumber: string;
   email: string;
   onContinueShopping: () => void;
-  onShowPostPurchaseOffer: () => void;
 }
 
 const OrderConfirmation = ({
   orderNumber,
   email,
   onContinueShopping,
-  onShowPostPurchaseOffer
 }: OrderConfirmationProps) => {
   const { items, subtotal, hasFreeShipping } = useCart();
   const [showConfetti, setShowConfetti] = useState(false);
 
   useEffect(() => {
-    // Trigger confetti animation
     setShowConfetti(true);
-    
-    // Show post-purchase offer after a delay
-    const timer = setTimeout(() => {
-      onShowPostPurchaseOffer();
-    }, 2000);
-
-    return () => clearTimeout(timer);
-  }, [onShowPostPurchaseOffer]);
+  }, []);
 
   // Calculate estimated delivery date
   const getEstimatedDelivery = () => {
