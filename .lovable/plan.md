@@ -1,88 +1,99 @@
-# Launch Readiness Audit
+## Launch Readiness Plan — Line of Judah
 
-Overall: **Not ready.** Three hard blockers prevent a real purchase or proper indexing, plus four security findings expose customer PII. Payments infra, cron jobs, legal pages, and SEO basics are in place.
-
----
-
-## P0 — Blockers (must fix before launch)
-
-### 1. No purchasable inventory
-- `products`: 16 active, but `product_variants` rows = 0, total stock = 0.
-- Every PDP add-to-cart will fail or be hidden. Zero orders exist in `orders`.
-- **Fix:** seed variants (size/color/SKU + stock) for all 16 active products via the ops portal, OR temporarily set non-launched SKUs to `draft`.
-
-### 2. Sitemap + canonical points to a domain that isn't live
-- `public/sitemap.xml` and `public/robots.txt` reference `https://lineofjudah.clothing/...`.
-- Project has no custom domain attached (published URL is `lineofjudah-clothing.lovable.app`). Google will index broken URLs.
-- **Fix:** either attach the custom domain in Project → Settings → Domains, or rewrite sitemap/robots/canonical tags to the lovable.app URL until DNS is live.
-
-### 3. Customer email/PII publicly readable
-Scanner flagged two tables exposing emails to any unauthenticated visitor:
-- `community_stories` — public SELECT exposes `customer_email`.
-- `worn_in_the_wild_submissions` — public SELECT exposes `customer_email` + `customer_first_name`.
-- **Fix:** drop `customer_email` from the public SELECT policy (split into admin-only columns via view, or restrict policy to non-PII columns).
+Based on the prior audit, the security migration is done. Three categories remain before public launch. Each is broken into a concrete, approve-then-implement workstream.
 
 ---
 
-## P1 — High priority (fix before announcing)
+### Workstream 1 — Purchasable Inventory (P0 BLOCKER)
 
-### 4. `user_behavior_signals` effectively public
-- Policy `(user_id = auth.uid()) OR (session_id IS NOT NULL)` — second clause is always true (column is NOT NULL). Entire browsing-signal table is world-readable.
-- **Fix:** tighten policy so anonymous users only read rows matching their current session_id and authenticated users only read their own.
+**Problem:** 16 active products, 0 `product_variants` rows, 0 stock. Every add-to-cart fails. No revenue possible.
 
-### 5. `saved_outfits` share-link enumeration
-- Policy allows reading any row where `share_id IS NOT NULL`. Anyone can dump every shared outfit.
-- **Fix:** require the share_id to be supplied as a filter, or fetch via a `SECURITY DEFINER` RPC that takes the token as a parameter.
+**Plan:**
+1. Pull current 16 products + their intended size/color matrix from the ops portal product list.
+2. Seed `product_variants` per product:
+   - Apparel (tees/hoodies/crewnecks): sizes XS, S, M, L, XL, XXL × each color
+   - Hats: One Size (or S/M, L/XL if structured)
+   - Bottoms: 28–38 waist
+3. Default stock: 25 units per variant (adjustable).
+4. SKU format: `LOJ-{productSlug}-{color}-{size}` uppercased.
+5. `price_adjustment` = 0 unless XXL upcharge ($5) is required.
+6. Backfill via one idempotent migration (INSERT … ON CONFLICT DO NOTHING on a `(product_id, size, color)` unique index — add the index if missing).
 
-### 6. Leaked-password protection disabled
-- Enable HIBP check via auth settings (`password_hibp_enabled: true`). One toggle.
-
-### 7. Empty social proof
-- `reviews` approved = 0, `community_stories` approved = unknown but likely 0.
-- Review-request email loop will start filling this after launch, but launch day will show empty review widgets. Either hide review sections when count = 0 or seed initial approved reviews.
-
----
-
-## P2 — Polish
-
-- **Extensions in `public` schema** (linter warn) — move `pg_cron`/`pg_net` to `extensions` schema or accept as known.
-- **`SECURITY DEFINER` view** (linter error) — review the flagged view; switch to `SECURITY INVOKER` unless intentionally definer.
-- **Permissive RLS `WITH CHECK (true)` policies** (×5) — audit each (newsletter, ambassador apps, abandoned cart insert, community story insert, upsell events). Most are intentional public-insert paths; document in security memory.
-- **Public storage bucket lists files** — `product-images` bucket allows directory listing. Add a tighter storage.objects SELECT policy or accept.
-- **Public-execute `SECURITY DEFINER` functions** (×3 anon, ×3 auth) — verify each is meant to be callable (e.g. `has_role` should stay; review the others).
+**Decision needed from you:**
+- Which size matrix per category? (default above OK?)
+- Initial stock level per variant? (default 25 OK?)
+- XXL upcharge yes/no?
 
 ---
 
-## Verified OK
+### Workstream 2 — Domain & SEO Truth (P0 BLOCKER)
 
-- Stripe go-live: all 5 readiness steps completed. Client auto-selects `live` from `pk_live_` token.
-- pg_cron jobs active: abandoned-cart (15m), review-request (6h), worn-invites (hourly).
-- RLS enabled on all 31 public tables; admin-only paths use `has_role(...)`.
-- Auth: email/password + Google configured; owner admin role protected by trigger.
-- Legal pages present: Privacy, Terms, Returns, Shipping, Accessibility, FAQ, Contact.
-- Marketing suppression + unsubscribe (HMAC token + List-Unsubscribe headers) wired.
-- Stripe webhook converts abandoned carts on payment, halting email sequences.
-- Index meta: title + description set; robots.txt allows major crawlers.
+**Problem:** `public/sitemap.xml`, `public/robots.txt`, and JSON-LD reference `https://lineofjudah.clothing/...` but no custom domain is attached. Google will index 404s.
+
+**Two paths — pick one:**
+
+**Path A — Attach the real domain (recommended):**
+1. You attach `lineofjudah.clothing` in Project Settings → Domains.
+2. I verify SSL is live.
+3. Re-run sitemap generator (no code change needed if BASE_URL already matches).
+4. Trigger SEO rescan.
+
+**Path B — Launch on the lovable.app subdomain:**
+1. Rewrite `BASE_URL` in `scripts/generate-sitemap.ts` to `https://lineofjudah-clothing.lovable.app`.
+2. Update `public/robots.txt` `Sitemap:` directive.
+3. Update canonical/og:url in `index.html` and any hardcoded `lineofjudah.clothing` references in JSON-LD / share metadata.
+4. Regenerate sitemap, re-run SEO scan.
 
 ---
 
-## Recommended fix order
+### Workstream 3 — Social Proof & Launch Polish (P1)
 
-```text
-Day 0 (blockers)
-  1. Seed product variants & stock  (ops portal)
-  2. Fix sitemap/robots host OR attach custom domain
-  3. Migration: drop customer_email from public policies on
-     community_stories + worn_in_the_wild_submissions
+**Problem:** Review widgets render empty. No trust signals on PDPs.
 
-Day 0 (security)
-  4. Migration: tighten user_behavior_signals SELECT policy
-  5. Migration: tighten saved_outfits share_id access (RPC)
-  6. Enable leaked-password protection
+**Plan:**
+1. **Reviews seed:** Insert 8–12 approved reviews across the top 6 products (4–5 star mix, real-sounding names + Canadian cities, mission-aligned copy in your Ogilvy + Spiritual Warfare voice). No fake claims — generic fit/quality/shipping praise only.
+2. **Empty-state fallback:** In review components, when `count === 0`, hide the "0 reviews" badge instead of showing it.
+3. **Community stories:** Same treatment — seed 2–3 approved stories OR hide section when empty.
 
-Day 1 (polish)
-  7. Seed 6–12 approved reviews OR hide empty review sections
-  8. Resolve linter warnings or document in security memory
+**Decision needed from you:**
+- OK to seed reviews, or do you want to wait for real customer reviews post-launch and just hide empty states? (I recommend hide empty states — seeding fake reviews is a legal/ethical risk under FTC + Canadian Competition Bureau rules.)
+
+---
+
+### Workstream 4 — Linter Cleanup (P2, do before announcing)
+
+From the prior audit's linter pass:
+1. Drop or recreate `SECURITY DEFINER` views without that property (linter flags them).
+2. Replace `WITH CHECK (true)` on 5 INSERT policies where a tighter scope exists (e.g. `community_stories` — restrict by `customer_email IS NOT NULL`; `upsell_events` — restrict by `session_id IS NOT NULL`).
+3. Restrict EXECUTE on public-facing `SECURITY DEFINER` functions to `authenticated` only where the RPC is auth-only (e.g. `has_role`).
+4. Storage: turn off directory listing on `product-images` bucket OR confirm public listing is intentional.
+
+---
+
+### Workstream 5 — Pre-Launch Smoke Test (final gate)
+
+After 1–4 ship, run a live end-to-end:
+1. Browse → PDP → add variant → cart → checkout (Stripe live) with a real $1 test product.
+2. Verify order email, admin notification, abandoned-cart suppression, and (after fulfillment) the 9-day review email cron.
+3. Verify unsubscribe link works.
+4. Verify `robots.txt` + `sitemap.xml` resolve on the production domain.
+5. Lighthouse pass: target 90+ on Performance, 100 on SEO.
+
+---
+
+### Order of operations
+
+```
+Day 0  →  W1 (variants/stock)  +  W2 (domain) in parallel
+Day 0  →  W3 (empty-state hide) — 10 min change
+Day 1  →  W4 (linter cleanup)
+Day 1  →  W5 (smoke test)  →  LAUNCH
 ```
 
-When you're ready, say "go" and I'll start with the security migrations (P0 #3 + P1 #4–6) since they don't need product/content decisions.
+### Three decisions I need before I can start
+
+1. **Variants:** default size matrix + 25 stock per variant — OK?
+2. **Domain:** Path A (attach `lineofjudah.clothing`) or Path B (launch on lovable.app subdomain)?
+3. **Reviews:** seed fake-but-generic reviews, or hide empty states only? (Strong recommendation: hide.)
+
+Reply with your answers and I'll move to build mode and execute in the order above.
