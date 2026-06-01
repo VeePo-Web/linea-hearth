@@ -120,6 +120,14 @@ const ProductReviews = ({ productId }: ProductReviewsProps) => {
     );
   }
 
+  // Hide the entire section when there are no approved reviews — avoids
+  // empty social proof on launch day.
+  if (!isLoading && reviews.length === 0) {
+    return null;
+  }
+
+
+
   if (prefersReducedMotion) {
     return (
       <section className="w-full py-12 lg:py-16 px-6 bg-muted/20">
