@@ -1,126 +1,54 @@
-## Goal
+# Review Request Email — 9 Days Post-Delivery
 
-The 3-email abandoned-cart recovery flow has all the code in place but nothing actually runs it, nothing sends real emails, and nothing prevents sending to people who already bought, already opted out, or whose cart is too old. This plan closes those three gaps.
+Automated single email asking customers to leave a review, sent exactly 9 days after `orders.delivered_at`.
 
-## What already works (leave alone)
+## Trigger logic
 
-- `abandoned_carts` table with `email_1/2/3_sent_at`, `recovery_token`, `discount_code`, `status`
-- `sync-abandoned-cart` edge function (captures cart from checkout email field)
-- `process-abandoned-carts` edge function (3 emails at 1h / 24h / 72h; email 3 mints a 15% `LOJ15-XXXXXX` discount)
-- `recover-cart` edge function + `/recover-cart` page that rehydrates the cart and clears existing items
-- `useAbandonedCart` hook (sync + markConverted on success)
+A new edge function `process-review-requests` runs every 6 hours via pg_cron. It selects orders where:
+- `delivered_at IS NOT NULL`
+- `delivered_at <= now() - interval '9 days'`
+- `delivered_at >= now() - interval '30 days'` (don't backfill ancient orders)
+- No prior review-request row exists in `marketing_email_log` for that order
+- Customer email not in `marketing_suppressions`
+- `status != 'cancelled' / 'refunded'`
 
-## What's missing — and the fix
+For each match: send via Resend, log to `marketing_email_log`.
 
-### 1. Real email delivery via Resend
+## Database
 
-Replace the stubbed `sendEmail()` in `process-abandoned-carts` with a working Resend call. The function already has the fetch scaffold; it just needs `RESEND_API_KEY`. Add the secret request, then:
+Migration adds:
+- `review_request_sent_at TIMESTAMPTZ` on `orders` (idempotency + admin visibility)
+- Index on `(delivered_at, review_request_sent_at)` for efficient cron scans
+- Extend `marketing_email_log` usage: new `email_number = 4` convention reserved for review requests (no schema change needed — column is smallint)
 
-- Read `RESEND_API_KEY` from env (already wired)
-- Set `from: 'Line of Judah <noreply@notify.lineofjudah.com>'` (matches the existing Email System memory's Stone/Amber transactional sender pattern)
-- Add `headers: { 'List-Unsubscribe': '<{unsubscribeUrl}>, <mailto:unsubscribe@lineofjudah.com>', 'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click' }` for Gmail/Yahoo bulk-sender compliance
-- Log every send attempt to a new `marketing_email_log` table (see below) so we have an audit trail and can dedupe on retries
+## Edge function: `process-review-requests`
 
-### 2. Suppression layer (standard set)
+- Service-role Supabase client
+- Query eligible orders + join `order_items` for product thumbnails (top 3)
+- Render editorial email: Silver Chrome + Forest Green tokens, "How did your armor serve you?" headline, Exodus 28:2 footer line, single CTA → `/account/orders/{id}/review` (existing review flow or product page deep-link)
+- Include `List-Unsubscribe` headers + HMAC unsubscribe token (reuses `MARKETING_UNSUBSCRIBE_SECRET`)
+- Standard suppression check before send
+- On success: `UPDATE orders SET review_request_sent_at = now()` + insert `marketing_email_log` row
 
-The current function happily emails anyone whose cart is >1h old. Add four checks before each send, in this order:
+## Cron
 
-1. **Cart converted** — already implicit via status filter, keep
-2. **Customer has any paid `orders` row created after the cart's `created_at`** — `select 1 from orders where customer_email = $1 and payment_status = 'paid' and created_at > $cart_created_at limit 1`. If a row exists, mark cart `status = 'converted_external'` and skip.
-3. **Email on suppression list** — query new `marketing_suppressions` table (`email`, `reason`, `created_at`); if hit, mark cart `status = 'suppressed'` and skip.
-4. **Cart older than 30 days** — already enforced inside `recover-cart` for the redemption side; mirror it here: skip + mark `status = 'expired'`.
+`pg_cron` job `process-review-requests-every-6h` invoking the edge function with anon key. Registered via `supabase--insert` (user-specific URL).
 
-New migration creates:
+## Frontend
 
-```text
-public.marketing_suppressions
-  email TEXT PRIMARY KEY
-  reason TEXT NOT NULL          -- 'unsubscribe' | 'bounce' | 'complaint' | 'manual'
-  created_at TIMESTAMPTZ
-  -- GRANTs: service_role ALL; authenticated SELECT via has_role admin only
-  -- RLS: admins read; service role writes
+No new pages required — CTA links to existing product page with `?review=1` query param to auto-open the review modal on PDP. Small addition to `ProductDetail.tsx` to read the param and open the existing review composer.
 
-public.marketing_email_log
-  id UUID PK
-  cart_id UUID
-  email TEXT
-  email_number SMALLINT          -- 1, 2, or 3
-  provider_message_id TEXT
-  status TEXT                    -- 'sent' | 'failed' | 'skipped_suppression' | 'skipped_converted'
-  error TEXT
-  created_at TIMESTAMPTZ
-  -- GRANTs: service_role ALL; authenticated SELECT via admin
-```
+## Files
 
-### 3. Scheduler (pg_cron + pg_net)
+- new migration: `orders.review_request_sent_at` + index
+- new `supabase/functions/process-review-requests/index.ts`
+- `supabase/config.toml`: register function (`verify_jwt = false`)
+- `src/pages/ProductDetail.tsx`: auto-open review modal on `?review=1`
+- pg_cron schedule via insert tool
 
-No cron job exists. Schedule `process-abandoned-carts` to fire every 15 minutes. This will be inserted (not migrated) because it embeds the project URL and anon key:
+## Out of scope
 
-```sql
-select cron.schedule(
-  'process-abandoned-carts-every-15min',
-  '*/15 * * * *',
-  $$
-    select net.http_post(
-      url := 'https://harckavibhmimndfvnyo.supabase.co/functions/v1/process-abandoned-carts',
-      headers := '{"Content-Type":"application/json","apikey":"<anon>"}'::jsonb,
-      body := '{}'::jsonb
-    );
-  $$
-);
-```
-
-15-min cadence is plenty for a 1h-granularity flow and keeps Resend costs predictable.
-
-### 4. One-click unsubscribe
-
-Add a tiny new `unsubscribe-marketing` edge function (`verify_jwt = false`, no auth) that:
-
-- Accepts `GET /unsubscribe-marketing?token=<hmac>&email=<email>`
-- Verifies an HMAC of `email` against `MARKETING_UNSUBSCRIBE_SECRET` (new secret)
-- Upserts the email into `marketing_suppressions` with `reason = 'unsubscribe'`
-- Returns a clean confirmation HTML page (Silver Chrome / Forest Green, `rounded-none`)
-
-Every recovery email's footer gets:
-
-```text
-Don't want recovery reminders? Unsubscribe in one tap.
-→ https://{site}/functions/v1/unsubscribe-marketing?token=...&email=...
-```
-
-This token is also used in the `List-Unsubscribe` header.
-
-### 5. Stripe webhook hook for "converted externally"
-
-When `stripe-webhook` marks an order paid, also flip any matching `abandoned_carts` rows for that email created within the last 72h to `status = 'converted'`. This stops sequence mid-flight when someone checks out without clicking the recovery link.
-
-### 6. Deep-link rehydration polish
-
-`/recover-cart` already wipes the cart, repopulates from the token, and shows the discount code. Two small additions:
-
-- Persist `recoveryDiscountCode` to localStorage and auto-apply it on Checkout (same path the existing `SUMMER2026` flow uses)
-- If status was `recovered` but user re-clicks the link, still allow rehydration (current code returns 400; relax that — return cart items, just don't re-mark)
-
-## Technical Details
-
-**Files touched**
-- `supabase/migrations/<new>.sql` — `marketing_suppressions`, `marketing_email_log` tables + GRANTs + RLS
-- `supabase/functions/process-abandoned-carts/index.ts` — real Resend send, suppression checks, log inserts, footer unsubscribe link, `from` address
-- `supabase/functions/unsubscribe-marketing/index.ts` — NEW
-- `supabase/functions/recover-cart/index.ts` — allow re-recover, return discount code unchanged
-- `supabase/functions/stripe-webhook/index.ts` — flip matching abandoned_carts to `converted` on paid order
-- `supabase/config.toml` — register `unsubscribe-marketing` with `verify_jwt = false`
-- `src/pages/RecoverCart.tsx` — write discount code to localStorage
-- `src/pages/Checkout.tsx` — read recovery discount from localStorage on mount and auto-apply
-- DB insert tool — `cron.schedule` for the 15-min job
-
-**Secrets requested** (via add_secret)
-- `RESEND_API_KEY`
-- `MARKETING_UNSUBSCRIBE_SECRET` (random 32-byte hex; used to sign unsubscribe tokens)
-
-## Out of Scope
-
-- Switching off Resend / migrating to Lovable Emails
-- Editing email copy or template visual design (already approved)
-- Bounce + complaint webhooks from Resend (would auto-populate `marketing_suppressions`) — can add later
-- SMS recovery, push notifications, A/B testing different cadences
+- Second reminder email (only 1 send per order, per request)
+- SMS/push
+- Review incentives / discount codes
+- Changing existing review submission flow
