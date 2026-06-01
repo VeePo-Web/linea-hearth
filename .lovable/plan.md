@@ -1,54 +1,88 @@
-# Review Request Email — 9 Days Post-Delivery
+# Launch Readiness Audit
 
-Automated single email asking customers to leave a review, sent exactly 9 days after `orders.delivered_at`.
+Overall: **Not ready.** Three hard blockers prevent a real purchase or proper indexing, plus four security findings expose customer PII. Payments infra, cron jobs, legal pages, and SEO basics are in place.
 
-## Trigger logic
+---
 
-A new edge function `process-review-requests` runs every 6 hours via pg_cron. It selects orders where:
-- `delivered_at IS NOT NULL`
-- `delivered_at <= now() - interval '9 days'`
-- `delivered_at >= now() - interval '30 days'` (don't backfill ancient orders)
-- No prior review-request row exists in `marketing_email_log` for that order
-- Customer email not in `marketing_suppressions`
-- `status != 'cancelled' / 'refunded'`
+## P0 — Blockers (must fix before launch)
 
-For each match: send via Resend, log to `marketing_email_log`.
+### 1. No purchasable inventory
+- `products`: 16 active, but `product_variants` rows = 0, total stock = 0.
+- Every PDP add-to-cart will fail or be hidden. Zero orders exist in `orders`.
+- **Fix:** seed variants (size/color/SKU + stock) for all 16 active products via the ops portal, OR temporarily set non-launched SKUs to `draft`.
 
-## Database
+### 2. Sitemap + canonical points to a domain that isn't live
+- `public/sitemap.xml` and `public/robots.txt` reference `https://lineofjudah.clothing/...`.
+- Project has no custom domain attached (published URL is `lineofjudah-clothing.lovable.app`). Google will index broken URLs.
+- **Fix:** either attach the custom domain in Project → Settings → Domains, or rewrite sitemap/robots/canonical tags to the lovable.app URL until DNS is live.
 
-Migration adds:
-- `review_request_sent_at TIMESTAMPTZ` on `orders` (idempotency + admin visibility)
-- Index on `(delivered_at, review_request_sent_at)` for efficient cron scans
-- Extend `marketing_email_log` usage: new `email_number = 4` convention reserved for review requests (no schema change needed — column is smallint)
+### 3. Customer email/PII publicly readable
+Scanner flagged two tables exposing emails to any unauthenticated visitor:
+- `community_stories` — public SELECT exposes `customer_email`.
+- `worn_in_the_wild_submissions` — public SELECT exposes `customer_email` + `customer_first_name`.
+- **Fix:** drop `customer_email` from the public SELECT policy (split into admin-only columns via view, or restrict policy to non-PII columns).
 
-## Edge function: `process-review-requests`
+---
 
-- Service-role Supabase client
-- Query eligible orders + join `order_items` for product thumbnails (top 3)
-- Render editorial email: Silver Chrome + Forest Green tokens, "How did your armor serve you?" headline, Exodus 28:2 footer line, single CTA → `/account/orders/{id}/review` (existing review flow or product page deep-link)
-- Include `List-Unsubscribe` headers + HMAC unsubscribe token (reuses `MARKETING_UNSUBSCRIBE_SECRET`)
-- Standard suppression check before send
-- On success: `UPDATE orders SET review_request_sent_at = now()` + insert `marketing_email_log` row
+## P1 — High priority (fix before announcing)
 
-## Cron
+### 4. `user_behavior_signals` effectively public
+- Policy `(user_id = auth.uid()) OR (session_id IS NOT NULL)` — second clause is always true (column is NOT NULL). Entire browsing-signal table is world-readable.
+- **Fix:** tighten policy so anonymous users only read rows matching their current session_id and authenticated users only read their own.
 
-`pg_cron` job `process-review-requests-every-6h` invoking the edge function with anon key. Registered via `supabase--insert` (user-specific URL).
+### 5. `saved_outfits` share-link enumeration
+- Policy allows reading any row where `share_id IS NOT NULL`. Anyone can dump every shared outfit.
+- **Fix:** require the share_id to be supplied as a filter, or fetch via a `SECURITY DEFINER` RPC that takes the token as a parameter.
 
-## Frontend
+### 6. Leaked-password protection disabled
+- Enable HIBP check via auth settings (`password_hibp_enabled: true`). One toggle.
 
-No new pages required — CTA links to existing product page with `?review=1` query param to auto-open the review modal on PDP. Small addition to `ProductDetail.tsx` to read the param and open the existing review composer.
+### 7. Empty social proof
+- `reviews` approved = 0, `community_stories` approved = unknown but likely 0.
+- Review-request email loop will start filling this after launch, but launch day will show empty review widgets. Either hide review sections when count = 0 or seed initial approved reviews.
 
-## Files
+---
 
-- new migration: `orders.review_request_sent_at` + index
-- new `supabase/functions/process-review-requests/index.ts`
-- `supabase/config.toml`: register function (`verify_jwt = false`)
-- `src/pages/ProductDetail.tsx`: auto-open review modal on `?review=1`
-- pg_cron schedule via insert tool
+## P2 — Polish
 
-## Out of scope
+- **Extensions in `public` schema** (linter warn) — move `pg_cron`/`pg_net` to `extensions` schema or accept as known.
+- **`SECURITY DEFINER` view** (linter error) — review the flagged view; switch to `SECURITY INVOKER` unless intentionally definer.
+- **Permissive RLS `WITH CHECK (true)` policies** (×5) — audit each (newsletter, ambassador apps, abandoned cart insert, community story insert, upsell events). Most are intentional public-insert paths; document in security memory.
+- **Public storage bucket lists files** — `product-images` bucket allows directory listing. Add a tighter storage.objects SELECT policy or accept.
+- **Public-execute `SECURITY DEFINER` functions** (×3 anon, ×3 auth) — verify each is meant to be callable (e.g. `has_role` should stay; review the others).
 
-- Second reminder email (only 1 send per order, per request)
-- SMS/push
-- Review incentives / discount codes
-- Changing existing review submission flow
+---
+
+## Verified OK
+
+- Stripe go-live: all 5 readiness steps completed. Client auto-selects `live` from `pk_live_` token.
+- pg_cron jobs active: abandoned-cart (15m), review-request (6h), worn-invites (hourly).
+- RLS enabled on all 31 public tables; admin-only paths use `has_role(...)`.
+- Auth: email/password + Google configured; owner admin role protected by trigger.
+- Legal pages present: Privacy, Terms, Returns, Shipping, Accessibility, FAQ, Contact.
+- Marketing suppression + unsubscribe (HMAC token + List-Unsubscribe headers) wired.
+- Stripe webhook converts abandoned carts on payment, halting email sequences.
+- Index meta: title + description set; robots.txt allows major crawlers.
+
+---
+
+## Recommended fix order
+
+```text
+Day 0 (blockers)
+  1. Seed product variants & stock  (ops portal)
+  2. Fix sitemap/robots host OR attach custom domain
+  3. Migration: drop customer_email from public policies on
+     community_stories + worn_in_the_wild_submissions
+
+Day 0 (security)
+  4. Migration: tighten user_behavior_signals SELECT policy
+  5. Migration: tighten saved_outfits share_id access (RPC)
+  6. Enable leaked-password protection
+
+Day 1 (polish)
+  7. Seed 6–12 approved reviews OR hide empty review sections
+  8. Resolve linter warnings or document in security memory
+```
+
+When you're ready, say "go" and I'll start with the security migrations (P0 #3 + P1 #4–6) since they don't need product/content decisions.

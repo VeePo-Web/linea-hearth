@@ -31,7 +31,7 @@ export default function CommunityHero() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("community_stories")
-        .select("*")
+        .select("id, customer_name, customer_photo_url, customer_location, headline, story_text, video_url")
         .eq("is_featured", true)
         .eq("is_approved", true)
         .limit(1)
