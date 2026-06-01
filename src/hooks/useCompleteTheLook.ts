@@ -198,16 +198,15 @@ async function fetchCompleteTheLook(productId: string): Promise<CompleteTheLookD
   };
 }
 
-/** Find the in-stock size for a product, biased toward the size memory hint. */
+/** Pick an initial size, biased toward the size memory hint. POD = always available. */
 function pickInitialSize(row: LookProductRow, hint: string | null): string | null {
   const sizedVariants = row.variants.filter((v) => v.size);
   if (!sizedVariants.length) return null;
   if (hint) {
-    const hit = sizedVariants.find((v) => v.size === hint && v.stock_quantity > 0);
+    const hit = sizedVariants.find((v) => v.size === hint);
     if (hit) return hit.size!;
   }
-  const inStock = sizedVariants.find((v) => v.stock_quantity > 0);
-  return inStock?.size ?? sizedVariants[0].size ?? null;
+  return sizedVariants[0].size ?? null;
 }
 
 function unitDisplayPrice(row: LookProductRow, size: string | null): number {
