@@ -270,7 +270,7 @@ export function useCompleteTheLook(productId: string | undefined): UseCompleteTh
     for (const row of rows) {
       const hint = getRememberedSize(row.position || row.category_slug || "");
       const size = pickInitialSize(row, hint);
-      const anyStock = row.variants.some((v) => v.stock_quantity > 0) || row.variants.length === 0;
+      const anyStock = true; // Print-on-demand: always available
       next[row.id] = {
         productId: row.id,
         size,
