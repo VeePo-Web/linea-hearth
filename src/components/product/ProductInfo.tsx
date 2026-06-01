@@ -17,6 +17,7 @@ import TestimonialSnippet from "./TestimonialSnippet";
 import ProductFAQ from "./ProductFAQ";
 import ShippingReturnsAccordion from "./ShippingReturnsAccordion";
 import TryItOnButton from "./TryItOnButton";
+import ScarcityBadge from "./ScarcityBadge";
 import TextReveal from "@/components/motion/TextReveal";
 import FavoriteButton from "@/components/favorites/FavoriteButton";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
