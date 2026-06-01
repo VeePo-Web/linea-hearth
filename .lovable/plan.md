@@ -1,19 +1,15 @@
-## Add 'All' Shop Dropdown Option
+## Fix "All" Shop Dropdown Link to /catalogue
 
-Add an "All" link at the top of the Shop dropdown menu that navigates to `/category` (the unified shop page).
+The previous implementation incorrectly routed the "All" option under Shop to `/category`. It should go to `/catalogue` — the unified product catalogue page that shows all items with category filters.
 
 ### Changes
 1. **Navigation.tsx**
-   - Insert `{ name: "All", href: "/category" }` as the first element in the `Shop` > `submenuItems` array (currently starts with "Bottoms").
+   - Change `{ name: "All", href: "/category" }` to `{ name: "All", href: "/catalogue" }` in the Shop `submenuItems` array.
 
 2. **MegaMenu.tsx**
-   - Update the "View All" CTA link at the bottom of the dropdown so that when `activeDropdown === "Shop"`, the destination is `/category` instead of `/category/shop`.
-
-3. **MobileMenu.tsx**
-   - No change needed. The mobile slide-out renders `submenuItems` dynamically from the `navItems` prop passed by `Navigation.tsx`, so adding the item there automatically propagates to mobile.
+   - Change the "View All" CTA link for the Shop dropdown from `/category` to `/catalogue`.
 
 ### Verification
-- Hovering Shop in the header shows "All" as the first column/category link.
-- Clicking "All" navigates to `/category`.
-- The "View All Shop" CTA at the bottom of the mega menu also goes to `/category`.
-- Mobile menu Shop accordion also lists "All" first.
+- Hovering Shop shows "All" as the first link.
+- Clicking "All" navigates to `/catalogue`.
+- The "View All Shop" CTA at the bottom of the mega menu also goes to `/catalogue`.
