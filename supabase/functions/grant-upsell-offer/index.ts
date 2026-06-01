@@ -117,17 +117,15 @@ Deno.serve(async (req) => {
     }
     if (!candidate) return json({ offer: null, reason: "no_candidate" });
 
-    // 4. Pick a default in-stock variant (or null if product has none)
+    // 4. Pick a default variant (print-on-demand: no stock gating)
     const { data: variants } = await sb
       .from("product_variants")
-      .select("id, size, color, stock_quantity, price_adjustment")
+      .select("id, size, color, price_adjustment")
       .eq("product_id", candidate.id);
     let pickedVariant: { id: string; size: string | null; color: string | null; price_adjustment: number } | null = null;
     if (variants && variants.length) {
-      const inStock = variants.filter((v: any) => (v.stock_quantity ?? 0) > 0);
-      if (!inStock.length) return json({ offer: null, reason: "out_of_stock" });
       // Prefer medium-ish size if present
-      const preferred = inStock.find((v: any) => ["M", "Medium"].includes(v.size)) ?? inStock[0];
+      const preferred = variants.find((v: any) => ["M", "Medium"].includes(v.size)) ?? variants[0];
       pickedVariant = {
         id: (preferred as any).id,
         size: (preferred as any).size,
