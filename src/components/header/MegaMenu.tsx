@@ -161,7 +161,7 @@ const MegaMenu = ({
                   variants={itemVariants}
                 >
                   <Link
-                    to={activeDropdown === "Shop" ? "/category/shop" : "/about/our-story"}
+                    to={activeDropdown === "Shop" ? "/category" : "/about/our-story"}
                     className="inline-flex items-center gap-2 text-sm font-medium text-foreground hover:text-muted-foreground transition-colors group"
                   >
                     <span>View All {activeDropdown}</span>

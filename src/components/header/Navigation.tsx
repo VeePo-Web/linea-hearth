@@ -74,6 +74,7 @@ const Navigation = () => {
       name: "Shop",
       href: "/category/shop",
       submenuItems: [
+        { name: "All", href: "/category" },
         { name: "Bottoms", href: "/category/bottoms", subcategories: [{ name: "Shorts", href: "/category/shorts" }, { name: "Joggers", href: "/category/joggers" }, { name: "Sweatpants", href: "/category/sweatpants" }] },
         { name: "Tees", href: "/category/tees", subcategories: [{ name: "Short Sleeve", href: "/category/short-sleeve" }, { name: "Long Sleeve", href: "/category/long-sleeve" }, { name: "Cropped", href: "/category/cropped" }] },
         { name: "Hoodies", href: "/category/hoodies", subcategories: [{ name: "Pullover Hoodies", href: "/category/pullover-hoodies" }, { name: "Zip-Up Hoodies", href: "/category/zip-up-hoodies" }, { name: "Crewnecks", href: "/category/crewnecks" }, { name: "Quarter Zips", href: "/category/quarter-zips" }, { name: "Lightweight Hoodies", href: "/category/lightweight-hoodies" }] },
