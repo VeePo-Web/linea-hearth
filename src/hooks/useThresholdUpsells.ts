@@ -93,9 +93,7 @@ export function useThresholdUpsells(): UseThresholdUpsellsReturn {
       const cartId = productIdToCartId(product.id);
       if (cartIds.has(cartId)) return false;
 
-      // Must have stock
-      const hasStock = product.product_variants?.some(v => v.stock_quantity > 0);
-      if (!hasStock) return false;
+      // Print-on-demand: stock is never a constraint.
 
       return true;
     })
