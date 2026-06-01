@@ -38,11 +38,7 @@ async function hmacHex(secret: string, message: string): Promise<string> {
 
 function buildEmail(order: EligibleOrder, siteUrl: string): { subject: string; html: string } {
   const firstName = order.customer_first_name?.trim() || 'Friend';
-  // Pick first product for primary CTA; fallback to /shop
-  const primary = order.order_items[0];
-  const reviewUrl = primary?.product_id
-    ? `${siteUrl}/product/${primary.product_id}?review=1`
-    : `${siteUrl}/shop`;
+  const reviewUrl = `${siteUrl}/community?review=1`;
 
   const itemsHtml = order.order_items.slice(0, 3).map((it) => `
     <tr>
@@ -53,10 +49,11 @@ function buildEmail(order: EligibleOrder, siteUrl: string): { subject: string; h
         <p style="margin:0;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;font-size:14px;font-weight:500;color:#1C1917;">${it.product_name}</p>
       </td>
       <td style="padding:12px 0;border-bottom:1px solid #E7E5E4;text-align:right;vertical-align:middle;">
-        <a href="${siteUrl}/product/${it.product_id ?? ''}?review=1" style="font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;font-size:12px;color:#4CAF50;text-decoration:none;letter-spacing:1px;text-transform:uppercase;">Review →</a>
+        <a href="${reviewUrl}" style="font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;font-size:12px;color:#4CAF50;text-decoration:none;letter-spacing:1px;text-transform:uppercase;">Review →</a>
       </td>
     </tr>
   `).join('');
+
 
   const subject = 'How did your armor serve you?';
   const html = `<!DOCTYPE html>
