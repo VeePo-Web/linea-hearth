@@ -47,9 +47,9 @@ const MissingProductCard = ({
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [showPicker, setShowPicker] = useState(false);
 
-  // Get in-stock variants
+  // Print-on-demand: all variants with a size are available.
   const inStockVariants = useMemo(() => {
-    return product.variants.filter(v => v.stock > 0 && v.size);
+    return product.variants.filter(v => v.size);
   }, [product.variants]);
 
   const availableSizes = useMemo(() => {
