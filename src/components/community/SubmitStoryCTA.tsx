@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import SubmitStoryModal from "./SubmitStoryModal";
@@ -7,6 +8,15 @@ import { staggerContainer, staggerItem, wordReveal, wordItem } from "@/lib/anima
 
 export default function SubmitStoryCTA() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [searchParams] = useSearchParams();
+
+  // Deep-link from review-request email: /community?review=1 auto-opens composer
+  useEffect(() => {
+    if (searchParams.get("review") === "1" || searchParams.get("share") === "1") {
+      setIsModalOpen(true);
+    }
+  }, [searchParams]);
+
 
   return (
     <>
