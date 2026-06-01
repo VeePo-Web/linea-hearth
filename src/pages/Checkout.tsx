@@ -93,6 +93,21 @@ const Checkout = () => {
   // Calculate discount amount from validated discount
   const discountAmount = appliedDiscount ? Math.round(appliedDiscount.discountAmountCents / 100) : 0;
 
+  // Auto-apply abandoned-cart recovery discount (set by /recover-cart on rehydration).
+  useEffect(() => {
+    const recoveryCode = localStorage.getItem('loj-recovery-discount-code');
+    if (!recoveryCode || appliedDiscount || subtotal <= 0) return;
+    const subtotalCents = Math.round(subtotal * 100);
+    const email = customerDetails.email || 'guest@checkout.temp';
+    validateCode(recoveryCode, subtotalCents, email).then((result) => {
+      if (result.valid) {
+        toast.success('Recovery discount applied');
+        localStorage.removeItem('loj-recovery-discount-code');
+      }
+    });
+  }, [subtotal, appliedDiscount, customerDetails.email, validateCode]);
+
+
   const getShippingCost = () => {
     if (hasFreeShipping && shippingOption === "standard") return 0;
     switch (shippingOption) {
