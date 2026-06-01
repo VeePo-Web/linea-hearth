@@ -294,8 +294,8 @@ interface BundleRowProps {
 const BundleRow = ({ row, entry, onToggle, onSize }: BundleRowProps) => {
   const sizedVariants = row.variants.filter((v) => v.size);
   const sizes = Array.from(new Set(sizedVariants.map((v) => v.size!)));
-  const inStockSet = new Set(sizedVariants.filter((v) => v.stock_quantity > 0).map((v) => v.size!));
-  const anyStock = row.variants.some((v) => v.stock_quantity > 0) || row.variants.length === 0;
+  const inStockSet = new Set(sizedVariants.map((v) => v.size!));
+  const anyStock = true; // Print-on-demand: always available
   const size = entry?.size ?? null;
   const included = entry?.included ?? false;
   const anchored = entry?.anchored ?? false;
