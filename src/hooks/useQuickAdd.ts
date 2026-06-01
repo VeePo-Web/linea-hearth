@@ -357,11 +357,8 @@ export function useQuickAdd(
       // One-tap add
       addToCart({ size: rememberedSize });
     } else if (suggestedFallback) {
-      // Use fallback if remembered is OOS
+      // Print-on-demand: never say "sold out". Use fallback silently.
       addToCart({ size: suggestedFallback });
-      if (showToast) {
-        toast.info(`Your size ${rememberedSize} sold out — added ${suggestedFallback} instead`);
-      }
     } else if (availableSizes.length === 1) {
       // Only one size available, auto-select
       addToCart({ size: availableSizes[0] });
