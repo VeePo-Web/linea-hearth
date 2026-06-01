@@ -110,6 +110,27 @@ async function handleCheckoutCompleted(session: any, env: StripeEnv) {
     }
   }
 
+  // Convert any in-flight abandoned-cart recovery sequence for this customer.
+  // Stops further recovery emails the moment the order is paid, even if the
+  // user checked out without clicking the recovery link.
+  try {
+    const { data: orderForEmail } = await sb
+      .from("orders")
+      .select("customer_email")
+      .eq("id", orderId)
+      .single();
+    const customerEmail = (orderForEmail as any)?.customer_email?.toLowerCase();
+    if (customerEmail) {
+      await sb
+        .from("abandoned_carts")
+        .update({ status: "converted", converted_at: new Date().toISOString() })
+        .eq("email", customerEmail)
+        .in("status", ["pending", "email_1_sent", "email_2_sent", "email_3_sent"]);
+    }
+  } catch (e) {
+    console.error("Failed to mark abandoned carts converted", e);
+  }
+
   await sendConfirmationEmail(orderId);
 }
 

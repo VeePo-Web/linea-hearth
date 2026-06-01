@@ -49,7 +49,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Check if cart is already converted
+    // Block only when the cart is fully converted to an order
     if (cart.status === 'converted') {
       return new Response(
         JSON.stringify({ error: 'This cart has already been converted to an order' }),
@@ -61,7 +61,6 @@ Deno.serve(async (req) => {
     const cartAge = Date.now() - new Date(cart.created_at).getTime();
     const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000;
     if (cartAge > thirtyDaysMs) {
-      // Mark as expired
       await supabase
         .from('abandoned_carts')
         .update({ status: 'expired' })
@@ -73,14 +72,16 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Mark cart as recovered
-    await supabase
-      .from('abandoned_carts')
-      .update({ 
-        status: 'recovered',
-        recovered_at: new Date().toISOString()
-      })
-      .eq('id', cart.id);
+    // Mark cart as recovered (idempotent — allow re-clicking the same link).
+    if (cart.status !== 'recovered') {
+      await supabase
+        .from('abandoned_carts')
+        .update({
+          status: 'recovered',
+          recovered_at: new Date().toISOString()
+        })
+        .eq('id', cart.id);
+    }
 
     return new Response(
       JSON.stringify({ 
