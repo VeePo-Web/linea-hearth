@@ -400,8 +400,8 @@ export function useQuickAdd(
     availableColors,
     stockForRemembered,
     totalStock,
-    isOutOfStock: totalStock === 0,
-    hasLowStock: totalStock > 0 && totalStock <= 3,
+    isOutOfStock: false, // Print-on-demand: never out of stock
+    hasLowStock: false,
     suggestedFallback,
     displayPrice,
 
