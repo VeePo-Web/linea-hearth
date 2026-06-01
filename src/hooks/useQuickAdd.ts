@@ -160,21 +160,19 @@ export function useQuickAdd(
       };
     }
 
+    // Print-on-demand: every variant is always available. We still
+    // collect sizes/colors for selection UI, but never gate on stock.
     const sizesWithStock = new Set<string>();
     const colorsWithStock = new Set<string>();
     const map = new Map<string, number>();
     let total = 0;
 
     for (const variant of product.product_variants) {
-      if (variant.stock_quantity > 0) {
-        if (variant.size) sizesWithStock.add(variant.size);
-        if (variant.color) colorsWithStock.add(variant.color);
-        
-        // Store stock by size-color key
-        const key = `${variant.size || ''}-${variant.color || ''}`;
-        map.set(key, (map.get(key) || 0) + variant.stock_quantity);
-        total += variant.stock_quantity;
-      }
+      if (variant.size) sizesWithStock.add(variant.size);
+      if (variant.color) colorsWithStock.add(variant.color);
+      const key = `${variant.size || ''}-${variant.color || ''}`;
+      map.set(key, (map.get(key) || 0) + 999);
+      total += 999;
     }
 
     return {
@@ -359,11 +357,8 @@ export function useQuickAdd(
       // One-tap add
       addToCart({ size: rememberedSize });
     } else if (suggestedFallback) {
-      // Use fallback if remembered is OOS
+      // Print-on-demand: never say "sold out". Use fallback silently.
       addToCart({ size: suggestedFallback });
-      if (showToast) {
-        toast.info(`Your size ${rememberedSize} sold out — added ${suggestedFallback} instead`);
-      }
     } else if (availableSizes.length === 1) {
       // Only one size available, auto-select
       addToCart({ size: availableSizes[0] });
@@ -405,8 +400,8 @@ export function useQuickAdd(
     availableColors,
     stockForRemembered,
     totalStock,
-    isOutOfStock: totalStock === 0,
-    hasLowStock: totalStock > 0 && totalStock <= 3,
+    isOutOfStock: false, // Print-on-demand: never out of stock
+    hasLowStock: false,
     suggestedFallback,
     displayPrice,
 

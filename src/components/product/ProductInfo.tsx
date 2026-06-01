@@ -17,6 +17,7 @@ import TestimonialSnippet from "./TestimonialSnippet";
 import ProductFAQ from "./ProductFAQ";
 import ShippingReturnsAccordion from "./ShippingReturnsAccordion";
 import TryItOnButton from "./TryItOnButton";
+import ScarcityBadge from "./ScarcityBadge";
 import TextReveal from "@/components/motion/TextReveal";
 import FavoriteButton from "@/components/favorites/FavoriteButton";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
@@ -77,46 +78,34 @@ const ProductInfo = ({ product, variants = [], onColorChange, onAuthRequired, on
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
   const prefersReducedMotion = useReducedMotion();
 
-  // Extract unique sizes with stock
+  // Print-on-demand: never gate on stock. Surface every distinct
+  // size/color with effectively infinite availability so SizeSelector
+  // / ColorSwatchSelector never disable an option. Real scarcity copy
+  // is driven by <ScarcityBadge /> below.
   const sizes = useMemo(() => {
-    const sizeMap = new Map<string, number>();
+    const sizeSet = new Set<string>();
     variants.forEach((v) => {
-      if (v.size) {
-        const currentStock = sizeMap.get(v.size) || 0;
-        // If color is selected, only count stock for that color
-        if (selectedColor) {
-          if (v.color?.toLowerCase() === selectedColor.toLowerCase()) {
-            sizeMap.set(v.size, currentStock + v.stock_quantity);
-          }
-        } else {
-          sizeMap.set(v.size, currentStock + v.stock_quantity);
-        }
-      }
+      if (!v.size) return;
+      if (selectedColor && v.color?.toLowerCase() !== selectedColor.toLowerCase()) return;
+      sizeSet.add(v.size);
     });
-    
     const sizeOrder = ["XS", "S", "M", "L", "XL", "2XL", "3XL"];
-    return Array.from(sizeMap.entries())
-      .map(([size, stock]) => ({ size, stock }))
+    return Array.from(sizeSet)
+      .map((size) => ({ size, stock: 999 }))
       .sort((a, b) => sizeOrder.indexOf(a.size) - sizeOrder.indexOf(b.size));
   }, [variants, selectedColor]);
 
-  // Extract unique colors with availability
+  // Extract unique colors — all are available under POD.
   const colors = useMemo(() => {
     const colorSet = new Set<string>();
     variants.forEach((v) => {
       if (v.color) colorSet.add(v.color.toLowerCase());
     });
-    
-    return Array.from(colorSet).map((color) => {
-      const hasStock = variants.some(
-        (v) => v.color?.toLowerCase() === color && v.stock_quantity > 0
-      );
-      return {
-        color,
-        colorCode: colorCodes[color] || "#cccccc",
-        available: hasStock,
-      };
-    });
+    return Array.from(colorSet).map((color) => ({
+      color,
+      colorCode: colorCodes[color] || "#cccccc",
+      available: true,
+    }));
   }, [variants]);
 
   // Auto-select color when only one option exists
@@ -264,6 +253,8 @@ const ProductInfo = ({ product, variants = [], onColorChange, onAuthRequired, on
               </Button>
             </div>
           </div>
+
+          <ScarcityBadge productId={product?.id} size={selectedSize} />
 
           <Button id="main-add-to-bag" disabled={!canAddToBag} onClick={() => onAddToBag?.({ size: selectedSize, color: selectedColor, quantity })} className="w-full h-12 bg-foreground text-background hover:bg-foreground/90 font-light rounded-none disabled:opacity-50 disabled:cursor-not-allowed">
             Add to Bag — ${totalPrice.toFixed(2)}
@@ -452,6 +443,8 @@ const ProductInfo = ({ product, variants = [], onColorChange, onAuthRequired, on
             </Button>
           </div>
         </div>
+
+        <ScarcityBadge productId={product?.id} size={selectedSize} />
 
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}

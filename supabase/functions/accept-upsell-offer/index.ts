@@ -80,18 +80,7 @@ Deno.serve(async (req) => {
       return json({ outcome: "error", reason: "parent_missing" }, 500);
     }
 
-    // 4. Re-check variant stock
-    if (offer.variant_id) {
-      const { data: v } = await sb
-        .from("product_variants")
-        .select("stock_quantity")
-        .eq("id", offer.variant_id)
-        .maybeSingle();
-      if (!v || ((v as any).stock_quantity ?? 0) < 1) {
-        await sb.from("post_purchase_offers").update({ status: "failed", failure_reason: "out_of_stock" }).eq("id", offer.id);
-        return json({ outcome: "out_of_stock" }, 409);
-      }
-    }
+    // 4. Print-on-demand: no stock check. Variant always available.
 
     // 5. Load product snapshot for the line item
     const { data: product } = await sb
