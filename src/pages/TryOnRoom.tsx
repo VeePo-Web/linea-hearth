@@ -30,11 +30,9 @@ const TryOnRoomContent = () => {
     if (outfitId) {
       const loadSavedOutfit = async () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { data, error } = await (supabase
-          .from('saved_outfits') as any)
-          .select('*')
-          .eq('share_id', outfitId)
-          .single();
+        const { data, error } = await (supabase as any)
+          .rpc('get_shared_outfit', { p_share_id: outfitId })
+          .maybeSingle();
 
         if (error || !data) {
           toast.error('Outfit not found');
