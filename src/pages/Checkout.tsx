@@ -259,9 +259,6 @@ const Checkout = () => {
     navigate("/");
   };
 
-
-  };
-
   // Scroll to payment section for mobile sticky bar
   const scrollToPayment = () => {
     document.getElementById("payment-section")?.scrollIntoView({ behavior: "smooth" });
