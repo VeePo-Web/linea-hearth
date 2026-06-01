@@ -789,6 +789,7 @@ export type Database = {
           metadata: Json | null
           notes: string | null
           payment_status: string
+          review_request_sent_at: string | null
           shipped_at: string | null
           shipping_address: Json
           shipping_cents: number
@@ -822,6 +823,7 @@ export type Database = {
           metadata?: Json | null
           notes?: string | null
           payment_status?: string
+          review_request_sent_at?: string | null
           shipped_at?: string | null
           shipping_address: Json
           shipping_cents?: number
@@ -855,6 +857,7 @@ export type Database = {
           metadata?: Json | null
           notes?: string | null
           payment_status?: string
+          review_request_sent_at?: string | null
           shipped_at?: string | null
           shipping_address?: Json
           shipping_cents?: number
