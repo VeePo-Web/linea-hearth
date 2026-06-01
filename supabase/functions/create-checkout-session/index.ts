@@ -159,11 +159,11 @@ Deno.serve(async (req) => {
     }
 
     const variantIds = Array.from(new Set(body.items.map((it) => it.variantId).filter(Boolean))) as string[];
-    const variantsById: Record<string, { id: string; product_id: string; price_adjustment: number | null; stock_quantity: number | null }> = {};
+    const variantsById: Record<string, { id: string; product_id: string; price_adjustment: number | null }> = {};
     if (variantIds.length) {
       const { data: dbVariants } = await sbAdmin
         .from("product_variants")
-        .select("id, product_id, price_adjustment, stock_quantity")
+        .select("id, product_id, price_adjustment")
         .in("id", variantIds);
       for (const v of dbVariants ?? []) variantsById[v.id] = v as any;
     }
@@ -187,27 +187,20 @@ Deno.serve(async (req) => {
         : Number(prod.price);
       let variantAdjustment = 0;
       if (item.variantId) {
+        // === PRINT-ON-DEMAND ===
+        // No inventory gating: Printful prints on demand, so we never
+        // sell out. Variant lookup is used only to resolve price
+        // adjustments. A missing/mismatched variant row is logged and
+        // skipped (no adjustment) rather than blocking the sale.
         const v = variantsById[item.variantId];
-        if (!v || v.product_id !== prod.id) {
-          return new Response(
-            JSON.stringify({ success: false, error: `Invalid variant for ${prod.name}` }),
-            { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-          );
+        if (v && v.product_id === prod.id) {
+          variantAdjustment = Number(v.price_adjustment ?? 0);
+        } else {
+          console.warn("Variant not found or product mismatch; proceeding without adjustment", {
+            productId: prod.id,
+            variantId: item.variantId,
+          });
         }
-        // === INVENTORY CHECK ===
-        // Variants are the source of truth for stock. Block oversells BEFORE
-        // Stripe session creation. Race-safe enough at single-digit QPS;
-        // upgrade to row-level locking + reservation table when traffic grows.
-        if (v.stock_quantity !== null && v.stock_quantity < item.quantity) {
-          return new Response(
-            JSON.stringify({
-              success: false,
-              error: `${prod.name}${item.size ? ` (${item.size})` : ""} just sold out. Please remove it or pick another size.`,
-            }),
-            { status: 409, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-          );
-        }
-        variantAdjustment = Number(v.price_adjustment ?? 0);
       }
       const authorizedDollars = basePrice + variantAdjustment;
       const unitAmountCents = Math.round(authorizedDollars * 100);
