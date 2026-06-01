@@ -46,44 +46,74 @@ function generateDiscountCode(): string {
   return code;
 }
 
-// Email sending function (stubbed - requires RESEND_API_KEY)
+// HMAC-SHA256 hex helper for signed unsubscribe links.
+async function hmacHex(secret: string, message: string): Promise<string> {
+  const key = await crypto.subtle.importKey(
+    'raw',
+    new TextEncoder().encode(secret),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign'],
+  );
+  const sig = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(message));
+  return Array.from(new Uint8Array(sig))
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('');
+}
+
+interface SendResult {
+  ok: boolean;
+  providerMessageId?: string;
+  error?: string;
+}
+
+// Real Resend send with List-Unsubscribe headers for Gmail/Yahoo bulk-sender compliance.
 async function sendEmail(
   to: string,
   subject: string,
   html: string,
-  resendApiKey?: string
-): Promise<boolean> {
+  unsubscribeUrl: string,
+  resendApiKey?: string,
+): Promise<SendResult> {
+  // Inject the unsubscribe URL into the footer placeholder (templates render href="#").
+  const finalHtml = html.replace('href="#"', `href="${unsubscribeUrl}"`);
+
   if (!resendApiKey) {
     console.log(`[STUB] Would send email to ${to}: ${subject}`);
-    console.log(`[STUB] Email content preview: ${html.substring(0, 200)}...`);
-    return true; // Pretend success for testing
+    return { ok: true, providerMessageId: 'stub' };
   }
 
   try {
     const response = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${resendApiKey}`,
+        Authorization: `Bearer ${resendApiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         from: 'Line of Judah <noreply@lineofjudah.com>',
         to: [to],
         subject,
-        html,
+        html: finalHtml,
+        headers: {
+          'List-Unsubscribe': `<${unsubscribeUrl}>, <mailto:unsubscribe@lineofjudah.com>`,
+          'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+        },
       }),
     });
 
     if (!response.ok) {
       const error = await response.text();
       console.error('Resend API error:', error);
-      return false;
+      return { ok: false, error: `Resend ${response.status}: ${error.slice(0, 300)}` };
     }
 
-    return true;
+    const data = await response.json();
+    return { ok: true, providerMessageId: data?.id };
   } catch (error) {
-    console.error('Failed to send email:', error);
-    return false;
+    const msg = error instanceof Error ? error.message : String(error);
+    console.error('Failed to send email:', msg);
+    return { ok: false, error: msg };
   }
 }
 
