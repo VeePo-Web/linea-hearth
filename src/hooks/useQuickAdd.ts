@@ -160,21 +160,19 @@ export function useQuickAdd(
       };
     }
 
+    // Print-on-demand: every variant is always available. We still
+    // collect sizes/colors for selection UI, but never gate on stock.
     const sizesWithStock = new Set<string>();
     const colorsWithStock = new Set<string>();
     const map = new Map<string, number>();
     let total = 0;
 
     for (const variant of product.product_variants) {
-      if (variant.stock_quantity > 0) {
-        if (variant.size) sizesWithStock.add(variant.size);
-        if (variant.color) colorsWithStock.add(variant.color);
-        
-        // Store stock by size-color key
-        const key = `${variant.size || ''}-${variant.color || ''}`;
-        map.set(key, (map.get(key) || 0) + variant.stock_quantity);
-        total += variant.stock_quantity;
-      }
+      if (variant.size) sizesWithStock.add(variant.size);
+      if (variant.color) colorsWithStock.add(variant.color);
+      const key = `${variant.size || ''}-${variant.color || ''}`;
+      map.set(key, (map.get(key) || 0) + 999);
+      total += 999;
     }
 
     return {
