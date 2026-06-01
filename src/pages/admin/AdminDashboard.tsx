@@ -341,8 +341,8 @@ const AdminDashboard = () => {
                           {[v.size, v.color].filter(Boolean).join(' / ') || 'Default'}
                         </span>
                       </div>
-                      <Badge variant={v.stock_quantity === 0 ? 'destructive' : 'secondary'} className="text-xs">
-                        {v.stock_quantity} left
+                      <Badge variant="secondary" className="text-xs">
+                        {v.stock_quantity} (informational)
                       </Badge>
                     </Link>
                   ))}
