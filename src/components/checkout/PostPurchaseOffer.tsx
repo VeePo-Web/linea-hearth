@@ -85,7 +85,7 @@ const PostPurchaseOffer = ({ isOpen, offer, customerEmail, onClose, onAccepted }
         setState("sca");
       } else if (outcome === "out_of_stock") {
         setState("declined");
-        setErrorMsg("Just sold out. We'll restock soon.");
+        setErrorMsg("We couldn't add this offer. Please try again.");
       } else if (outcome === "expired") {
         setState("expired");
       } else {
