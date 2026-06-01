@@ -1775,6 +1775,26 @@ export type Database = {
       }
     }
     Functions: {
+      get_shared_outfit: {
+        Args: { p_share_id: string }
+        Returns: {
+          avatar_body_type: string
+          avatar_gender: string
+          created_at: string
+          equipped_items: Json
+          id: string
+          name: string | null
+          screenshot_url: string | null
+          share_id: string | null
+          user_id: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "saved_outfits"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
