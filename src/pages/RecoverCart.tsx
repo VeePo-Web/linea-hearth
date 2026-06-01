@@ -129,10 +129,15 @@ const RecoverCart = () => {
         setRecoveredData(data);
         setStatus('success');
 
+        // Persist recovery discount so Checkout can auto-apply it on mount.
+        if (data.discountCode) {
+          localStorage.setItem('loj-recovery-discount-code', data.discountCode);
+        }
+
         toast({
           title: "Cart restored",
-          description: data.discountCode 
-            ? `Use code ${data.discountCode} for 15% off`
+          description: data.discountCode
+            ? `Code ${data.discountCode} will apply automatically at checkout`
             : "Your items are ready for checkout",
         });
 

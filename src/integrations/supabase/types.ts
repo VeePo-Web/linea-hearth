@@ -626,6 +626,57 @@ export type Database = {
         }
         Relationships: []
       }
+      marketing_email_log: {
+        Row: {
+          cart_id: string | null
+          created_at: string
+          email: string
+          email_number: number
+          error: string | null
+          id: string
+          provider_message_id: string | null
+          status: string
+        }
+        Insert: {
+          cart_id?: string | null
+          created_at?: string
+          email: string
+          email_number: number
+          error?: string | null
+          id?: string
+          provider_message_id?: string | null
+          status: string
+        }
+        Update: {
+          cart_id?: string | null
+          created_at?: string
+          email?: string
+          email_number?: number
+          error?: string | null
+          id?: string
+          provider_message_id?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
+      marketing_suppressions: {
+        Row: {
+          created_at: string
+          email: string
+          reason: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          reason: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          reason?: string
+        }
+        Relationships: []
+      }
       newsletter_subscribers: {
         Row: {
           created_at: string

@@ -46,44 +46,74 @@ function generateDiscountCode(): string {
   return code;
 }
 
-// Email sending function (stubbed - requires RESEND_API_KEY)
+// HMAC-SHA256 hex helper for signed unsubscribe links.
+async function hmacHex(secret: string, message: string): Promise<string> {
+  const key = await crypto.subtle.importKey(
+    'raw',
+    new TextEncoder().encode(secret),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign'],
+  );
+  const sig = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(message));
+  return Array.from(new Uint8Array(sig))
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('');
+}
+
+interface SendResult {
+  ok: boolean;
+  providerMessageId?: string;
+  error?: string;
+}
+
+// Real Resend send with List-Unsubscribe headers for Gmail/Yahoo bulk-sender compliance.
 async function sendEmail(
   to: string,
   subject: string,
   html: string,
-  resendApiKey?: string
-): Promise<boolean> {
+  unsubscribeUrl: string,
+  resendApiKey?: string,
+): Promise<SendResult> {
+  // Inject the unsubscribe URL into the footer placeholder (templates render href="#").
+  const finalHtml = html.replace('href="#"', `href="${unsubscribeUrl}"`);
+
   if (!resendApiKey) {
     console.log(`[STUB] Would send email to ${to}: ${subject}`);
-    console.log(`[STUB] Email content preview: ${html.substring(0, 200)}...`);
-    return true; // Pretend success for testing
+    return { ok: true, providerMessageId: 'stub' };
   }
 
   try {
     const response = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${resendApiKey}`,
+        Authorization: `Bearer ${resendApiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         from: 'Line of Judah <noreply@lineofjudah.com>',
         to: [to],
         subject,
-        html,
+        html: finalHtml,
+        headers: {
+          'List-Unsubscribe': `<${unsubscribeUrl}>, <mailto:unsubscribe@lineofjudah.com>`,
+          'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+        },
       }),
     });
 
     if (!response.ok) {
       const error = await response.text();
       console.error('Resend API error:', error);
-      return false;
+      return { ok: false, error: `Resend ${response.status}: ${error.slice(0, 300)}` };
     }
 
-    return true;
+    const data = await response.json();
+    return { ok: true, providerMessageId: data?.id };
   } catch (error) {
-    console.error('Failed to send email:', error);
-    return false;
+    const msg = error instanceof Error ? error.message : String(error);
+    console.error('Failed to send email:', msg);
+    return { ok: false, error: msg };
   }
 }
 
@@ -427,29 +457,134 @@ function getEmail3Html(cart: AbandonedCart, recoveryUrl: string, discountCode: s
   `;
 }
 
-Deno.serve(async (req) => {
-  // Handle CORS preflight
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+const FUNCTIONS_BASE = `${Deno.env.get('SUPABASE_URL') || ''}/functions/v1`;
+const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
+
+type EmailNumber = 1 | 2 | 3;
+
+interface ProcessDeps {
+  supabase: ReturnType<typeof createClient>;
+  resendApiKey?: string;
+  unsubscribeSecret: string;
+  siteUrl: string;
+}
+
+// Per-cart pre-send guard. Returns null if the send should proceed, or a
+// terminal status string if the sequence must be stopped + logged + skipped.
+async function suppressionReason(
+  deps: ProcessDeps,
+  cart: AbandonedCart,
+): Promise<null | { status: string; reason: string }> {
+  // 1. Expired (>30 days from creation).
+  if (Date.now() - new Date(cart.created_at).getTime() > THIRTY_DAYS_MS) {
+    return { status: 'expired', reason: 'cart older than 30 days' };
   }
+
+  // 2. Customer already placed a paid order after the cart was captured.
+  const { data: paidOrder } = await deps.supabase
+    .from('orders')
+    .select('id')
+    .eq('customer_email', cart.email.toLowerCase())
+    .eq('payment_status', 'paid')
+    .gt('created_at', cart.created_at)
+    .limit(1)
+    .maybeSingle();
+  if (paidOrder) {
+    return { status: 'converted', reason: 'customer placed a paid order' };
+  }
+
+  // 3. Email is on the marketing suppression list (unsubscribe/bounce/etc.).
+  const { data: suppression } = await deps.supabase
+    .from('marketing_suppressions')
+    .select('email')
+    .eq('email', cart.email.toLowerCase())
+    .maybeSingle();
+  if (suppression) {
+    return { status: 'suppressed', reason: 'email on suppression list' };
+  }
+
+  return null;
+}
+
+async function processCart(
+  deps: ProcessDeps,
+  cart: AbandonedCart,
+  emailNumber: EmailNumber,
+  subject: string,
+  buildHtml: (recoveryUrl: string) => { html: string; discountCode?: string },
+): Promise<'sent' | 'skipped' | 'failed'> {
+  const skip = await suppressionReason(deps, cart);
+  if (skip) {
+    await deps.supabase
+      .from('abandoned_carts')
+      .update({ status: skip.status })
+      .eq('id', cart.id);
+    await deps.supabase.from('marketing_email_log').insert({
+      cart_id: cart.id,
+      email: cart.email,
+      email_number: emailNumber,
+      status: `skipped_${skip.status}`,
+      error: skip.reason,
+    });
+    return 'skipped';
+  }
+
+  const recoveryUrl = `${deps.siteUrl}/recover-cart?token=${cart.recovery_token}`;
+  const emailLower = cart.email.toLowerCase();
+  const unsubToken = await hmacHex(deps.unsubscribeSecret, emailLower);
+  const unsubscribeUrl = `${FUNCTIONS_BASE}/unsubscribe-marketing?token=${unsubToken}&email=${encodeURIComponent(emailLower)}`;
+
+  const { html, discountCode } = buildHtml(recoveryUrl);
+  const result = await sendEmail(cart.email, subject, html, unsubscribeUrl, deps.resendApiKey);
+
+  await deps.supabase.from('marketing_email_log').insert({
+    cart_id: cart.id,
+    email: cart.email,
+    email_number: emailNumber,
+    provider_message_id: result.providerMessageId ?? null,
+    status: result.ok ? 'sent' : 'failed',
+    error: result.error ?? null,
+  });
+
+  if (!result.ok) return 'failed';
+
+  const now = new Date().toISOString();
+  const update: Record<string, unknown> =
+    emailNumber === 1
+      ? { email_1_sent_at: now, status: 'email_1_sent' }
+      : emailNumber === 2
+        ? { email_2_sent_at: now, status: 'email_2_sent' }
+        : { email_3_sent_at: now, status: 'email_3_sent', discount_code: discountCode };
+
+  await deps.supabase.from('abandoned_carts').update(update).eq('id', cart.id);
+  return 'sent';
+}
+
+Deno.serve(async (req) => {
+  if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
 
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const resendApiKey = Deno.env.get('RESEND_API_KEY'); // Optional - emails are stubbed without it
-    const siteUrl = Deno.env.get('SITE_URL') || 'https://lineofjudah.com';
+    const resendApiKey = Deno.env.get('RESEND_API_KEY');
+    const unsubscribeSecret = Deno.env.get('MARKETING_UNSUBSCRIBE_SECRET') || 'dev-only-do-not-use';
+    const siteUrl = Deno.env.get('SITE_URL') || 'https://lineofjudah-clothing.lovable.app';
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    const deps: ProcessDeps = { supabase, resendApiKey, unsubscribeSecret, siteUrl };
 
     const now = new Date();
-    const results = {
-      email1Sent: 0,
-      email2Sent: 0,
-      email3Sent: 0,
-      errors: 0,
+    const results = { email1Sent: 0, email2Sent: 0, email3Sent: 0, skipped: 0, errors: 0 };
+
+    const tally = (r: 'sent' | 'skipped' | 'failed', n: EmailNumber) => {
+      if (r === 'skipped') results.skipped++;
+      else if (r === 'failed') results.errors++;
+      else if (n === 1) results.email1Sent++;
+      else if (n === 2) results.email2Sent++;
+      else results.email3Sent++;
     };
 
-    // Fetch carts eligible for Email 1 (1 hour after creation, no email sent yet)
+    // Email 1 — 1h after capture
     const email1Threshold = new Date(now.getTime() - EMAIL_1_DELAY_HOURS * 60 * 60 * 1000);
     const { data: email1Carts } = await supabase
       .from('abandoned_carts')
@@ -457,33 +592,14 @@ Deno.serve(async (req) => {
       .eq('status', 'pending')
       .is('email_1_sent_at', null)
       .lt('created_at', email1Threshold.toISOString());
-
     for (const cart of email1Carts || []) {
-      const recoveryUrl = `${siteUrl}/recover-cart?token=${cart.recovery_token}`;
-      const html = getEmail1Html(cart as AbandonedCart, recoveryUrl, siteUrl);
-      
-      const sent = await sendEmail(
-        cart.email,
-        "Your armor is waiting | Line of Judah",
-        html,
-        resendApiKey
-      );
-
-      if (sent) {
-        await supabase
-          .from('abandoned_carts')
-          .update({ 
-            email_1_sent_at: now.toISOString(),
-            status: 'email_1_sent'
-          })
-          .eq('id', cart.id);
-        results.email1Sent++;
-      } else {
-        results.errors++;
-      }
+      const r = await processCart(deps, cart as AbandonedCart, 1, 'Your armor is waiting | Line of Judah', (url) => ({
+        html: getEmail1Html(cart as AbandonedCart, url, siteUrl),
+      }));
+      tally(r, 1);
     }
 
-    // Fetch carts eligible for Email 2 (24 hours after creation, email 1 sent)
+    // Email 2 — 24h after capture
     const email2Threshold = new Date(now.getTime() - EMAIL_2_DELAY_HOURS * 60 * 60 * 1000);
     const { data: email2Carts } = await supabase
       .from('abandoned_carts')
@@ -491,33 +607,14 @@ Deno.serve(async (req) => {
       .eq('status', 'email_1_sent')
       .is('email_2_sent_at', null)
       .lt('created_at', email2Threshold.toISOString());
-
     for (const cart of email2Carts || []) {
-      const recoveryUrl = `${siteUrl}/recover-cart?token=${cart.recovery_token}`;
-      const html = getEmail2Html(cart as AbandonedCart, recoveryUrl, siteUrl);
-      
-      const sent = await sendEmail(
-        cart.email,
-        "The mission continues | Line of Judah",
-        html,
-        resendApiKey
-      );
-
-      if (sent) {
-        await supabase
-          .from('abandoned_carts')
-          .update({ 
-            email_2_sent_at: now.toISOString(),
-            status: 'email_2_sent'
-          })
-          .eq('id', cart.id);
-        results.email2Sent++;
-      } else {
-        results.errors++;
-      }
+      const r = await processCart(deps, cart as AbandonedCart, 2, 'The mission continues | Line of Judah', (url) => ({
+        html: getEmail2Html(cart as AbandonedCart, url, siteUrl),
+      }));
+      tally(r, 2);
     }
 
-    // Fetch carts eligible for Email 3 (72 hours after creation, email 2 sent)
+    // Email 3 — 72h after capture, with 15% discount
     const email3Threshold = new Date(now.getTime() - EMAIL_3_DELAY_HOURS * 60 * 60 * 1000);
     const { data: email3Carts } = await supabase
       .from('abandoned_carts')
@@ -525,55 +622,31 @@ Deno.serve(async (req) => {
       .eq('status', 'email_2_sent')
       .is('email_3_sent_at', null)
       .lt('created_at', email3Threshold.toISOString());
-
     for (const cart of email3Carts || []) {
-      // Generate discount code for this cart
       const discountCode = generateDiscountCode();
-      
-      const recoveryUrl = `${siteUrl}/recover-cart?token=${cart.recovery_token}`;
-      const html = getEmail3Html(cart as AbandonedCart, recoveryUrl, discountCode, siteUrl);
-      
-      const sent = await sendEmail(
-        cart.email,
-        "15% reinforcement—your final call | Line of Judah",
-        html,
-        resendApiKey
-      );
-
-      if (sent) {
-        await supabase
-          .from('abandoned_carts')
-          .update({ 
-            email_3_sent_at: now.toISOString(),
-            status: 'email_3_sent',
-            discount_code: discountCode
-          })
-          .eq('id', cart.id);
-        results.email3Sent++;
-      } else {
-        results.errors++;
-      }
+      const r = await processCart(deps, cart as AbandonedCart, 3, '15% reinforcement—your final call | Line of Judah', (url) => ({
+        html: getEmail3Html(cart as AbandonedCart, url, discountCode, siteUrl),
+        discountCode,
+      }));
+      tally(r, 3);
     }
 
     return new Response(
-      JSON.stringify({ 
+      JSON.stringify({
         success: true,
         message: 'Abandoned cart processing complete',
         results,
-        note: resendApiKey ? 'Emails sent via Resend' : 'Emails stubbed (RESEND_API_KEY not configured)'
+        note: resendApiKey ? 'Emails sent via Resend' : 'Emails stubbed (RESEND_API_KEY not configured)',
       }),
-      { 
-        status: 200, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-      }
+      { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
     );
-
   } catch (error: unknown) {
     console.error('Error processing abandoned carts:', error);
     const errorMessage = error instanceof Error ? error.message : 'Internal server error';
-    return new Response(
-      JSON.stringify({ error: errorMessage }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+    return new Response(JSON.stringify({ error: errorMessage }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   }
 });
+
