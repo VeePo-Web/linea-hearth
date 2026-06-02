@@ -12,6 +12,8 @@ import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useCart } from "@/hooks/useCart";
 import { formatPrice } from "@/lib/currency";
+import { getColorHex } from "@/lib/cartUtils";
+import { useProductColors } from "@/hooks/useProductColors";
 
 interface ProductImage {
   image_url: string;
@@ -89,14 +91,19 @@ const ProductCard = ({ product, onQuickView, index = 0, onAuthRequired }: Produc
   // Check if product is new (created within last 14 days)
   const isNew = new Date(product.created_at) > new Date(Date.now() - 14 * 24 * 60 * 60 * 1000);
 
-  // Get unique colors
-  const uniqueColors = [
-    ...new Set(
-      (product.product_variants || [])
-        .map((v) => v.color)
-        .filter(Boolean) as string[]
-    ),
-  ];
+  // Persisted colors override variant-derived ones (admin-managed).
+  const { colors: persistedColors } = useProductColors(product.id);
+
+  // Build display swatches: persisted first, fall back to unique variant colors.
+  const colorSwatches: { name: string; hex: string; image: string | null }[] = persistedColors.length > 0
+    ? persistedColors.map((c) => ({ name: c.name, hex: c.hex, image: c.swatch_image_url }))
+    : [
+        ...new Set(
+          (product.product_variants || [])
+            .map((v) => v.color)
+            .filter(Boolean) as string[]
+        ),
+      ].map((name) => ({ name, hex: getColorHex(name), image: null }));
 
   // Determine badges
   const badges: { label: string; className: string }[] = [];
