@@ -22,6 +22,8 @@ import TextReveal from "@/components/motion/TextReveal";
 import FavoriteButton from "@/components/favorites/FavoriteButton";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { easing } from "@/lib/animations";
+import { useProductColors } from "@/hooks/useProductColors";
+import { getColorHex } from "@/lib/cartUtils";
 
 interface ProductVariant {
   id: string;
@@ -58,30 +60,16 @@ interface ProductInfoProps {
   onAddToBag?: (details: { size: string | null; color: string | null; quantity: number }) => void;
 }
 
-// Color code mapping
-const colorCodes: Record<string, string> = {
-  black: "#1a1a1a",
-  white: "#ffffff",
-  navy: "#1e3a5f",
-  gray: "#6b7280",
-  natural: "#f5f5dc",
-  gold: "#d4af37",
-  charcoal: "#36454f",
-  burgundy: "#800020",
-  forest: "#228b22",
-  cream: "#fffdd0",
-};
-
 const ProductInfo = ({ product, variants = [], onColorChange, onAuthRequired, onAddToBag }: ProductInfoProps) => {
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
   const prefersReducedMotion = useReducedMotion();
 
-  // Print-on-demand: never gate on stock. Surface every distinct
-  // size/color with effectively infinite availability so SizeSelector
-  // / ColorSwatchSelector never disable an option. Real scarcity copy
-  // is driven by <ScarcityBadge /> below.
+  // Load persisted colors for this product (admin-managed).
+  const { colors: productColors } = useProductColors(product?.id);
+
+  // Print-on-demand: never gate on stock.
   const sizes = useMemo(() => {
     const sizeSet = new Set<string>();
     variants.forEach((v) => {
@@ -95,18 +83,27 @@ const ProductInfo = ({ product, variants = [], onColorChange, onAuthRequired, on
       .sort((a, b) => sizeOrder.indexOf(a.size) - sizeOrder.indexOf(b.size));
   }, [variants, selectedColor]);
 
-  // Extract unique colors — all are available under POD.
+  // Colors: prefer admin-managed product_colors; fall back to variant-derived.
   const colors = useMemo(() => {
+    if (productColors.length > 0) {
+      return productColors.map((c) => ({
+        color: c.name.toLowerCase(),
+        colorCode: c.hex,
+        swatchImage: c.swatch_image_url || null,
+        available: true,
+      }));
+    }
     const colorSet = new Set<string>();
     variants.forEach((v) => {
       if (v.color) colorSet.add(v.color.toLowerCase());
     });
     return Array.from(colorSet).map((color) => ({
       color,
-      colorCode: colorCodes[color] || "#cccccc",
+      colorCode: getColorHex(color),
+      swatchImage: null as string | null,
       available: true,
     }));
-  }, [variants]);
+  }, [productColors, variants]);
 
   // Auto-select color when only one option exists
   useEffect(() => {

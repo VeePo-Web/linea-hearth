@@ -12,6 +12,8 @@ import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useCart } from "@/hooks/useCart";
 import { formatPrice } from "@/lib/currency";
+import { getColorHex } from "@/lib/cartUtils";
+import { useProductColors } from "@/hooks/useProductColors";
 
 interface ProductImage {
   image_url: string;
@@ -89,14 +91,19 @@ const ProductCard = ({ product, onQuickView, index = 0, onAuthRequired }: Produc
   // Check if product is new (created within last 14 days)
   const isNew = new Date(product.created_at) > new Date(Date.now() - 14 * 24 * 60 * 60 * 1000);
 
-  // Get unique colors
-  const uniqueColors = [
-    ...new Set(
-      (product.product_variants || [])
-        .map((v) => v.color)
-        .filter(Boolean) as string[]
-    ),
-  ];
+  // Persisted colors override variant-derived ones (admin-managed).
+  const { colors: persistedColors } = useProductColors(product.id);
+
+  // Build display swatches: persisted first, fall back to unique variant colors.
+  const colorSwatches: { name: string; hex: string; image: string | null }[] = persistedColors.length > 0
+    ? persistedColors.map((c) => ({ name: c.name, hex: c.hex, image: c.swatch_image_url }))
+    : [
+        ...new Set(
+          (product.product_variants || [])
+            .map((v) => v.color)
+            .filter(Boolean) as string[]
+        ),
+      ].map((name) => ({ name, hex: getColorHex(name), image: null }));
 
   // Determine badges
   const badges: { label: string; className: string }[] = [];
@@ -360,34 +367,23 @@ const ProductCard = ({ product, onQuickView, index = 0, onAuthRequired }: Produc
 
           {/* Color Swatches + Size Memory Hint */}
           <div className="flex items-center justify-between pt-1">
-            {uniqueColors.length > 1 && (
+            {colorSwatches.length > 1 && (
               <div className="flex items-center gap-1.5">
-                {uniqueColors.slice(0, 4).map((color) => (
+                {colorSwatches.slice(0, 4).map((c) => (
                   <span
-                    key={color}
-                    className="w-4 h-4 md:w-3.5 md:h-3.5 rounded-full border border-border"
-                    style={{
-                      backgroundColor:
-                        color.toLowerCase() === "black"
-                          ? "#1a1a1a"
-                          : color.toLowerCase() === "white"
-                          ? "#ffffff"
-                          : color.toLowerCase() === "navy"
-                          ? "#1e3a5f"
-                          : color.toLowerCase() === "gray" || color.toLowerCase() === "grey"
-                          ? "#6b7280"
-                          : color.toLowerCase() === "natural"
-                          ? "#f5f0e6"
-                          : color.toLowerCase() === "gold"
-                          ? "#d4af37"
-                          : color,
-                    }}
-                    title={color}
-                  />
+                    key={c.name}
+                    className="relative w-4 h-4 md:w-3.5 md:h-3.5 rounded-full border border-border overflow-hidden"
+                    style={{ backgroundColor: c.hex }}
+                    title={c.name}
+                  >
+                    {c.image && (
+                      <img src={c.image} alt="" className="w-full h-full object-cover" />
+                    )}
+                  </span>
                 ))}
-                {uniqueColors.length > 4 && (
+                {colorSwatches.length > 4 && (
                   <span className="text-[10px] text-muted-foreground">
-                    +{uniqueColors.length - 4}
+                    +{colorSwatches.length - 4}
                   </span>
                 )}
               </div>

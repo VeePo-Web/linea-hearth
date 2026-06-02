@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -16,7 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Plus, Trash2, Loader2, Wand2, X } from 'lucide-react';
+import { Plus, Trash2, Loader2, Wand2, X, Upload, Pencil, Check } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -30,8 +30,9 @@ import {
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { getColorHex } from '@/lib/cartUtils';
+import { useProductColors, ProductColor } from '@/hooks/useProductColors';
 
-// Inline stock editor component
+// Inline stock editor (unchanged)
 const InlineStockEdit = ({ variantId, value, onSave }: { variantId: string; value: number; onSave: (v: number) => void }) => {
   const [editing, setEditing] = useState(false);
   const [qty, setQty] = useState(value);
@@ -82,16 +83,12 @@ interface Variant {
   id: string;
   size: string | null;
   color: string | null;
+  color_id?: string | null;
   style: string | null;
   sku: string | null;
   stock_quantity: number;
   price_adjustment: number | null;
   product_id: string;
-}
-
-interface ColorEntry {
-  name: string;
-  hex: string;
 }
 
 interface VariantManagerProps {
@@ -103,9 +100,17 @@ const STANDARD_SIZES = ['S', 'M', 'L', 'XL', 'XXL'];
 
 const VariantManager = ({ productId, productSlug }: VariantManagerProps) => {
   const [variants, setVariants] = useState<Variant[]>([]);
-  const [colors, setColors] = useState<ColorEntry[]>([]);
+  const { colors, setColors, refetch: refetchColors } = useProductColors(productId);
   const [newColorName, setNewColorName] = useState('');
   const [newColorHex, setNewColorHex] = useState('#1a1a1a');
+  const [addingColor, setAddingColor] = useState(false);
+  const [editingColorId, setEditingColorId] = useState<string | null>(null);
+  const [editColorDraft, setEditColorDraft] = useState<{ name: string; hex: string }>({ name: '', hex: '#1a1a1a' });
+  const [uploadingSwatchId, setUploadingSwatchId] = useState<string | null>(null);
+  const [deleteColorId, setDeleteColorId] = useState<string | null>(null);
+  const swatchInputRef = useRef<HTMLInputElement>(null);
+  const [swatchUploadTarget, setSwatchUploadTarget] = useState<string | null>(null);
+
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
@@ -130,23 +135,7 @@ const VariantManager = ({ productId, productSlug }: VariantManagerProps) => {
         .order('created_at', { ascending: true });
 
       if (error) throw error;
-      const rows = data || [];
-      setVariants(rows);
-
-      // Derive color list from existing variants (preserve insertion order)
-      setColors((prev) => {
-        const seen = new Map<string, ColorEntry>();
-        prev.forEach((c) => seen.set(c.name.toLowerCase(), c));
-        rows.forEach((v) => {
-          if (v.color) {
-            const key = v.color.toLowerCase();
-            if (!seen.has(key)) {
-              seen.set(key, { name: v.color, hex: getColorHex(v.color) });
-            }
-          }
-        });
-        return Array.from(seen.values());
-      });
+      setVariants((data || []) as Variant[]);
     } catch {
       toast({ title: 'Error', description: 'Failed to load variants', variant: 'destructive' });
     } finally {
@@ -158,14 +147,12 @@ const VariantManager = ({ productId, productSlug }: VariantManagerProps) => {
     fetchVariants();
   }, [fetchVariants]);
 
-  const generateSku = (size: string, color: string) => {
-    const slugPart = productSlug.slice(0, 8).toUpperCase().replace(/-/g, '');
-    const sizePart = size.toUpperCase().slice(0, 3);
-    const colorPart = color ? `-${color.toUpperCase().slice(0, 3)}` : '';
-    return `${slugPart}-${sizePart}${colorPart}`;
-  };
-
-  const addColor = () => {
+  // ---- Colors CRUD ----
+  const addColor = async () => {
+    if (!productId) {
+      toast({ title: 'Save product first', variant: 'destructive' });
+      return;
+    }
     const name = newColorName.trim();
     if (!name) {
       toast({ title: 'Color name required', variant: 'destructive' });
@@ -175,13 +162,109 @@ const VariantManager = ({ productId, productSlug }: VariantManagerProps) => {
       toast({ title: 'Color already added' });
       return;
     }
-    setColors([...colors, { name, hex: newColorHex }]);
+    setAddingColor(true);
+    const { data, error } = await supabase
+      .from('product_colors' as never)
+      .insert({
+        product_id: productId,
+        name,
+        hex: newColorHex,
+        position: colors.length,
+      } as never)
+      .select()
+      .single();
+    setAddingColor(false);
+    if (error || !data) {
+      toast({ title: 'Error', description: 'Failed to add color', variant: 'destructive' });
+      return;
+    }
+    setColors([...colors, data as unknown as ProductColor]);
     setNewColorName('');
     setNewColorHex('#1a1a1a');
   };
 
-  const removeColor = (name: string) => {
-    setColors(colors.filter((c) => c.name.toLowerCase() !== name.toLowerCase()));
+  const startEditColor = (c: ProductColor) => {
+    setEditingColorId(c.id);
+    setEditColorDraft({ name: c.name, hex: c.hex });
+  };
+
+  const saveEditColor = async (id: string) => {
+    const name = editColorDraft.name.trim();
+    if (!name) return;
+    const { error } = await supabase
+      .from('product_colors' as never)
+      .update({ name, hex: editColorDraft.hex } as never)
+      .eq('id', id);
+    if (error) {
+      toast({ title: 'Error', description: 'Failed to update color', variant: 'destructive' });
+      return;
+    }
+    setColors(colors.map((c) => (c.id === id ? { ...c, name, hex: editColorDraft.hex } : c)));
+    setEditingColorId(null);
+  };
+
+  const removeColor = async (id: string) => {
+    const inUse = variants.filter((v) => v.color_id === id).length;
+    if (inUse > 0) {
+      // Null out color_id on those variants (keep legacy color text)
+      await supabase.from('product_variants').update({ color_id: null } as never).eq('color_id', id);
+    }
+    const { error } = await supabase.from('product_colors' as never).delete().eq('id', id);
+    if (error) {
+      toast({ title: 'Error', description: 'Failed to delete color', variant: 'destructive' });
+      return;
+    }
+    setColors(colors.filter((c) => c.id !== id));
+    fetchVariants();
+  };
+
+  const triggerSwatchUpload = (colorId: string) => {
+    setSwatchUploadTarget(colorId);
+    swatchInputRef.current?.click();
+  };
+
+  const handleSwatchFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file || !swatchUploadTarget) return;
+    const colorId = swatchUploadTarget;
+    setSwatchUploadTarget(null);
+    setUploadingSwatchId(colorId);
+    try {
+      const ext = file.name.split('.').pop() || 'jpg';
+      const path = `colors/${productId}/${colorId}-${Date.now()}.${ext}`;
+      const { error: upErr } = await supabase.storage.from('product-images').upload(path, file, { upsert: true });
+      if (upErr) throw upErr;
+      const { data: pub } = supabase.storage.from('product-images').getPublicUrl(path);
+      const url = pub.publicUrl;
+      const { error } = await supabase
+        .from('product_colors' as never)
+        .update({ swatch_image_url: url } as never)
+        .eq('id', colorId);
+      if (error) throw error;
+      setColors(colors.map((c) => (c.id === colorId ? { ...c, swatch_image_url: url } : c)));
+      toast({ title: 'Swatch image uploaded' });
+    } catch {
+      toast({ title: 'Error', description: 'Upload failed', variant: 'destructive' });
+    } finally {
+      setUploadingSwatchId(null);
+    }
+  };
+
+  // Suggest hex from known color names
+  useEffect(() => {
+    const known = getColorHex(newColorName.trim());
+    if (newColorName.trim() && known.startsWith('#')) {
+      setNewColorHex(known);
+    }
+  }, [newColorName]);
+
+  // ---- Variants ----
+  const generateSku = (size: string, color: string) => {
+    const slugPart = productSlug.slice(0, 8).toUpperCase().replace(/-/g, '');
+    const sizePart = size.toUpperCase().slice(0, 3);
+    const colorPart = color ? `-${color.toUpperCase().slice(0, 3)}` : '';
+    return `${slugPart}-${sizePart}${colorPart}`;
   };
 
   const addVariant = async () => {
@@ -198,22 +281,24 @@ const VariantManager = ({ productId, productSlug }: VariantManagerProps) => {
     setSaving(true);
     try {
       const sku = newVariant.sku || generateSku(newVariant.size, newVariant.color);
+      const colorRecord = colors.find((c) => c.name.toLowerCase() === newVariant.color.toLowerCase());
       const { data, error } = await supabase
         .from('product_variants')
         .insert({
           product_id: productId,
           size: newVariant.size || null,
           color: newVariant.color || null,
+          color_id: colorRecord?.id || null,
           style: newVariant.style || null,
           sku,
           stock_quantity: newVariant.stock_quantity,
           price_adjustment: newVariant.price_adjustment || null,
-        })
+        } as never)
         .select()
         .single();
 
       if (error) throw error;
-      setVariants((prev) => [...prev, data]);
+      setVariants((prev) => [...prev, data as Variant]);
       setNewVariant({ size: '', color: '', style: '', sku: '', stock_quantity: 0, price_adjustment: 0 });
       toast({ title: 'Variant added' });
     } catch {
@@ -225,11 +310,7 @@ const VariantManager = ({ productId, productSlug }: VariantManagerProps) => {
 
   const deleteVariant = async (id: string) => {
     try {
-      const { error } = await supabase
-        .from('product_variants')
-        .delete()
-        .eq('id', id);
-
+      const { error } = await supabase.from('product_variants').delete().eq('id', id);
       if (error) throw error;
       setVariants((prev) => prev.filter((v) => v.id !== id));
     } catch {
@@ -247,35 +328,21 @@ const VariantManager = ({ productId, productSlug }: VariantManagerProps) => {
       variants.map((v) => `${v.size || ''}::${(v.color || '').toLowerCase()}`)
     );
 
-    const rows: Array<{ product_id: string; size: string; color: string | null; sku: string; stock_quantity: number }> = [];
+    const rows: Array<{ product_id: string; size: string; color: string | null; color_id: string | null; sku: string; stock_quantity: number }> = [];
 
     if (colors.length === 0) {
-      // Size-only generation (legacy behavior)
       STANDARD_SIZES.forEach((size) => {
         const key = `${size}::`;
         if (!existing.has(key)) {
-          rows.push({
-            product_id: productId,
-            size,
-            color: null,
-            sku: generateSku(size, ''),
-            stock_quantity: 0,
-          });
+          rows.push({ product_id: productId, size, color: null, color_id: null, sku: generateSku(size, ''), stock_quantity: 0 });
         }
       });
     } else {
-      // Size × Color cross product
       STANDARD_SIZES.forEach((size) => {
         colors.forEach((c) => {
           const key = `${size}::${c.name.toLowerCase()}`;
           if (!existing.has(key)) {
-            rows.push({
-              product_id: productId,
-              size,
-              color: c.name,
-              sku: generateSku(size, c.name),
-              stock_quantity: 0,
-            });
+            rows.push({ product_id: productId, size, color: c.name, color_id: c.id, sku: generateSku(size, c.name), stock_quantity: 0 });
           }
         });
       });
@@ -288,13 +355,9 @@ const VariantManager = ({ productId, productSlug }: VariantManagerProps) => {
 
     setSaving(true);
     try {
-      const { data, error } = await supabase
-        .from('product_variants')
-        .insert(rows)
-        .select();
-
+      const { data, error } = await supabase.from('product_variants').insert(rows as never).select();
       if (error) throw error;
-      setVariants((prev) => [...prev, ...(data || [])]);
+      setVariants((prev) => [...prev, ...((data || []) as Variant[])]);
       toast({ title: `${rows.length} variant${rows.length === 1 ? '' : 's'} generated` });
     } catch {
       toast({ title: 'Error', description: 'Failed to generate variants', variant: 'destructive' });
@@ -302,6 +365,25 @@ const VariantManager = ({ productId, productSlug }: VariantManagerProps) => {
       setSaving(false);
     }
   };
+
+  // Stock rollup per color
+  const stockByColor = useMemo(() => {
+    const map = new Map<string, number>();
+    variants.forEach((v) => {
+      if (v.color_id) {
+        map.set(v.color_id, (map.get(v.color_id) || 0) + v.stock_quantity);
+      }
+    });
+    return map;
+  }, [variants]);
+
+  const variantCountByColor = useMemo(() => {
+    const map = new Map<string, number>();
+    variants.forEach((v) => {
+      if (v.color_id) map.set(v.color_id, (map.get(v.color_id) || 0) + 1);
+    });
+    return map;
+  }, [variants]);
 
   const generateLabel = useMemo(
     () => (colors.length === 0 ? 'Generate S–XXL' : `Generate Size × Color (${STANDARD_SIZES.length * colors.length})`),
@@ -318,71 +400,133 @@ const VariantManager = ({ productId, productSlug }: VariantManagerProps) => {
 
   return (
     <div className="space-y-6">
+      {/* Hidden file input for swatch uploads */}
+      <input
+        ref={swatchInputRef}
+        type="file"
+        accept="image/jpeg,image/png,image/webp"
+        onChange={handleSwatchFile}
+        className="hidden"
+      />
+
       {/* Colors panel */}
-      <div className="space-y-3 border border-border p-4">
+      <div className="space-y-4 border border-border p-4">
         <div className="flex items-center justify-between">
           <h3 className="text-xs uppercase tracking-wider text-muted-foreground font-medium">
             Colors ({colors.length})
           </h3>
+          <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
+            Stored per product
+          </span>
         </div>
 
         {colors.length > 0 && (
-          <div className="flex flex-wrap gap-2">
-            {colors.map((c) => (
-              <div
-                key={c.name}
-                className="flex items-center gap-2 border border-border pl-2 pr-1 py-1"
-              >
-                <span
-                  className="inline-block w-4 h-4 border border-border"
-                  style={{ backgroundColor: c.hex }}
-                  aria-hidden
-                />
-                <span className="text-xs">{c.name}</span>
-                <button
-                  type="button"
-                  onClick={() => removeColor(c.name)}
-                  className="h-5 w-5 inline-flex items-center justify-center hover:bg-secondary"
-                  aria-label={`Remove ${c.name}`}
-                >
-                  <X className="h-3 w-3" />
-                </button>
-              </div>
-            ))}
+          <div className="border border-border divide-y divide-border">
+            {colors.map((c) => {
+              const isEditing = editingColorId === c.id;
+              const stock = stockByColor.get(c.id) || 0;
+              const variantCount = variantCountByColor.get(c.id) || 0;
+              return (
+                <div key={c.id} className="flex items-center gap-3 p-2.5 bg-background">
+                  {/* Swatch (image or hex) */}
+                  <button
+                    type="button"
+                    onClick={() => triggerSwatchUpload(c.id)}
+                    className="relative w-10 h-10 border border-border shrink-0 overflow-hidden group/swatch"
+                    title="Upload swatch image"
+                    style={{ backgroundColor: c.hex }}
+                  >
+                    {c.swatch_image_url && (
+                      <img src={c.swatch_image_url} alt={c.name} className="w-full h-full object-cover" />
+                    )}
+                    {uploadingSwatchId === c.id ? (
+                      <span className="absolute inset-0 flex items-center justify-center bg-background/80">
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      </span>
+                    ) : (
+                      <span className="absolute inset-0 flex items-center justify-center bg-foreground/40 opacity-0 group-hover/swatch:opacity-100 transition-opacity">
+                        <Upload className="h-4 w-4 text-background" />
+                      </span>
+                    )}
+                  </button>
+
+                  {/* Name / hex */}
+                  {isEditing ? (
+                    <div className="flex items-center gap-2 flex-1">
+                      <Input
+                        value={editColorDraft.name}
+                        onChange={(e) => setEditColorDraft({ ...editColorDraft, name: e.target.value })}
+                        className="h-8 text-xs rounded-none flex-1"
+                      />
+                      <input
+                        type="color"
+                        value={editColorDraft.hex}
+                        onChange={(e) => setEditColorDraft({ ...editColorDraft, hex: e.target.value })}
+                        className="h-8 w-10 border border-border cursor-pointer bg-background"
+                      />
+                      <Button size="sm" variant="outline" className="h-8 rounded-none" onClick={() => saveEditColor(c.id)}>
+                        <Check className="h-3.5 w-3.5" />
+                      </Button>
+                      <Button size="sm" variant="ghost" className="h-8 rounded-none" onClick={() => setEditingColorId(null)}>
+                        <X className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-sm font-medium truncate">{c.name}</div>
+                        <div className="text-[10px] text-muted-foreground font-mono uppercase">{c.hex}</div>
+                      </div>
+                      <div className="text-[10px] uppercase tracking-wider text-muted-foreground hidden sm:block">
+                        {variantCount} variant{variantCount === 1 ? '' : 's'} · {stock} in stock
+                      </div>
+                      <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => startEditColor(c)}>
+                        <Pencil className="h-3.5 w-3.5" />
+                      </Button>
+                      <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => setDeleteColorId(c.id)}>
+                        <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                      </Button>
+                    </>
+                  )}
+                </div>
+              );
+            })}
           </div>
         )}
 
+        {/* Add new color row */}
         <div className="flex items-center gap-2">
           <Input
             value={newColorName}
             onChange={(e) => setNewColorName(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addColor(); } }}
-            placeholder="Color name (e.g. Black)"
-            className="h-8 text-xs rounded-none flex-1"
+            placeholder="Color name (e.g. Black, Olive, Forest)"
+            className="h-9 text-xs rounded-none flex-1"
           />
           <input
             type="color"
             value={newColorHex}
             onChange={(e) => setNewColorHex(e.target.value)}
-            className="h-8 w-12 border border-border cursor-pointer bg-background"
+            className="h-9 w-12 border border-border cursor-pointer bg-background"
             aria-label="Pick color"
           />
           <Button
             variant="outline"
             size="sm"
             onClick={addColor}
-            className="h-8 rounded-none"
+            disabled={addingColor}
+            className="h-9 rounded-none"
           >
-            <Plus className="h-3.5 w-3.5 mr-1" />
+            {addingColor ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" /> : <Plus className="h-3.5 w-3.5 mr-1" />}
             Add Color
           </Button>
         </div>
         <p className="text-xs text-muted-foreground">
-          Colors are used when generating variants and as quick-pick options below.
+          Typing a known color (Black, Navy, Olive…) auto-fills the hex. Click a swatch to upload a custom image (heathers, prints).
         </p>
       </div>
 
-      {/* Variants */}
+      {/* Variants header */}
       <div className="flex items-center justify-between">
         <h3 className="text-xs uppercase tracking-wider text-muted-foreground font-medium">
           Variants ({variants.length})
@@ -413,9 +557,12 @@ const VariantManager = ({ productId, productSlug }: VariantManagerProps) => {
             </TableHeader>
             <TableBody>
               {variants.map((v) => {
-                const swatch = v.color
-                  ? colors.find((c) => c.name.toLowerCase() === v.color!.toLowerCase())?.hex || getColorHex(v.color)
-                  : null;
+                const colorRecord = v.color_id
+                  ? colors.find((c) => c.id === v.color_id)
+                  : v.color
+                    ? colors.find((c) => c.name.toLowerCase() === v.color!.toLowerCase())
+                    : null;
+                const swatch = colorRecord?.hex || (v.color ? getColorHex(v.color) : null);
                 return (
                   <TableRow key={v.id}>
                     <TableCell className="font-medium">{v.size || '—'}</TableCell>
@@ -423,11 +570,18 @@ const VariantManager = ({ productId, productSlug }: VariantManagerProps) => {
                       {v.color ? (
                         <span className="inline-flex items-center gap-2">
                           <span
-                            className="inline-block w-3 h-3 border border-border"
+                            className="inline-block w-3 h-3 border border-border overflow-hidden"
                             style={{ backgroundColor: swatch || '#ccc' }}
                             aria-hidden
-                          />
+                          >
+                            {colorRecord?.swatch_image_url && (
+                              <img src={colorRecord.swatch_image_url} alt="" className="w-full h-full object-cover" />
+                            )}
+                          </span>
                           {v.color}
+                          {!v.color_id && colorRecord && (
+                            <span className="text-[9px] uppercase text-muted-foreground">(unlinked)</span>
+                          )}
                         </span>
                       ) : '—'}
                     </TableCell>
@@ -479,7 +633,7 @@ const VariantManager = ({ productId, productSlug }: VariantManagerProps) => {
                       <SelectContent>
                         <SelectItem value="__none__">— None —</SelectItem>
                         {colors.map((c) => (
-                          <SelectItem key={c.name} value={c.name}>
+                          <SelectItem key={c.id} value={c.name}>
                             <span className="inline-flex items-center gap-2">
                               <span
                                 className="inline-block w-3 h-3 border border-border"
@@ -567,6 +721,30 @@ const VariantManager = ({ productId, productSlug }: VariantManagerProps) => {
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => { if (deleteConfirmId) deleteVariant(deleteConfirmId); setDeleteConfirmId(null); }}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={!!deleteColorId} onOpenChange={() => setDeleteColorId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Color</AlertDialogTitle>
+            <AlertDialogDescription>
+              {(() => {
+                const c = colors.find((x) => x.id === deleteColorId);
+                const inUse = c ? variants.filter((v) => v.color_id === c.id).length : 0;
+                return `Delete "${c?.name}"? ${inUse > 0 ? `${inUse} variant${inUse === 1 ? '' : 's'} will be unlinked (but kept).` : 'No variants reference this color.'}`;
+              })()}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => { if (deleteColorId) removeColor(deleteColorId); setDeleteColorId(null); }}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               Delete
