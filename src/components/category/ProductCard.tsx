@@ -367,34 +367,23 @@ const ProductCard = ({ product, onQuickView, index = 0, onAuthRequired }: Produc
 
           {/* Color Swatches + Size Memory Hint */}
           <div className="flex items-center justify-between pt-1">
-            {uniqueColors.length > 1 && (
+            {colorSwatches.length > 1 && (
               <div className="flex items-center gap-1.5">
-                {uniqueColors.slice(0, 4).map((color) => (
+                {colorSwatches.slice(0, 4).map((c) => (
                   <span
-                    key={color}
-                    className="w-4 h-4 md:w-3.5 md:h-3.5 rounded-full border border-border"
-                    style={{
-                      backgroundColor:
-                        color.toLowerCase() === "black"
-                          ? "#1a1a1a"
-                          : color.toLowerCase() === "white"
-                          ? "#ffffff"
-                          : color.toLowerCase() === "navy"
-                          ? "#1e3a5f"
-                          : color.toLowerCase() === "gray" || color.toLowerCase() === "grey"
-                          ? "#6b7280"
-                          : color.toLowerCase() === "natural"
-                          ? "#f5f0e6"
-                          : color.toLowerCase() === "gold"
-                          ? "#d4af37"
-                          : color,
-                    }}
-                    title={color}
-                  />
+                    key={c.name}
+                    className="relative w-4 h-4 md:w-3.5 md:h-3.5 rounded-full border border-border overflow-hidden"
+                    style={{ backgroundColor: c.hex }}
+                    title={c.name}
+                  >
+                    {c.image && (
+                      <img src={c.image} alt="" className="w-full h-full object-cover" />
+                    )}
+                  </span>
                 ))}
-                {uniqueColors.length > 4 && (
+                {colorSwatches.length > 4 && (
                   <span className="text-[10px] text-muted-foreground">
-                    +{uniqueColors.length - 4}
+                    +{colorSwatches.length - 4}
                   </span>
                 )}
               </div>
