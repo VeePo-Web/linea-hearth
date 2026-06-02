@@ -1012,6 +1012,79 @@ export type Database = {
           },
         ]
       }
+      product_color_images: {
+        Row: {
+          color_id: string
+          created_at: string
+          id: string
+          image_url: string
+          position: number
+        }
+        Insert: {
+          color_id: string
+          created_at?: string
+          id?: string
+          image_url: string
+          position?: number
+        }
+        Update: {
+          color_id?: string
+          created_at?: string
+          id?: string
+          image_url?: string
+          position?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_color_images_color_id_fkey"
+            columns: ["color_id"]
+            isOneToOne: false
+            referencedRelation: "product_colors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      product_colors: {
+        Row: {
+          created_at: string
+          hex: string
+          id: string
+          name: string
+          position: number
+          product_id: string
+          swatch_image_url: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          hex?: string
+          id?: string
+          name: string
+          position?: number
+          product_id: string
+          swatch_image_url?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          hex?: string
+          id?: string
+          name?: string
+          position?: number
+          product_id?: string
+          swatch_image_url?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_colors_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       product_images: {
         Row: {
           alt_text: string | null
@@ -1094,6 +1167,7 @@ export type Database = {
       product_variants: {
         Row: {
           color: string | null
+          color_id: string | null
           created_at: string
           id: string
           price_adjustment: number | null
@@ -1106,6 +1180,7 @@ export type Database = {
         }
         Insert: {
           color?: string | null
+          color_id?: string | null
           created_at?: string
           id?: string
           price_adjustment?: number | null
@@ -1118,6 +1193,7 @@ export type Database = {
         }
         Update: {
           color?: string | null
+          color_id?: string | null
           created_at?: string
           id?: string
           price_adjustment?: number | null
@@ -1129,6 +1205,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "product_variants_color_id_fkey"
+            columns: ["color_id"]
+            isOneToOne: false
+            referencedRelation: "product_colors"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "product_variants_product_id_fkey"
             columns: ["product_id"]
