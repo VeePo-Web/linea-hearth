@@ -70,8 +70,11 @@ export function findNearestSize(preferredSize: string, availableSizes: string[])
 
 /**
  * Maps a color name to its CSS hex value for consistent rendering.
+ * Pass `overrides` (e.g. from product_colors) to take precedence over the static fallbacks.
  */
-export function getColorHex(color: string): string {
+export function getColorHex(color: string, overrides?: Record<string, string>): string {
+  const key = color.toLowerCase();
+  if (overrides && overrides[key]) return overrides[key];
   const colorMap: Record<string, string> = {
     black: '#1a1a1a',
     white: '#ffffff',
@@ -86,7 +89,7 @@ export function getColorHex(color: string): string {
     burgundy: '#800020',
     charcoal: '#36454f',
     heather: '#b6b6b4',
+    forest: '#228b22',
   };
-  
-  return colorMap[color.toLowerCase()] || color;
+  return colorMap[key] || color;
 }
