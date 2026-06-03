@@ -267,7 +267,7 @@ function getEmail1Html(cart: AbandonedCart, recoveryUrl: string, siteUrl: string
   `;
 }
 
-export function getEmail2Html(cart: AbandonedCart, recoveryUrl: string, siteUrl: string): string {
+function getEmail2Html(cart: AbandonedCart, recoveryUrl: string, siteUrl: string): string {
   return `
     <!DOCTYPE html>
     <html lang="en">
