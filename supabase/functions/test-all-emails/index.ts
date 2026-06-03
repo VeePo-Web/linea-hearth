@@ -321,6 +321,8 @@ Deno.serve(async (req) => {
     } catch (e) {
       results.push({ template: t.name, ok: false, error: (e as Error).message });
     }
+    // Throttle to stay under Resend's 5 req/s limit
+    await new Promise((res) => setTimeout(res, 300));
   }
 
   const sent = results.filter((r) => r.ok).length;
