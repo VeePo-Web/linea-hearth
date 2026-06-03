@@ -286,7 +286,10 @@ function UploadForm(props: {
 }) {
   const s = props.state as any;
   const isSubmitting = props.state.kind === "submitting";
-  const progress = isSubmitting ? (props.state as any).progress : 0;
+  const currentStep: SubmitStep | null = isSubmitting ? (props.state as any).step : null;
+  const progressPct = currentStep
+    ? Math.round(((STEP_ORDER.indexOf(currentStep) + 1) / STEP_ORDER.length) * 100)
+    : 0;
 
   return (
     <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease: EASE }}>
