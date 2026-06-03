@@ -133,7 +133,8 @@ function getEmailFooter(siteUrl: string): string {
           <tr>
             <td align="center" style="padding-top:24px;">
               <p style="margin:0 0 4px;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;color:#FFFFFF;text-transform:uppercase;">LINE OF JUDAH</p>
-              <p style="margin:0;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;font-size:13px;color:#78716C;">For those who walk different.</p>
+              <p style="margin:0 0 8px;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;font-size:13px;color:#78716C;">For those who walk different.</p>
+              <p style="margin:0;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;font-size:13px;color:#A8A29E;font-style:italic;">— Parker &amp; the Line of Judah team</p>
             </td>
           </tr>
           <tr>
