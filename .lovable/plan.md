@@ -1,26 +1,28 @@
-## Overview
-Replace the minimal upload progress (subtle white bar inside button) and plain red error text on `/worn-in-the-wild/upload` with a clear, step-based progress indicator and polished Alert-styled messages.
+## Finding
 
-## What will change
+The site is published and public, but the live catalogue is not empty because of publishing anymore. The live page is failing its product request with:
 
-### 1. Upload progress indicator
-- Add a visible 3-step progress tracker above the submit button during upload.
-- Steps: **Preparing photo...** (resize + EXIF strip) → **Uploading...** (POST to edge function) → **Finishing up...** (server response + discount generation).
-- Each step shows a checkmark when complete, a spinner when active, and a muted dot when pending.
-- Uses Framer Motion for smooth transitions between step states.
-- Styled with the existing Forest Green (`#4CAF50`) accent, sharp edges, and editorial typography.
+`permission denied for function has_role`
 
-### 2. Error messages
-- Replace the current plain red `<p>` with the project's `Alert` component (`destructive` variant).
-- Add a `CircleAlert` Lucide icon, a bold title, and the error description.
-- Sharp edges via `rounded-none` override to match the editorial design system.
-- Keep error placement just above the submit button.
+That makes the product query return `401`, so the UI falls back to “NOTHING YET”. The database still has 18 active products.
 
-### 3. Success confirmation
-- Keep the existing reward code reveal as the final state.
-- Add a brief "Submitted" success Alert before the reward block transitions in.
+## Plan
 
-### File changes
-- `src/pages/WornInTheWildUpload.tsx` — add `ProgressSteps` inline component, wire into `UploadForm`, replace error display with `Alert`.
+1. **Update database permissions**
+   - Grant public/authenticated execution permission on the existing `has_role` database function.
+   - This function is already used inside public product/category/image policies to let active products be visible while still allowing admin access.
 
-No backend, routing, or edge function changes needed.
+2. **Re-test the live catalogue**
+   - Reload `https://lineofjudah.clothing/catalogue`.
+   - Confirm the product request returns `200` instead of `401`.
+   - Confirm the 18 active products appear.
+
+## Technical detail
+
+No frontend code change is needed. This is a backend permission migration only:
+
+```sql
+GRANT EXECUTE ON FUNCTION public.has_role(uuid, app_role) TO anon;
+GRANT EXECUTE ON FUNCTION public.has_role(uuid, app_role) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.has_role(uuid, app_role) TO service_role;
+```
