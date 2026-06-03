@@ -164,7 +164,7 @@ function getEmailFooter(siteUrl: string): string {
 }
 
 // Email templates using premium editorial tone - Line of Judah brand voice
-function getEmail1Html(cart: AbandonedCart, recoveryUrl: string, siteUrl: string): string {
+export function getEmail1Html(cart: AbandonedCart, recoveryUrl: string, siteUrl: string): string {
   const itemsHtml = cart.cart_items.map(item => `
     <tr>
       <td style="padding:16px 0;border-bottom:1px solid #E7E5E4;">
