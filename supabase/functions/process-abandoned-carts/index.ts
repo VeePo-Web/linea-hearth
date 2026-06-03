@@ -133,7 +133,8 @@ function getEmailFooter(siteUrl: string): string {
           <tr>
             <td align="center" style="padding-top:24px;">
               <p style="margin:0 0 4px;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;color:#FFFFFF;text-transform:uppercase;">LINE OF JUDAH</p>
-              <p style="margin:0;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;font-size:13px;color:#78716C;">For those who walk different.</p>
+              <p style="margin:0 0 8px;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;font-size:13px;color:#78716C;">For those who walk different.</p>
+              <p style="margin:0;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;font-size:13px;color:#A8A29E;font-style:italic;">— Parker &amp; the Line of Judah team</p>
             </td>
           </tr>
           <tr>
@@ -198,8 +199,8 @@ function getEmail1Html(cart: AbandonedCart, recoveryUrl: string, siteUrl: string
               <!-- Header -->
               <tr>
                 <td style="padding:32px 40px 24px;text-align:center;border-bottom:1px solid #E7E5E4;">
-                  <p style="margin:0 0 8px;font-size:12px;font-weight:700;letter-spacing:2px;color:#1C1917;text-transform:uppercase;">LINE OF JUDAH</p>
-                  <div style="width:40px;height:2px;background:#F59E0B;margin:0 auto;"></div>
+                  <table cellpadding="0" cellspacing="0" border="0" style="margin:0 auto 8px;"><tr><td style="vertical-align:middle;padding-right:8px;line-height:0;"><img src="https://lineofjudah.clothing/favicon-180.png" width="20" height="20" alt="" style="display:block;border:0;border-radius:3px;" /></td><td style="vertical-align:middle;"><p style="margin:0;font-size:12px;font-weight:700;letter-spacing:2px;color:#1C1917;text-transform:uppercase;">LINE OF JUDAH</p></td></tr></table>
+                  <div style="width:60px;height:1px;background:#C5C7CA;margin:0 auto;opacity:0.7;"></div>
                 </td>
               </tr>
               
@@ -207,10 +208,10 @@ function getEmail1Html(cart: AbandonedCart, recoveryUrl: string, siteUrl: string
               <tr>
                 <td style="padding:48px 40px 32px;text-align:center;">
                   <h1 style="margin:0 0 16px;font-size:28px;font-weight:300;letter-spacing:0.02em;color:#1C1917;">
-                    YOUR ARMOR IS WAITING
+                    Did the page time out?
                   </h1>
                   <p style="margin:0;font-size:15px;line-height:1.6;color:#57534E;">
-                    You started something. Your selection is on standby—<br/>armor ready, mission waiting.
+                    No pressure — your selection is saved.<br/>Pick up where you left off when you're ready.
                   </p>
                 </td>
               </tr>
@@ -286,8 +287,8 @@ function getEmail2Html(cart: AbandonedCart, recoveryUrl: string, siteUrl: string
               <!-- Header -->
               <tr>
                 <td style="padding:32px 40px 24px;text-align:center;border-bottom:1px solid #E7E5E4;">
-                  <p style="margin:0 0 8px;font-size:12px;font-weight:700;letter-spacing:2px;color:#1C1917;text-transform:uppercase;">LINE OF JUDAH</p>
-                  <div style="width:40px;height:2px;background:#F59E0B;margin:0 auto;"></div>
+                  <table cellpadding="0" cellspacing="0" border="0" style="margin:0 auto 8px;"><tr><td style="vertical-align:middle;padding-right:8px;line-height:0;"><img src="https://lineofjudah.clothing/favicon-180.png" width="20" height="20" alt="" style="display:block;border:0;border-radius:3px;" /></td><td style="vertical-align:middle;"><p style="margin:0;font-size:12px;font-weight:700;letter-spacing:2px;color:#1C1917;text-transform:uppercase;">LINE OF JUDAH</p></td></tr></table>
+                  <div style="width:60px;height:1px;background:#C5C7CA;margin:0 auto;opacity:0.7;"></div>
                 </td>
               </tr>
               
@@ -295,10 +296,10 @@ function getEmail2Html(cart: AbandonedCart, recoveryUrl: string, siteUrl: string
               <tr>
                 <td style="padding:48px 40px 24px;text-align:center;">
                   <h1 style="margin:0 0 16px;font-size:28px;font-weight:300;letter-spacing:0.02em;color:#1C1917;">
-                    THE MISSION CONTINUES
+                    Still thinking it over?
                   </h1>
                   <p style="margin:0;font-size:15px;line-height:1.6;color:#57534E;">
-                    You came close. Your armor is still waiting—but not forever.<br/>Every piece is a declaration. Don't leave it behind.
+                    Sixty-seven others picked up theirs this week.<br/>Yours is still here, exactly as you left it.
                   </p>
                 </td>
               </tr>
@@ -373,22 +374,22 @@ function getEmail3Html(cart: AbandonedCart, recoveryUrl: string, discountCode: s
               <!-- Header -->
               <tr>
                 <td style="padding:32px 40px 24px;text-align:center;border-bottom:1px solid #E7E5E4;">
-                  <p style="margin:0 0 8px;font-size:12px;font-weight:700;letter-spacing:2px;color:#1C1917;text-transform:uppercase;">LINE OF JUDAH</p>
-                  <div style="width:40px;height:2px;background:#F59E0B;margin:0 auto;"></div>
+                  <table cellpadding="0" cellspacing="0" border="0" style="margin:0 auto 8px;"><tr><td style="vertical-align:middle;padding-right:8px;line-height:0;"><img src="https://lineofjudah.clothing/favicon-180.png" width="20" height="20" alt="" style="display:block;border:0;border-radius:3px;" /></td><td style="vertical-align:middle;"><p style="margin:0;font-size:12px;font-weight:700;letter-spacing:2px;color:#1C1917;text-transform:uppercase;">LINE OF JUDAH</p></td></tr></table>
+                  <div style="width:60px;height:1px;background:#C5C7CA;margin:0 auto;opacity:0.7;"></div>
                 </td>
               </tr>
               
               <!-- Hero -->
               <tr>
                 <td style="padding:48px 40px 24px;text-align:center;">
-                  <p style="margin:0 0 12px;font-size:11px;font-weight:600;letter-spacing:0.2em;color:#F59E0B;text-transform:uppercase;">
-                    FINAL CALL
+                  <p style="margin:0 0 12px;font-size:11px;font-weight:600;letter-spacing:0.2em;color:#4CAF50;text-transform:uppercase;">
+                    On us, this once
                   </p>
                   <h1 style="margin:0 0 16px;font-size:28px;font-weight:300;letter-spacing:0.02em;color:#1C1917;">
-                    REINFORCEMENT INCOMING
+                    Take 15% off.
                   </h1>
                   <p style="margin:0;font-size:15px;line-height:1.6;color:#57534E;">
-                    This is it. We're giving you 15% off to finish<br/>what you started. After this, the next move is yours.
+                    No tricks, no timer games. We'd just love to see you wear it.<br/>Here's a thank-you in advance.
                   </p>
                 </td>
               </tr>

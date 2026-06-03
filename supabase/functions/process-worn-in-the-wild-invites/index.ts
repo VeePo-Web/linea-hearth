@@ -44,27 +44,37 @@ function renderEmail(opts: {
 <title>Worn in the wild</title></head>
 <body style="margin:0;padding:0;background:#ffffff;font-family:Georgia,'Times New Roman',serif;color:#111111;">
   <div style="max-width:580px;margin:0 auto;background:#ffffff;">
+
+    <!-- Brand header with favicon -->
+    <div style="padding:28px 28px 0;text-align:center;">
+      <table cellpadding="0" cellspacing="0" border="0" style="margin:0 auto;"><tr>
+        <td style="vertical-align:middle;padding-right:10px;line-height:0;">
+          <img src="https://lineofjudah.clothing/favicon-180.png" width="22" height="22" alt="" style="display:block;border:0;border-radius:4px;" />
+        </td>
+        <td style="vertical-align:middle;">
+          <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:13px;font-weight:700;letter-spacing:3px;color:#111111;text-transform:uppercase;">LINE OF JUDAH</p>
+        </td>
+      </tr></table>
+      <div style="width:60px;height:1px;background:#C5C7CA;margin:14px auto 0;opacity:0.7;"></div>
+    </div>
+
     ${hero}
     <div style="padding:40px 28px 28px;">
-      <h1 style="font-family:Georgia,serif;font-size:32px;font-weight:400;line-height:1.1;margin:0 0 12px;color:#111111;letter-spacing:-0.01em;">Worn in the wild.</h1>
-      <div style="width:40%;height:1px;background:#9ca3af;opacity:0.6;margin:0 0 28px;"></div>
+      <h1 style="font-family:Georgia,serif;font-size:32px;font-weight:400;line-height:1.1;margin:0 0 12px;color:#111111;letter-spacing:-0.01em;">We'd love to see it on you.</h1>
+      <div style="width:40%;height:1px;background:#C5C7CA;opacity:0.7;margin:0 0 28px;"></div>
 
       <p style="font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.65;color:#1a1a1a;margin:0 0 16px;">${greet}</p>
 
       <p style="font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.65;color:#1a1a1a;margin:0 0 16px;">
-        It's been five days since your <strong>${opts.productName}</strong> arrived.
+        Your <strong>${opts.productName}</strong> arrived a few days ago. By now you've worn it somewhere — and we'd love to see where.
       </p>
 
       <p style="font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.65;color:#1a1a1a;margin:0 0 16px;">
-        By now you've worn it. To the gym. To church. To the street. Somewhere it became part of you.
-      </p>
-
-      <p style="font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.65;color:#1a1a1a;margin:0 0 28px;">
-        We're building an archive of how this armor lives in the real world — not on models, not in studios, on the people it was made for.
+        We're building an archive of how this armor actually lives. Not models. Not studios. The people it was made for.
       </p>
 
       <p style="font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.65;color:#1a1a1a;margin:0 0 32px;">
-        If you have a photo, send it. One tap below.
+        If you have a photo, we'd be honored to include it. One tap below — that's it.
       </p>
 
       <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="width:100%;margin:0 0 28px;">
@@ -78,6 +88,8 @@ function renderEmail(opts: {
       </p>
 
       <div style="border-top:1px solid #e5e7eb;padding-top:24px;text-align:center;">
+        <p style="font-family:Georgia,serif;font-style:italic;font-size:13px;color:#57534E;margin:0 0 12px;">Thank you for being part of this.</p>
+        <p style="font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#9ca3af;margin:0 0 16px;font-style:italic;">— Parker &amp; the Line of Judah team</p>
         <p style="font-family:Georgia,serif;font-style:italic;font-size:12px;color:#9ca3af;margin:0;letter-spacing:0.04em;">for glory and for beauty</p>
         <p style="font-family:Arial,Helvetica,sans-serif;font-size:10px;color:#9ca3af;margin:8px 0 0;letter-spacing:0.05em;">— Exodus 28:2</p>
       </div>

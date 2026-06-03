@@ -141,7 +141,7 @@ function buildOrderConfirmationHtml(order: Order, items: OrderItem[], siteUrl: s
   
   <!-- Preheader -->
   <div style="display:none;max-height:0;overflow:hidden;mso-hide:all;">
-    Your armor is on the way. Order #${orderNumber} confirmed. Welcome to the tribe.
+    Your armor is on the way. Order #${orderNumber} confirmed. Welcome in — you're one of us now.
   </div>
   
   <!-- Email Container -->
@@ -150,13 +150,20 @@ function buildOrderConfirmationHtml(order: Order, items: OrderItem[], siteUrl: s
       <td align="center" style="padding:40px 20px;">
         
         <!-- Content Card -->
-        <table width="600" cellpadding="0" cellspacing="0" style="background-color:#FFFFFF;max-width:600px;border-radius:8px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.05);">
+        <table width="600" cellpadding="0" cellspacing="0" style="background-color:#FFFFFF;max-width:600px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.05);">
           
-          <!-- Logo Header -->
+          <!-- Logo Header with Favicon -->
           <tr>
             <td align="center" style="padding:48px 40px 32px;">
-              <p style="margin:0;font-size:14px;font-weight:700;letter-spacing:3px;color:#1C1917;text-transform:uppercase;">LINE OF JUDAH</p>
-              <div style="width:60px;height:2px;background:#F59E0B;margin:16px auto 0;"></div>
+              <table cellpadding="0" cellspacing="0" border="0" style="margin:0 auto;"><tr>
+                <td style="vertical-align:middle;padding-right:10px;line-height:0;">
+                  <img src="https://lineofjudah.clothing/favicon-180.png" width="22" height="22" alt="" style="display:block;border:0;border-radius:4px;" />
+                </td>
+                <td style="vertical-align:middle;">
+                  <p style="margin:0;font-size:14px;font-weight:700;letter-spacing:3px;color:#1C1917;text-transform:uppercase;">LINE OF JUDAH</p>
+                </td>
+              </tr></table>
+              <div style="width:60px;height:1px;background:#C5C7CA;margin:14px auto 0;opacity:0.7;"></div>
             </td>
           </tr>
           
@@ -172,8 +179,9 @@ function buildOrderConfirmationHtml(order: Order, items: OrderItem[], siteUrl: s
           <tr>
             <td style="padding:0 40px 40px;">
               <p style="margin:0 0 16px;font-size:16px;line-height:1.6;color:#1C1917;">Hey ${firstName},</p>
-              <p style="margin:0 0 16px;font-size:16px;line-height:1.6;color:#44403C;">You didn't just place an order—you made a declaration. Every thread you wear is a statement. Every stitch is a stand.</p>
-              <p style="margin:0;font-size:16px;line-height:1.6;color:#44403C;font-weight:600;">Welcome to the tribe.</p>
+              <p style="margin:0 0 16px;font-size:16px;line-height:1.6;color:#44403C;">You didn't just place an order — you made a declaration. Every thread you wear is a statement. Every stitch is a stand.</p>
+              <p style="margin:0 0 16px;font-size:16px;line-height:1.6;color:#44403C;font-weight:600;">Welcome in. You're one of us now.</p>
+              <p style="margin:0;font-size:15px;line-height:1.6;color:#57534E;">Your purchase keeps independent craft alive. From the bottom of our hearts — thank you.</p>
             </td>
           </tr>
           
@@ -205,7 +213,7 @@ function buildOrderConfirmationHtml(order: Order, items: OrderItem[], siteUrl: s
                 ` : ""}
                 <tr>
                   <td style="padding:8px 0;font-size:15px;color:#44403C;">Shipping</td>
-                  <td align="right" style="padding:8px 0;font-size:15px;${isFreeShipping ? "color:#F59E0B;font-weight:600;" : "color:#1C1917;"}">${isFreeShipping ? "FREE" : formatCurrency(order.shipping_cents, order.currency)}</td>
+                  <td align="right" style="padding:8px 0;font-size:15px;${isFreeShipping ? "color:#4CAF50;font-weight:600;" : "color:#1C1917;"}">${isFreeShipping ? "FREE" : formatCurrency(order.shipping_cents, order.currency)}</td>
                 </tr>
                 <tr>
                   <td colspan="2" style="padding:12px 0 0;">
@@ -262,7 +270,8 @@ function buildOrderConfirmationHtml(order: Order, items: OrderItem[], siteUrl: s
                 <tr>
                   <td align="center" style="padding-top:24px;">
                     <p style="margin:0 0 4px;font-size:12px;font-weight:700;letter-spacing:2px;color:#FFFFFF;text-transform:uppercase;">LINE OF JUDAH</p>
-                    <p style="margin:0;font-size:13px;color:#78716C;">For those who walk different.</p>
+                    <p style="margin:0 0 8px;font-size:13px;color:#78716C;">For those who walk different.</p>
+                    <p style="margin:0;font-size:13px;color:#A8A29E;font-style:italic;">— Parker &amp; the Line of Judah team</p>
                   </td>
                 </tr>
                 <tr>
