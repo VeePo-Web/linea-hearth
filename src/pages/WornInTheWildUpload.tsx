@@ -1,8 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { Helmet } from "react-helmet-async";
+import { Check, Loader2, CircleAlert } from "lucide-react";
+
+type SubmitStep = "prepare" | "upload" | "finalize";
 
 type State =
   | { kind: "loading" }
@@ -10,8 +13,15 @@ type State =
   | { kind: "expired" }
   | { kind: "already" }
   | { kind: "ready"; firstName: string | null; productName: string | null; productImage: string | null }
-  | { kind: "submitting"; progress: number }
+  | { kind: "submitting"; step: SubmitStep; firstName: string | null; productName: string | null; productImage: string | null }
   | { kind: "done"; rewardCode: string; rewardPercent: number };
+
+const STEP_ORDER: SubmitStep[] = ["prepare", "upload", "finalize"];
+const STEP_LABELS: Record<SubmitStep, string> = {
+  prepare: "Preparing photo",
+  upload: "Uploading",
+  finalize: "Finishing up",
+};
 
 const EASE = [0.25, 0.46, 0.45, 0.94] as const;
 const MAX_BYTES = 10 * 1024 * 1024;
