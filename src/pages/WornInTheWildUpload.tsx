@@ -385,9 +385,77 @@ function UploadForm(props: {
         </span>
       </label>
 
-      {props.error && (
-        <p className="text-xs text-red-700 mb-4 font-medium">{props.error}</p>
-      )}
+      <AnimatePresence>
+        {props.error && (
+          <motion.div
+            initial={{ opacity: 0, y: -6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.3, ease: EASE }}
+            role="alert"
+            aria-live="assertive"
+            className="mb-6 border border-red-300 bg-red-50/70 p-4 flex items-start gap-3"
+          >
+            <CircleAlert className="h-4 w-4 text-red-700 mt-0.5 shrink-0" />
+            <div>
+              <p className="text-[10px] uppercase tracking-[0.2em] text-red-700 font-medium mb-1">
+                Upload failed
+              </p>
+              <p className="text-xs text-red-800 leading-relaxed">{props.error}</p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Progress steps */}
+      <AnimatePresence>
+        {isSubmitting && currentStep && (
+          <motion.div
+            initial={{ opacity: 0, y: -6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3, ease: EASE }}
+            className="mb-6 border border-[#4CAF50]/40 bg-[#4CAF50]/5 p-4"
+            role="status"
+            aria-live="polite"
+          >
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-[10px] uppercase tracking-[0.2em] text-neutral-700 font-medium">
+                Sending your photo
+              </p>
+              <p className="text-[10px] tabular-nums text-neutral-500">{progressPct}%</p>
+            </div>
+            <div className="h-px bg-neutral-200 mb-4 overflow-hidden">
+              <motion.div
+                className="h-full bg-[#4CAF50]"
+                initial={false}
+                animate={{ width: `${progressPct}%` }}
+                transition={{ duration: 0.4, ease: EASE }}
+              />
+            </div>
+            <ul className="space-y-2">
+              {STEP_ORDER.map((step) => {
+                const idx = STEP_ORDER.indexOf(step);
+                const currentIdx = STEP_ORDER.indexOf(currentStep);
+                const status = idx < currentIdx ? "done" : idx === currentIdx ? "active" : "pending";
+                return (
+                  <li key={step} className="flex items-center gap-3 text-xs">
+                    <span className="w-4 h-4 flex items-center justify-center shrink-0">
+                      {status === "done" && <Check className="h-3.5 w-3.5 text-[#4CAF50]" />}
+                      {status === "active" && <Loader2 className="h-3.5 w-3.5 text-[#4CAF50] animate-spin" />}
+                      {status === "pending" && <span className="h-1.5 w-1.5 rounded-full bg-neutral-300" />}
+                    </span>
+                    <span className={status === "pending" ? "text-neutral-400" : "text-neutral-800"}>
+                      {STEP_LABELS[step]}
+                      {status === "active" && "…"}
+                    </span>
+                  </li>
+                );
+              })}
+            </ul>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Submit */}
       <button
@@ -397,13 +465,10 @@ function UploadForm(props: {
         className="w-full bg-[#4CAF50] text-white text-xs uppercase tracking-[0.2em] font-medium py-4 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#449e48] transition-colors relative overflow-hidden"
       >
         {isSubmitting ? (
-          <>
-            <span className="relative z-10">Sending…</span>
-            <span
-              className="absolute inset-y-0 left-0 bg-white/15 transition-all duration-300"
-              style={{ width: `${progress}%` }}
-            />
-          </>
+          <span className="inline-flex items-center justify-center gap-2">
+            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            Sending…
+          </span>
         ) : (
           "Submit"
         )}
