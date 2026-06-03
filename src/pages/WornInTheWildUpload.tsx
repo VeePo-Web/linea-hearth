@@ -131,10 +131,16 @@ export default function WornInTheWildUpload() {
 
   const onSubmit = async () => {
     if (!file || !token || !consent) return;
-    setState({ kind: "submitting", progress: 0 });
+    const ctx = {
+      firstName: (state as any).firstName ?? null,
+      productName: (state as any).productName ?? null,
+      productImage: (state as any).productImage ?? null,
+    };
+    setError(null);
+    setState({ kind: "submitting", step: "prepare", ...ctx });
     try {
       const stripped = await resizeAndStrip(file);
-      setState({ kind: "submitting", progress: 40 });
+      setState({ kind: "submitting", step: "upload", ...ctx });
 
       const form = new FormData();
       form.append("token", token);
@@ -149,28 +155,18 @@ export default function WornInTheWildUpload() {
         headers: { apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY },
         body: form,
       });
-      setState({ kind: "submitting", progress: 90 });
+      setState({ kind: "submitting", step: "finalize", ...ctx });
       const json = await res.json();
       if (!res.ok || !json.ok) {
-        setError(json.error || "Something went wrong. Try again.");
-        setState({
-          kind: "ready",
-          firstName: (state as any).firstName ?? null,
-          productName: (state as any).productName ?? null,
-          productImage: (state as any).productImage ?? null,
-        });
+        setError(friendlyError(json.error));
+        setState({ kind: "ready", ...ctx });
         return;
       }
       setState({ kind: "done", rewardCode: json.rewardCode, rewardPercent: json.rewardPercent });
     } catch (e) {
       console.error(e);
-      setError("Upload failed. Try again.");
-      setState({
-        kind: "ready",
-        firstName: (state as any).firstName ?? null,
-        productName: (state as any).productName ?? null,
-        productImage: (state as any).productImage ?? null,
-      });
+      setError("Upload failed. Please check your connection and try again.");
+      setState({ kind: "ready", ...ctx });
     }
   };
 
