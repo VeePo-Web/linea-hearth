@@ -348,7 +348,7 @@ const MobileMenu = ({
                     <Instagram size={18} strokeWidth={1.5} />
                   </a>
                   <a
-                    href="mailto:hello@lineofjudah.com"
+                    href="mailto:1.lineofjudah.1@gmail.com"
                     className="p-2 text-muted-foreground hover:text-foreground transition-colors"
                     aria-label="Email"
                   >

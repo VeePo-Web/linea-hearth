@@ -158,7 +158,7 @@ const Accessibility = () => {
   }, []);
 
   const handleContactClick = () => {
-    window.location.href = 'mailto:accessibility@lineofjudah.com?subject=Accessibility%20Inquiry';
+    window.location.href = 'mailto:1.lineofjudah.1@gmail.com?subject=Accessibility%20Inquiry';
   };
 
   return (
@@ -307,8 +307,7 @@ const Accessibility = () => {
         onSubmit={handleContactClick}
         footerText="Or contact us directly:"
         footerLinks={[
-          { text: "accessibility@lineofjudah.com", href: "mailto:accessibility@lineofjudah.com?subject=Accessibility%20Inquiry", isExternal: true },
-          { text: "+1 (212) 555-0123", href: "tel:+12125550123", isExternal: true }
+          { text: "1.lineofjudah.1@gmail.com", href: "mailto:1.lineofjudah.1@gmail.com?subject=Accessibility%20Inquiry", isExternal: true }
         ]}
       />
     </ServicePageLayout>

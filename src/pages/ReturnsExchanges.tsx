@@ -202,7 +202,7 @@ const ReturnsExchanges = () => {
         footerText="Questions?"
         footerLinks={[
           { text: "Check our FAQ", href: "/faq" },
-          { text: "returns@lineofjudah.com", href: "mailto:returns@lineofjudah.com", isExternal: true },
+          { text: "1.lineofjudah.1@gmail.com", href: "mailto:1.lineofjudah.1@gmail.com", isExternal: true },
         ]}
       />
     </ServicePageLayout>

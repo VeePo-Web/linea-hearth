@@ -16,7 +16,7 @@ const shippingFAQs = [
   },
   {
     question: "Can I change my shipping address after ordering?",
-    answer: "If your order hasn't entered production yet, contact our support team immediately at orders@lineofjudah.com. Once production has started, we cannot modify the delivery address."
+    answer: "If your order hasn't entered production yet, contact our support team immediately at 1.lineofjudah.1@gmail.com. Once production has started, we cannot modify the delivery address."
   },
   {
     question: "What if my package is lost or damaged?",

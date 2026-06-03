@@ -21,9 +21,9 @@ export const BRAND = {
   // CONTACT INFORMATION
   // ═══════════════════════════════════════════════════════════
   email: {
-    support: "hello@lineofjudah.com",
-    legal: "legal@lineofjudah.com",
-    press: "press@lineofjudah.com",
+    support: "1.lineofjudah.1@gmail.com",
+    legal: "1.lineofjudah.1@gmail.com",
+    press: "1.lineofjudah.1@gmail.com",
   },
   
   // ═══════════════════════════════════════════════════════════

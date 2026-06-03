@@ -140,10 +140,10 @@ const LegalSidebar = ({ tocSections }: LegalSidebarProps) => {
           Our team is here for you.
         </p>
         <a 
-          href="mailto:hello@lineofjudah.com"
+          href="mailto:1.lineofjudah.1@gmail.com"
           className="text-sm text-champagne-600 hover:text-champagne-700 transition-colors"
         >
-          hello@lineofjudah.com
+          1.lineofjudah.1@gmail.com
         </a>
       </div>
     </nav>

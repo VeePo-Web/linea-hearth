@@ -207,7 +207,7 @@ const ShippingInfo = () => {
         onSubmit={handleTrackOrder}
         footerText="Or contact"
         footerLinks={[
-          { text: "orders@lineofjudah.com", href: "mailto:orders@lineofjudah.com", isExternal: true }
+          { text: "1.lineofjudah.1@gmail.com", href: "mailto:1.lineofjudah.1@gmail.com", isExternal: true }
         ]}
       />
     </ServicePageLayout>

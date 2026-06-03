@@ -328,7 +328,7 @@ const FAQ = () => {
           onSubmit={() => setIsAskModalOpen(true)}
           footerText="Or reach us at"
           footerLinks={[
-            { text: "intel@lineofjudah.com", href: "mailto:hello@lineofjudah.com", isExternal: true }
+            { text: "1.lineofjudah.1@gmail.com", href: "mailto:1.lineofjudah.1@gmail.com", isExternal: true }
           ]}
           className="mt-16"
         />

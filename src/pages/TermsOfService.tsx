@@ -168,7 +168,7 @@ const TermsOfService = () => {
           If you have any questions about these Terms of Service, please contact us at:
         </p>
         <div className="mt-4 space-y-1">
-          <p className="text-foreground">Email: legal@lineofjudah.com</p>
+          <p className="text-foreground">Email: 1.lineofjudah.1@gmail.com</p>
           <p className="text-foreground">Website: lineofjudah.com</p>
         </div>
       </LegalSection>

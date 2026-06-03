@@ -88,7 +88,7 @@ const SizeGuide = () => {
   }, []);
 
   const handleContact = () => {
-    window.location.href = "mailto:support@lineofjudah.com?subject=Size%20Fit%20Help";
+    window.location.href = "mailto:1.lineofjudah.1@gmail.com?subject=Size%20Fit%20Help";
   };
 
   return (

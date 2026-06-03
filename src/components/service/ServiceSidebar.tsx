@@ -77,18 +77,11 @@ const ServiceSidebar = () => {
         </p>
         <div className="space-y-2">
           <a 
-            href="mailto:hello@lineofjudah.com"
+            href="mailto:1.lineofjudah.1@gmail.com"
             className="flex items-center gap-2 text-sm text-champagne-600 hover:text-champagne-700 transition-colors"
           >
             <Mail className="w-4 h-4" strokeWidth={1.5} />
-            Email Us
-          </a>
-          <a 
-            href="tel:+12125550123"
-            className="flex items-center gap-2 text-sm text-champagne-600 hover:text-champagne-700 transition-colors"
-          >
-            <Phone className="w-4 h-4" strokeWidth={1.5} />
-            +1 (212) 555-0123
+            1.lineofjudah.1@gmail.com
           </a>
         </div>
       </div>
