@@ -1,3 +1,4 @@
+import { CartThumb } from "@/components/cart/CartThumb";
 import { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { toast as sonnerToast } from 'sonner';
@@ -57,12 +58,7 @@ const AddedToCartToast = ({
     >
       {/* Product Thumbnail */}
       <div className="w-12 h-16 bg-muted/30 overflow-hidden flex-shrink-0">
-        <img
-          src={productImage}
-          alt=""
-          className="w-full h-full object-cover"
-          loading="eager"
-        />
+        <CartThumb src={productImage} alt="" loading="eager" />
       </div>
 
       {/* Product Info */}

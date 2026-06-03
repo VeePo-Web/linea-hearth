@@ -1,3 +1,4 @@
+import { CartThumb } from "@/components/cart/CartThumb";
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Loader2, ChevronDown } from "lucide-react";
@@ -193,11 +194,7 @@ const MissingProductCard = ({
     >
       {/* Thumbnail */}
       <div className="relative w-10 h-10 flex-shrink-0 rounded-none overflow-hidden bg-muted">
-        <img 
-          src={product.imageUrl || '/placeholder.svg'} 
-          alt={product.name}
-          className="w-full h-full object-cover"
-        />
+        <CartThumb src={product.imageUrl} alt={product.name} />
         {isLowStock && (
           <div className="absolute bottom-0 left-0 right-0 bg-champagne-500/90 text-[8px] text-white text-center py-0.5 font-medium">
             Low Stock

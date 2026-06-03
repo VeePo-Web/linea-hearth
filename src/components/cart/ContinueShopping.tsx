@@ -1,3 +1,4 @@
+import { CartThumb } from "@/components/cart/CartThumb";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Clock, Plus, Check } from "lucide-react";
@@ -38,11 +39,7 @@ const MiniProductCard = ({ product, onAdd }: MiniProductCardProps) => {
         onClick={closeCart}
       >
         <div className="w-14 h-14 bg-muted overflow-hidden">
-          <img 
-            src={product.image_url} 
-            alt={product.name}
-            className="w-full h-full object-cover"
-          />
+          <CartThumb src={product.image_url} alt={product.name} />
         </div>
       </Link>
       

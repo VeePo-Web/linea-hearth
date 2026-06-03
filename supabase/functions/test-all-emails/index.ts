@@ -1,6 +1,8 @@
 // Test endpoint: sends every email template to parker@veepo.ca for inbox QA.
 // Templates duplicated verbatim from production senders so output matches what customers receive.
 // READ-ONLY relative to production code — does not import or modify any other function.
+import { resolveImageUrl } from "../_shared/imageUrl.ts";
+
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -51,9 +53,7 @@ function buildOrderConfirmationHtml(order: any, items: any[], siteUrl: string): 
     <tr><td style="padding:16px 0;border-bottom:1px solid #E7E5E4;">
       <table width="100%" cellpadding="0" cellspacing="0"><tr>
         <td width="80" valign="top">
-          ${item.product_image_url
-            ? `<img src="${item.product_image_url}" alt="${item.product_name}" width="80" height="100" style="display:block;object-fit:cover;border-radius:4px;background:#F5F5F4;" />`
-            : `<div style="width:80px;height:100px;background:#F5F5F4;border-radius:4px;"></div>`}
+          <img src="${resolveImageUrl(item.product_image_url)}" alt="${item.product_name}" width="80" height="100" style="display:block;object-fit:cover;border-radius:4px;background:#F5F5F4;" />
         </td>
         <td style="padding-left:16px;vertical-align:top;">
           <p style="margin:0 0 4px;font-size:16px;font-weight:600;color:#1C1917;">${item.product_name}</p>
@@ -162,7 +162,7 @@ function getEmailFooter(siteUrl: string): string {
 function getEmail1Html(cart: any, recoveryUrl: string, siteUrl: string): string {
   const itemsHtml = cart.cart_items.map((item: any) => `
     <tr>
-      <td style="padding:16px 0;border-bottom:1px solid #E7E5E4;"><img src="${item.image}" alt="${item.name}" width="80" height="100" style="display:block;width:80px;height:100px;object-fit:cover;border-radius:4px;" /></td>
+      <td style="padding:16px 0;border-bottom:1px solid #E7E5E4;"><img src="${resolveImageUrl(item.image)}" alt="${item.name}" width="80" height="100" style="display:block;width:80px;height:100px;object-fit:cover;border-radius:4px;" /></td>
       <td style="padding:16px;border-bottom:1px solid #E7E5E4;vertical-align:top;"><p style="margin:0 0 4px;font-size:14px;font-weight:500;color:#1C1917;">${item.name}</p><p style="margin:0;font-size:12px;color:#78716C;">Size: ${item.size || 'One Size'}${item.color ? ` · ${item.color}` : ''}</p></td>
       <td style="padding:16px 0;border-bottom:1px solid #E7E5E4;text-align:right;vertical-align:top;"><p style="margin:0;font-size:14px;font-weight:500;color:#1C1917;">${item.priceFormatted}</p></td>
     </tr>`).join('');
@@ -218,7 +218,7 @@ function buildReviewEmail(order: any, siteUrl: string): { subject: string; html:
   const reviewUrl = `${siteUrl}/community?review=1`;
   const itemsHtml = order.order_items.slice(0, 3).map((it: any) => `
     <tr>
-      <td style="padding:12px 0;border-bottom:1px solid #E7E5E4;width:80px;">${it.product_image_url ? `<img src="${it.product_image_url}" alt="${it.product_name}" width="80" height="100" style="display:block;width:80px;height:100px;object-fit:cover;" />` : ''}</td>
+      <td style="padding:12px 0;border-bottom:1px solid #E7E5E4;width:80px;"><img src="${resolveImageUrl(it.product_image_url)}" alt="${it.product_name}" width="80" height="100" style="display:block;width:80px;height:100px;object-fit:cover;" /></td>
       <td style="padding:12px 16px;border-bottom:1px solid #E7E5E4;vertical-align:middle;"><p style="margin:0;font-size:14px;font-weight:500;color:#1C1917;">${it.product_name}</p></td>
       <td style="padding:12px 0;border-bottom:1px solid #E7E5E4;text-align:right;vertical-align:middle;"><a href="${reviewUrl}" style="font-size:12px;color:#4CAF50;text-decoration:none;letter-spacing:1px;text-transform:uppercase;">Review →</a></td>
     </tr>`).join('');

@@ -1,6 +1,7 @@
 // deno-lint-ignore-file no-explicit-any
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { create as createJwt, getNumericDate } from "https://deno.land/x/djwt@v3.0.2/mod.ts";
+import { resolveImageUrl } from "../_shared/imageUrl.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -34,9 +35,7 @@ function renderEmail(opts: {
   uploadUrl: string;
 }): string {
   const greet = opts.firstName ? `${opts.firstName},` : "";
-  const hero = opts.heroImage
-    ? `<img src="${opts.heroImage}" alt="${opts.productName}" style="width:100%;display:block;" />`
-    : "";
+  const hero = `<img src="${resolveImageUrl(opts.heroImage)}" alt="${opts.productName}" style="width:100%;display:block;" />`;
 
   return `<!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8"/>

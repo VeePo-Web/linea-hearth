@@ -1,4 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { resolveImageUrl } from "../_shared/imageUrl.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -169,7 +170,7 @@ function getEmail1Html(cart: AbandonedCart, recoveryUrl: string, siteUrl: string
   const itemsHtml = cart.cart_items.map(item => `
     <tr>
       <td style="padding:16px 0;border-bottom:1px solid #E7E5E4;">
-        <img src="${item.image}" alt="${item.name}" width="80" height="100" style="display:block;width:80px;height:100px;object-fit:cover;border-radius:4px;" />
+        <img src="${resolveImageUrl(item.image)}" alt="${item.name}" width="80" height="100" style="display:block;width:80px;height:100px;object-fit:cover;border-radius:4px;" />
       </td>
       <td style="padding:16px;border-bottom:1px solid #E7E5E4;vertical-align:top;">
         <p style="margin:0 0 4px;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;font-size:14px;font-weight:500;color:#1C1917;">${item.name}</p>

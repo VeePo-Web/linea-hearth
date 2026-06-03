@@ -1,3 +1,4 @@
+import { CartThumb } from "@/components/cart/CartThumb";
 import { Minus, Plus, X, Bookmark } from "lucide-react";
 import { useCart, CartItem as CartItemType } from "@/hooks/useCart";
 import { useSavedForLater } from "@/hooks/useSavedForLater";
@@ -97,12 +98,7 @@ const CartItem = ({ item }: CartItemProps) => {
       )}>
         {/* Thumbnail */}
         <div className="relative w-20 h-24 bg-muted/20 overflow-hidden flex-shrink-0">
-          <img
-            src={item.image}
-            alt={item.name}
-            className="w-full h-full object-cover"
-            loading="lazy"
-          />
+          <CartThumb src={item.image} alt={item.name} loading="lazy" />
           {/* Color swatch overlay if color exists */}
           {item.color && (
             <div 

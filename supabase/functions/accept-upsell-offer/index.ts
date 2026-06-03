@@ -3,6 +3,7 @@
 // Creates a child order linked to the parent.
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { createStripeClient, type StripeEnv } from "../_shared/stripe.ts";
+import { resolveImageUrl } from "../_shared/imageUrl.ts";
 import { verifyUpsellToken, sha256Hex } from "../_shared/upsell-token.ts";
 
 const corsHeaders = {
@@ -159,7 +160,7 @@ Deno.serve(async (req) => {
       product_id: offer.product_id,
       variant_id: offer.variant_id,
       product_name: (product as any)?.name ?? "Upsell item",
-      product_image_url: (img as any)?.image_url ?? null,
+      product_image_url: resolveImageUrl((img as any)?.image_url),
       variant_size: variantSize,
       variant_color: variantColor,
       unit_price_cents: offer.unit_amount_cents,

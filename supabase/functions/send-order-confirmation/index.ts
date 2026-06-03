@@ -1,4 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { resolveImageUrl } from "../_shared/imageUrl.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -109,10 +110,7 @@ function buildOrderConfirmationHtml(order: Order, items: OrderItem[], siteUrl: s
         <table width="100%" cellpadding="0" cellspacing="0">
           <tr>
             <td width="80" valign="top">
-              ${item.product_image_url 
-                ? `<img src="${item.product_image_url}" alt="${item.product_name}" width="80" height="100" style="display:block;object-fit:cover;border-radius:4px;background:#F5F5F4;" />`
-                : `<div style="width:80px;height:100px;background:#F5F5F4;border-radius:4px;"></div>`
-              }
+              <img src="${resolveImageUrl(item.product_image_url)}" alt="${item.product_name}" width="80" height="100" style="display:block;object-fit:cover;border-radius:4px;background:#F5F5F4;" />
             </td>
             <td style="padding-left:16px;vertical-align:top;">
               <p style="margin:0 0 4px;font-size:16px;font-weight:600;color:#1C1917;">${item.product_name}</p>
