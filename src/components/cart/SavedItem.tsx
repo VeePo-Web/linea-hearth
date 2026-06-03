@@ -46,7 +46,7 @@ const SavedItem = ({ item, onMoveToCart, onRemove }: SavedItemProps) => {
         to={`/product/${item.product.slug}`}
         className="relative w-14 h-18 bg-muted/20 overflow-hidden flex-shrink-0 group"
       >
-        <img
+        <CartThumb
           src={item.product.image_url}
           alt={item.product.name}
           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"

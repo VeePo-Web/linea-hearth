@@ -32,10 +32,9 @@ const ThresholdUpsellCard = ({
       <div className="flex-shrink-0 w-24 flex flex-col items-center">
         {/* Compact image */}
         <div className="w-20 h-20 bg-muted/30 overflow-hidden relative mb-2">
-          <img
-            src={primaryImage?.image_url || '/placeholder.svg'}
+          <CartThumb
+            src={primaryImage?.image_url}
             alt={product.name}
-            className="w-full h-full object-cover"
             loading="lazy"
           />
           
@@ -139,10 +138,9 @@ const ThresholdUpsellCard = ({
     <div className="flex gap-3 items-center">
       {/* Product image */}
       <div className="w-16 h-16 bg-muted/30 overflow-hidden flex-shrink-0 relative">
-        <img
-          src={primaryImage?.image_url || '/placeholder.svg'}
+        <CartThumb
+          src={primaryImage?.image_url}
           alt={product.name}
-          className="w-full h-full object-cover"
           loading="lazy"
         />
         
