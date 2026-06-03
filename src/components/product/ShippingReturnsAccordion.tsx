@@ -65,7 +65,7 @@ const ShippingReturnsAccordion = () => {
               </li>
             </ul>
             <p className="text-xs font-light text-muted-foreground pt-2">
-              Need help? Contact us at support@lineofjudah.com
+              Need help? Contact us at 1.lineofjudah.1@gmail.com
             </p>
           </AccordionContent>
         </AccordionItem>

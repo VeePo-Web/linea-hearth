@@ -141,10 +141,10 @@ const AskUsModal = ({ isOpen, onClose }: AskUsModalProps) => {
         <div className="text-center text-sm text-muted-foreground font-light">
           or email us directly at{" "}
           <a 
-            href="mailto:hello@lineofjudah.com" 
+            href="mailto:1.lineofjudah.1@gmail.com" 
             className="text-champagne-600 hover:underline inline-flex items-center min-h-[44px] px-1"
           >
-            hello@lineofjudah.com
+            1.lineofjudah.1@gmail.com
           </a>
         </div>
       </div>

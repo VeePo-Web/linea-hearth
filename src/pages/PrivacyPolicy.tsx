@@ -108,7 +108,7 @@ const PrivacyPolicy = () => {
           <li><strong>Withdrawal</strong> — Withdraw consent where applicable</li>
         </ul>
         <p className="mt-4">
-          To exercise any of these rights, please contact us at privacy@lineofjudah.com.
+          To exercise any of these rights, please contact us at 1.lineofjudah.1@gmail.com.
         </p>
       </LegalSection>
 
@@ -144,9 +144,7 @@ const PrivacyPolicy = () => {
           please contact us at:
         </p>
         <div className="mt-4 space-y-1">
-          <p className="text-foreground">Email: privacy@lineofjudah.com</p>
-          <p className="text-foreground">Phone: +1 (212) 555-0123</p>
-          <p className="text-foreground">Address: 123 Madison Avenue, New York, NY 10016</p>
+          <p className="text-foreground">Email: 1.lineofjudah.1@gmail.com</p>
         </div>
       </LegalSection>
     </LegalPageLayout>

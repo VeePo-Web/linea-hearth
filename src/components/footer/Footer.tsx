@@ -23,8 +23,8 @@ const Footer = () => {
             <div className="space-y-2 text-sm font-light text-white/70">
               <div>
                 <p className="font-normal text-white mb-1">Contact Us</p>
-                <a href="mailto:hello@lineofjudah.com" className="hover:text-white transition-colors touch-target-sm inline-flex items-center">
-                  hello@lineofjudah.com
+                <a href="mailto:1.lineofjudah.1@gmail.com" className="hover:text-white transition-colors touch-target-sm inline-flex items-center">
+                  1.lineofjudah.1@gmail.com
                 </a>
               </div>
               {/* Social Links - Larger touch targets */}

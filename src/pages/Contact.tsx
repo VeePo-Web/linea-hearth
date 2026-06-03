@@ -1,4 +1,4 @@
-import { Clock, Calendar, Zap, MessageCircle, Mail, Phone, MessageSquare, Instagram, ExternalLink, Package, Ruler, RotateCcw, HelpCircle } from "lucide-react";
+import { Clock, Calendar, Zap, MessageCircle, Mail, MessageSquare, Instagram, ExternalLink, Package, Ruler, RotateCcw, HelpCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import ServicePageLayout from "@/components/service/ServicePageLayout";
 import ServiceSection from "@/components/service/ServiceSection";
@@ -25,18 +25,8 @@ const contactChannels = [
     icon: Mail,
     iconColor: "emerald" as const,
     action: {
-      label: "hello@lineofjudah.com",
-      href: "mailto:hello@lineofjudah.com",
-    },
-  },
-  {
-    title: "PHONE",
-    description: "Speak directly with our team. Best for urgent order issues or complex questions.",
-    icon: Phone,
-    iconColor: "blue" as const,
-    action: {
-      label: "+1 (212) 555-0123",
-      href: "tel:+12125550123",
+      label: "1.lineofjudah.1@gmail.com",
+      href: "mailto:1.lineofjudah.1@gmail.com",
     },
   },
   {
@@ -65,27 +55,27 @@ const contactChannels = [
 const priorityHotlines = [
   {
     subject: "Order Status",
-    email: "orders@lineofjudah.com",
+    email: "1.lineofjudah.1@gmail.com",
     response: "4-8 hours",
   },
   {
     subject: "Returns & Exchanges",
-    email: "returns@lineofjudah.com",
+    email: "1.lineofjudah.1@gmail.com",
     response: "24 hours",
   },
   {
     subject: "Size & Fit Help",
-    email: "fit@lineofjudah.com",
+    email: "1.lineofjudah.1@gmail.com",
     response: "12 hours",
   },
   {
     subject: "Accessibility",
-    email: "accessibility@lineofjudah.com",
+    email: "1.lineofjudah.1@gmail.com",
     response: "24 hours",
   },
   {
     subject: "Partnership / Press",
-    email: "press@lineofjudah.com",
+    email: "1.lineofjudah.1@gmail.com",
     response: "48-72 hours",
   },
 ];
@@ -131,7 +121,7 @@ const quickFAQs = [
   {
     id: "sizing",
     question: "How do I find my size?",
-    answer: "Check our Size Guide for detailed measurements on every product. Each item includes model info (height, size worn). For personalized recommendations, use our AI Fit Finder in the Try-On Room or email fit@lineofjudah.com.",
+    answer: "Check our Size Guide for detailed measurements on every product. Each item includes model info (height, size worn). For personalized recommendations, use our AI Fit Finder in the Try-On Room or email 1.lineofjudah.1@gmail.com.",
   },
   {
     id: "tracking",
@@ -365,11 +355,11 @@ const Contact = () => {
       <div className="mt-16">
         <ActionCTA
           title="Need Immediate Assistance?"
-          subtitle="For time-sensitive order issues, call our hotline directly."
-          buttonText="Call Now"
+          subtitle="For time-sensitive order issues, email us directly."
+          buttonText="Email Us"
           alignment="center"
           footerLinks={[
-            { text: "+1 (212) 555-0123", href: "tel:+12125550123" },
+            { text: "1.lineofjudah.1@gmail.com", href: "mailto:1.lineofjudah.1@gmail.com" },
             { text: "Mon-Sat 9am-6pm ET", href: "#hours" },
           ]}
         />
