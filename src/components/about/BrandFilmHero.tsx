@@ -1,5 +1,5 @@
 import { motion, useInView } from 'framer-motion';
-import { useRef, useState, useEffect } from 'react';
+import { useRef } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import CharacterReveal from '@/components/motion/CharacterReveal';
@@ -8,33 +8,7 @@ const BrandFilmHero = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
   const isInView = useInView(sectionRef, { once: true, amount: 0.3 });
   const prefersReducedMotion = useReducedMotion();
-  
-  // Counter animation
-  const [counts, setCounts] = useState({ believers: 0, cities: 0, countries: 0 });
-  const [hasAnimated, setHasAnimated] = useState(false);
 
-  useEffect(() => {
-    if (isInView && !hasAnimated) {
-      setHasAnimated(true);
-      const targets = { believers: 10, cities: 45, countries: 5 };
-      const duration = 2000;
-      const steps = 60;
-      let step = 0;
-
-      const timer = setInterval(() => {
-        step++;
-        const progress = step / steps;
-        setCounts({
-          believers: Math.min(Math.floor(targets.believers * progress), targets.believers),
-          cities: Math.min(Math.floor(targets.cities * progress), targets.cities),
-          countries: Math.min(Math.floor(targets.countries * progress), targets.countries),
-        });
-        if (step >= steps) clearInterval(timer);
-      }, duration / steps);
-
-      return () => clearInterval(timer);
-    }
-  }, [isInView, hasAnimated]);
 
   const scrollToContent = () => {
     const nextSection = sectionRef.current?.nextElementSibling;
