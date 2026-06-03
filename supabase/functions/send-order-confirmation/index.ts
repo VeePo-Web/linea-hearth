@@ -85,7 +85,7 @@ function getDeliveryWindow(shippingMethod: string | null, orderDate: Date): { st
 }
 
 // Build the premium HTML email template
-function buildOrderConfirmationHtml(order: Order, items: OrderItem[], siteUrl: string): string {
+export function buildOrderConfirmationHtml(order: Order, items: OrderItem[], siteUrl: string): string {
   const orderNumber = order.id.slice(0, 8).toUpperCase();
   const firstName = order.customer_first_name || "Friend";
   const orderDate = new Date(order.created_at);
