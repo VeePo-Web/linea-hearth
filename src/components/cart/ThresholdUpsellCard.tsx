@@ -1,3 +1,4 @@
+import { CartThumb } from "@/components/cart/CartThumb";
 import { Plus, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";

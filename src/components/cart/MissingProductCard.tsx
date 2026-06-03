@@ -1,3 +1,4 @@
+import { CartThumb } from "@/components/cart/CartThumb";
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Loader2, ChevronDown } from "lucide-react";

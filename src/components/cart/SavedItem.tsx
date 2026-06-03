@@ -1,3 +1,4 @@
+import { CartThumb } from "@/components/cart/CartThumb";
 import { X, RotateCcw } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";

@@ -1,3 +1,4 @@
+import { CartThumb } from "@/components/cart/CartThumb";
 import { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { toast as sonnerToast } from 'sonner';

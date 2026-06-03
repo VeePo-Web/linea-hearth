@@ -1,3 +1,4 @@
+import { CartThumb } from "@/components/cart/CartThumb";
 import { Minus, Plus, X, Bookmark } from "lucide-react";
 import { useCart, CartItem as CartItemType } from "@/hooks/useCart";
 import { useSavedForLater } from "@/hooks/useSavedForLater";
