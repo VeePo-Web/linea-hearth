@@ -1,6 +1,8 @@
 // Test endpoint: sends every email template to parker@veepo.ca for inbox QA.
 // Templates duplicated verbatim from production senders so output matches what customers receive.
 // READ-ONLY relative to production code — does not import or modify any other function.
+import { resolveImageUrl } from "../_shared/imageUrl.ts";
+
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
