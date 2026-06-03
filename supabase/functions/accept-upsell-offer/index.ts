@@ -159,7 +159,7 @@ Deno.serve(async (req) => {
       product_id: offer.product_id,
       variant_id: offer.variant_id,
       product_name: (product as any)?.name ?? "Upsell item",
-      product_image_url: (img as any)?.image_url ?? null,
+      product_image_url: resolveImageUrl((img as any)?.image_url),
       variant_size: variantSize,
       variant_color: variantColor,
       unit_price_cents: offer.unit_amount_cents,
