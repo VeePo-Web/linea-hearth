@@ -36,7 +36,7 @@ async function hmacHex(secret: string, message: string): Promise<string> {
     .join('');
 }
 
-function buildEmail(order: EligibleOrder, siteUrl: string): { subject: string; html: string } {
+export function buildEmail(order: EligibleOrder, siteUrl: string): { subject: string; html: string } {
   const firstName = order.customer_first_name?.trim() || 'Friend';
   const reviewUrl = `${siteUrl}/community?review=1`;
 
