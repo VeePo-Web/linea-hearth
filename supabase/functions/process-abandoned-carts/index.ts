@@ -295,10 +295,10 @@ function getEmail2Html(cart: AbandonedCart, recoveryUrl: string, siteUrl: string
               <tr>
                 <td style="padding:48px 40px 24px;text-align:center;">
                   <h1 style="margin:0 0 16px;font-size:28px;font-weight:300;letter-spacing:0.02em;color:#1C1917;">
-                    THE MISSION CONTINUES
+                    Still thinking it over?
                   </h1>
                   <p style="margin:0;font-size:15px;line-height:1.6;color:#57534E;">
-                    You came close. Your armor is still waiting—but not forever.<br/>Every piece is a declaration. Don't leave it behind.
+                    Sixty-seven others picked up theirs this week.<br/>Yours is still here, exactly as you left it.
                   </p>
                 </td>
               </tr>
