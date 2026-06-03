@@ -27,7 +27,7 @@ async function sha256(input: string): Promise<string> {
     .join("");
 }
 
-function renderEmail(opts: {
+export function renderEmail(opts: {
   firstName: string | null;
   heroImage: string | null;
   productName: string;
