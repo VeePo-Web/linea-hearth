@@ -3,6 +3,7 @@
 // Creates a child order linked to the parent.
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { createStripeClient, type StripeEnv } from "../_shared/stripe.ts";
+import { resolveImageUrl } from "../_shared/imageUrl.ts";
 import { verifyUpsellToken, sha256Hex } from "../_shared/upsell-token.ts";
 
 const corsHeaders = {
