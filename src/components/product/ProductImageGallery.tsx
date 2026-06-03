@@ -341,16 +341,13 @@ const DesktopImage = ({
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, amount: 0.2 });
 
-  // First image gets special mask reveal treatment
+  // First image renders immediately (above the fold) — no scroll-trigger gate
   if (index === 0) {
     return (
       <motion.div
         ref={ref}
         className="w-full aspect-[3/4] overflow-hidden cursor-pointer group bg-muted"
         onClick={() => onImageClick(index)}
-        variants={imageRevealVariants}
-        initial="hidden"
-        animate={isInView ? "visible" : "hidden"}
         whileHover={{ scale: 1.005 }}
         transition={{ scale: { type: "spring", stiffness: 400, damping: 30 } }}
       >
@@ -358,15 +355,18 @@ const DesktopImage = ({
           src={image.image_url}
           alt={image.alt_text || `Product view ${index + 1}`}
           className="w-full h-full object-cover"
+          loading="eager"
+          fetchPriority="high"
           variants={kenBurnsVariants}
           initial="hidden"
-          animate={isInView ? "visible" : "hidden"}
+          animate="visible"
           whileHover={{ scale: 1.05 }}
           transition={{ scale: { duration: 0.6, ease: easing.editorial } }}
         />
       </motion.div>
     );
   }
+
 
   // Subsequent images get fadeUp treatment
   return (
