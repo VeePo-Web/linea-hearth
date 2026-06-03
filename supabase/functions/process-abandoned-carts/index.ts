@@ -382,13 +382,13 @@ function getEmail3Html(cart: AbandonedCart, recoveryUrl: string, discountCode: s
               <tr>
                 <td style="padding:48px 40px 24px;text-align:center;">
                   <p style="margin:0 0 12px;font-size:11px;font-weight:600;letter-spacing:0.2em;color:#4CAF50;text-transform:uppercase;">
-                    FINAL CALL
+                    On us, this once
                   </p>
                   <h1 style="margin:0 0 16px;font-size:28px;font-weight:300;letter-spacing:0.02em;color:#1C1917;">
-                    REINFORCEMENT INCOMING
+                    Take 15% off.
                   </h1>
                   <p style="margin:0;font-size:15px;line-height:1.6;color:#57534E;">
-                    This is it. We're giving you 15% off to finish<br/>what you started. After this, the next move is yours.
+                    No tricks, no timer games. We'd just love to see you wear it.<br/>Here's a thank-you in advance.
                   </p>
                 </td>
               </tr>
