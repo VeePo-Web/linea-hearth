@@ -1,8 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { Helmet } from "react-helmet-async";
+import { Check, Loader2, CircleAlert } from "lucide-react";
+
+type SubmitStep = "prepare" | "upload" | "finalize";
 
 type State =
   | { kind: "loading" }
@@ -10,11 +13,41 @@ type State =
   | { kind: "expired" }
   | { kind: "already" }
   | { kind: "ready"; firstName: string | null; productName: string | null; productImage: string | null }
-  | { kind: "submitting"; progress: number }
+  | { kind: "submitting"; step: SubmitStep; firstName: string | null; productName: string | null; productImage: string | null }
   | { kind: "done"; rewardCode: string; rewardPercent: number };
+
+const STEP_ORDER: SubmitStep[] = ["prepare", "upload", "finalize"];
+const STEP_LABELS: Record<SubmitStep, string> = {
+  prepare: "Preparing photo",
+  upload: "Uploading",
+  finalize: "Finishing up",
+};
 
 const EASE = [0.25, 0.46, 0.45, 0.94] as const;
 const MAX_BYTES = 10 * 1024 * 1024;
+
+function friendlyError(code?: string): string {
+  switch (code) {
+    case "file_too_large":
+      return "That photo is over 10MB. Please choose a smaller one.";
+    case "unsupported_type":
+      return "Only JPG, PNG, WebP, or HEIC photos are accepted.";
+    case "invalid_image":
+      return "We couldn't read that image. Try a different file.";
+    case "invalid_token":
+    case "invite_not_found":
+      return "This invite link is no longer valid.";
+    case "already_submitted":
+      return "A photo has already been submitted for this order.";
+    case "rate_limited":
+      return "Too many attempts. Please wait a moment and try again.";
+    case "upload_failed":
+    case "submission_failed":
+      return "We couldn't save your photo. Please try again.";
+    default:
+      return code ? `Something went wrong (${code}). Try again.` : "Something went wrong. Try again.";
+  }
+}
 
 // Client-side resize + EXIF strip via canvas re-encode (canvas does not
 // preserve EXIF, so re-encoded output is automatically EXIF-free).
@@ -121,10 +154,16 @@ export default function WornInTheWildUpload() {
 
   const onSubmit = async () => {
     if (!file || !token || !consent) return;
-    setState({ kind: "submitting", progress: 0 });
+    const ctx = {
+      firstName: (state as any).firstName ?? null,
+      productName: (state as any).productName ?? null,
+      productImage: (state as any).productImage ?? null,
+    };
+    setError(null);
+    setState({ kind: "submitting", step: "prepare", ...ctx });
     try {
       const stripped = await resizeAndStrip(file);
-      setState({ kind: "submitting", progress: 40 });
+      setState({ kind: "submitting", step: "upload", ...ctx });
 
       const form = new FormData();
       form.append("token", token);
@@ -139,28 +178,18 @@ export default function WornInTheWildUpload() {
         headers: { apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY },
         body: form,
       });
-      setState({ kind: "submitting", progress: 90 });
+      setState({ kind: "submitting", step: "finalize", ...ctx });
       const json = await res.json();
       if (!res.ok || !json.ok) {
-        setError(json.error || "Something went wrong. Try again.");
-        setState({
-          kind: "ready",
-          firstName: (state as any).firstName ?? null,
-          productName: (state as any).productName ?? null,
-          productImage: (state as any).productImage ?? null,
-        });
+        setError(friendlyError(json.error));
+        setState({ kind: "ready", ...ctx });
         return;
       }
       setState({ kind: "done", rewardCode: json.rewardCode, rewardPercent: json.rewardPercent });
     } catch (e) {
       console.error(e);
-      setError("Upload failed. Try again.");
-      setState({
-        kind: "ready",
-        firstName: (state as any).firstName ?? null,
-        productName: (state as any).productName ?? null,
-        productImage: (state as any).productImage ?? null,
-      });
+      setError("Upload failed. Please check your connection and try again.");
+      setState({ kind: "ready", ...ctx });
     }
   };
 
@@ -257,7 +286,10 @@ function UploadForm(props: {
 }) {
   const s = props.state as any;
   const isSubmitting = props.state.kind === "submitting";
-  const progress = isSubmitting ? (props.state as any).progress : 0;
+  const currentStep: SubmitStep | null = isSubmitting ? (props.state as any).step : null;
+  const progressPct = currentStep
+    ? Math.round(((STEP_ORDER.indexOf(currentStep) + 1) / STEP_ORDER.length) * 100)
+    : 0;
 
   return (
     <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease: EASE }}>
@@ -353,9 +385,77 @@ function UploadForm(props: {
         </span>
       </label>
 
-      {props.error && (
-        <p className="text-xs text-red-700 mb-4 font-medium">{props.error}</p>
-      )}
+      <AnimatePresence>
+        {props.error && (
+          <motion.div
+            initial={{ opacity: 0, y: -6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.3, ease: EASE }}
+            role="alert"
+            aria-live="assertive"
+            className="mb-6 border border-red-300 bg-red-50/70 p-4 flex items-start gap-3"
+          >
+            <CircleAlert className="h-4 w-4 text-red-700 mt-0.5 shrink-0" />
+            <div>
+              <p className="text-[10px] uppercase tracking-[0.2em] text-red-700 font-medium mb-1">
+                Upload failed
+              </p>
+              <p className="text-xs text-red-800 leading-relaxed">{props.error}</p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Progress steps */}
+      <AnimatePresence>
+        {isSubmitting && currentStep && (
+          <motion.div
+            initial={{ opacity: 0, y: -6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3, ease: EASE }}
+            className="mb-6 border border-[#4CAF50]/40 bg-[#4CAF50]/5 p-4"
+            role="status"
+            aria-live="polite"
+          >
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-[10px] uppercase tracking-[0.2em] text-neutral-700 font-medium">
+                Sending your photo
+              </p>
+              <p className="text-[10px] tabular-nums text-neutral-500">{progressPct}%</p>
+            </div>
+            <div className="h-px bg-neutral-200 mb-4 overflow-hidden">
+              <motion.div
+                className="h-full bg-[#4CAF50]"
+                initial={false}
+                animate={{ width: `${progressPct}%` }}
+                transition={{ duration: 0.4, ease: EASE }}
+              />
+            </div>
+            <ul className="space-y-2">
+              {STEP_ORDER.map((step) => {
+                const idx = STEP_ORDER.indexOf(step);
+                const currentIdx = STEP_ORDER.indexOf(currentStep);
+                const status = idx < currentIdx ? "done" : idx === currentIdx ? "active" : "pending";
+                return (
+                  <li key={step} className="flex items-center gap-3 text-xs">
+                    <span className="w-4 h-4 flex items-center justify-center shrink-0">
+                      {status === "done" && <Check className="h-3.5 w-3.5 text-[#4CAF50]" />}
+                      {status === "active" && <Loader2 className="h-3.5 w-3.5 text-[#4CAF50] animate-spin" />}
+                      {status === "pending" && <span className="h-1.5 w-1.5 rounded-full bg-neutral-300" />}
+                    </span>
+                    <span className={status === "pending" ? "text-neutral-400" : "text-neutral-800"}>
+                      {STEP_LABELS[step]}
+                      {status === "active" && "…"}
+                    </span>
+                  </li>
+                );
+              })}
+            </ul>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Submit */}
       <button
@@ -365,13 +465,10 @@ function UploadForm(props: {
         className="w-full bg-[#4CAF50] text-white text-xs uppercase tracking-[0.2em] font-medium py-4 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#449e48] transition-colors relative overflow-hidden"
       >
         {isSubmitting ? (
-          <>
-            <span className="relative z-10">Sending…</span>
-            <span
-              className="absolute inset-y-0 left-0 bg-white/15 transition-all duration-300"
-              style={{ width: `${progress}%` }}
-            />
-          </>
+          <span className="inline-flex items-center justify-center gap-2">
+            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            Sending…
+          </span>
         ) : (
           "Submit"
         )}
