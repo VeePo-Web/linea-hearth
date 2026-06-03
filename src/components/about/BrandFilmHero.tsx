@@ -178,27 +178,6 @@ const BrandFilmHero = () => {
         </div>
       </div>
 
-      {/* Bottom: Counter stats */}
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-        transition={{ duration: 0.8, delay: 2.2 }}
-        className="absolute bottom-24 left-6 md:left-12 lg:left-16 z-20"
-      >
-        <div className="flex items-center gap-6 md:gap-8 text-white/60">
-          <span className="text-sm font-light">
-            <span className="text-white font-medium">{counts.believers}K+</span> believers
-          </span>
-          <span className="w-px h-4 bg-white/20" />
-          <span className="text-sm font-light">
-            <span className="text-white font-medium">{counts.cities}</span> cities
-          </span>
-          <span className="w-px h-4 bg-white/20" />
-          <span className="text-sm font-light">
-            <span className="text-white font-medium">{counts.countries}</span> countries
-          </span>
-        </div>
-      </motion.div>
 
       {/* Scroll indicator */}
       <motion.button
