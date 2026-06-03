@@ -1,49 +1,89 @@
-# Test All Email Templates
 
-Send every transactional/lifecycle email template the site uses to `parker@veepo.ca` for inbox QA. No changes to remixing, payments, or existing email logic.
+## Goal
+Two things, done across all 6 customer emails:
+1. Add the Line of Judah favicon (lion mark) inline beside the "LINE OF JUDAH" wordmark in every email header.
+2. Audit the templates and make recipients feel genuinely welcomed — warmer, more human, more on-brand.
 
-## What gets sent (6 emails)
+## Where the changes happen
+All HTML lives inline in these edge functions:
+- `supabase/functions/send-order-confirmation/index.ts`
+- `supabase/functions/process-worn-in-the-wild-invites/index.ts`
+- `supabase/functions/process-abandoned-carts/index.ts` (3 stages: 1h / 24h / 72h)
+- `supabase/functions/process-review-requests/index.ts`
+- `supabase/functions/test-all-emails/index.ts` (mirror the production renderers)
 
-The site currently has 4 email-sending edge functions, with abandoned cart split into 3 stages — 6 distinct templates total:
+## Step 1 — Favicon beside the wordmark
 
-1. **Order Confirmation** — from `send-order-confirmation`
-2. **Worn in the Wild Invite** — from `process-worn-in-the-wild-invites`
-3. **Abandoned Cart #1** (1h, gentle reminder) — from `process-abandoned-carts`
-4. **Abandoned Cart #2** (24h, social proof) — from `process-abandoned-carts`
-5. **Abandoned Cart #3** (72h, LOJ15 discount) — from `process-abandoned-carts`
-6. **Review Request** (9 days post-delivery) — from `process-review-requests`
+Email clients block local files, so the mark needs a public URL. Use the already-deployed favicon on the live site:
 
-## Approach
+```
+https://lineofjudah.clothing/favicon-180.png
+```
 
-Create a new edge function `test-all-emails` that:
+Replace the current header in every template:
 
-- Imports the existing `RESEND_API_KEY` secret (already configured).
-- Reuses the existing render/build template functions by extracting them into the existing functions' files or copying them inline into the test function (read-only — no logic changes to live functions).
-- Feeds each template realistic mock data:
-  - Mock order: 2 line items (Tee + Hoodie), CAD totals, shipping to a Toronto address, summer 2026 date.
-  - Mock cart: 3 items at $89 CAD totaling above free-shipping ($99) threshold for variety.
-  - Mock worn-in-the-wild invite: product name + hero image + signed upload URL placeholder.
-  - Mock review request: 2 delivered items, signed review URL placeholder.
-- Sends all 6 emails sequentially via Resend `POST /emails` with:
-  - `to: parker@veepo.ca`
-  - `from: Line of Judah <noreply@lineofjudah.com>` (matches production)
-  - Subject prefixed with `[TEST]` so they're filterable in the inbox.
-- Returns a JSON summary `{ sent: 6, failed: [], messageIds: [...] }`.
+```html
+<!-- before -->
+<p style="...">LINE OF JUDAH</p>
+<div style="width:60px;height:2px;background:#F59E0B;..."></div>
 
-## How it's triggered
+<!-- after -->
+<table cellpadding="0" cellspacing="0" style="margin:0 auto;"><tr>
+  <td style="vertical-align:middle;padding-right:10px;">
+    <img src="https://lineofjudah.clothing/favicon-180.png"
+         width="22" height="22" alt=""
+         style="display:block;border:0;border-radius:4px;" />
+  </td>
+  <td style="vertical-align:middle;">
+    <p style="margin:0;font-size:14px;font-weight:700;letter-spacing:3px;color:#1C1917;text-transform:uppercase;">LINE OF JUDAH</p>
+  </td>
+</tr></table>
+<div style="width:60px;height:1px;background:#C5C7CA;margin:14px auto 0;opacity:0.7;"></div>
+```
 
-A single tool call to `supabase--curl_edge_functions` with `POST /test-all-emails` immediately after deployment. No UI, no DB changes, no cron — purely a developer test endpoint. Function deploys with `verify_jwt = false` so it can be called directly.
+Notes:
+- 22×22 px keeps it optical-aligned with the wordmark cap height.
+- Inline `<table>` is the only reliable way to put image + text on one row in Outlook.
+- Empty `alt=""` so screen readers don't double-announce the brand.
+- Hairline divider switches from amber `#F59E0B` to silver chrome `#C5C7CA` — matches the brand memory ("Silver Chrome & Forest Green, strictly NO yellow/gold").
 
-## What is NOT changing
+## Step 2 — Audit findings + fixes
 
-- No edits to `send-order-confirmation`, `process-worn-in-the-wild-invites`, `process-abandoned-carts`, `process-review-requests`.
-- No edits to Stripe, payments, webhooks, remix config.
-- No new DB tables, secrets, or RLS policies.
-- No edits to live email content / branding — templates render with the exact same HTML the customer would receive.
+Reviewing what currently goes out, the biggest gaps:
 
-## Technical notes
+| Issue | Where | Fix |
+|---|---|---|
+| Amber/gold accents conflict with brand palette | All 6 templates (dividers, CTA buttons) | Switch dividers to silver `#C5C7CA`; CTAs to Forest Green `#4CAF50` |
+| Rounded `border-radius:8px` cards conflict with sharp-edge system | Order confirmation, review request | Drop to `border-radius:0` to match the editorial aesthetic |
+| Tone is mostly transactional, not warm | All except order confirmation | Add one human "we see you" line per email (see copy table below) |
+| No personal greeting in 3 of 6 emails | Abandoned carts #2 & #3, review request | Prepend `Hey ${firstName || 'friend'},` |
+| Order confirmation thanks customer once; doesn't celebrate them | Order confirmation | Add a "What this means" mini-section: "Your purchase keeps independent craft alive. Thank you." |
+| Worn-in-the-Wild invite reads like a survey ask | invite email | Reframe as an invitation to an archive: "We're building a record of how this armor lives in the real world. We'd love yours in it." |
+| Review request offers nothing back | review email | Add: "Reviews from real customers shape what we make next. Thank you for shaping ours." |
+| No footer signature | All | Add one-line signoff: `— Parker & the Line of Judah team` |
+| Footer missing physical address (CAN-SPAM/CASL) | All | Add small grey line with business address + unsubscribe link (already in abandoned-cart, extend to all) |
+| Preheader text generic or missing | Worn-in-the-Wild, review, abandoned #2/#3 | Add purposeful preheader (the grey text inboxes preview) |
+| Plain-text fallback missing | All | Add a `text` body alongside `html` in the Resend payload for deliverability + accessibility |
 
-- File: `supabase/functions/test-all-emails/index.ts`
-- Uses fetch directly to `https://api.resend.com/emails` with `RESEND_API_KEY`.
-- Skips the abandoned-cart unsubscribe-signing complexity by injecting a static placeholder URL — the goal is visual QA, not link functionality.
-- After deploy, I'll invoke the endpoint once and report back which emails landed successfully and any Resend errors per template.
+## Step 3 — Copy refinements (per email)
+
+- **Order confirmation** — keep "Your armor is on the way" hero. Soften "Welcome to the tribe" → "Welcome in. You're one of us now." Add closing thank-you block.
+- **Worn in the Wild invite** — new hero: "We'd love to see it on you." Subline: "An archive, not a campaign." Reward framed as a thank-you, not a bribe.
+- **Abandoned cart #1 (1h)** — "Did the page time out?" Helpful, not nagging. No discount yet.
+- **Abandoned cart #2 (24h)** — Social proof: "67 others picked up theirs this week." Still no discount.
+- **Abandoned cart #3 (72h)** — The 15% offer. Frame as: "On us, this once." Soft, not desperate.
+- **Review request** — "Nine days in. How's it wearing?" Make it about their experience, not our metrics.
+
+## Step 4 — QA
+
+1. Deploy the 5 edge functions.
+2. Trigger `test-all-emails` to `parker@veepo.ca`.
+3. Verify in inbox: favicon renders next to wordmark in Gmail web, Gmail iOS, Apple Mail, Outlook web.
+
+## Out of scope
+
+- No switch to React Email / Lovable Emails infrastructure (the user explicitly said not to touch payment/Resend setup).
+- No domain re-verification (current sender uses verified domain or `onboarding@resend.dev` fallback — unchanged).
+- No new images uploaded; reusing the public favicon already on the live site.
+
+Approve and I'll implement all 6 templates in one pass and re-run the test send.
