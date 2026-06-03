@@ -199,7 +199,7 @@ function getEmail1Html(cart: AbandonedCart, recoveryUrl: string, siteUrl: string
               <tr>
                 <td style="padding:32px 40px 24px;text-align:center;border-bottom:1px solid #E7E5E4;">
                   <p style="margin:0 0 8px;font-size:12px;font-weight:700;letter-spacing:2px;color:#1C1917;text-transform:uppercase;">LINE OF JUDAH</p>
-                  <div style="width:40px;height:2px;background:#F59E0B;margin:0 auto;"></div>
+                  <div style="width:60px;height:1px;background:#C5C7CA;margin:0 auto;opacity:0.7;"></div>
                 </td>
               </tr>
               
@@ -287,7 +287,7 @@ function getEmail2Html(cart: AbandonedCart, recoveryUrl: string, siteUrl: string
               <tr>
                 <td style="padding:32px 40px 24px;text-align:center;border-bottom:1px solid #E7E5E4;">
                   <p style="margin:0 0 8px;font-size:12px;font-weight:700;letter-spacing:2px;color:#1C1917;text-transform:uppercase;">LINE OF JUDAH</p>
-                  <div style="width:40px;height:2px;background:#F59E0B;margin:0 auto;"></div>
+                  <div style="width:60px;height:1px;background:#C5C7CA;margin:0 auto;opacity:0.7;"></div>
                 </td>
               </tr>
               
@@ -374,14 +374,14 @@ function getEmail3Html(cart: AbandonedCart, recoveryUrl: string, discountCode: s
               <tr>
                 <td style="padding:32px 40px 24px;text-align:center;border-bottom:1px solid #E7E5E4;">
                   <p style="margin:0 0 8px;font-size:12px;font-weight:700;letter-spacing:2px;color:#1C1917;text-transform:uppercase;">LINE OF JUDAH</p>
-                  <div style="width:40px;height:2px;background:#F59E0B;margin:0 auto;"></div>
+                  <div style="width:60px;height:1px;background:#C5C7CA;margin:0 auto;opacity:0.7;"></div>
                 </td>
               </tr>
               
               <!-- Hero -->
               <tr>
                 <td style="padding:48px 40px 24px;text-align:center;">
-                  <p style="margin:0 0 12px;font-size:11px;font-weight:600;letter-spacing:0.2em;color:#F59E0B;text-transform:uppercase;">
+                  <p style="margin:0 0 12px;font-size:11px;font-weight:600;letter-spacing:0.2em;color:#4CAF50;text-transform:uppercase;">
                     FINAL CALL
                   </p>
                   <h1 style="margin:0 0 16px;font-size:28px;font-weight:300;letter-spacing:0.02em;color:#1C1917;">
