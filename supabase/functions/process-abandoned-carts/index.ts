@@ -198,7 +198,7 @@ function getEmail1Html(cart: AbandonedCart, recoveryUrl: string, siteUrl: string
               <!-- Header -->
               <tr>
                 <td style="padding:32px 40px 24px;text-align:center;border-bottom:1px solid #E7E5E4;">
-                  <p style="margin:0 0 8px;font-size:12px;font-weight:700;letter-spacing:2px;color:#1C1917;text-transform:uppercase;">LINE OF JUDAH</p>
+                  <table cellpadding="0" cellspacing="0" border="0" style="margin:0 auto 8px;"><tr><td style="vertical-align:middle;padding-right:8px;line-height:0;"><img src="https://lineofjudah.clothing/favicon-180.png" width="20" height="20" alt="" style="display:block;border:0;border-radius:3px;" /></td><td style="vertical-align:middle;"><p style="margin:0;font-size:12px;font-weight:700;letter-spacing:2px;color:#1C1917;text-transform:uppercase;">LINE OF JUDAH</p></td></tr></table>
                   <div style="width:60px;height:1px;background:#C5C7CA;margin:0 auto;opacity:0.7;"></div>
                 </td>
               </tr>
@@ -286,7 +286,7 @@ function getEmail2Html(cart: AbandonedCart, recoveryUrl: string, siteUrl: string
               <!-- Header -->
               <tr>
                 <td style="padding:32px 40px 24px;text-align:center;border-bottom:1px solid #E7E5E4;">
-                  <p style="margin:0 0 8px;font-size:12px;font-weight:700;letter-spacing:2px;color:#1C1917;text-transform:uppercase;">LINE OF JUDAH</p>
+                  <table cellpadding="0" cellspacing="0" border="0" style="margin:0 auto 8px;"><tr><td style="vertical-align:middle;padding-right:8px;line-height:0;"><img src="https://lineofjudah.clothing/favicon-180.png" width="20" height="20" alt="" style="display:block;border:0;border-radius:3px;" /></td><td style="vertical-align:middle;"><p style="margin:0;font-size:12px;font-weight:700;letter-spacing:2px;color:#1C1917;text-transform:uppercase;">LINE OF JUDAH</p></td></tr></table>
                   <div style="width:60px;height:1px;background:#C5C7CA;margin:0 auto;opacity:0.7;"></div>
                 </td>
               </tr>
@@ -373,7 +373,7 @@ function getEmail3Html(cart: AbandonedCart, recoveryUrl: string, discountCode: s
               <!-- Header -->
               <tr>
                 <td style="padding:32px 40px 24px;text-align:center;border-bottom:1px solid #E7E5E4;">
-                  <p style="margin:0 0 8px;font-size:12px;font-weight:700;letter-spacing:2px;color:#1C1917;text-transform:uppercase;">LINE OF JUDAH</p>
+                  <table cellpadding="0" cellspacing="0" border="0" style="margin:0 auto 8px;"><tr><td style="vertical-align:middle;padding-right:8px;line-height:0;"><img src="https://lineofjudah.clothing/favicon-180.png" width="20" height="20" alt="" style="display:block;border:0;border-radius:3px;" /></td><td style="vertical-align:middle;"><p style="margin:0;font-size:12px;font-weight:700;letter-spacing:2px;color:#1C1917;text-transform:uppercase;">LINE OF JUDAH</p></td></tr></table>
                   <div style="width:60px;height:1px;background:#C5C7CA;margin:0 auto;opacity:0.7;"></div>
                 </td>
               </tr>
