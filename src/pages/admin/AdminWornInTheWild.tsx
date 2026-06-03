@@ -24,14 +24,11 @@ export default function AdminWornInTheWild() {
 
   const load = async () => {
     setLoading(true);
-    let q = supabase
-      .from("worn_in_the_wild_submissions")
-      .select("id, order_id, customer_email, customer_first_name, photo_path, caption, city, status, submitted_at")
-      .order("submitted_at", { ascending: false })
-      .limit(100);
-    if (statusFilter !== "all") q = q.eq("status", statusFilter as Submission["status"]);
-    const { data } = await q;
-    const rows = (data as Submission[]) || [];
+    const { data } = await supabase.rpc("admin_list_worn_submissions");
+    let rows = ((data as Submission[]) || []).slice(0, 100);
+    if (statusFilter !== "all") {
+      rows = rows.filter((r) => r.status === statusFilter);
+    }
     setSubs(rows);
     setLoading(false);
 
