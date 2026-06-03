@@ -213,7 +213,7 @@ function buildOrderConfirmationHtml(order: Order, items: OrderItem[], siteUrl: s
                 ` : ""}
                 <tr>
                   <td style="padding:8px 0;font-size:15px;color:#44403C;">Shipping</td>
-                  <td align="right" style="padding:8px 0;font-size:15px;${isFreeShipping ? "color:#F59E0B;font-weight:600;" : "color:#1C1917;"}">${isFreeShipping ? "FREE" : formatCurrency(order.shipping_cents, order.currency)}</td>
+                  <td align="right" style="padding:8px 0;font-size:15px;${isFreeShipping ? "color:#4CAF50;font-weight:600;" : "color:#1C1917;"}">${isFreeShipping ? "FREE" : formatCurrency(order.shipping_cents, order.currency)}</td>
                 </tr>
                 <tr>
                   <td colspan="2" style="padding:12px 0 0;">
