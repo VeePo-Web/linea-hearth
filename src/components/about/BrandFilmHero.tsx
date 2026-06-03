@@ -1,5 +1,5 @@
 import { motion, useInView } from 'framer-motion';
-import { useRef, useState, useEffect } from 'react';
+import { useRef } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import CharacterReveal from '@/components/motion/CharacterReveal';
@@ -8,33 +8,7 @@ const BrandFilmHero = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
   const isInView = useInView(sectionRef, { once: true, amount: 0.3 });
   const prefersReducedMotion = useReducedMotion();
-  
-  // Counter animation
-  const [counts, setCounts] = useState({ believers: 0, cities: 0, countries: 0 });
-  const [hasAnimated, setHasAnimated] = useState(false);
 
-  useEffect(() => {
-    if (isInView && !hasAnimated) {
-      setHasAnimated(true);
-      const targets = { believers: 10, cities: 45, countries: 5 };
-      const duration = 2000;
-      const steps = 60;
-      let step = 0;
-
-      const timer = setInterval(() => {
-        step++;
-        const progress = step / steps;
-        setCounts({
-          believers: Math.min(Math.floor(targets.believers * progress), targets.believers),
-          cities: Math.min(Math.floor(targets.cities * progress), targets.cities),
-          countries: Math.min(Math.floor(targets.countries * progress), targets.countries),
-        });
-        if (step >= steps) clearInterval(timer);
-      }, duration / steps);
-
-      return () => clearInterval(timer);
-    }
-  }, [isInView, hasAnimated]);
 
   const scrollToContent = () => {
     const nextSection = sectionRef.current?.nextElementSibling;
@@ -178,27 +152,6 @@ const BrandFilmHero = () => {
         </div>
       </div>
 
-      {/* Bottom: Counter stats */}
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-        transition={{ duration: 0.8, delay: 2.2 }}
-        className="absolute bottom-24 left-6 md:left-12 lg:left-16 z-20"
-      >
-        <div className="flex items-center gap-6 md:gap-8 text-white/60">
-          <span className="text-sm font-light">
-            <span className="text-white font-medium">{counts.believers}K+</span> believers
-          </span>
-          <span className="w-px h-4 bg-white/20" />
-          <span className="text-sm font-light">
-            <span className="text-white font-medium">{counts.cities}</span> cities
-          </span>
-          <span className="w-px h-4 bg-white/20" />
-          <span className="text-sm font-light">
-            <span className="text-white font-medium">{counts.countries}</span> countries
-          </span>
-        </div>
-      </motion.div>
 
       {/* Scroll indicator */}
       <motion.button
