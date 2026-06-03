@@ -62,17 +62,30 @@ function buildEmail(order: EligibleOrder, siteUrl: string): { subject: string; h
 <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background:#F5F5F4;">
   <tr><td align="center" style="padding:40px 20px;">
     <table width="600" cellpadding="0" cellspacing="0" role="presentation" style="max-width:600px;background:#FFFFFF;">
-      <tr><td style="padding:48px 40px 24px;text-align:center;">
+      <tr><td align="center" style="padding:40px 40px 0;">
+        <table cellpadding="0" cellspacing="0" border="0" style="margin:0 auto;"><tr>
+          <td style="vertical-align:middle;padding-right:10px;line-height:0;">
+            <img src="https://lineofjudah.clothing/favicon-180.png" width="22" height="22" alt="" style="display:block;border:0;border-radius:4px;" />
+          </td>
+          <td style="vertical-align:middle;">
+            <p style="margin:0;font-size:13px;font-weight:700;letter-spacing:3px;color:#1C1917;text-transform:uppercase;">LINE OF JUDAH</p>
+          </td>
+        </tr></table>
+        <div style="width:60px;height:1px;background:#C5C7CA;margin:14px auto 0;opacity:0.7;"></div>
+      </td></tr>
+      <tr><td style="padding:32px 40px 24px;text-align:center;">
         <p style="margin:0 0 24px;font-size:11px;font-weight:700;letter-spacing:3px;color:#4CAF50;text-transform:uppercase;">Nine Days In</p>
-        <h1 style="margin:0 0 16px;font-size:32px;font-weight:300;line-height:1.2;color:#1C1917;letter-spacing:-0.5px;">How did your<br/>armor serve you?</h1>
-        <p style="margin:0;font-size:15px;line-height:1.6;color:#57534E;">${firstName}, your order arrived nine days ago. We'd be grateful for your honest words — the good, the imperfect, all of it. Other warriors are watching, weighing.</p>
+        <h1 style="margin:0 0 16px;font-size:32px;font-weight:300;line-height:1.2;color:#1C1917;letter-spacing:-0.5px;">How's it wearing?</h1>
+        <p style="margin:0;font-size:15px;line-height:1.6;color:#57534E;">${firstName}, your order arrived nine days ago. We'd love to hear how it's holding up — the good, the imperfect, all of it. Reviews from real customers shape what we make next.</p>
       </td></tr>
       <tr><td style="padding:24px 40px;">
         <table width="100%" cellpadding="0" cellspacing="0" role="presentation">${itemsHtml}</table>
       </td></tr>
       <tr><td style="padding:16px 40px 48px;text-align:center;">
         <a href="${reviewUrl}" style="display:inline-block;padding:16px 40px;background:#1C1917;color:#FFFFFF;font-size:13px;font-weight:600;letter-spacing:2px;text-transform:uppercase;text-decoration:none;">Leave a Review</a>
-        <p style="margin:24px 0 0;font-size:12px;line-height:1.6;color:#78716C;font-style:italic;">"And thou shalt make holy garments for Aaron thy brother for glory and for beauty." — Exodus 28:2</p>
+        <p style="margin:24px 0 8px;font-size:13px;color:#57534E;font-style:italic;">Thank you for shaping ours.</p>
+        <p style="margin:0 0 16px;font-size:13px;color:#A8A29E;font-style:italic;">— Parker &amp; the Line of Judah team</p>
+        <p style="margin:8px 0 0;font-size:12px;line-height:1.6;color:#78716C;font-style:italic;">"And thou shalt make holy garments for Aaron thy brother for glory and for beauty." — Exodus 28:2</p>
       </td></tr>
       <tr><td style="background:#1C1917;padding:32px 40px;text-align:center;">
         <p style="margin:0 0 4px;font-size:12px;font-weight:700;letter-spacing:2px;color:#FFFFFF;text-transform:uppercase;">LINE OF JUDAH</p>
