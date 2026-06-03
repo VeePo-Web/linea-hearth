@@ -8,7 +8,7 @@ const corsHeaders = {
 };
 
 const TEST_TO = "parker@veepo.ca";
-const FROM = "Line of Judah <noreply@lineofjudah.clothing>";
+const FROM = "Line of Judah <onboarding@resend.dev>";
 const SITE_URL = "https://lineofjudah.clothing";
 
 // ============================================================================
