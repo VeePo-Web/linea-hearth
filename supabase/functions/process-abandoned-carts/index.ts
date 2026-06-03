@@ -352,7 +352,7 @@ export function getEmail2Html(cart: AbandonedCart, recoveryUrl: string, siteUrl:
   `;
 }
 
-function getEmail3Html(cart: AbandonedCart, recoveryUrl: string, discountCode: string, siteUrl: string): string {
+export function getEmail3Html(cart: AbandonedCart, recoveryUrl: string, discountCode: string, siteUrl: string): string {
   const discountedTotal = (cart.cart_total * 0.85).toFixed(2);
   
   return `
