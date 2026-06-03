@@ -1,5 +1,6 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { createStripeClient, type StripeEnv } from "../_shared/stripe.ts";
+import { resolveImageUrl } from "../_shared/imageUrl.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -238,7 +239,7 @@ Deno.serve(async (req) => {
           tax_behavior: "exclusive" as const,
           product_data: {
             name: item.name + (descriptionBits ? ` (${descriptionBits})` : ""),
-            ...(item.image && { images: [item.image] }),
+            images: [resolveImageUrl(item.image)],
             tax_code: APPAREL_TAX_CODE,
             metadata: {
               ...(item.productId && { productId: item.productId }),
@@ -484,7 +485,7 @@ Deno.serve(async (req) => {
         product_id: item.productId || null,
         variant_id: item.variantId || null,
         product_name: item.name,
-        product_image_url: item.image || null,
+        product_image_url: resolveImageUrl(item.image),
         variant_size: item.size || null,
         variant_color: item.color || null,
         unit_price_cents: unitAmountCents,
