@@ -26,6 +26,29 @@ const STEP_LABELS: Record<SubmitStep, string> = {
 const EASE = [0.25, 0.46, 0.45, 0.94] as const;
 const MAX_BYTES = 10 * 1024 * 1024;
 
+function friendlyError(code?: string): string {
+  switch (code) {
+    case "file_too_large":
+      return "That photo is over 10MB. Please choose a smaller one.";
+    case "unsupported_type":
+      return "Only JPG, PNG, WebP, or HEIC photos are accepted.";
+    case "invalid_image":
+      return "We couldn't read that image. Try a different file.";
+    case "invalid_token":
+    case "invite_not_found":
+      return "This invite link is no longer valid.";
+    case "already_submitted":
+      return "A photo has already been submitted for this order.";
+    case "rate_limited":
+      return "Too many attempts. Please wait a moment and try again.";
+    case "upload_failed":
+    case "submission_failed":
+      return "We couldn't save your photo. Please try again.";
+    default:
+      return code ? `Something went wrong (${code}). Try again.` : "Something went wrong. Try again.";
+  }
+}
+
 // Client-side resize + EXIF strip via canvas re-encode (canvas does not
 // preserve EXIF, so re-encoded output is automatically EXIF-free).
 async function resizeAndStrip(file: File): Promise<Blob> {
