@@ -209,7 +209,7 @@ export function SwipeableLookCard({
                   dismissSuccess();
                   onViewBag?.();
                 }}
-                className="flex-1 h-12 bg-white text-green-700 hover:bg-white/90 rounded-none font-medium"
+                className="flex-1 h-12 bg-primary text-primary-foreground hover:bg-primary/90 rounded-none font-medium"
               >
                 View Bag
               </Button>
