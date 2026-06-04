@@ -114,13 +114,6 @@ export default function WornInTheWildUpload() {
     }
     (async () => {
       try {
-        const { data, error } = await supabase.functions.invoke("validate-worn-token", {
-          method: "GET" as never,
-          headers: {},
-          body: undefined,
-          // @ts-ignore - pass token via query
-        });
-        // Fall back to direct fetch since invoke doesn't easily handle GET with query
         const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/validate-worn-token?token=${encodeURIComponent(
           token,
         )}`;
@@ -128,7 +121,6 @@ export default function WornInTheWildUpload() {
           headers: { apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY },
         });
         const json = await res.json();
-        void data; void error;
         if (!json.valid) {
           setState({ kind: json.reason === "invalid_or_expired" ? "expired" : "invalid" });
           return;
@@ -153,6 +145,10 @@ export default function WornInTheWildUpload() {
   const onPickFile = (f: File | null) => {
     setError(null);
     if (!f) return;
+    if (isHeic(f)) {
+      setError(friendlyError("heic_unsupported"));
+      return;
+    }
     if (f.size > MAX_BYTES) {
       setError("Photo is too large. Max 10MB.");
       return;
