@@ -399,12 +399,24 @@ function UploadForm(props: {
           <button
             type="button"
             onClick={props.onPickClick}
-            className="w-full aspect-[4/5] md:aspect-video border border-[#4CAF50]/60 hover:border-[#4CAF50] transition-colors flex flex-col items-center justify-center gap-3 group"
+            disabled={props.isConverting}
+            className="w-full aspect-[4/5] md:aspect-video border border-[#4CAF50]/60 hover:border-[#4CAF50] transition-colors flex flex-col items-center justify-center gap-3 group disabled:opacity-60 disabled:cursor-wait"
           >
-            <span className="text-xs uppercase tracking-[0.2em] text-neutral-600 group-hover:text-black">
-              Tap to add photo
-            </span>
-            <span className="text-[10px] text-neutral-400 uppercase tracking-wider">JPG · PNG · HEIC · Max 10MB</span>
+            {props.isConverting ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin text-[#4CAF50]" />
+                <span className="text-xs uppercase tracking-[0.2em] text-neutral-600">
+                  Converting iPhone photo…
+                </span>
+              </>
+            ) : (
+              <>
+                <span className="text-xs uppercase tracking-[0.2em] text-neutral-600 group-hover:text-black">
+                  Tap to add photo
+                </span>
+                <span className="text-[10px] text-neutral-400 uppercase tracking-wider">JPG · PNG · HEIC · Max 10MB</span>
+              </>
+            )}
           </button>
         ) : (
           <div className="relative">
@@ -419,6 +431,7 @@ function UploadForm(props: {
           </div>
         )}
       </div>
+
 
       {/* Caption + city */}
       <div className="space-y-4 mb-8">
