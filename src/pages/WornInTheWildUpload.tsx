@@ -187,23 +187,43 @@ export default function WornInTheWildUpload() {
     })();
   }, [token]);
 
-  const onPickFile = (f: File | null) => {
+  const onPickFile = async (raw: File | null) => {
     setError(null);
-    if (!f) return;
+    if (!raw) return;
+
+    let f = raw;
     if (isHeic(f)) {
-      setError(friendlyError("heic_unsupported"));
+      setIsConverting(true);
+      try {
+        f = await convertHeicToJpeg(f);
+      } catch (e) {
+        console.error("HEIC conversion failed", e);
+        setIsConverting(false);
+        setError(friendlyError("heic_conversion_failed"));
+        return;
+      }
+      setIsConverting(false);
+    }
+
+    const res = validateFile(f);
+    if (!res.ok) {
+      setError(friendlyError(res.code));
       return;
     }
-    if (f.size > MAX_BYTES) {
-      setError("Photo is too large. Max 10MB.");
-      return;
-    }
+
+    if (preview) URL.revokeObjectURL(preview);
     setFile(f);
     setPreview(URL.createObjectURL(f));
   };
 
   const onSubmit = async () => {
     if (!file || !token || !consent) return;
+    const validation = validateFile(file);
+    if (!validation.ok) {
+      setError(friendlyError(validation.code));
+      return;
+    }
+
     const ctx = {
       firstName: (state as any).firstName ?? null,
       productName: (state as any).productName ?? null,
