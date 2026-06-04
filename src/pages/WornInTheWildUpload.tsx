@@ -13,7 +13,7 @@ type State =
   | { kind: "expired" }
   | { kind: "already" }
   | { kind: "ready"; firstName: string | null; productName: string | null; productImage: string | null }
-  | { kind: "submitting"; step: SubmitStep; firstName: string | null; productName: string | null; productImage: string | null }
+  | { kind: "submitting"; step: SubmitStep; uploadPct: number; uploadedBytes: number; totalBytes: number; firstName: string | null; productName: string | null; productImage: string | null }
   | { kind: "done"; rewardCode: string; rewardPercent: number };
 
 const STEP_ORDER: SubmitStep[] = ["prepare", "upload", "finalize"];
@@ -71,6 +71,32 @@ async function convertHeicToJpeg(file: File): Promise<File> {
   const base = file.name.replace(/\.(heic|heif)$/i, "") || "photo";
   return new File([blob], `${base}.jpg`, { type: "image/jpeg" });
 }
+
+function uploadWithProgress(
+  url: string,
+  form: FormData,
+  headers: Record<string, string>,
+  onProgress: (uploadedBytes: number, totalBytes: number) => void,
+): Promise<{ status: number; body: any }> {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", url);
+    Object.entries(headers).forEach(([k, v]) => xhr.setRequestHeader(k, v));
+    xhr.timeout = 60_000;
+    xhr.upload.onprogress = (e) => {
+      if (e.lengthComputable) onProgress(e.loaded, e.total);
+    };
+    xhr.onload = () => {
+      let body: any = null;
+      try { body = JSON.parse(xhr.responseText); } catch { body = { error: "submission_failed" }; }
+      resolve({ status: xhr.status, body });
+    };
+    xhr.onerror = () => reject(new Error("network_error"));
+    xhr.ontimeout = () => reject(new Error("timeout"));
+    xhr.send(form);
+  });
+}
+
 
 function friendlyError(code?: string): string {
   switch (code) {
@@ -235,10 +261,9 @@ export default function WornInTheWildUpload() {
       productImage: (state as any).productImage ?? null,
     };
     setError(null);
-    setState({ kind: "submitting", step: "prepare", ...ctx });
+    setState({ kind: "submitting", step: "prepare", uploadPct: 0, uploadedBytes: 0, totalBytes: 0, ...ctx });
     try {
       const stripped = await resizeAndStrip(file);
-      setState({ kind: "submitting", step: "upload", ...ctx });
 
       const form = new FormData();
       form.append("token", token);
@@ -247,26 +272,55 @@ export default function WornInTheWildUpload() {
       form.append("city", city.slice(0, 80));
       form.append("consent", "true");
 
-      const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/submit-worn-photo`;
-      const res = await fetch(url, {
-        method: "POST",
-        headers: { apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY },
-        body: form,
+      setState({
+        kind: "submitting",
+        step: "upload",
+        uploadPct: 0,
+        uploadedBytes: 0,
+        totalBytes: stripped.size,
+        ...ctx,
       });
-      setState({ kind: "submitting", step: "finalize", ...ctx });
-      const json = await res.json();
-      if (!res.ok || !json.ok) {
-        setError(friendlyError(json.error));
+
+      const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/submit-worn-photo`;
+      const { status, body: json } = await uploadWithProgress(
+        url,
+        form,
+        { apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY },
+        (loaded, total) => {
+          const pct = total > 0 ? Math.min(100, Math.round((loaded / total) * 100)) : 0;
+          setState({
+            kind: "submitting",
+            step: "upload",
+            uploadPct: pct,
+            uploadedBytes: loaded,
+            totalBytes: total,
+            ...ctx,
+          });
+        },
+      );
+
+      setState({
+        kind: "submitting",
+        step: "finalize",
+        uploadPct: 100,
+        uploadedBytes: stripped.size,
+        totalBytes: stripped.size,
+        ...ctx,
+      });
+
+      if (status < 200 || status >= 300 || !json?.ok) {
+        setError(friendlyError(json?.error));
         setState({ kind: "ready", ...ctx });
         return;
       }
       setState({ kind: "done", rewardCode: json.rewardCode, rewardPercent: json.rewardPercent });
     } catch (e) {
       console.error(e);
-      setError("Upload failed. Please check your connection and try again.");
+      setError(friendlyError("upload_failed"));
       setState({ kind: "ready", ...ctx });
     }
   };
+
 
   return (
     <>
