@@ -1,23 +1,24 @@
-# Rename Parker → Olliver Abbey
+## Goal
+Rebuild `src/pages/NotFound.tsx` as a "lone epigraph" 404 — scripture-forward, no imagery except a 36px lion favicon sigil, typography-only, dark field.
 
-## Site audit
-Already correct. `FounderLetter.tsx` displays **Olliver Abbey — Founder & Creative Director**. No other founder/owner copy on the site references Parker. No changes needed in `src/`.
+## Design
+- **Background**: Full dark (`bg-background`, `#0F172A`), `h-[100dvh]`.
+- **Layout**: Single centered column. Tall, narrow text column.
+- **404 mark**: Reduced to a 10px superscript reference mark, muted.
+- **Verse**: Dominant — "And thou shalt make holy garments for Aaron thy brother, for glory and for beauty." — set in large, light text, centered, narrow max-width (~480px), generous line-height.
+- **Reference**: "— Exodus 28:2 (ASV)" below in smaller muted caps.
+- **Lion sigil**: 36px favicon at bottom-center as a quiet seal.
+- **Back link**: "Return to the Treasury" (or "Enter the Gate" — we can decide in build), sharp-edged button or text link, appears after a 3-second delay via Framer Motion.
+- **Animation**: Slow fade-in (1.2s) on mount. Back link staggers in at 3s.
+- **Styling**: `rounded-none`, `-0.02em` tracking, editorialEase `[0.25, 0.46, 0.45, 0.94]`. No yellow. Silver Chrome accents if any.
 
-## Email copy changes
-Update every visible signature line from `— Parker & the Line of Judah team` (and `Walk in it. — Parker…`) to:
+## Technical
+- Single file: `src/pages/NotFound.tsx`.
+- Use `motion` from framer-motion for entrance + delayed Back link.
+- Use existing `Link` from react-router-dom.
+- Respect `prefers-reduced-motion`.
+- Keep `Helmet` for SEO: title "Not Found — Line of Judah".
+- No `Layout` wrapper — this page should feel like a standalone epigraph, not a standard page. Or use `Layout` but override styles. Decision: full-bleed standalone, no Layout wrapper for immersion.
 
-> **Olliver Abbey and the Line of Judah Team**
-
-Files:
-- `supabase/functions/send-order-confirmation/index.ts` (customer footer line 371)
-- `supabase/functions/preview-order-emails/index.ts` (line 115)
-- `supabase/functions/process-abandoned-carts/index.ts` (line 138)
-- `supabase/functions/process-review-requests/index.ts` (line 88)
-- `supabase/functions/process-worn-in-the-wild-invites/index.ts` (line 91)
-- `supabase/functions/test-all-emails/index.ts` — change preview `customer_first_name: "Parker"` to `"Olliver"` (lines 259, 283, 309)
-
-## Functional addresses — kept as-is
-`parker@veepo.ca` remains as the **recipient inbox** for admin order notifications and QA previews (`send-order-confirmation` admin CC, `preview-order-emails`, `test-all-emails`, admin role migration). These are routing addresses, never visible in customer email bodies. If you'd rather forward those to a different inbox (e.g. olliver@lineofjudah.clothing), tell me the address and I'll swap it in the same pass.
-
-## Verify
-Redeploy the 6 functions, then trigger `preview-order-emails` so the customer + admin confirmations land in your inbox with the new signature.
+## Files
+- `src/pages/NotFound.tsx` (rewrite)
