@@ -56,7 +56,7 @@ function buildEmail(order: EligibleOrder, siteUrl: string): { subject: string; h
   `).join('');
 
 
-  const subject = 'How did your armor serve you?';
+  const subject = 'How does it wear?';
   const html = `<!DOCTYPE html>
 <html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${subject}</title></head>
 <body style="margin:0;padding:0;background:#F5F5F4;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;">
