@@ -195,7 +195,7 @@ export default function OrderReorderButton({
       disabled={isDisabled}
       className={`
         min-h-[36px] transition-all duration-200
-        ${state === 'success' ? 'bg-green-600 hover:bg-green-600 border-green-600 text-white' : ''}
+        ${state === 'success' ? 'bg-primary hover:bg-primary border-primary text-primary-foreground' : ''}
         ${className}
       `}
       aria-label={

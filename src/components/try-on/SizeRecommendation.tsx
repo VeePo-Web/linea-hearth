@@ -23,10 +23,10 @@ export const SizeRecommendation = ({ recommendation, className }: SizeRecommenda
 
   // Confidence bar segments
   const confidenceColor = confidence >= 85 
-    ? 'bg-green-500' 
+    ? 'bg-primary' 
     : confidence >= 70 
-      ? 'bg-amber-500' 
-      : 'bg-red-500';
+      ? 'bg-muted-foreground' 
+      : 'bg-destructive';
 
   return (
     <div className={cn("space-y-4", className)}>
@@ -85,9 +85,9 @@ export const SizeRecommendation = ({ recommendation, className }: SizeRecommenda
 
       {/* Perfect fit indicator */}
       {confidence >= 90 && fits.every(f => f.status === 'perfect') && (
-        <div className="flex items-center gap-2 p-3 bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-900 rounded-sm">
-          <Check className="h-4 w-4 text-green-600" />
-          <span className="text-sm text-green-700 dark:text-green-400 font-medium">
+        <div className="flex items-center gap-2 p-3 bg-muted border border-border rounded-sm">
+          <Check className="h-4 w-4 text-foreground" />
+          <span className="text-sm text-foreground font-medium">
             Perfect match for your measurements!
           </span>
         </div>
