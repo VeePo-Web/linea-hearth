@@ -63,8 +63,8 @@ const AskUsModal = ({ isOpen, onClose }: AskUsModalProps) => {
 
   const formContent = isSubmitted ? (
     <div className="py-12 text-center">
-      <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
-        <DrawCheckIcon size="lg" className="text-green-600 dark:text-green-400" delay={100} />
+      <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
+        <DrawCheckIcon size="lg" className="text-foreground" delay={100} />
       </div>
       <h3 className="text-xl font-light mb-2">Question Submitted!</h3>
       <p className="text-muted-foreground font-light">
