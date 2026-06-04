@@ -1,58 +1,62 @@
-## Real upload progress + locked submit button
+# Payment came through on Stripe — webhook never reached us
 
-Scope: `src/pages/WornInTheWildUpload.tsx` only. No backend changes.
+## What actually happened
 
-### Current state
+- Stripe **did** capture CA$40.00 from parker@veepo.ca (customer `cus_UdiSlOI9lBQnXO`, order `FF614293`). Your Stripe email confirms it.
+- In our database, order `ff614293-6e8c-4a98-8465-49b0046ebf02` is still `status: pending` / `payment_status: unpaid`, with `stripe_payment_intent_id: null`.
+- The `stripe-webhook` edge function has **never been invoked** — zero rows in `stripe_webhook_events`, zero HTTP requests in edge logs.
+- The success page therefore polls/checks an order that never flipped to `paid` → "still processing" forever.
 
-- Submit button already disables while `isSubmitting` (good).
-- "Progress" today is a fake 3-step indicator (`prepare` → `upload` → `finalize`) that jumps 33% → 66% → 100% based on which `setState` fired last. The `upload` step shows 66% for the entire network transfer, regardless of how large the photo is or how slow the connection is. On a 10MB upload over 3G this looks frozen.
-- `fetch` is used for the POST, which cannot report upload progress.
+Conclusion: the Stripe → Lovable webhook is not wired up (or is wired without the required `?env=live` query parameter, which the handler hard-rejects with 400).
 
-### What changes
+## Plan
 
-**1. Swap `fetch` → `XMLHttpRequest` for the submit POST**
-Only for `submit-worn-photo`. `XHR.upload.onprogress` is the only browser API that fires real byte-level upload progress. Wrap it in a small `uploadWithProgress(url, form, headers, onProgress)` helper that returns `Promise<{ status: number; body: any }>`. Keeps the call site clean.
+### 1. Backfill THIS order now (one-shot reconciliation)
+Build a small admin-only edge function `reconcile-order` that:
+- Takes `{ orderId, environment }`.
+- Looks up the order; if already `paid`, no-op.
+- Calls Stripe `checkout.sessions.list({ limit: 100 })` or retrieves by the session id stored in `orders.stripe_session_id` (if we stored it — verify in `create-checkout-session`). Falls back to finding the most recent paid Session whose `metadata.orderId === orderId`.
+- Runs the exact same update path as `handleCheckoutCompleted` in `stripe-webhook/index.ts` (status `processing`, payment_status `paid`, tax/discount/shipping/total, addresses, phone, `stripe_payment_intent_id`, `stripe_customer_id`), then triggers `send-order-confirmation`.
+- Protected by `verify_jwt = false` + an explicit admin-role check via `has_role(auth.uid(), 'admin')`.
+- Invoke it once from the ops portal (or via `supabase--curl_edge_functions`) for order `FF614293`.
 
-**2. Extend submit state with a real percentage**
-- Change `State` `submitting` variant to: `{ kind: "submitting"; step: SubmitStep; uploadPct: number; ... }`.
-- `uploadPct` is 0 during `prepare`, the live XHR percentage during `upload`, and 100 during `finalize`.
-- The existing overall `progressPct` computation (step-based) is replaced with a blended value:
-  - `prepare` → 10%
-  - `upload` → 10 + uploadPct × 0.8 (so 10 → 90% over the real upload)
-  - `finalize` → 95%
-  - `done` → 100%
-- This means the bar actually moves in lockstep with bytes sent, not in three discrete jumps.
+### 2. Fix the webhook for all future orders
+This is a config step you have to do in your Stripe Dashboard — I can't do it from code:
 
-**3. Progress UI polish (still editorial / sharp-edged, #4CAF50)**
-- Keep the existing block (border + bg-[#4CAF50]/5, sharp corners).
-- Header line shows `Sending your photo` + `{progressPct}%` tabular-nums on the right (already there) — now driven by real %.
-- Underneath the bar, when in `upload` step also show a small `{uploadedKB} / {totalKB} KB` line in 10px uppercase tracking. Hidden in `prepare` / `finalize` (those have no bytes context).
-- Bar transition tightens from `0.4s` to `0.15s linear` so it tracks the XHR ticks smoothly instead of easing past them.
-- Step list (`Preparing photo` / `Uploading` / `Finishing up`) stays — it gives semantic context the raw % doesn't convey.
+In Stripe Dashboard → **Developers → Webhooks → Add endpoint**, register **two** endpoints:
 
-**4. Submit button — explicit lock**
-- Already disables on `isSubmitting`. Add: also disable while `isConverting` (HEIC), while `!file`, while `!consent`, and during the brief network roundtrip.
-- Button label cycles with step:
-  - `prepare` → `Preparing…`
-  - `upload` → `Uploading {pct}%`
-  - `finalize` → `Finishing up…`
-  - default → `Submit`
-- Add `aria-busy={isSubmitting}` and keep `aria-live="polite"` on the progress block so screen readers announce step changes (already there for the block).
+```
+https://harckavibhmimndfvnyo.supabase.co/functions/v1/stripe-webhook?env=live
+https://harckavibhmimndfvnyo.supabase.co/functions/v1/stripe-webhook?env=sandbox
+```
 
-**5. Prevent double-submit / change-during-upload**
-- The "Change" overlay on the preview image (top-right) gets `disabled` and `pointer-events-none` while `isSubmitting` so users can't swap the file mid-upload.
-- The hidden file input is left alone; nothing can reach it while the button is disabled.
+Events to subscribe to (matches the handler's switch):
+- `checkout.session.completed`
+- `checkout.session.async_payment_succeeded`
+- `checkout.session.async_payment_failed`
+- `payment_intent.payment_failed`
+- `charge.refunded`
+- `charge.refund.updated`
+- `charge.dispute.created` / `.updated` / `.funds_withdrawn` / `.funds_reinstated` / `.closed`
 
-**6. Safety net for XHR errors**
-- `xhr.onerror` / `xhr.ontimeout` → reject with a synthetic `upload_failed` so the existing `friendlyError` switch handles it. Set a 60s timeout.
-- On error: reset to `ready` state, surface friendly message, keep the file in state so the user can retry without re-picking.
+Then copy each endpoint's **Signing secret** into the corresponding Lovable Cloud secret:
+- Live secret → `PAYMENTS_LIVE_WEBHOOK_SECRET` (currently set — verify it matches the live endpoint, not a stale one)
+- Sandbox secret → `PAYMENTS_SANDBOX_WEBHOOK_SECRET` (same)
 
-### Out of scope
+If the secrets are stale, signature verification will silently fail with 400 → Stripe retries for 3 days then gives up.
 
-- No new `resizeAndStrip` work — it's already fast (canvas re-encode) and runs in `prepare`. We don't need progress for it.
-- No backend / edge function changes. Server still receives the same multipart payload.
-- No change to validation, HEIC conversion, or token validation flows.
+### 3. Safety net on the success page
+Add a polling fallback to `src/pages/CheckoutSuccess.tsx` so even if a future webhook is slow/dropped the UI eventually reflects truth:
+- After mount, poll `orders` by id every 2s up to 30s.
+- If still unpaid after that, show "We're confirming your payment — you'll get an email shortly" + a link to `/account/orders` instead of an infinite spinner.
 
-### Files touched
+### 4. Diagnostic logging
+Add a one-line `console.log("webhook hit", req.url, req.method)` at the very top of `supabase/functions/stripe-webhook/index.ts` (before env validation) so we can confirm in edge logs that Stripe is reaching us at all once you register the endpoint.
 
-- `src/pages/WornInTheWildUpload.tsx`
+## Technical notes
+- The handler already dedupes via `stripe_webhook_events` (PK on `event_id`), so re-delivering historical events from the Stripe Dashboard "Resend" button after step 2 is safe — it will fulfill any other orders stuck like this one without double-charging.
+- Once the webhook is live, you can also retroactively reconcile by clicking "Resend" on the `checkout.session.completed` event for order FF614293 in Stripe Dashboard → Events. That would replace step 1 entirely. I'd still build `reconcile-order` since it's the right operational tool to have.
+
+## Out of scope
+- No changes to `create-checkout-session`, pricing, tax, or cart logic.
+- No migration to Stripe Embedded Checkout — current redirect-based flow stays.
