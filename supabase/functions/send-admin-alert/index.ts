@@ -1,6 +1,10 @@
-// Internal admin alert sender. Routes Resend through the Lovable connector
-// gateway. From-address uses onboarding@resend.dev since lineofjudah.clothing
-// isn't verified in Resend yet — flip ADMIN_FROM once you verify the domain.
+// Internal admin alert sender. Posts directly to api.resend.com with
+// RESEND_API_KEY (matches send-order-confirmation / process-abandoned-carts).
+// From-address uses onboarding@resend.dev because no Resend domain is
+// verified yet — Resend restricts that sender to the account owner, so we
+// only send to parker@veepo.ca for now. Once lineofjudah.clothing is
+// verified, flip ADMIN_FROM to alerts@lineofjudah.clothing and add
+// 1.lineofjudah.1@gmail.com back to ADMIN_RECIPIENTS.
 
 import { createClient } from "npm:@supabase/supabase-js@2";
 
@@ -11,15 +15,12 @@ const corsHeaders = {
 };
 
 // === CONFIG ===
-// Update these once the lineofjudah.clothing domain is verified in Resend.
 const ADMIN_FROM = "Line of Judah Alerts <onboarding@resend.dev>";
 const ADMIN_REPLY_TO = "parker@veepo.ca";
 const ADMIN_RECIPIENTS = [
   "parker@veepo.ca",
-  "1.lineofjudah.1@gmail.com",
+  // "1.lineofjudah.1@gmail.com", // re-enable once Resend domain is verified
 ];
-
-const GATEWAY_URL = "https://connector-gateway.lovable.dev/resend";
 
 function sb() {
   return createClient(
