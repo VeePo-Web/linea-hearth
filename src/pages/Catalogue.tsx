@@ -1,13 +1,14 @@
 import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Helmet } from "react-helmet-async";
 import { SlidersHorizontal, X, ChevronDown } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import CollectionHero from "@/components/category/CollectionHero";
+import ProductCard, { ProductCardData } from "@/components/category/ProductCard";
+import QuickViewModal from "@/components/category/QuickViewModal";
+import AuthModal from "@/components/auth/AuthModal";
 import { supabase } from "@/integrations/supabase/client";
-import { formatPrice } from "@/lib/currency";
 
 interface Product {
   id: string;
