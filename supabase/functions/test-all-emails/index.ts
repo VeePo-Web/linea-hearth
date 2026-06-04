@@ -256,7 +256,7 @@ async function sendViaResend(apiKey: string, subject: string, html: string) {
 const mockOrder = {
   id: "abcdef12-3456-7890-abcd-ef1234567890",
   customer_email: TEST_TO,
-  customer_first_name: "Parker",
+  customer_first_name: "Olliver",
   customer_last_name: "Test",
   shipping_address: { address: "123 King St W", city: "Toronto", state: "ON", postalCode: "M5H 1A1", country: "CA" },
   subtotal_cents: 21800, shipping_cents: 0, discount_cents: 0, total_cents: 21800,
@@ -280,7 +280,7 @@ const mockCart = {
 };
 
 const mockReviewOrder = {
-  id: "rev-test-1", customer_email: TEST_TO, customer_first_name: "Parker",
+  id: "rev-test-1", customer_email: TEST_TO, customer_first_name: "Olliver",
   delivered_at: new Date().toISOString(),
   order_items: [
     { product_id: "p1", product_name: "Lion of Judah Tee — Forest", product_image_url: "https://lineofjudah.clothing/og-image.jpg" },
@@ -306,7 +306,7 @@ Deno.serve(async (req) => {
 
   const tests = [
     { name: "1-order-confirmation", subject: "Your order is on its way", html: buildOrderConfirmationHtml(mockOrder, mockOrderItems, SITE_URL) },
-    { name: "2-worn-in-the-wild-invite", subject: "Worn in the wild", html: renderWornInvite({ firstName: "Parker", heroImage: "https://lineofjudah.clothing/og-image.jpg", productName: "Lion of Judah Tee — Forest", uploadUrl: `${SITE_URL}/worn/upload?t=TEST` }) },
+    { name: "2-worn-in-the-wild-invite", subject: "Worn in the wild", html: renderWornInvite({ firstName: "Olliver", heroImage: "https://lineofjudah.clothing/og-image.jpg", productName: "Lion of Judah Tee — Forest", uploadUrl: `${SITE_URL}/worn/upload?t=TEST` }) },
     { name: "3-abandoned-cart-1-gentle-reminder", subject: "You left something behind", html: getEmail1Html(mockCart, recoveryUrl, SITE_URL) },
     { name: "4-abandoned-cart-2-social-proof", subject: "Still thinking it over?", html: getEmail2Html(mockCart, recoveryUrl, SITE_URL) },
     { name: "5-abandoned-cart-3-discount", subject: "15% off — last call on your cart", html: getEmail3Html(mockCart, recoveryUrl, "LOJ15-TEST00", SITE_URL) },

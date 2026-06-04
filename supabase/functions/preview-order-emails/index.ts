@@ -112,7 +112,7 @@ function buildCustomerHtml(order: any, items: any[], siteUrl: string): string {
   <tr><td style="background:#1C1917;padding:32px 40px;text-align:center;">
     <p style="margin:0 0 4px;font-size:12px;font-weight:700;letter-spacing:2px;color:#fff;text-transform:uppercase;">LINE OF JUDAH</p>
     <p style="margin:0 0 8px;font-size:13px;color:#A8A29E;">Faith you can wear.</p>
-    <p style="margin:0;font-size:13px;color:#A8A29E;font-style:italic;">Walk in it. — Parker &amp; the Line of Judah team</p>
+    <p style="margin:0;font-size:13px;color:#A8A29E;font-style:italic;">Walk in it. — Olliver Abbey and the Line of Judah Team</p>
   </td></tr>
 </table></td></tr></table></body></html>`;
 }

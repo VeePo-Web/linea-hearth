@@ -88,7 +88,7 @@ function renderEmail(opts: {
 
       <div style="border-top:1px solid #e5e7eb;padding-top:24px;text-align:center;">
         <p style="font-family:Georgia,serif;font-style:italic;font-size:13px;color:#57534E;margin:0 0 12px;">Thank you for being part of this.</p>
-        <p style="font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#9ca3af;margin:0 0 16px;font-style:italic;">— Parker &amp; the Line of Judah team</p>
+        <p style="font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#9ca3af;margin:0 0 16px;font-style:italic;">— Olliver Abbey and the Line of Judah Team</p>
         <p style="font-family:Georgia,serif;font-style:italic;font-size:12px;color:#9ca3af;margin:0;letter-spacing:0.04em;">for glory and for beauty</p>
         <p style="font-family:Arial,Helvetica,sans-serif;font-size:10px;color:#9ca3af;margin:8px 0 0;letter-spacing:0.05em;">— Exodus 28:2</p>
       </div>
