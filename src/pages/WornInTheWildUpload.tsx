@@ -223,10 +223,11 @@ export default function WornInTheWildUpload() {
   const onSubmit = async () => {
     if (!file || !token || !consent) return;
     const validation = validateFile(file);
-    if (!validation.ok) {
+    if (validation.ok === false) {
       setError(friendlyError(validation.code));
       return;
     }
+
 
     const ctx = {
       firstName: (state as any).firstName ?? null,
