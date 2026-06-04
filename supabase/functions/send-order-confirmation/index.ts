@@ -22,22 +22,112 @@ interface Order {
   customer_email: string;
   customer_first_name: string | null;
   customer_last_name: string | null;
+  customer_phone: string | null;
   shipping_address: {
-    // Canonical app shape (written by stripe-webhook -> mapStripeAddress)
     address?: string;
     city?: string;
     state?: string;
     postalCode?: string;
     country?: string;
   };
+  billing_address: Record<string, unknown> | null;
   subtotal_cents: number;
   shipping_cents: number;
   discount_cents: number;
+  tax_cents: number;
   total_cents: number;
   shipping_method: string | null;
   discount_code: string | null;
+  notes: string | null;
+  stripe_payment_intent_id: string | null;
+  stripe_checkout_session_id: string | null;
+  payment_status: string;
   created_at: string;
   currency: string;
+}
+
+const INTERNAL_NOTIFY_RECIPIENTS = [
+  "1.lineofjudah.1@gmail.com",
+  "parker@veepo.ca",
+];
+
+function escapeHtml(s: unknown): string {
+  return String(s ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function buildAdminNotificationHtml(order: Order, items: OrderItem[], siteUrl: string): string {
+  const orderNumber = order.id.slice(0, 8).toUpperCase();
+  const addr = order.shipping_address || {};
+  const fullName = `${order.customer_first_name || ""} ${order.customer_last_name || ""}`.trim() || "—";
+  const placedAt = new Date(order.created_at).toLocaleString("en-US", {
+    dateStyle: "medium", timeStyle: "short", timeZone: "America/Toronto",
+  });
+  const itemsRows = items.map((it) => `
+    <tr>
+      <td style="padding:8px;border-bottom:1px solid #eee;">${escapeHtml(it.product_name)}</td>
+      <td style="padding:8px;border-bottom:1px solid #eee;">${escapeHtml(it.variant_size || "—")}</td>
+      <td style="padding:8px;border-bottom:1px solid #eee;">${escapeHtml(it.variant_color || "—")}</td>
+      <td style="padding:8px;border-bottom:1px solid #eee;text-align:center;">${it.quantity}</td>
+      <td style="padding:8px;border-bottom:1px solid #eee;text-align:right;">${formatCurrency(it.unit_price_cents, order.currency)}</td>
+      <td style="padding:8px;border-bottom:1px solid #eee;text-align:right;"><strong>${formatCurrency(it.total_cents, order.currency)}</strong></td>
+    </tr>`).join("");
+
+  const shipLines = [
+    fullName,
+    addr.address,
+    `${addr.city || ""}${addr.state ? `, ${addr.state}` : ""} ${addr.postalCode || ""}`.trim(),
+    addr.country,
+  ].filter((l) => l && String(l).trim().length > 0).map((l) => escapeHtml(l)).join("<br>");
+
+  const billing = order.billing_address as Record<string, string> | null;
+  const billingHtml = billing && JSON.stringify(billing) !== JSON.stringify(addr)
+    ? `<p style="margin:0 0 4px;"><strong>Billing address:</strong><br>${escapeHtml(JSON.stringify(billing))}</p>` : "";
+
+  return `<!DOCTYPE html><html><body style="font-family:-apple-system,Segoe UI,Roboto,sans-serif;background:#f5f5f4;margin:0;padding:24px;color:#1c1917;">
+    <div style="max-width:680px;margin:0 auto;background:#fff;padding:32px;border:1px solid #e7e5e4;">
+      <h1 style="margin:0 0 4px;font-size:20px;">New order #${orderNumber}</h1>
+      <p style="margin:0 0 24px;color:#78716c;font-size:13px;">Placed ${escapeHtml(placedAt)} • Payment: <strong>${escapeHtml(order.payment_status)}</strong></p>
+
+      <h2 style="font-size:14px;margin:24px 0 8px;text-transform:uppercase;letter-spacing:1px;color:#57534e;">Customer</h2>
+      <p style="margin:0 0 4px;"><strong>${escapeHtml(fullName)}</strong></p>
+      <p style="margin:0 0 4px;"><a href="mailto:${escapeHtml(order.customer_email)}">${escapeHtml(order.customer_email)}</a></p>
+      ${order.customer_phone ? `<p style="margin:0 0 4px;">${escapeHtml(order.customer_phone)}</p>` : ""}
+
+      <h2 style="font-size:14px;margin:24px 0 8px;text-transform:uppercase;letter-spacing:1px;color:#57534e;">Ship to</h2>
+      <p style="margin:0 0 12px;line-height:1.5;">${shipLines}</p>
+      ${billingHtml}
+
+      <h2 style="font-size:14px;margin:24px 0 8px;text-transform:uppercase;letter-spacing:1px;color:#57534e;">Items</h2>
+      <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;font-size:13px;">
+        <thead><tr style="background:#fafaf9;text-align:left;">
+          <th style="padding:8px;">Product</th><th style="padding:8px;">Size</th><th style="padding:8px;">Color</th>
+          <th style="padding:8px;text-align:center;">Qty</th><th style="padding:8px;text-align:right;">Unit</th><th style="padding:8px;text-align:right;">Total</th>
+        </tr></thead>
+        <tbody>${itemsRows}</tbody>
+      </table>
+
+      <h2 style="font-size:14px;margin:24px 0 8px;text-transform:uppercase;letter-spacing:1px;color:#57534e;">Summary</h2>
+      <table width="100%" style="font-size:14px;">
+        <tr><td>Subtotal</td><td align="right">${formatCurrency(order.subtotal_cents, order.currency)}</td></tr>
+        ${order.discount_cents > 0 ? `<tr><td>Discount${order.discount_code ? ` (${escapeHtml(order.discount_code)})` : ""}</td><td align="right">-${formatCurrency(order.discount_cents, order.currency)}</td></tr>` : ""}
+        <tr><td>Shipping${order.shipping_method ? ` (${escapeHtml(order.shipping_method)})` : ""}</td><td align="right">${formatCurrency(order.shipping_cents, order.currency)}</td></tr>
+        ${order.tax_cents > 0 ? `<tr><td>Tax</td><td align="right">${formatCurrency(order.tax_cents, order.currency)}</td></tr>` : ""}
+        <tr><td style="padding-top:8px;border-top:2px solid #1c1917;"><strong>Total</strong></td><td align="right" style="padding-top:8px;border-top:2px solid #1c1917;"><strong>${formatCurrency(order.total_cents, order.currency)}</strong></td></tr>
+      </table>
+
+      ${order.notes ? `<h2 style="font-size:14px;margin:24px 0 8px;text-transform:uppercase;letter-spacing:1px;color:#57534e;">Customer notes</h2><p style="margin:0;white-space:pre-wrap;">${escapeHtml(order.notes)}</p>` : ""}
+
+      <h2 style="font-size:14px;margin:24px 0 8px;text-transform:uppercase;letter-spacing:1px;color:#57534e;">Stripe</h2>
+      <p style="margin:0 0 4px;font-family:monospace;font-size:12px;color:#57534e;">PI: ${escapeHtml(order.stripe_payment_intent_id || "—")}</p>
+      <p style="margin:0 0 16px;font-family:monospace;font-size:12px;color:#57534e;">Session: ${escapeHtml(order.stripe_checkout_session_id || "—")}</p>
+
+      <p style="margin:24px 0 0;"><a href="${siteUrl}/ops-portal/orders/${order.id}" style="display:inline-block;background:#1c1917;color:#fff;text-decoration:none;padding:12px 20px;font-size:13px;letter-spacing:0.5px;">Open in ops portal →</a></p>
+    </div>
+  </body></html>`;
 }
 
 
