@@ -1,62 +1,58 @@
-## Add client-side validation + HEIC conversion to Worn-in-the-Wild upload
+## Real upload progress + locked submit button
 
-Scope: `src/pages/WornInTheWildUpload.tsx` only. No backend, schema, or storage changes. Server-side validation in `submit-worn-photo` stays as the source of truth — this is defense in depth and a better UX (catch problems before the user waits for the upload).
+Scope: `src/pages/WornInTheWildUpload.tsx` only. No backend changes.
+
+### Current state
+
+- Submit button already disables while `isSubmitting` (good).
+- "Progress" today is a fake 3-step indicator (`prepare` → `upload` → `finalize`) that jumps 33% → 66% → 100% based on which `setState` fired last. The `upload` step shows 66% for the entire network transfer, regardless of how large the photo is or how slow the connection is. On a 10MB upload over 3G this looks frozen.
+- `fetch` is used for the POST, which cannot report upload progress.
 
 ### What changes
 
-**1. Centralized validation constants**
-At the top of the file, define:
-- `ALLOWED_MIME = ["image/jpeg","image/png","image/webp"]`
-- `ALLOWED_EXT = ["jpg","jpeg","png","webp"]`
-- `HEIC_MIME = ["image/heic","image/heif"]`, `HEIC_EXT = ["heic","heif"]`
-- `MAX_BYTES = 10 * 1024 * 1024` (already exists)
-- `MIN_BYTES = 5 * 1024` (rejects 0-byte / obviously broken picks)
+**1. Swap `fetch` → `XMLHttpRequest` for the submit POST**
+Only for `submit-worn-photo`. `XHR.upload.onprogress` is the only browser API that fires real byte-level upload progress. Wrap it in a small `uploadWithProgress(url, form, headers, onProgress)` helper that returns `Promise<{ status: number; body: any }>`. Keeps the call site clean.
 
-**2. New `validateFile(f)` helper**
-Returns `{ ok: true } | { ok: false, code: "unsupported_type" | "file_too_large" | "file_too_small" | "empty_file" }`. Checks, in order:
-- `f.size === 0` → `empty_file`
-- `f.size > MAX_BYTES` → `file_too_large`
-- `f.size < MIN_BYTES` → `file_too_small`
-- MIME OR extension must match an allowed image type (HEIC handled separately, not rejected here)
-- Anything else → `unsupported_type`
+**2. Extend submit state with a real percentage**
+- Change `State` `submitting` variant to: `{ kind: "submitting"; step: SubmitStep; uploadPct: number; ... }`.
+- `uploadPct` is 0 during `prepare`, the live XHR percentage during `upload`, and 100 during `finalize`.
+- The existing overall `progressPct` computation (step-based) is replaced with a blended value:
+  - `prepare` → 10%
+  - `upload` → 10 + uploadPct × 0.8 (so 10 → 90% over the real upload)
+  - `finalize` → 95%
+  - `done` → 100%
+- This means the bar actually moves in lockstep with bytes sent, not in three discrete jumps.
 
-**3. HEIC conversion via `heic2any` (dynamic import)**
-- Add dependency: `heic2any` (~50KB, browser-only, no peer deps).
-- New `convertHeicToJpeg(file)`: `await import("heic2any")`, convert to JPEG at quality 0.9, wrap the resulting `Blob` back into a `File` named `<basename>.jpg` with `type: "image/jpeg"`. Dynamic import keeps the bundle lean — only loaded when an iPhone user picks HEIC.
-- Wrapped in try/catch → surfaces `heic_conversion_failed` friendly error.
+**3. Progress UI polish (still editorial / sharp-edged, #4CAF50)**
+- Keep the existing block (border + bg-[#4CAF50]/5, sharp corners).
+- Header line shows `Sending your photo` + `{progressPct}%` tabular-nums on the right (already there) — now driven by real %.
+- Underneath the bar, when in `upload` step also show a small `{uploadedKB} / {totalKB} KB` line in 10px uppercase tracking. Hidden in `prepare` / `finalize` (those have no bytes context).
+- Bar transition tightens from `0.4s` to `0.15s linear` so it tracks the XHR ticks smoothly instead of easing past them.
+- Step list (`Preparing photo` / `Uploading` / `Finishing up`) stays — it gives semantic context the raw % doesn't convey.
 
-**4. New `onPickFile` flow** (replaces current one)
-```text
-setError(null)
-if (!f) return
-if (isHeic(f)):
-    setState busy "Converting iPhone photo…"  // brief inline status
-    f = await convertHeicToJpeg(f)            // may throw → friendly error
-end
-res = validateFile(f)
-if (!res.ok): setError(friendlyError(res.code)); return
-setFile(f); setPreview(URL.createObjectURL(f))
-```
-- Revoke any previous `preview` URL before assigning a new one (small leak fix while we're here).
-- Add a lightweight `isConverting` boolean so the upload tile shows "Converting iPhone photo…" with a spinner instead of looking frozen during the (1–3s) HEIC decode.
+**4. Submit button — explicit lock**
+- Already disables on `isSubmitting`. Add: also disable while `isConverting` (HEIC), while `!file`, while `!consent`, and during the brief network roundtrip.
+- Button label cycles with step:
+  - `prepare` → `Preparing…`
+  - `upload` → `Uploading {pct}%`
+  - `finalize` → `Finishing up…`
+  - default → `Submit`
+- Add `aria-busy={isSubmitting}` and keep `aria-live="polite"` on the progress block so screen readers announce step changes (already there for the block).
 
-**5. Friendly error copy additions**
-Add to the `friendlyError` switch:
-- `file_too_small` → "That photo looks corrupted or empty. Try another."
-- `empty_file` → same as above
-- `heic_conversion_failed` → "We couldn't convert that iPhone HEIC photo. In iOS Settings → Camera → Formats, switch to 'Most Compatible', then retake — or pick a JPG/PNG."
-- Keep existing `heic_unsupported` entry but it becomes unreachable (conversion now handles HEIC) — leave it in as a safety net.
+**5. Prevent double-submit / change-during-upload**
+- The "Change" overlay on the preview image (top-right) gets `disabled` and `pointer-events-none` while `isSubmitting` so users can't swap the file mid-upload.
+- The hidden file input is left alone; nothing can reach it while the button is disabled.
 
-**6. `onSubmit` defense-in-depth**
-Re-run `validateFile(file)` at the top of `onSubmit` before `resizeAndStrip`. If the file was somehow mutated or stale, fail fast with the same friendly error instead of letting the server reject it after the upload.
+**6. Safety net for XHR errors**
+- `xhr.onerror` / `xhr.ontimeout` → reject with a synthetic `upload_failed` so the existing `friendlyError` switch handles it. Set a 60s timeout.
+- On error: reset to `ready` state, surface friendly message, keep the file in state so the user can retry without re-picking.
 
 ### Out of scope
 
-- No change to `<input accept>` — keeps HEIC selectable on iOS so we can convert it.
-- No change to `resizeAndStrip` — it already re-encodes to JPEG and strips EXIF, which now happens after HEIC conversion.
-- No server changes — `submit-worn-photo` remains the authoritative MIME/magic-byte gate.
+- No new `resizeAndStrip` work — it's already fast (canvas re-encode) and runs in `prepare`. We don't need progress for it.
+- No backend / edge function changes. Server still receives the same multipart payload.
+- No change to validation, HEIC conversion, or token validation flows.
 
 ### Files touched
 
 - `src/pages/WornInTheWildUpload.tsx`
-- `package.json` (adds `heic2any`)
