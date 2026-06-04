@@ -295,12 +295,17 @@ Deno.serve(async (req) => {
       case "checkout.session.async_payment_failed":
       case "payment_intent.payment_failed":
         await handlePaymentFailed(event.data.object);
+        await alertPaymentFailed(event, env);
         break;
       case "charge.refunded":
       case "charge.refund.updated":
         await handleRefund(event.data.object);
+        await alertRefund(event, env);
         break;
       case "charge.dispute.created":
+        await handleDispute(event.data.object, env);
+        await alertDispute(event, env);
+        break;
       case "charge.dispute.updated":
       case "charge.dispute.funds_withdrawn":
       case "charge.dispute.funds_reinstated":
@@ -311,6 +316,7 @@ Deno.serve(async (req) => {
         console.log("Unhandled event:", event.type);
     }
   } catch (e) {
+
     console.error("Handler error:", e);
     // Returning 500 lets Stripe retry the event. The dedupe row will
     // still be there, so we'd skip it — fix: delete the row so retries
