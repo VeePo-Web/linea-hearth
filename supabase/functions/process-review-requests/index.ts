@@ -85,7 +85,7 @@ function buildEmail(order: EligibleOrder, siteUrl: string): { subject: string; h
       <tr><td style="padding:16px 40px 48px;text-align:center;">
         <a href="${reviewUrl}" style="display:inline-block;padding:16px 40px;background:#1C1917;color:#FFFFFF;font-size:13px;font-weight:600;letter-spacing:2px;text-transform:uppercase;text-decoration:none;">Leave a Review</a>
         <p style="margin:24px 0 8px;font-size:13px;color:#57534E;font-style:italic;">Thank you for shaping ours.</p>
-        <p style="margin:0 0 16px;font-size:13px;color:#A8A29E;font-style:italic;">— Parker &amp; the Line of Judah team</p>
+        <p style="margin:0 0 16px;font-size:13px;color:#A8A29E;font-style:italic;">— Olliver Abbey and the Line of Judah Team</p>
         <p style="margin:8px 0 0;font-size:12px;line-height:1.6;color:#78716C;font-style:italic;">"And thou shalt make holy garments for Aaron thy brother for glory and for beauty." — Exodus 28:2</p>
       </td></tr>
       <tr><td style="background:#1C1917;padding:32px 40px;text-align:center;">
