@@ -79,7 +79,7 @@ const ImageUploader = ({
               className="flex items-center gap-3 text-sm p-2 bg-secondary rounded-md"
             >
               {u.status === 'uploading' && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
-              {u.status === 'done' && <ImageIcon className="h-4 w-4 text-green-500" />}
+              {u.status === 'done' && <ImageIcon className="h-4 w-4 text-foreground" />}
               {u.status === 'error' && <X className="h-4 w-4 text-destructive" />}
               <span className="truncate flex-1">{u.fileName}</span>
               <span className="text-xs text-muted-foreground capitalize">{u.status}</span>

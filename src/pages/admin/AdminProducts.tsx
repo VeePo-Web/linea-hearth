@@ -119,7 +119,7 @@ const AdminProducts = () => {
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'active': return <Badge className="bg-green-600 text-white">Active</Badge>;
+      case 'active': return <Badge className="bg-foreground text-background">Active</Badge>;
       case 'draft': return <Badge variant="secondary">Draft</Badge>;
       case 'archived': return <Badge variant="outline">Archived</Badge>;
       default: return null;

@@ -79,7 +79,7 @@ const AdminOrders = () => {
 
   const paymentBadge = (status: string) => {
     switch (status) {
-      case 'paid': return <Badge className="bg-green-600 text-white">Paid</Badge>;
+      case 'paid': return <Badge className="bg-foreground text-background">Paid</Badge>;
       case 'unpaid': return <Badge variant="secondary">Unpaid</Badge>;
       case 'refunded': return <Badge variant="outline">Refunded</Badge>;
       default: return <Badge variant="secondary">{status}</Badge>;
@@ -88,9 +88,9 @@ const AdminOrders = () => {
 
   const fulfillmentBadge = (status: string | null) => {
     switch (status) {
-      case 'fulfilled': return <Badge className="bg-green-600 text-white">Fulfilled</Badge>;
+      case 'fulfilled': return <Badge className="bg-foreground text-background">Fulfilled</Badge>;
       case 'shipped': return <Badge className="bg-blue-600 text-white">Shipped</Badge>;
-      case 'delivered': return <Badge className="bg-green-700 text-white">Delivered</Badge>;
+      case 'delivered': return <Badge className="bg-foreground text-background">Delivered</Badge>;
       default: return <Badge variant="outline">Unfulfilled</Badge>;
     }
   };

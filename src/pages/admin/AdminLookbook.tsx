@@ -325,7 +325,7 @@ const AdminLookbook = () => {
                         className="cursor-pointer"
                       >
                         {look.is_active ? (
-                          <Badge className="bg-green-600 text-white">Active</Badge>
+                          <Badge className="bg-foreground text-background">Active</Badge>
                         ) : (
                           <Badge variant="secondary">Hidden</Badge>
                         )}

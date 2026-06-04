@@ -55,7 +55,7 @@ export default function WornInTheWildGallery() {
             <h1 className="font-serif text-5xl md:text-7xl font-normal leading-[0.95] tracking-[-0.02em] mb-4">
               Worn in the Wild
             </h1>
-            <div className="w-[40%] md:w-[20%] h-px bg-[#4CAF50]/80 mb-6" />
+            <div className="w-[40%] md:w-[20%] h-px bg-foreground/80 mb-6" />
             <p className="font-serif italic text-sm text-neutral-500 max-w-md">
               "For glory and for beauty." — Exodus 28:2
             </p>
