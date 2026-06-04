@@ -25,13 +25,64 @@ const STEP_LABELS: Record<SubmitStep, string> = {
 
 const EASE = [0.25, 0.46, 0.45, 0.94] as const;
 const MAX_BYTES = 10 * 1024 * 1024;
+const MIN_BYTES = 5 * 1024;
+const ALLOWED_MIME = ["image/jpeg", "image/png", "image/webp"];
+const ALLOWED_EXT = ["jpg", "jpeg", "png", "webp"];
+
+type ValidationCode =
+  | "empty_file"
+  | "file_too_large"
+  | "file_too_small"
+  | "unsupported_type"
+  | "heic_conversion_failed";
+
+function fileExt(name: string): string {
+  const i = name.lastIndexOf(".");
+  return i >= 0 ? name.slice(i + 1).toLowerCase() : "";
+}
+
+function isHeic(f: File): boolean {
+  const t = (f.type || "").toLowerCase();
+  if (t.includes("heic") || t.includes("heif")) return true;
+  const ext = fileExt(f.name);
+  return ext === "heic" || ext === "heif";
+}
+
+type ValidationResult = { ok: true } | { ok: false; code: ValidationCode };
+
+function validateFile(f: File): ValidationResult {
+  if (f.size === 0) return { ok: false, code: "empty_file" };
+  if (f.size > MAX_BYTES) return { ok: false, code: "file_too_large" };
+  if (f.size < MIN_BYTES) return { ok: false, code: "file_too_small" };
+  const mime = (f.type || "").toLowerCase();
+  const ext = fileExt(f.name);
+  const mimeOk = ALLOWED_MIME.includes(mime);
+  const extOk = ALLOWED_EXT.includes(ext);
+  if (!mimeOk && !extOk) return { ok: false, code: "unsupported_type" };
+  return { ok: true };
+}
+
+
+async function convertHeicToJpeg(file: File): Promise<File> {
+  const mod = await import("heic2any");
+  const heic2any = (mod as any).default ?? (mod as any);
+  const out = await heic2any({ blob: file, toType: "image/jpeg", quality: 0.9 });
+  const blob: Blob = Array.isArray(out) ? out[0] : out;
+  const base = file.name.replace(/\.(heic|heif)$/i, "") || "photo";
+  return new File([blob], `${base}.jpg`, { type: "image/jpeg" });
+}
 
 function friendlyError(code?: string): string {
   switch (code) {
     case "heic_unsupported":
       return "iPhone HEIC photos can't be processed in-browser. In iOS Settings → Camera → Formats, switch to 'Most Compatible', then retake — or pick a JPG/PNG from your library.";
+    case "heic_conversion_failed":
+      return "We couldn't convert that iPhone HEIC photo. In iOS Settings → Camera → Formats, switch to 'Most Compatible', then retake — or pick a JPG/PNG.";
     case "file_too_large":
       return "That photo is over 10MB. Please choose a smaller one.";
+    case "file_too_small":
+    case "empty_file":
+      return "That photo looks corrupted or empty. Try another.";
     case "unsupported_type":
       return "Only JPG, PNG, or WebP photos are accepted.";
     case "invalid_image":
@@ -51,12 +102,7 @@ function friendlyError(code?: string): string {
   }
 }
 
-function isHeic(f: File): boolean {
-  const t = (f.type || "").toLowerCase();
-  if (t.includes("heic") || t.includes("heif")) return true;
-  const name = f.name.toLowerCase();
-  return name.endsWith(".heic") || name.endsWith(".heif");
-}
+
 
 // Client-side resize + EXIF strip via canvas re-encode (canvas does not
 // preserve EXIF, so re-encoded output is automatically EXIF-free).
@@ -105,7 +151,9 @@ export default function WornInTheWildUpload() {
   const [city, setCity] = useState("");
   const [consent, setConsent] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isConverting, setIsConverting] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+
 
   useEffect(() => {
     if (!token) {
@@ -142,23 +190,45 @@ export default function WornInTheWildUpload() {
     })();
   }, [token]);
 
-  const onPickFile = (f: File | null) => {
+  const onPickFile = async (raw: File | null) => {
     setError(null);
-    if (!f) return;
+    if (!raw) return;
+
+    let f = raw;
     if (isHeic(f)) {
-      setError(friendlyError("heic_unsupported"));
+      setIsConverting(true);
+      try {
+        f = await convertHeicToJpeg(f);
+      } catch (e) {
+        console.error("HEIC conversion failed", e);
+        setIsConverting(false);
+        setError(friendlyError("heic_conversion_failed"));
+        return;
+      }
+      setIsConverting(false);
+    }
+
+    const res = validateFile(f);
+    if (res.ok === false) {
+      setError(friendlyError(res.code));
       return;
     }
-    if (f.size > MAX_BYTES) {
-      setError("Photo is too large. Max 10MB.");
-      return;
-    }
+
+
+    if (preview) URL.revokeObjectURL(preview);
     setFile(f);
     setPreview(URL.createObjectURL(f));
   };
 
   const onSubmit = async () => {
     if (!file || !token || !consent) return;
+    const validation = validateFile(file);
+    if (validation.ok === false) {
+      setError(friendlyError(validation.code));
+      return;
+    }
+
+
     const ctx = {
       firstName: (state as any).firstName ?? null,
       productName: (state as any).productName ?? null,
@@ -233,7 +303,9 @@ export default function WornInTheWildUpload() {
               city={city}
               consent={consent}
               error={error}
+              isConverting={isConverting}
               onPickFile={onPickFile}
+
               onPickClick={() => fileRef.current?.click()}
               fileRef={fileRef}
               setCaption={setCaption}
@@ -281,7 +353,9 @@ function UploadForm(props: {
   city: string;
   consent: boolean;
   error: string | null;
+  isConverting: boolean;
   onPickFile: (f: File | null) => void;
+
   onPickClick: () => void;
   fileRef: React.RefObject<HTMLInputElement>;
   setCaption: (v: string) => void;
@@ -325,12 +399,24 @@ function UploadForm(props: {
           <button
             type="button"
             onClick={props.onPickClick}
-            className="w-full aspect-[4/5] md:aspect-video border border-[#4CAF50]/60 hover:border-[#4CAF50] transition-colors flex flex-col items-center justify-center gap-3 group"
+            disabled={props.isConverting}
+            className="w-full aspect-[4/5] md:aspect-video border border-[#4CAF50]/60 hover:border-[#4CAF50] transition-colors flex flex-col items-center justify-center gap-3 group disabled:opacity-60 disabled:cursor-wait"
           >
-            <span className="text-xs uppercase tracking-[0.2em] text-neutral-600 group-hover:text-black">
-              Tap to add photo
-            </span>
-            <span className="text-[10px] text-neutral-400 uppercase tracking-wider">JPG · PNG · HEIC · Max 10MB</span>
+            {props.isConverting ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin text-[#4CAF50]" />
+                <span className="text-xs uppercase tracking-[0.2em] text-neutral-600">
+                  Converting iPhone photo…
+                </span>
+              </>
+            ) : (
+              <>
+                <span className="text-xs uppercase tracking-[0.2em] text-neutral-600 group-hover:text-black">
+                  Tap to add photo
+                </span>
+                <span className="text-[10px] text-neutral-400 uppercase tracking-wider">JPG · PNG · HEIC · Max 10MB</span>
+              </>
+            )}
           </button>
         ) : (
           <div className="relative">
@@ -345,6 +431,7 @@ function UploadForm(props: {
           </div>
         )}
       </div>
+
 
       {/* Caption + city */}
       <div className="space-y-4 mb-8">
