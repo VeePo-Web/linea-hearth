@@ -81,8 +81,8 @@ export default function SwipeActions({
           className={`
             w-16 h-16 rounded-full border-2 flex flex-col items-center justify-center gap-0.5
             ${canOneTap 
-              ? 'bg-champagne-500 hover:bg-champagne-400 border-champagne-400 text-white' 
-              : 'bg-green-500/20 hover:bg-green-500/40 border-green-500/50 hover:border-green-400 text-green-400 hover:text-green-300'
+              ? 'bg-primary hover:bg-primary/90 border-primary text-primary-foreground' 
+              : 'bg-primary/20 hover:bg-primary/40 border-primary/50 hover:border-primary text-primary hover:text-primary'
             }
           `}
           aria-label={canOneTap 
