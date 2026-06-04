@@ -551,8 +551,8 @@ Deno.serve(async (req) => {
       await sbAdmin
         .from("orders")
         .update({
-          status: "failed",
-          payment_status: "failed",
+          status: "cancelled",
+          payment_status: "unpaid",
           metadata: {
             abandonedCartId: body.abandonedCartId ?? null,
             checkoutError: stripeErr instanceof Error ? stripeErr.message : "Stripe checkout session failed",
