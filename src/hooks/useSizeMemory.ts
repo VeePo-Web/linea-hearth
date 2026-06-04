@@ -61,7 +61,7 @@ const getSizeType = (categorySlug: string): SizeType | null => {
   
   const topsCategories = [
     'tops', 'tees', 'short-sleeve', 'long-sleeve', 'cropped',
-    'hoodies', 'pullover-hoodies', 'zip-up-hoodies', 'crewnecks',
+    'hoodies', 'pullover-hoodies', 'zip-up-hoodies',
     'quarter-zips', 'lightweight-hoodies', 'top', 't-shirts',
     'sweatshirts', 'jackets', 'outerwear', 'shirts'
   ];

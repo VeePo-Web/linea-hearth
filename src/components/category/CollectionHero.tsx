@@ -87,11 +87,6 @@ const collectionData: Record<string, CollectionContent> = {
     tagline: "Layer up. Stand out.",
     bgClass: "bg-gradient-to-br from-neutral-700 to-zinc-900",
   },
-  "crewnecks": {
-    title: "Crewnecks",
-    tagline: "Clean lines. Clear message.",
-    bgClass: "bg-gradient-to-br from-stone-600 to-zinc-900",
-  },
   "quarter-zips": {
     title: "Quarter Zips",
     tagline: "Refined. Relentless.",

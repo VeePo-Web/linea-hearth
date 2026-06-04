@@ -1,16 +1,23 @@
-# Remove all "Heavenly Crewneck" references
+# Remove Crewneck from Catalog Surfaces
 
-Grep shows the visible copy is already gone (SearchOverlay uses "Heavenly Cap"). Remaining mentions are stale identifiers/comments that should be cleaned up so no future code re-references a ghost SKU.
+## Context
+
+DB check: no `crewneck` products and no `crewnecks` category exist. The only "Heavenly*" products are caps (Heavenly Khaki Low-Profile Baseball Cap, etc.). `SearchOverlay` already lists "Heavenly Cap" — good.
+
+Remaining stale crewneck references are all in frontend marketing/UI strings (and one size-memory list). The 3D try-on `CrewneckGeometry` is internal rendering engine code, not catalog — leaving it alone unless you want it ripped out too.
 
 ## Changes
 
-1. **`src/pages/Lookbook.tsx`** — the `DEMO_PRODUCTS.heavenlyCrewneck` key actually points to the `"Adam & God" Boxy Tee`. Rename the key to `adamGodTee` and update all 4 usages in `demoLooks` (lines 75, 86, 97, 119). No visible product/name changes — just removes the misleading identifier.
+1. **`src/components/category/CollectionHero.tsx`** (lines 90–94) — Remove the `"crewnecks"` entry from the category hero map so no PLP can render a Crewnecks hero.
 
-2. **`src/lib/realProductImages.ts`** — update the header comment (line 3) to drop the `heavenly-crewneck` example. Replace with a neutral example or remove the parenthetical.
+2. **`src/components/content/FiftyFiftySection.tsx`** (line 44) — Change heading `"Crewnecks & Tees"` → `"Tees & Tops"` (or your preferred label).
 
-3. **`.lovable/plan.md`** — stale planning doc still referencing "Heavenly Crewneck". Delete the file (work is done) or strip section #1.
+3. **`src/hooks/useSizeMemory.ts`** (line 64) — Remove `'crewnecks'` from the tops category list used for size-memory grouping.
+
+4. **Verify** — re-grep `crewneck` across `src/` to confirm only the try-on 3D engine references remain.
 
 ## Out of scope
-- Not touching `.lovable/heavenly-hat-original-price.md` (that's the real Heavenly **Hat**, not crewneck).
-- Not changing `SearchOverlay.tsx` ("Heavenly Cap" stays — real product).
-- Lookbook page itself is gated behind "Coming Soon" — no visible behavior change.
+
+- `src/components/try-on/**` (CrewneckGeometry, uvProjection, GarmentLayer, useGarmentTexture) — internal 3D mesh code, not catalog/imagery. Tell me if you want this purged too.
+- No DB migration needed (no crewneck rows exist).
+- `REAL_PRODUCT_IMAGES` already has no crewneck keys.
