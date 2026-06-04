@@ -1,24 +1,32 @@
 ## Goal
-Rebuild `src/pages/NotFound.tsx` as a "lone epigraph" 404 — scripture-forward, no imagery except a 36px lion favicon sigil, typography-only, dark field.
+Polish 404 typography for perfect optical centering and readability.
 
-## Design
-- **Background**: Full dark (`bg-background`, `#0F172A`), `h-[100dvh]`.
-- **Layout**: Single centered column. Tall, narrow text column.
-- **404 mark**: Reduced to a 10px superscript reference mark, muted.
-- **Verse**: Dominant — "And thou shalt make holy garments for Aaron thy brother, for glory and for beauty." — set in large, light text, centered, narrow max-width (~480px), generous line-height.
-- **Reference**: "— Exodus 28:2 (ASV)" below in smaller muted caps.
-- **Lion sigil**: 36px favicon at bottom-center as a quiet seal.
-- **Back link**: "Return to the Treasury" (or "Enter the Gate" — we can decide in build), sharp-edged button or text link, appears after a 3-second delay via Framer Motion.
-- **Animation**: Slow fade-in (1.2s) on mount. Back link staggers in at 3s.
-- **Styling**: `rounded-none`, `-0.02em` tracking, editorialEase `[0.25, 0.46, 0.45, 0.94]`. No yellow. Silver Chrome accents if any.
+## Changes to `src/pages/NotFound.tsx`
 
-## Technical
-- Single file: `src/pages/NotFound.tsx`.
-- Use `motion` from framer-motion for entrance + delayed Back link.
-- Use existing `Link` from react-router-dom.
-- Respect `prefers-reduced-motion`.
-- Keep `Helmet` for SEO: title "Not Found — Line of Judah".
-- No `Layout` wrapper — this page should feel like a standalone epigraph, not a standard page. Or use `Layout` but override styles. Decision: full-bleed standalone, no Layout wrapper for immersion.
+**Verse (centerpiece)**
+- Narrow column: `max-w-[420px]` → `max-w-[440px]` (slightly wider for better line breaks)
+- Size: `text-xl md:text-2xl` → `text-[22px] md:text-[28px]` (more presence on desktop)
+- Leading: `1.6` → `1.5` (tighter, more poetic)
+- Tracking: `-0.01em` → `-0.015em`
+- Weight: keep `font-light`; bump opacity `text-foreground/90` → `text-foreground/95`
+
+**Hairline divider**
+- `mt-10` → `mt-12`; width `40%` → `48px` (fixed hairline, more editorial)
+- `bg-foreground/20` → `bg-foreground/30`
+
+**Citation**
+- `mt-6` → `mt-5`; tracking `0.4em` → `0.45em`
+
+**404 superscript (top)**
+- `top-8` → `top-10`; remove `<sup>` wrapper (already small); tracking `0.4em` → `0.5em`
+
+**Lion sigil + Return link (bottom)**
+- `bottom-16` → `bottom-12`; gap `gap-6` → `gap-5`
+- Sigil opacity `0.8` → `0.7` for quieter presence
+- Return link: tracking `0.45em`; add tiny silver hairline under on hover (chrome underline pattern)
+
+**Optical centering fix**
+- Wrap verse block + reserve symmetric bottom space so the verse sits at true visual center (the absolute-positioned sigil currently pulls weight downward without offsetting the layout). Add `pb-32` to main and remove absolute positioning ambiguity — keep sigil absolute but ensure verse stays vertically centered relative to viewport, not pushed up.
 
 ## Files
-- `src/pages/NotFound.tsx` (rewrite)
+- `src/pages/NotFound.tsx` (edit only)
