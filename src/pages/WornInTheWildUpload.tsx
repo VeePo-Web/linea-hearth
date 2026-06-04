@@ -48,7 +48,9 @@ function isHeic(f: File): boolean {
   return ext === "heic" || ext === "heif";
 }
 
-function validateFile(f: File): { ok: true } | { ok: false; code: ValidationCode } {
+type ValidationResult = { ok: true } | { ok: false; code: ValidationCode };
+
+function validateFile(f: File): ValidationResult {
   if (f.size === 0) return { ok: false, code: "empty_file" };
   if (f.size > MAX_BYTES) return { ok: false, code: "file_too_large" };
   if (f.size < MIN_BYTES) return { ok: false, code: "file_too_small" };
@@ -59,6 +61,7 @@ function validateFile(f: File): { ok: true } | { ok: false; code: ValidationCode
   if (!mimeOk && !extOk) return { ok: false, code: "unsupported_type" };
   return { ok: true };
 }
+
 
 async function convertHeicToJpeg(file: File): Promise<File> {
   const mod = await import("heic2any");
