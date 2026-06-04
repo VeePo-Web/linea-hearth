@@ -586,14 +586,21 @@ function UploadForm(props: {
               </p>
               <p className="text-[10px] tabular-nums text-neutral-500">{progressPct}%</p>
             </div>
-            <div className="h-px bg-neutral-200 mb-4 overflow-hidden">
+            <div className="h-px bg-neutral-200 mb-2 overflow-hidden">
               <motion.div
                 className="h-full bg-[#4CAF50]"
                 initial={false}
                 animate={{ width: `${progressPct}%` }}
-                transition={{ duration: 0.4, ease: EASE }}
+                transition={{ duration: 0.15, ease: "linear" }}
               />
             </div>
+            {currentStep === "upload" && totalBytes > 0 && (
+              <p className="text-[10px] uppercase tracking-[0.18em] text-neutral-500 tabular-nums mb-4">
+                {kb(uploadedBytes).toLocaleString()} / {kb(totalBytes).toLocaleString()} KB
+              </p>
+            )}
+            {currentStep !== "upload" && <div className="mb-4" />}
+
             <ul className="space-y-2">
               {STEP_ORDER.map((step) => {
                 const idx = STEP_ORDER.indexOf(step);
