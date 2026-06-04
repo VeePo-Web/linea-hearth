@@ -595,7 +595,7 @@ Deno.serve(async (req) => {
       .is('email_1_sent_at', null)
       .lt('created_at', email1Threshold.toISOString());
     for (const cart of email1Carts || []) {
-      const r = await processCart(deps, cart as AbandonedCart, 1, 'Your armor is waiting | Line of Judah', (url) => ({
+      const r = await processCart(deps, cart as AbandonedCart, 1, 'You left something behind | Line of Judah', (url) => ({
         html: getEmail1Html(cart as AbandonedCart, url, siteUrl),
       }));
       tally(r, 1);
