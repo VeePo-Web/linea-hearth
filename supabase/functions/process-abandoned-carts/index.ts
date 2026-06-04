@@ -300,7 +300,7 @@ function getEmail2Html(cart: AbandonedCart, recoveryUrl: string, siteUrl: string
                     Still thinking it over?
                   </h1>
                   <p style="margin:0;font-size:15px;line-height:1.6;color:#57534E;">
-                    Sixty-seven others picked up theirs this week.<br/>Yours is still here, exactly as you left it.
+                    Your selection is still here — exactly as you left it.<br/>Whenever you're ready, we're here.
                   </p>
                 </td>
               </tr>
