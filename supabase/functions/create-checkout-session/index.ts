@@ -258,9 +258,12 @@ Deno.serve(async (req) => {
       (sum, { item, unitAmountCents }) => sum + unitAmountCents * item.quantity,
       0,
     );
-    const method = body.shippingMethod ?? "standard";
+    // Regular shipping is the only active option for now. Force this server-side
+    // too, so stale clients or carts cannot request express/overnight rates.
+    const method: "standard" = "standard";
     const isFreeShipping = subtotalCents >= FREE_SHIPPING_THRESHOLD_CENTS && method === "standard";
     const shippingAmount = isFreeShipping ? 0 : SHIPPING_RATES[method];
+    const enableAutomaticTax = environment === "live";
 
     // Resolve + create discount (one-off Stripe coupon) if a valid code was applied
     let stripeDiscounts: Array<{ coupon: string }> | undefined;
@@ -494,53 +497,78 @@ Deno.serve(async (req) => {
       })),
     );
 
-    const session = await stripe.checkout.sessions.create({
-      line_items: lineItems,
-      mode: "payment",
-      ui_mode: "embedded_page",
-      return_url: body.returnUrl,
-      ...(customerId && { customer: customerId }),
-      ...(stripeDiscounts && { discounts: stripeDiscounts }),
-      automatic_tax: { enabled: true },
-      shipping_address_collection: { allowed_countries: ["CA", "US"] },
-      shipping_options: [
-        {
-          shipping_rate_data: {
-            type: "fixed_amount",
-            fixed_amount: { amount: shippingAmount, currency: "cad" },
-            display_name: isFreeShipping
-              ? "Free shipping"
-              : method === "standard"
-                ? "Standard (5-9 days)"
-                : method === "express"
-                  ? "Express (2-3 days)"
-                  : "Overnight",
-            tax_behavior: "exclusive",
-            tax_code: "txcd_92010001", // shipping
+    let session;
+    try {
+      session = await stripe.checkout.sessions.create({
+        line_items: lineItems,
+        mode: "payment",
+        ui_mode: "embedded_page",
+        return_url: body.returnUrl,
+        ...(customerId && {
+          customer: customerId,
+          customer_update: {
+            address: "auto",
+            shipping: "auto",
+          },
+        }),
+        ...(stripeDiscounts && { discounts: stripeDiscounts }),
+        ...(enableAutomaticTax && { automatic_tax: { enabled: true } }),
+        shipping_address_collection: { allowed_countries: ["CA", "US"] },
+        shipping_options: [
+          {
+            shipping_rate_data: {
+              type: "fixed_amount",
+              fixed_amount: { amount: shippingAmount, currency: "cad" },
+              display_name: isFreeShipping ? "Free shipping" : "Standard (5-9 days)",
+              tax_behavior: "exclusive",
+              tax_code: "txcd_92010001", // shipping
+            },
+          },
+        ],
+        payment_intent_data: {
+          description: `Line of Judah order ${order.id.slice(0, 8).toUpperCase()}`,
+          // Statement descriptor suffix surfaces on the customer's bank statement
+          // alongside the Stripe DBA. Recognizable descriptors are the #1
+          // chargeback preventer. Max 22 chars, no <>'"* characters.
+          statement_descriptor_suffix: "ORDER",
+          // Persist the PM on the Customer so the post-purchase one-click upsell
+          // can charge off_session within the 30-min eligibility window.
+          setup_future_usage: "off_session",
+          metadata: {
+            orderId: order.id,
+            ...(userId && { userId }),
           },
         },
-      ],
-      payment_intent_data: {
-        description: `Line of Judah order ${order.id.slice(0, 8).toUpperCase()}`,
-        // Statement descriptor suffix surfaces on the customer's bank statement
-        // alongside the Stripe DBA. Recognizable descriptors are the #1
-        // chargeback preventer. Max 22 chars, no <>'"* characters.
-        statement_descriptor_suffix: "ORDER",
-        // Persist the PM on the Customer so the post-purchase one-click upsell
-        // can charge off_session within the 30-min eligibility window.
-        setup_future_usage: "off_session",
+
+
         metadata: {
           orderId: order.id,
           ...(userId && { userId }),
         },
-      },
+      });
+    } catch (stripeErr) {
+      console.error("Stripe checkout session creation failed", stripeErr);
+      await sbAdmin
+        .from("orders")
+        .update({
+          status: "cancelled",
+          payment_status: "unpaid",
+          metadata: {
+            abandonedCartId: body.abandonedCartId ?? null,
+            checkoutError: stripeErr instanceof Error ? stripeErr.message : "Stripe checkout session failed",
+          },
+        })
+        .eq("id", order.id);
 
-
-      metadata: {
-        orderId: order.id,
-        ...(userId && { userId }),
-      },
-    });
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: stripeErr instanceof Error ? stripeErr.message : "Stripe checkout session failed",
+          orderId: order.id,
+        }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
 
     await sbAdmin
       .from("orders")
