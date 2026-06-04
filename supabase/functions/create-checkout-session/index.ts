@@ -263,6 +263,7 @@ Deno.serve(async (req) => {
     const method: "standard" = "standard";
     const isFreeShipping = subtotalCents >= FREE_SHIPPING_THRESHOLD_CENTS && method === "standard";
     const shippingAmount = isFreeShipping ? 0 : SHIPPING_RATES[method];
+    const enableAutomaticTax = environment === "live";
 
     // Resolve + create discount (one-off Stripe coupon) if a valid code was applied
     let stripeDiscounts: Array<{ coupon: string }> | undefined;
@@ -511,7 +512,7 @@ Deno.serve(async (req) => {
           },
         }),
         ...(stripeDiscounts && { discounts: stripeDiscounts }),
-        automatic_tax: { enabled: true },
+        ...(enableAutomaticTax && { automatic_tax: { enabled: true } }),
         shipping_address_collection: { allowed_countries: ["CA", "US"] },
         shipping_options: [
           {
