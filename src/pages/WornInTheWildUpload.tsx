@@ -28,10 +28,12 @@ const MAX_BYTES = 10 * 1024 * 1024;
 
 function friendlyError(code?: string): string {
   switch (code) {
+    case "heic_unsupported":
+      return "iPhone HEIC photos can't be processed in-browser. In iOS Settings → Camera → Formats, switch to 'Most Compatible', then retake — or pick a JPG/PNG from your library.";
     case "file_too_large":
       return "That photo is over 10MB. Please choose a smaller one.";
     case "unsupported_type":
-      return "Only JPG, PNG, WebP, or HEIC photos are accepted.";
+      return "Only JPG, PNG, or WebP photos are accepted.";
     case "invalid_image":
       return "We couldn't read that image. Try a different file.";
     case "invalid_token":
@@ -47,6 +49,13 @@ function friendlyError(code?: string): string {
     default:
       return code ? `Something went wrong (${code}). Try again.` : "Something went wrong. Try again.";
   }
+}
+
+function isHeic(f: File): boolean {
+  const t = (f.type || "").toLowerCase();
+  if (t.includes("heic") || t.includes("heif")) return true;
+  const name = f.name.toLowerCase();
+  return name.endsWith(".heic") || name.endsWith(".heif");
 }
 
 // Client-side resize + EXIF strip via canvas re-encode (canvas does not
