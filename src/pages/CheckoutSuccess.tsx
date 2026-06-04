@@ -70,9 +70,10 @@ const CheckoutSuccess = () => {
         return;
       }
 
-      // Poll up to ~12s for the webhook to mark the order paid
-      const maxAttempts = 6;
+      // Poll up to ~30s for the webhook to mark the order paid
+      const maxAttempts = 15;
       for (let attempt = 0; attempt < maxAttempts; attempt++) {
+
         const { data: orderData } = await supabase
           .from("orders")
           .select("*")
