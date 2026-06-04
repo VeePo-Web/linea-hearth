@@ -132,7 +132,7 @@ export default function SwipeProgress({
             style={{ left: '50%' }}
           />
           <div 
-            className="absolute top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-green-500/50 border border-green-500"
+            className="absolute top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-primary/50 border border-primary"
             style={{ left: '100%', transform: 'translate(-100%, -50%)' }}
           />
         </div>
