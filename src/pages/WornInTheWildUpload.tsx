@@ -631,7 +631,7 @@ function UploadForm(props: {
         disabled={submitDisabled}
         aria-busy={isSubmitting}
         onClick={props.onSubmit}
-        className="w-full bg-foreground text-white text-xs uppercase tracking-[0.2em] font-medium py-4 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-foreground/85 transition-colors relative overflow-hidden tabular-nums"
+        className="w-full bg-foreground text-background text-xs uppercase tracking-[0.2em] font-medium py-4 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-foreground/85 transition-colors relative overflow-hidden tabular-nums"
       >
         {isSubmitting ? (
           <span className="inline-flex items-center justify-center gap-2">
@@ -687,7 +687,7 @@ function RewardReveal({ code, percent }: { code: string; percent: number }) {
 
       <Link
         to={`/catalogue?promo=${code}`}
-        className="block w-full bg-foreground text-white text-xs uppercase tracking-[0.2em] font-medium py-4 text-center hover:bg-foreground/85 transition-colors"
+        className="block w-full bg-foreground text-background text-xs uppercase tracking-[0.2em] font-medium py-4 text-center hover:bg-foreground/85 transition-colors"
       >
         Use it now
       </Link>

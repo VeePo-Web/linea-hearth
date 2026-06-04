@@ -189,7 +189,7 @@ const AdminOrderDetail = () => {
                     <span>${(order.subtotal_cents / 100).toFixed(2)}</span>
                   </div>
                   {order.discount_cents > 0 && (
-                    <div className="flex justify-between text-green-600">
+                    <div className="flex justify-between text-foreground">
                       <span>Discount{order.discount_code ? ` (${order.discount_code})` : ''}</span>
                       <span>-${(order.discount_cents / 100).toFixed(2)}</span>
                     </div>

@@ -105,7 +105,7 @@ export default function AdminWornInTheWild() {
                       {s.city && ` · ${s.city}`}
                     </span>
                     <span className={`text-[10px] uppercase px-2 py-0.5 ${
-                      s.status === "featured" ? "bg-foreground text-white" :
+                      s.status === "featured" ? "bg-foreground text-background" :
                       s.status === "approved" ? "bg-emerald-100 text-emerald-900" :
                       s.status === "rejected" ? "bg-red-100 text-red-900" :
                       "bg-amber-100 text-amber-900"
@@ -121,7 +121,7 @@ export default function AdminWornInTheWild() {
                       <button
                         disabled={busy === s.id}
                         onClick={() => review(s.id, "approve")}
-                        className="flex-1 text-[10px] uppercase tracking-wider bg-foreground text-white py-2 disabled:opacity-50"
+                        className="flex-1 text-[10px] uppercase tracking-wider bg-foreground text-background py-2 disabled:opacity-50"
                       >Approve</button>
                       <button
                         disabled={busy === s.id}
