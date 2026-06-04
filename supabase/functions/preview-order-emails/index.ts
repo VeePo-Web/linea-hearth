@@ -135,6 +135,14 @@ function buildAdminHtml(order: any, items: any[], siteUrl: string): string {
     .filter((l) => l && String(l).trim().length > 0).map((l) => escapeHtml(l)).join("<br>");
   return `<!DOCTYPE html><html><body style="font-family:-apple-system,Segoe UI,Roboto,sans-serif;background:#f5f5f4;margin:0;padding:24px;color:#1c1917;">
   <div style="max-width:680px;margin:0 auto;background:#fff;padding:32px;border:1px solid #e7e5e4;">
+    <table cellpadding="0" cellspacing="0" border="0" style="margin:0 0 20px;"><tr>
+      <td style="vertical-align:middle;padding-right:10px;line-height:0;">
+        <img src="https://lineofjudah.clothing/favicon-180.png" width="22" height="22" alt="" style="display:block;border:0;" />
+      </td>
+      <td style="vertical-align:middle;">
+        <p style="margin:0;font-size:12px;font-weight:700;letter-spacing:2px;color:#1c1917;text-transform:uppercase;">LINE OF JUDAH — OPS</p>
+      </td>
+    </tr></table>
     <h1 style="margin:0 0 4px;font-size:20px;">New order #${orderNumber}</h1>
     <p style="margin:0 0 24px;color:#78716c;font-size:13px;">Placed ${escapeHtml(placedAt)} • Payment: <strong>${escapeHtml(order.payment_status)}</strong></p>
     <h2 style="font-size:14px;margin:24px 0 8px;text-transform:uppercase;letter-spacing:1px;color:#57534e;">Customer</h2>
