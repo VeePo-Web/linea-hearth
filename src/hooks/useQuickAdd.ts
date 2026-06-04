@@ -25,6 +25,7 @@ export interface ProductForQuickAdd {
   position?: string | null;
   product_images?: Array<{ image_url: string; is_primary: boolean; display_order?: number }>;
   product_variants?: Array<{ 
+    id?: string;
     size: string | null; 
     color: string | null;
     stock_quantity: number;
@@ -285,8 +286,14 @@ export function useQuickAdd(
       const primaryImage = product.product_images?.find(img => img.is_primary) 
         || product.product_images?.[0];
 
+      const matchedVariant = product.product_variants?.find(
+        v => (v.size || '') === (sizeToUse || '') && (v.color || '') === (color || '')
+      );
+
       addItem({
         id: productIdToCartId(product.id),
+        productId: product.id,
+        variantId: matchedVariant?.id,
         name: product.name,
         price: displayPrice,
         priceFormatted: formatPrice(displayPrice),
