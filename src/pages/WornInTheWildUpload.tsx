@@ -491,10 +491,12 @@ function UploadForm(props: {
             <button
               type="button"
               onClick={props.onPickClick}
-              className="absolute top-3 right-3 bg-white/90 backdrop-blur px-3 py-2 text-[10px] uppercase tracking-[0.18em] border border-neutral-300"
+              disabled={isSubmitting}
+              className="absolute top-3 right-3 bg-white/90 backdrop-blur px-3 py-2 text-[10px] uppercase tracking-[0.18em] border border-neutral-300 disabled:opacity-40 disabled:cursor-not-allowed disabled:pointer-events-none"
             >
               Change
             </button>
+
           </div>
         )}
       </div>
