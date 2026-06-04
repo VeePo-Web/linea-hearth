@@ -124,7 +124,7 @@ export function SwipeableLookCard({
         style={{ opacity: addOpacity }}
         className="absolute top-1/2 right-4 -translate-y-1/2 z-20 pointer-events-none"
       >
-        <div className="bg-green-600/95 backdrop-blur-sm text-white px-4 py-3 flex items-center gap-2 shadow-lg">
+        <div className="bg-primary/95 backdrop-blur-sm text-primary-foreground px-4 py-3 flex items-center gap-2 shadow-lg">
           <ShoppingBag className="w-5 h-5" />
           <span className="font-medium text-sm uppercase tracking-wide">Add Look</span>
         </div>
