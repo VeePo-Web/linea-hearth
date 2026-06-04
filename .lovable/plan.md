@@ -1,54 +1,50 @@
-# Stripe deep audit, $1 test path, and failure alerts
+# Audit results
 
-## 1. Deep Stripe audit — could it be your own card?
+## ✅ Working
 
-Pull a full read-only picture from Stripe (via the connector gateway) before drawing conclusions:
+- **Heavenly Hat price**: confirmed `$1.00` in DB on product `39912e5b…`. Storefront will reflect immediately. Revert snapshot saved at `.lovable/heavenly-hat-original-price.md`.
+- **Webhook alert wiring**: `stripe-webhook/index.ts` correctly calls `alertPaymentFailed` on both `payment_intent.payment_failed` and `checkout.session.async_payment_failed`, `alertRefund` on `charge.refunded`, and `alertDispute` on `charge.dispute.created`. Idempotency keyed off Stripe event id. Webhook dedupe table also gates retries.
+- **Config**: `send-admin-alert` has `verify_jwt = false` and is gated internally by a SERVICE_ROLE_KEY check, so it can't be invoked anonymously.
+- **Helper**: `sendAdminAlert` is fire-and-forget — it can't break the webhook handler if Resend is down.
 
-- **Customer `cus_UdiSlOI9lBQnXO`** (parker@veepo.ca): list every `payment_intent` and `charge` ever attached — successes, failures, blocked. Check Radar outcome (`risk_level`, `risk_score`, `network_status`, `seller_message`) on each.
-- **Pull this specific successful charge** for order FF614293: confirm `outcome.network_status == "approved_by_network"`, `risk_level`, `payment_method_details.card.checks` (cvc/postal/address), funding type (credit/debit/prepaid), country, and brand. This tells us if your card is being soft-flagged.
-- **Search all Stripe Events** in live for `payment_intent.payment_failed` and `charge.failed` in the last 7 days — surface anything we never heard about because the webhook wasn't wired.
-- **Cross-check `failed_orders`-equivalent**: pending/unpaid orders in our DB created in the last 7 days, joined to whatever Stripe knows about them.
+## 🔴 Two bugs that will prevent delivery
 
-Surfaced as a single report in chat: card brand/funding/country, success vs decline counts, risk scores, any Radar blocks, and any silent declines we missed. If your card is being flagged, you'll see it here. (Spoiler from earlier audit: the $40 charge was `succeeded`, so the only failure mode so far is **the webhook never reaching us**, not the card. But this audit confirms it definitively.)
+### Bug 1 — Wrong Resend transport
+`send-admin-alert/index.ts` posts to `https://connector-gateway.lovable.dev/resend` with `LOVABLE_API_KEY` + `X-Connection-Api-Key`. But this project has **no Resend connector linked** — every other function (`send-order-confirmation`, `process-abandoned-carts`, etc.) hits `https://api.resend.com/emails` directly with `RESEND_API_KEY` as Bearer. The gateway call will 401/404.
 
-## 2. $1 Heavenly Hat test (temporary)
+**Fix:** rewrite the Resend POST in `send-admin-alert` to match the rest of the codebase:
+```
+fetch("https://api.resend.com/emails", {
+  headers: { Authorization: `Bearer ${RESEND_API_KEY}` },
+  body: { from, to, reply_to, subject, html },
+})
+```
 
-- Find the Heavenly Hat product in `products` (and any variant rows that override base price). Snapshot current `price_cents` into a note in `.lovable/heavenly-hat-original-price.md` so we can revert with one command.
-- `UPDATE` price to `100` cents on the product and every variant (compare-at price left alone).
-- Verify on the storefront PLP/PDP that it shows $1.00.
+### Bug 2 — `onboarding@resend.dev` can only send to the account owner
+Resend restricts the shared `onboarding@resend.dev` sender to the email address that owns the Resend account. Sending to **both** `parker@veepo.ca` and `1.lineofjudah.1@gmail.com` from this sender will be rejected by Resend with `403 You can only send testing emails to your own email address` for whichever recipient isn't the account owner.
 
-## 3. Failure-purchase alert emails
+This is the same root cause as the `process-abandoned-carts` log we already see:
+```
+Resend API error: lineofjudah.com domain is not verified
+```
 
-### Trigger points (inside `supabase/functions/stripe-webhook/index.ts`)
-Add admin alerts on these existing event handlers:
-- `payment_intent.payment_failed` → `handlePaymentFailed`
-- `checkout.session.async_payment_failed` (currently only logs — add alert + mark order unpaid)
-- `charge.dispute.created` → already updates DB, add alert
-- `charge.refunded` → add alert (so you know when one fires)
+**Two ways to fix — pick one:**
 
-### Mechanism
-New shared helper `supabase/functions/_shared/admin-alert.ts` that POSTs to a new edge function `send-admin-alert` with `{ subject, html, context }`.
+- **(A) Domain verification (proper fix)** — verify `lineofjudah.clothing` (or a subdomain like `mail.lineofjudah.clothing`) in Resend, then switch `ADMIN_FROM` to `alerts@lineofjudah.clothing`. Unblocks customer confirmations too.
+- **(B) Single-recipient fallback (immediate)** — temporarily set `ADMIN_RECIPIENTS = ["<resend-account-owner-email>"]` only, until domain verifies. Loses the dual-inbox guarantee but starts working today.
 
-`send-admin-alert` edge function:
-- Sends via **Resend** (existing `RESEND_API_KEY` is set).
-- **From:** `Line of Judah Alerts <onboarding@resend.dev>` — guaranteed deliverable today even though `lineofjudah.clothing` isn't verified in Resend yet. Once you verify the domain, flip one constant to `alerts@lineofjudah.clothing` and redeploy.
-- **To:** `parker@veepo.ca`, `1.lineofjudah.1@gmail.com` (both hardcoded as `ADMIN_ALERT_RECIPIENTS` constant — easy to edit later).
-- **Reply-to:** same admin list.
-- Subject format: `[LOJ Alert] Payment failed — order FF614293 — $40 CAD`.
-- Body: editorial-stripped HTML — order id (linked to ops portal), customer email, amount, failure reason from Stripe (`last_payment_error.message` / decline_code), payment method type, timestamp, link to Stripe Dashboard event.
-- Logged to `email_send_log` so failures are auditable.
-- Idempotency key per Stripe event id so retries don't double-alert.
+## 🧪 Validation plan after fixes
 
-### Out of scope
-- Not touching the customer-facing `send-order-confirmation` flow (still blocked on Resend verifying `lineofjudah.com`). Separate fix.
-- Not building the new domain verification — admin alerts route around it.
+1. Curl `send-admin-alert` directly with a synthetic payload (service-role auth) and confirm a 200 + an email lands.
+2. Use Stripe CLI / Dashboard to fire a test `payment_intent.payment_failed` against the live webhook (`?env=live`) and confirm an alert lands in both inboxes (if domain verified) or the owner inbox (if fallback).
+3. Tail `supabase functions logs send-admin-alert` to confirm `email_send_log` rows go `pending → sent`.
 
-## Technical notes
-- Gateway used for Stripe reads: `https://connector-gateway.lovable.dev/stripe` with `X-Connection-Api-Key: $STRIPE_LIVE_API_KEY`.
-- Resend used directly via existing `RESEND_API_KEY` secret (no connector needed — secret already exists).
-- All work is server-side; no UI changes except the Heavenly Hat price reflecting through existing PDP/PLP queries.
+## Questions before I proceed
+
+1. **Resend transport fix** — go ahead and rewrite to direct `api.resend.com` (matches rest of codebase). Yes/no.
+2. **Sender domain** — should I (A) walk you through verifying `lineofjudah.clothing` in Resend now, or (B) ship the single-recipient fallback first and verify later? Which email owns your Resend account?
+3. After fixes, want me to actually fire the test alert (curl the function) so you see a real email land?
 
 ## Out of scope
-- Switching to Lovable's built-in email system.
-- Fixing the customer-facing order confirmation email path (separate Resend domain verification task).
-- Re-registering the Stripe webhook (still your action — covered last turn).
+- Customer-facing confirmation email path (still blocked on same domain verification — separate task).
+- Re-registering the Stripe webhook endpoint.
