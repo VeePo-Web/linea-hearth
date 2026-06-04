@@ -142,7 +142,7 @@ export const recommendSize = (
 export const getFitStatusInfo = (status: SizeFit['status']): { icon: string; color: string; text: string } => {
   switch (status) {
     case 'perfect':
-      return { icon: '✓', color: 'text-green-600', text: 'Perfect fit' };
+      return { icon: '✓', color: 'text-foreground', text: 'Perfect fit' };
     case 'tight':
       return { icon: '△', color: 'text-amber-500', text: 'Snug fit' };
     case 'loose':
