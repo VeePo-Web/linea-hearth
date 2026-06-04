@@ -1,6 +1,6 @@
 // Real product image URLs from Supabase storage.
 // Used as decorative/editorial fallbacks across marketing surfaces so we never
-// reference ghost products (e.g. heavenly-crewneck, stay-holy-hoodie).
+// reference ghost products that don't exist in the live catalogue.
 
 const BASE =
   "https://harckavibhmimndfvnyo.supabase.co/storage/v1/object/public/product-images";

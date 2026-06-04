@@ -39,7 +39,7 @@ interface Look {
 import { REAL_PRODUCT_IMAGES as IMG } from "@/lib/realProductImages";
 
 const DEMO_PRODUCTS = {
-  heavenlyCrewneck: {
+  adamGodTee: {
     id: 'demo-adam-god',
     name: '"Adam & God" Boxy Tee',
     slug: 'adam-god-mineral-wash-cotton-boxy-tee-shirt',
@@ -72,7 +72,7 @@ const demoLooks: Look[] = [
     image_url: 'https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?w=1200',
     video_url: null,
     gender: 'male',
-    products: [DEMO_PRODUCTS.heavenlyCrewneck, DEMO_PRODUCTS.stayHolyHoodie],
+    products: [DEMO_PRODUCTS.adamGodTee, DEMO_PRODUCTS.stayHolyHoodie],
   },
   {
     id: '2',
@@ -83,7 +83,7 @@ const demoLooks: Look[] = [
     image_url: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=1200',
     video_url: null,
     gender: 'female',
-    products: [DEMO_PRODUCTS.stayHolyHoodie, DEMO_PRODUCTS.heavenlyCrewneck],
+    products: [DEMO_PRODUCTS.stayHolyHoodie, DEMO_PRODUCTS.adamGodTee],
   },
   {
     id: '3',
@@ -94,7 +94,7 @@ const demoLooks: Look[] = [
     image_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=1200',
     video_url: null,
     gender: 'male',
-    products: [DEMO_PRODUCTS.heavenlyCrewneck],
+    products: [DEMO_PRODUCTS.adamGodTee],
   },
   {
     id: '4',
@@ -116,7 +116,7 @@ const demoLooks: Look[] = [
     image_url: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=1200',
     video_url: null,
     gender: 'unisex',
-    products: [DEMO_PRODUCTS.heavenlyCrewneck, DEMO_PRODUCTS.stayHolyHoodie],
+    products: [DEMO_PRODUCTS.adamGodTee, DEMO_PRODUCTS.stayHolyHoodie],
   },
 ];
 
