@@ -278,7 +278,7 @@ function buildOrderConfirmationHtml(order: Order, items: OrderItem[], siteUrl: s
           <tr>
             <td style="padding:0 40px;">
               <div style="border-top:1px solid #E7E5E4;padding-top:32px;">
-                <p style="margin:0 0 20px;font-size:12px;font-weight:700;letter-spacing:2px;color:#78716C;text-transform:uppercase;">WHAT YOU'RE WEARING INTO BATTLE</p>
+                <p style="margin:0 0 20px;font-size:12px;font-weight:700;letter-spacing:2px;color:#78716C;text-transform:uppercase;">WHAT YOU'LL BE WEARING</p>
                 <table width="100%" cellpadding="0" cellspacing="0">
                   ${itemsHtml}
                 </table>
