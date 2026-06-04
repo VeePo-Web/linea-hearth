@@ -148,7 +148,9 @@ export default function WornInTheWildUpload() {
   const [city, setCity] = useState("");
   const [consent, setConsent] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isConverting, setIsConverting] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+
 
   useEffect(() => {
     if (!token) {
