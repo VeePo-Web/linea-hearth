@@ -229,7 +229,7 @@ function buildOrderConfirmationHtml(order: Order, items: OrderItem[], siteUrl: s
   
   <!-- Preheader -->
   <div style="display:none;max-height:0;overflow:hidden;mso-hide:all;">
-    Your armor is on the way. Order #${orderNumber} confirmed. Welcome in — you're one of us now.
+    Your order is on its way. Order #${orderNumber} confirmed — thank you for walking with us.
   </div>
   
   <!-- Email Container -->
