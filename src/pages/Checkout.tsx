@@ -849,29 +849,6 @@ const Checkout = () => {
                         </div>
                       </div>
 
-                      <div className="flex items-center justify-between p-4 border border-muted-foreground/20 rounded-none">
-                        <div className="flex items-center space-x-3">
-                          <RadioGroupItem value="express" id="express" />
-                          <Label htmlFor="express" className="font-light text-foreground">
-                            Express Shipping
-                          </Label>
-                        </div>
-                        <div className="text-sm text-muted-foreground">
-                          {formatPrice(CURRENCY.expressShippingCost)} • 1-2 business days
-                        </div>
-                      </div>
-
-                      <div className="flex items-center justify-between p-4 border border-muted-foreground/20 rounded-none">
-                        <div className="flex items-center space-x-3">
-                          <RadioGroupItem value="overnight" id="overnight" />
-                          <Label htmlFor="overnight" className="font-light text-foreground">
-                            Overnight Delivery
-                          </Label>
-                        </div>
-                        <div className="text-sm text-muted-foreground">
-                          {formatPrice(CURRENCY.overnightShippingCost)} • Next business day
-                        </div>
-                      </div>
                     </RadioGroup>
                   </div>
 

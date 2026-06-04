@@ -1,23 +1,15 @@
-## Plan
+## Goal
+Temporarily remove Express and Overnight shipping options from checkout, leaving only Standard.
 
-1. **Fix the product data feeding Quick Add**
-   - Update the catalogue product queries to include `product_variants.id`.
-   - Update the shared product card variant type so Quick Add receives the real variant ID instead of only size/color/stock.
+## Changes
 
-2. **Prevent stale bad cart data from breaking checkout**
-   - Add a small safety pass in the cart load/checkout path so any cart items saved before the fix that only have numeric IDs do not get sent as fake product UUIDs.
-   - If an item cannot be trusted, show a clear cart-refresh message instead of a backend 500.
+**`src/pages/Checkout.tsx`** (UI only)
+- Remove the Express and Overnight `RadioGroup` items (lines ~852-874).
+- Keep Standard as the sole, pre-selected option.
+- Initial state already defaults to `"standard"` so no logic changes needed.
 
-3. **Validate against the actual failing signal**
-   - Check the `create-checkout-session` edge function logs again after the change.
-   - Confirm the old `invalid input syntax for type uuid: "965815899"` error is no longer produced when attempting checkout.
+That's it — the backend (`create-checkout-session`) still understands `"standard"` and will charge the standard rate (or free if threshold met). Express/overnight code paths stay intact server-side for easy re-enable later.
 
-## Technical details
-
-The previous Quick Add hook fix added `productId` and `variantId` when adding to cart, but the catalogue/category queries still only fetched:
-
-```text
-product_variants(size, color, stock_quantity)
-```
-
-So `matchedVariant?.id` remained `undefined`, and any cart item already saved before the fix can still fall back to the numeric cart ID (`965815899`) during checkout. The edge function expects real UUID product IDs, so it rejects the numeric value before Stripe can open.
+## Out of scope
+- No changes to `create-checkout-session` edge function, `useStripeCheckout`, or shipping rate constants.
+- No copy changes elsewhere (FAQ, ShippingInfo, etc.) since they describe shipping in general, not the checkout selector.
