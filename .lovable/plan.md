@@ -1,55 +1,57 @@
-# Catalogue Quick Actions + Category Cleanup
+# Order confirmation + internal admin notification
 
-## 1. Add hover Quick View / Quick Add to `/catalogue`
+## Background
 
-`src/pages/Catalogue.tsx` currently renders its own bare product tiles. Replace the inline tile markup inside the grid with the existing `ProductCard` component used by `/category/*` pages — that component already ships the hover dark-glass strip with **Quick View** + **Plus** add-to-bag, mobile floating +, size picker, favorite, badges, and color swatches.
+`send-order-confirmation` (Resend, called from `stripe-webhook` on `checkout.session.completed`) already sends a branded confirmation to the customer with their items, sizes/colors, totals, discount, shipping address, and ETA. That stays.
 
-Wiring:
-- Update the `useQuery` select to include `product_variants(size, color, stock_quantity)` so `ProductCard`'s size/stock logic works.
-- Add the same `QuickViewModal` + `AuthModal` state Catalogue is missing, mirroring `ProductGrid.tsx`.
-- Pass `onQuickView` and `onAuthRequired` props; render the modals after the grid.
-- Keep Catalogue's existing toolbar, category pills, sort, and mobile filter drawer.
+## Changes
 
-## 2. Fix miscategorized products
+### 1. Add an internal admin notification email
 
-Current DB state (active only):
-- `Tops` (parent) has **1 product** — "Blessed be his name" Mineral Wash Boxy Tee → actually a tee, move to `tees` (or `short-sleeve`).
-- `Hoodies` (parent) has **1 product** — "God Bless" Line of Judah Sweater → move into `pullover-hoodies` subcategory.
+In `supabase/functions/send-order-confirmation/index.ts`, after the customer email is sent, send a **second** email containing the full order detail:
 
-After moves, parent categories `Tops` and `Hoodies` hold 0 direct products (subcategories still aggregate up via `ProductGrid`'s parent→subcategory query, so the Hoodies parent page keeps working).
+- **To:** `1.lineofjudah.1@gmail.com`, `parker@veepo.ca` (both as `to` recipients so each gets a normal inbox copy)
+- **From:** `Line of Judah Orders <orders@lineofjudah.com>` (same verified sender already in use)
+- **Reply-To:** `customer_email` (so replying goes straight to the buyer)
+- **Subject:** `New order #ABC12345 — $XX.XX CAD — {First Last}`
+- **Body (admin-focused, plain inline HTML, no marketing):**
+  - Order #, placed-at timestamp, payment status
+  - Customer: full name, email, phone
+  - Shipping address (full lines)
+  - Billing address if present and different
+  - Line items table: image thumb, product name, size, color, SKU, qty, unit price, line total
+  - Subtotal, discount + code, shipping method + cost, tax, **total**
+  - Stripe Payment Intent + Checkout Session IDs (for ops lookup)
+  - Internal notes / customer notes if present
+  - Link to `/ops-portal/orders/{id}` (admin order detail)
 
-I'll confirm the target slugs with you before running the SQL migration (see Question below).
+Failure of the admin email must not fail the customer email — wrap it in its own try/catch and log only.
 
-## 3. Remove empty category pages from navigation
+### 2. Make "send to Line of Judah" mean both inboxes everywhere
 
-`src/components/header/Navigation.tsx` hardcodes many subcategories that don't exist in the DB. Compared to populated categories, the following are empty and should be removed from the desktop + mobile menus:
+Apply the same dual-recipient rule to any other place where an email is sent **to** the Line of Judah inbox (internal notifications only — never to customer-facing emails). Audit and update if found:
+- `supabase/functions/submit-worn-photo/index.ts`
+- `supabase/functions/process-worn-in-the-wild-invites/index.ts`
+- `supabase/functions/review-worn-submission/index.ts` (only admin-direction emails)
+- `src/components/contact/ContactForm.tsx` flow if it triggers a notify email
+- Ambassador application notify if one exists
 
-- **Bottoms** entire branch (Shorts, Joggers, Sweatpants) — no `bottoms` category, no products
-- **Tees** subs: Cropped (empty); keep Short Sleeve + Long Sleeve
-- **Hoodies** subs: Crewnecks, Lightweight Hoodies (don't exist); Zip-Up Hoodies, Quarter Zips (exist but 0 products) — remove all four, keep Pullover Hoodies
-- **Hats** subs: Snapbacks, Dad Hats, Beanies (don't exist) — remove all three, Hats stays as a flat link
-- **Accessories** entire branch (Bags, Socks, Stickers) — no `accessories` category, no products
+Centralize the recipient list as a constant `INTERNAL_NOTIFY_RECIPIENTS = ["1.lineofjudah.1@gmail.com", "parker@veepo.ca"]` inside each function (no shared lib needed; keeps edge functions self-contained).
 
-Final visible nav:
-- Tees → Short Sleeve, Long Sleeve
-- Hoodies → Pullover Hoodies
-- Hats (no submenu)
+If no internal-notification email exists today for contact form or ambassador apps, do **not** add new ones in this pass — out of scope unless the user asks. Only modify existing ones.
 
-Same cleanup applied to `MobileMenu.tsx` if it mirrors the same data.
+### 3. No DB / no new env vars
 
-## 4. Out of scope
+Uses existing `RESEND_API_KEY`. No migration, no secret changes, no schema.
 
-- Not creating new DB categories.
-- Not touching admin tooling — products can still be reassigned in the admin UI later.
-- Not changing the `/catalogue` toolbar/sort/filter UX, only the tile.
+### 4. Out of scope
+
+- Not changing the customer confirmation template (already complete with all their info).
+- Not adding contact-form notifications or admin alerts where none currently exist.
+- Not switching email providers.
 
 ---
 
-## Question before I build
+## Quick confirm
 
-For the two miscategorized products, which subcategory do you want?
-
-1. **"Blessed be his name" Mineral Wash Boxy Tee** → `tees` (parent) or `short-sleeve` (sub)?
-2. **"God Bless" Line of Judah Sweater** → `pullover-hoodies`, or leave under `hoodies` parent?
-
-If you just say "you pick" I'll use `short-sleeve` and `pullover-hoodies`.
+I'm planning to **CC parker@veepo.ca on the existing internal-notification emails only** (admin alerts), not on customer-facing emails like order confirmations, shipping updates, abandoned cart, etc. Customer emails still go only to the customer. Sound right?
