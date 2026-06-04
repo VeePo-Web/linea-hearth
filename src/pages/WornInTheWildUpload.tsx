@@ -353,7 +353,9 @@ function UploadForm(props: {
   city: string;
   consent: boolean;
   error: string | null;
+  isConverting: boolean;
   onPickFile: (f: File | null) => void;
+
   onPickClick: () => void;
   fileRef: React.RefObject<HTMLInputElement>;
   setCaption: (v: string) => void;
