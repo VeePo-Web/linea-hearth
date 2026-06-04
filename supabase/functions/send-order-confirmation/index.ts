@@ -258,8 +258,9 @@ function buildOrderConfirmationHtml(order: Order, items: OrderItem[], siteUrl: s
           <!-- Hero Message -->
           <tr>
             <td align="center" style="padding:0 40px 32px;">
-              <h1 style="margin:0 0 8px;font-size:28px;font-weight:700;color:#1C1917;letter-spacing:-0.5px;">YOUR ARMOR IS ON THE WAY</h1>
-              <p style="margin:0;font-size:14px;color:#78716C;">Order #${orderNumber}</p>
+              <h1 style="margin:0 0 8px;font-size:28px;font-weight:700;color:#1C1917;letter-spacing:-0.5px;">YOUR ORDER IS ON ITS WAY</h1>
+              <p style="margin:0 0 4px;font-size:14px;color:#78716C;">Order #${orderNumber}</p>
+              <p style="margin:8px 0 0;font-size:13px;color:#78716C;font-style:italic;">Worn faith, sent with care.</p>
             </td>
           </tr>
           
@@ -267,9 +268,9 @@ function buildOrderConfirmationHtml(order: Order, items: OrderItem[], siteUrl: s
           <tr>
             <td style="padding:0 40px 40px;">
               <p style="margin:0 0 16px;font-size:16px;line-height:1.6;color:#1C1917;">Hey ${firstName},</p>
-              <p style="margin:0 0 16px;font-size:16px;line-height:1.6;color:#44403C;">You didn't just place an order — you made a declaration. Every thread you wear is a statement. Every stitch is a stand.</p>
-              <p style="margin:0 0 16px;font-size:16px;line-height:1.6;color:#44403C;font-weight:600;">Welcome in. You're one of us now.</p>
-              <p style="margin:0;font-size:15px;line-height:1.6;color:#57534E;">Your purchase keeps independent craft alive. From the bottom of our hearts — thank you.</p>
+              <p style="margin:0 0 16px;font-size:16px;line-height:1.6;color:#44403C;">You didn't just place an order — you took a stand. Every thread is a testimony. Every stitch, a step in faith.</p>
+              <p style="margin:0 0 16px;font-size:16px;line-height:1.6;color:#44403C;font-weight:600;">Called, chosen, clothed. Welcome to the family.</p>
+              <p style="margin:0;font-size:15px;line-height:1.6;color:#57534E;">Your purchase keeps independent, faith-rooted craft alive. From our family to yours — thank you.</p>
             </td>
           </tr>
           
