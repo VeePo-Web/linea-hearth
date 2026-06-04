@@ -269,83 +269,35 @@ const Catalogue = () => {
           ) : (
             <motion.div layout className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
               <AnimatePresence mode="popLayout">
-                {filtered.map((product, i) => {
-                  const img = primaryImage(product);
-                  const displayPrice =
-                    product.is_on_sale && product.sale_price
-                      ? product.sale_price
-                      : product.price;
-
-                  return (
-                    <motion.div
-                      key={product.id}
-                      layout
-                      initial={{ opacity: 0, y: 16 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0 }}
-                      transition={{
-                        duration: 0.35,
-                        delay: Math.min(i * 0.04, 0.32),
-                      }}
-                    >
-                      <Link to={`/product/${product.slug}`} className="group block">
-                        <div className="relative aspect-[3/4] bg-secondary overflow-hidden mb-3">
-                          {img ? (
-                            <img
-                              src={img}
-                              alt={product.name}
-                              className="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-105"
-                              loading="lazy"
-                            />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center">
-                              <span className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground">
-                                No image
-                              </span>
-                            </div>
-                          )}
-
-                          {/* Badges */}
-                          <div className="absolute top-2 left-2 flex flex-col gap-1">
-                            {product.is_on_sale && (
-                              <span className="bg-foreground text-background text-[9px] tracking-[0.15em] uppercase px-2 py-0.5">
-                                Sale
-                              </span>
-                            )}
-                            {product.is_featured && !product.is_on_sale && (
-                              <span className="bg-foreground/80 text-background text-[9px] tracking-[0.15em] uppercase px-2 py-0.5">
-                                Featured
-                              </span>
-                            )}
-                          </div>
-                        </div>
-
-                        <div>
-                          <p className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground mb-1">
-                            {product.categories?.name || ""}
-                          </p>
-                          <p className="text-sm font-light text-foreground leading-snug group-hover:text-muted-foreground transition-colors duration-300">
-                            {product.name}
-                          </p>
-                          <div className="flex items-center gap-2 mt-1.5">
-                            <p className="text-sm text-foreground">
-                              {formatPrice(displayPrice)}
-                            </p>
-                            {product.is_on_sale && product.sale_price && (
-                              <p className="text-xs text-muted-foreground line-through">
-                                {formatPrice(product.price)}
-                              </p>
-                            )}
-                          </div>
-                        </div>
-                      </Link>
-                    </motion.div>
-                  );
-                })}
+                {filtered.map((product, i) => (
+                  <motion.div
+                    key={product.id}
+                    layout
+                    initial={{ opacity: 0, y: 16 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.35, delay: Math.min(i * 0.04, 0.32) }}
+                  >
+                    <ProductCard
+                      product={product}
+                      index={i}
+                      onQuickView={setQuickViewProduct}
+                      onAuthRequired={() => setIsAuthModalOpen(true)}
+                    />
+                  </motion.div>
+                ))}
               </AnimatePresence>
             </motion.div>
           )}
         </div>
+
+        <QuickViewModal
+          product={quickViewProduct}
+          open={!!quickViewProduct}
+          onClose={() => setQuickViewProduct(null)}
+          onAuthRequired={() => setIsAuthModalOpen(true)}
+        />
+        <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
       </div>
     </Layout>
   );
