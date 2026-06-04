@@ -75,7 +75,7 @@ export default function AdminWornInTheWild() {
               key={s}
               onClick={() => setStatusFilter(s)}
               className={`px-4 py-2 text-xs uppercase tracking-wider border-b-2 -mb-px transition-colors ${
-                statusFilter === s ? "border-[#4CAF50] text-foreground" : "border-transparent text-muted-foreground"
+                statusFilter === s ? "border-foreground text-foreground" : "border-transparent text-muted-foreground"
               }`}
             >
               {s}
@@ -105,7 +105,7 @@ export default function AdminWornInTheWild() {
                       {s.city && ` · ${s.city}`}
                     </span>
                     <span className={`text-[10px] uppercase px-2 py-0.5 ${
-                      s.status === "featured" ? "bg-[#4CAF50] text-white" :
+                      s.status === "featured" ? "bg-foreground text-white" :
                       s.status === "approved" ? "bg-emerald-100 text-emerald-900" :
                       s.status === "rejected" ? "bg-red-100 text-red-900" :
                       "bg-amber-100 text-amber-900"
@@ -121,12 +121,12 @@ export default function AdminWornInTheWild() {
                       <button
                         disabled={busy === s.id}
                         onClick={() => review(s.id, "approve")}
-                        className="flex-1 text-[10px] uppercase tracking-wider bg-[#4CAF50] text-white py-2 disabled:opacity-50"
+                        className="flex-1 text-[10px] uppercase tracking-wider bg-foreground text-white py-2 disabled:opacity-50"
                       >Approve</button>
                       <button
                         disabled={busy === s.id}
                         onClick={() => review(s.id, "feature")}
-                        className="flex-1 text-[10px] uppercase tracking-wider border border-[#4CAF50] text-[#4CAF50] py-2 disabled:opacity-50"
+                        className="flex-1 text-[10px] uppercase tracking-wider border border-foreground text-foreground py-2 disabled:opacity-50"
                       >Feature</button>
                       <button
                         disabled={busy === s.id}

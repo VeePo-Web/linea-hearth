@@ -445,7 +445,7 @@ function UploadForm(props: {
       <h1 className="font-serif text-4xl md:text-5xl font-normal leading-[1.05] tracking-[-0.01em] mb-3">
         Worn in the wild.
       </h1>
-      <div className="w-[40%] h-px bg-[#4CAF50]/80 mb-8" />
+      <div className="w-[40%] h-px bg-foreground/80 mb-8" />
 
       <p className="text-sm leading-relaxed text-neutral-700 mb-10 max-w-lg">
         One photo of you in your {s.productName ? <strong className="font-normal text-black">{s.productName}</strong> : "piece"} —
@@ -467,11 +467,11 @@ function UploadForm(props: {
             type="button"
             onClick={props.onPickClick}
             disabled={props.isConverting}
-            className="w-full aspect-[4/5] md:aspect-video border border-[#4CAF50]/60 hover:border-[#4CAF50] transition-colors flex flex-col items-center justify-center gap-3 group disabled:opacity-60 disabled:cursor-wait"
+            className="w-full aspect-[4/5] md:aspect-video border border-foreground/60 hover:border-foreground transition-colors flex flex-col items-center justify-center gap-3 group disabled:opacity-60 disabled:cursor-wait"
           >
             {props.isConverting ? (
               <>
-                <Loader2 className="h-4 w-4 animate-spin text-[#4CAF50]" />
+                <Loader2 className="h-4 w-4 animate-spin text-foreground" />
                 <span className="text-xs uppercase tracking-[0.2em] text-neutral-600">
                   Converting iPhone photo…
                 </span>
@@ -514,7 +514,7 @@ function UploadForm(props: {
             onChange={(e) => props.setCaption(e.target.value.slice(0, 140))}
             maxLength={140}
             placeholder="At the gym after Sunday service…"
-            className="w-full bg-transparent border-b border-neutral-300 focus:border-[#4CAF50] outline-none py-2 text-sm placeholder:text-neutral-400"
+            className="w-full bg-transparent border-b border-neutral-300 focus:border-foreground outline-none py-2 text-sm placeholder:text-neutral-400"
           />
           <p className="text-[10px] text-neutral-400 mt-1">{props.caption.length}/140</p>
         </div>
@@ -528,7 +528,7 @@ function UploadForm(props: {
             onChange={(e) => props.setCity(e.target.value.slice(0, 80))}
             maxLength={80}
             placeholder="Toronto"
-            className="w-full bg-transparent border-b border-neutral-300 focus:border-[#4CAF50] outline-none py-2 text-sm placeholder:text-neutral-400"
+            className="w-full bg-transparent border-b border-neutral-300 focus:border-foreground outline-none py-2 text-sm placeholder:text-neutral-400"
           />
         </div>
       </div>
@@ -539,7 +539,7 @@ function UploadForm(props: {
           type="checkbox"
           checked={props.consent}
           onChange={(e) => props.setConsent(e.target.checked)}
-          className="mt-1 accent-[#4CAF50]"
+          className="mt-1 accent-foreground"
         />
         <span className="text-xs leading-relaxed text-neutral-600">
           I grant Line of Judah permission to feature this photo on the site and in marketing. Revocable anytime by replying to the invite email.
@@ -576,7 +576,7 @@ function UploadForm(props: {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3, ease: EASE }}
-            className="mb-6 border border-[#4CAF50]/40 bg-[#4CAF50]/5 p-4"
+            className="mb-6 border border-foreground/40 bg-foreground/5 p-4"
             role="status"
             aria-live="polite"
           >
@@ -588,7 +588,7 @@ function UploadForm(props: {
             </div>
             <div className="h-px bg-neutral-200 mb-2 overflow-hidden">
               <motion.div
-                className="h-full bg-[#4CAF50]"
+                className="h-full bg-foreground"
                 initial={false}
                 animate={{ width: `${progressPct}%` }}
                 transition={{ duration: 0.15, ease: "linear" }}
@@ -609,8 +609,8 @@ function UploadForm(props: {
                 return (
                   <li key={step} className="flex items-center gap-3 text-xs">
                     <span className="w-4 h-4 flex items-center justify-center shrink-0">
-                      {status === "done" && <Check className="h-3.5 w-3.5 text-[#4CAF50]" />}
-                      {status === "active" && <Loader2 className="h-3.5 w-3.5 text-[#4CAF50] animate-spin" />}
+                      {status === "done" && <Check className="h-3.5 w-3.5 text-foreground" />}
+                      {status === "active" && <Loader2 className="h-3.5 w-3.5 text-foreground animate-spin" />}
                       {status === "pending" && <span className="h-1.5 w-1.5 rounded-full bg-neutral-300" />}
                     </span>
                     <span className={status === "pending" ? "text-neutral-400" : "text-neutral-800"}>
@@ -631,7 +631,7 @@ function UploadForm(props: {
         disabled={submitDisabled}
         aria-busy={isSubmitting}
         onClick={props.onSubmit}
-        className="w-full bg-[#4CAF50] text-white text-xs uppercase tracking-[0.2em] font-medium py-4 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#449e48] transition-colors relative overflow-hidden tabular-nums"
+        className="w-full bg-foreground text-white text-xs uppercase tracking-[0.2em] font-medium py-4 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-foreground/85 transition-colors relative overflow-hidden tabular-nums"
       >
         {isSubmitting ? (
           <span className="inline-flex items-center justify-center gap-2">
@@ -661,7 +661,7 @@ function RewardReveal({ code, percent }: { code: string; percent: number }) {
   return (
     <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, ease: EASE }}>
       <h1 className="font-serif text-5xl md:text-6xl font-normal leading-[1] tracking-[-0.02em] mb-4">Thank you.</h1>
-      <div className="w-[40%] h-px bg-[#4CAF50]/80 mb-8" />
+      <div className="w-[40%] h-px bg-foreground/80 mb-8" />
       <p className="text-sm leading-relaxed text-neutral-700 mb-10 max-w-lg">
         Your photo is in review. As promised — here's something for your trouble.
       </p>
@@ -687,7 +687,7 @@ function RewardReveal({ code, percent }: { code: string; percent: number }) {
 
       <Link
         to={`/catalogue?promo=${code}`}
-        className="block w-full bg-[#4CAF50] text-white text-xs uppercase tracking-[0.2em] font-medium py-4 text-center hover:bg-[#449e48] transition-colors"
+        className="block w-full bg-foreground text-white text-xs uppercase tracking-[0.2em] font-medium py-4 text-center hover:bg-foreground/85 transition-colors"
       >
         Use it now
       </Link>
