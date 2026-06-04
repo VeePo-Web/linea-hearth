@@ -170,9 +170,9 @@ const Footer = () => {
           >
             <p className="text-xs tracking-[0.15em] uppercase text-white/40 transition-colors duration-500">
               This{' '}
-              <span className="transition-colors duration-500 group-hover:text-[#FF6B35]">Vision</span>
+              <span className="transition-colors duration-500 group-hover:text-foreground">Vision</span>
               {' '}Is{' '}
-              <span className="transition-colors duration-500 group-hover:text-[#4CAF50]">Powered</span>
+              <span className="transition-colors duration-500 group-hover:text-foreground">Powered</span>
               {' '}By
             </p>
             <img
@@ -182,8 +182,8 @@ const Footer = () => {
             />
             <span className="text-[10px] tracking-[0.2em] uppercase text-white/30 group-hover:text-white/60 transition-colors duration-500">veepo.ca</span>
             <span className="text-[9px] tracking-[0.15em] italic text-white/20 group-hover:text-white/40 transition-colors duration-500">Where Vision Meets Precision</span>
-            {/* Gradient underline reveal */}
-            <span className="block h-px w-24 bg-gradient-to-r from-[#FF6B35] to-[#4CAF50] scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-center" />
+            {/* Chrome hairline underline reveal */}
+            <span className="block h-px w-24 bg-foreground/60 scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-center" />
           </a>
         </div>
       </div>
