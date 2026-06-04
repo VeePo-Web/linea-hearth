@@ -1,37 +1,47 @@
-**Audit finding**
+# Fix: Stripe `return_url` rejected — checkout still broken
 
-The checkout failure is a Stripe session creation error, not a missing key problem. The edge function passes an existing Stripe customer plus `automatic_tax: { enabled: true }` and `shipping_address_collection`, but it does not include `customer_update: { shipping: "auto" }`. Stripe rejects that exact combination with:
+## What I found
 
-```text
-Automatic tax calculation uses fields saved on the Customer. To collect a shipping address with automatic_tax enabled, set customer_update[shipping] to 'auto'
+Previous `customer_update` fix worked — Stripe no longer rejects on `automatic_tax`. But the latest log shows a **new** Stripe error blocking every checkout:
+
+```
+StripeInvalidRequestError: Invalid URL: An explicit scheme (such as https) must be provided.
+param: "return_url"
 ```
 
-That is why the frontend only shows the generic “Edge Function returned a non-2xx status code” and never reaches embedded Stripe checkout.
+The client builds `returnUrl` as:
+```ts
+`${window.location.origin}/checkout/success?session_id={CHECKOUT_SESSION_ID}`
+```
 
-**Plan**
+In the Lovable preview iframe (and some sandboxed iframes), `window.location.origin` returns the string `"null"`, so the value sent to Stripe becomes `null/checkout/success?...` — no scheme, hence the rejection. Webhooks are fine; the session never gets created, so there is nothing for webhooks to receive.
 
-1. **Fix the Stripe session parameters**
-   - In `supabase/functions/create-checkout-session/index.ts`, add `customer_update: { shipping: "auto", address: "auto" }` when a Stripe customer is attached.
-   - Keep Embedded Checkout, `ui_mode: "embedded_page"`, CAD pricing, and automatic tax intact.
+## Fix
 
-2. **Enforce regular shipping everywhere**
-   - In the edge function, force checkout shipping to standard only, even if an old client/cart sends `express` or `overnight`.
-   - Return only one Stripe shipping option: Standard / Free shipping when eligible.
-   - This completes the earlier UI-only change at the backend level too.
+### 1. Harden `returnUrl` on the client (`src/hooks/useStripeCheckout.ts`)
+- Detect when `window.location.origin` is falsy or equals `"null"`.
+- Fall back to `window.location.href` parsed origin, then to the published domain `https://lineofjudah.clothing`.
+- Guarantee the final string starts with `https://`.
 
-3. **Improve checkout error visibility**
-   - Return Stripe’s real error message from the edge function when session creation fails.
-   - Keep the frontend toast/error path unchanged, but make it receive a clearer backend message instead of the generic non-2xx wording where possible.
+### 2. Validate + normalize on the server (`supabase/functions/create-checkout-session/index.ts`)
+- Before calling Stripe, run `new URL(body.returnUrl)`; if it throws or scheme is not `http(s)`, rebuild it using:
+  1. `req.headers.get("origin")` if absolute, else
+  2. hard fallback `https://lineofjudah.clothing/checkout/success?session_id={CHECKOUT_SESSION_ID}`.
+- Preserve the `{CHECKOUT_SESSION_ID}` placeholder.
+- This is defense-in-depth so stale clients or odd iframes can never break checkout again.
 
-4. **Prevent orphaned failed draft orders**
-   - If the draft order is created but Stripe session creation fails, mark that order as failed/cancelled instead of leaving it as `pending` with no checkout session.
+### 3. Surface Stripe's real error
+Already returning `error: stripeErr.message` from the catch — verify it's reaching the client so future failures show "Invalid URL…" instead of generic "non-2xx".
 
-5. **Stress test after deploying the function**
-   - Deploy `create-checkout-session`.
-   - Call the deployed edge function directly with a real active hat product payload.
-   - Confirm it returns `success: true`, a `clientSecret`, and a Stripe session id.
-   - Verify the latest order row has a non-empty `stripe_checkout_session_id`.
-   - Check recent edge logs for no new `create-checkout-session error` entries.
+### 4. Verify
+- Deploy `create-checkout-session`.
+- Call it via `curl_edge_functions` with a deliberately bad `returnUrl: "/foo"` → expect `success: true` (normalized) and a `clientSecret`.
+- Call it once with a real cart from the preview, confirm `clientSecret` returned and embedded Stripe iframe mounts.
+- Check `create-checkout-session` logs for zero new errors.
+- Confirm `payments-webhook` is registered and receives events on test card completion (logs currently empty because no session has ever succeeded).
 
-6. **Report final result**
-   - Tell you whether checkout reaches Stripe successfully and whether any remaining failure is frontend-only, backend-only, or Stripe/account configuration.
+## Files touched
+- `src/hooks/useStripeCheckout.ts`
+- `supabase/functions/create-checkout-session/index.ts`
+
+No DB migrations, no UI changes, no business-logic changes.
