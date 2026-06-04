@@ -502,10 +502,38 @@ Deno.serve(async (req) => {
     }
     
     console.log("Order confirmation email sent:", emailResult);
-    
+
+    // Fire-and-forget admin notification to Line of Judah inbox + parker@veepo.ca
+    try {
+      const adminHtml = buildAdminNotificationHtml(order as Order, (items || []) as OrderItem[], siteUrl);
+      const adminSubject = `New order #${orderId.slice(0, 8).toUpperCase()} — ${formatCurrency(order.total_cents, order.currency)} — ${(order.customer_first_name || "")} ${(order.customer_last_name || "")}`.trim();
+      const adminRes = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${resendApiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          from: "Line of Judah Orders <orders@lineofjudah.com>",
+          to: INTERNAL_NOTIFY_RECIPIENTS,
+          reply_to: order.customer_email,
+          subject: adminSubject,
+          html: adminHtml,
+        }),
+      });
+      const adminResult = await adminRes.json();
+      if (!adminRes.ok) {
+        console.error("Admin notification failed:", adminResult);
+      } else {
+        console.log("Admin notification sent:", adminResult);
+      }
+    } catch (adminErr) {
+      console.error("Admin notification threw:", adminErr);
+    }
+
     return new Response(
-      JSON.stringify({ 
-        success: true, 
+      JSON.stringify({
+        success: true,
         mode: "live",
         emailId: emailResult.id,
       }),
