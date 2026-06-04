@@ -330,7 +330,7 @@ function getEmail2Html(cart: AbandonedCart, recoveryUrl: string, siteUrl: string
               <tr>
                 <td style="padding:16px 40px 48px;text-align:center;">
                   <a href="${recoveryUrl}" style="display:inline-block;background:#1C1917;color:#FFFFFF;text-decoration:none;padding:16px 48px;font-size:12px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;border-radius:4px;">
-                    GEAR UP NOW
+                    PICK UP WHERE YOU LEFT OFF
                   </a>
                 </td>
               </tr>
@@ -338,8 +338,8 @@ function getEmail2Html(cart: AbandonedCart, recoveryUrl: string, siteUrl: string
               <!-- Brand Quote -->
               <tr>
                 <td style="padding:32px 40px;background:#FAFAF9;border-top:1px solid #E7E5E4;">
-                  <p style="margin:0;font-size:14px;font-style:italic;color:#78716C;text-align:center;line-height:1.6;">
-                    "You don't preach—you spark curiosity. They ask. You answer."
+                  <p style="margin:0;font-size:14px;font-style:italic;color:#78716C;text-align:center;line-height:1.7;">
+                    "Faith you can wear."
                   </p>
                 </td>
               </tr>
