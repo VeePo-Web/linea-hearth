@@ -303,7 +303,9 @@ export default function WornInTheWildUpload() {
               city={city}
               consent={consent}
               error={error}
+              isConverting={isConverting}
               onPickFile={onPickFile}
+
               onPickClick={() => fileRef.current?.click()}
               fileRef={fileRef}
               setCaption={setCaption}
