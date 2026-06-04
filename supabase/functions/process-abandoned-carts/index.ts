@@ -189,7 +189,7 @@ function getEmail1Html(cart: AbandonedCart, recoveryUrl: string, siteUrl: string
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <meta name="color-scheme" content="light">
-      <title>Your armor is waiting | Line of Judah</title>
+      <title>You left something behind | Line of Judah</title>
     </head>
     <body style="margin:0;padding:0;background:#FAFAF9;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;">
       <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background:#FAFAF9;">
