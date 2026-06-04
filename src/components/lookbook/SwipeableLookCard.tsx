@@ -151,7 +151,7 @@ export function SwipeableLookCard({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={dismissSuccess}
-            className="absolute inset-0 z-30 bg-green-600/95 backdrop-blur-md flex flex-col items-center justify-center gap-4 p-6"
+            className="absolute inset-0 z-30 bg-foreground/95 backdrop-blur-md flex flex-col items-center justify-center gap-4 p-6"
           >
             <DrawCheckIcon 
               size="xl" 
