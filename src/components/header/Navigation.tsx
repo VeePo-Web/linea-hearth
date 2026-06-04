@@ -75,11 +75,9 @@ const Navigation = () => {
       href: "/category/shop",
       submenuItems: [
         { name: "All", href: "/catalogue" },
-        { name: "Bottoms", href: "/category/bottoms", subcategories: [{ name: "Shorts", href: "/category/shorts" }, { name: "Joggers", href: "/category/joggers" }, { name: "Sweatpants", href: "/category/sweatpants" }] },
-        { name: "Tees", href: "/category/tees", subcategories: [{ name: "Short Sleeve", href: "/category/short-sleeve" }, { name: "Long Sleeve", href: "/category/long-sleeve" }, { name: "Cropped", href: "/category/cropped" }] },
-        { name: "Hoodies", href: "/category/hoodies", subcategories: [{ name: "Pullover Hoodies", href: "/category/pullover-hoodies" }, { name: "Zip-Up Hoodies", href: "/category/zip-up-hoodies" }, { name: "Crewnecks", href: "/category/crewnecks" }, { name: "Quarter Zips", href: "/category/quarter-zips" }, { name: "Lightweight Hoodies", href: "/category/lightweight-hoodies" }] },
-        { name: "Hats", href: "/category/hats", subcategories: [{ name: "Snapbacks", href: "/category/snapbacks" }, { name: "Dad Hats", href: "/category/dad-hats" }, { name: "Beanies", href: "/category/beanies" }] },
-        { name: "Accessories", href: "/category/accessories", subcategories: [{ name: "Bags", href: "/category/bags" }, { name: "Socks", href: "/category/socks" }, { name: "Stickers", href: "/category/stickers" }] }
+        { name: "Tees", href: "/category/tees", subcategories: [{ name: "Short Sleeve", href: "/category/short-sleeve" }, { name: "Long Sleeve", href: "/category/long-sleeve" }] },
+        { name: "Hoodies", href: "/category/hoodies", subcategories: [{ name: "Pullover Hoodies", href: "/category/pullover-hoodies" }] },
+        { name: "Hats", href: "/category/hats", subcategories: [] }
       ],
       images: [
         { src: REAL_PRODUCT_IMAGES.youNeedJesus, alt: "Hoodies Collection", label: "Hoodies" },
