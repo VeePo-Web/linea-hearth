@@ -1,5 +1,42 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { createStripeClient, verifyWebhook, type StripeEnv } from "../_shared/stripe.ts";
+import { sendAdminAlert } from "../_shared/admin-alert.ts";
+
+// === Alert formatting helpers ===
+const cad = (cents?: number | null) =>
+  typeof cents === "number"
+    ? `$${(cents / 100).toFixed(2)} CAD`
+    : "(unknown amount)";
+
+const dashboardLink = (env: StripeEnv, path: string) =>
+  env === "live"
+    ? `https://dashboard.stripe.com/${path}`
+    : `https://dashboard.stripe.com/test/${path}`;
+
+const opsOrderLink = (orderId: string) =>
+  `https://lineofjudah.clothing/ops-portal/orders/${orderId}`;
+
+function alertShell(title: string, rows: Array<[string, string]>, ctaUrl?: string, ctaLabel?: string) {
+  const rowsHtml = rows
+    .map(
+      ([k, v]) =>
+        `<tr><td style="padding:6px 12px 6px 0;color:#666;font-size:13px;white-space:nowrap;vertical-align:top;">${k}</td><td style="padding:6px 0;color:#111;font-size:13px;word-break:break-word;">${v}</td></tr>`,
+    )
+    .join("");
+  const cta = ctaUrl
+    ? `<p style="margin:24px 0 0;"><a href="${ctaUrl}" style="display:inline-block;padding:10px 18px;background:#111;color:#fff;text-decoration:none;font-size:13px;letter-spacing:0.04em;">${ctaLabel ?? "Open"}</a></p>`
+    : "";
+  return `<!doctype html><html><body style="margin:0;padding:32px;background:#f5f5f5;font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif;">
+  <div style="max-width:560px;margin:0 auto;background:#fff;padding:28px 32px;border:1px solid #e5e5e5;">
+    <p style="margin:0 0 4px;font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:#888;">Line of Judah · Ops Alert</p>
+    <h1 style="margin:0 0 20px;font-size:20px;font-weight:600;color:#111;letter-spacing:-0.01em;">${title}</h1>
+    <table style="border-collapse:collapse;width:100%;">${rowsHtml}</table>
+    ${cta}
+    <hr style="margin:24px 0 12px;border:none;border-top:1px solid #eee;"/>
+    <p style="margin:0;font-size:11px;color:#999;">Automated message · do not reply directly</p>
+  </div></body></html>`;
+}
+
 
 let _supabase: ReturnType<typeof createClient> | null = null;
 function getSupabase() {
@@ -199,6 +236,102 @@ async function handleDispute(dispute: any, env: StripeEnv) {
   }
 }
 
+// === ADMIN ALERT DISPATCHERS ===
+async function alertPaymentFailed(
+  event: { id: string; type: string; data: { object: any } },
+  env: StripeEnv,
+) {
+  const obj = event.data.object;
+  const isSession = event.type.startsWith("checkout.session");
+  const amount = isSession ? obj.amount_total : obj.amount;
+  const orderId = obj.metadata?.orderId ?? "(no orderId)";
+  const reason =
+    obj.last_payment_error?.message ??
+    obj.last_payment_error?.code ??
+    obj.failure_message ??
+    "Unknown failure reason";
+  const declineCode = obj.last_payment_error?.decline_code ?? null;
+  const email = isSession ? obj.customer_details?.email : obj.receipt_email;
+
+  await sendAdminAlert({
+    subject: `[LOJ Alert] Payment failed — ${orderId} — ${cad(amount)}`,
+    idempotencyKey: event.id,
+    context: { eventType: event.type, eventId: event.id, env },
+    html: alertShell(
+      "Payment failed",
+      [
+        ["Order", orderId],
+        ["Amount", cad(amount)],
+        ["Customer", email ?? "(unknown)"],
+        ["Reason", reason],
+        ...(declineCode ? [["Decline code", declineCode]] as Array<[string, string]> : []),
+        ["Stripe event", event.type],
+        ["Environment", env],
+        ["When", new Date().toISOString()],
+      ],
+      orderId !== "(no orderId)"
+        ? opsOrderLink(orderId)
+        : dashboardLink(env, `events/${event.id}`),
+      orderId !== "(no orderId)" ? "Open order" : "Open Stripe event",
+    ),
+  });
+}
+
+async function alertRefund(
+  event: { id: string; type: string; data: { object: any } },
+  env: StripeEnv,
+) {
+  const charge = event.data.object;
+  await sendAdminAlert({
+    subject: `[LOJ Alert] Refund processed — ${cad(charge.amount_refunded)}`,
+    idempotencyKey: event.id,
+    context: { eventId: event.id, env },
+    html: alertShell(
+      "Refund processed",
+      [
+        ["Charge", charge.id],
+        ["Refunded", cad(charge.amount_refunded)],
+        ["Original amount", cad(charge.amount)],
+        ["Customer", charge.billing_details?.email ?? charge.receipt_email ?? "(unknown)"],
+        ["Payment intent", charge.payment_intent ?? "(none)"],
+        ["Environment", env],
+      ],
+      dashboardLink(env, `payments/${charge.payment_intent ?? ""}`),
+      "Open in Stripe",
+    ),
+  });
+}
+
+async function alertDispute(
+  event: { id: string; type: string; data: { object: any } },
+  env: StripeEnv,
+) {
+  const d = event.data.object;
+  await sendAdminAlert({
+    subject: `[LOJ Alert] Dispute opened — ${cad(d.amount)} — ${d.reason ?? "unknown reason"}`,
+    idempotencyKey: event.id,
+    context: { eventId: event.id, env },
+    html: alertShell(
+      "Dispute opened",
+      [
+        ["Dispute", d.id],
+        ["Amount", cad(d.amount)],
+        ["Reason", d.reason ?? "(unknown)"],
+        ["Status", d.status ?? "(unknown)"],
+        ["Charge", d.charge ?? "(unknown)"],
+        ["Evidence due", d.evidence_details?.due_by
+          ? new Date(d.evidence_details.due_by * 1000).toISOString()
+          : "(none)"],
+        ["Environment", env],
+      ],
+      dashboardLink(env, `disputes/${d.id}`),
+      "Open dispute",
+    ),
+  });
+}
+
+
+
 Deno.serve(async (req) => {
   console.log("stripe-webhook hit:", req.method, req.url);
   if (req.method !== "POST") return new Response("Method not allowed", { status: 405 });
@@ -258,12 +391,17 @@ Deno.serve(async (req) => {
       case "checkout.session.async_payment_failed":
       case "payment_intent.payment_failed":
         await handlePaymentFailed(event.data.object);
+        await alertPaymentFailed(event, env);
         break;
       case "charge.refunded":
       case "charge.refund.updated":
         await handleRefund(event.data.object);
+        await alertRefund(event, env);
         break;
       case "charge.dispute.created":
+        await handleDispute(event.data.object, env);
+        await alertDispute(event, env);
+        break;
       case "charge.dispute.updated":
       case "charge.dispute.funds_withdrawn":
       case "charge.dispute.funds_reinstated":
@@ -274,6 +412,7 @@ Deno.serve(async (req) => {
         console.log("Unhandled event:", event.type);
     }
   } catch (e) {
+
     console.error("Handler error:", e);
     // Returning 500 lets Stripe retry the event. The dedupe row will
     // still be there, so we'd skip it — fix: delete the row so retries
