@@ -25,38 +25,50 @@ const STEP_LABELS: Record<SubmitStep, string> = {
 
 const EASE = [0.25, 0.46, 0.45, 0.94] as const;
 const MAX_BYTES = 10 * 1024 * 1024;
+const MIN_BYTES = 5 * 1024;
+const ALLOWED_MIME = ["image/jpeg", "image/png", "image/webp"];
+const ALLOWED_EXT = ["jpg", "jpeg", "png", "webp"];
 
-function friendlyError(code?: string): string {
-  switch (code) {
-    case "heic_unsupported":
-      return "iPhone HEIC photos can't be processed in-browser. In iOS Settings → Camera → Formats, switch to 'Most Compatible', then retake — or pick a JPG/PNG from your library.";
-    case "file_too_large":
-      return "That photo is over 10MB. Please choose a smaller one.";
-    case "unsupported_type":
-      return "Only JPG, PNG, or WebP photos are accepted.";
-    case "invalid_image":
-      return "We couldn't read that image. Try a different file.";
-    case "invalid_token":
-    case "invite_not_found":
-      return "This invite link is no longer valid.";
-    case "already_submitted":
-      return "A photo has already been submitted for this order.";
-    case "rate_limited":
-      return "Too many attempts. Please wait a moment and try again.";
-    case "upload_failed":
-    case "submission_failed":
-      return "We couldn't save your photo. Please try again.";
-    default:
-      return code ? `Something went wrong (${code}). Try again.` : "Something went wrong. Try again.";
-  }
+type ValidationCode =
+  | "empty_file"
+  | "file_too_large"
+  | "file_too_small"
+  | "unsupported_type"
+  | "heic_conversion_failed";
+
+function fileExt(name: string): string {
+  const i = name.lastIndexOf(".");
+  return i >= 0 ? name.slice(i + 1).toLowerCase() : "";
 }
 
 function isHeic(f: File): boolean {
   const t = (f.type || "").toLowerCase();
   if (t.includes("heic") || t.includes("heif")) return true;
-  const name = f.name.toLowerCase();
-  return name.endsWith(".heic") || name.endsWith(".heif");
+  const ext = fileExt(f.name);
+  return ext === "heic" || ext === "heif";
 }
+
+function validateFile(f: File): { ok: true } | { ok: false; code: ValidationCode } {
+  if (f.size === 0) return { ok: false, code: "empty_file" };
+  if (f.size > MAX_BYTES) return { ok: false, code: "file_too_large" };
+  if (f.size < MIN_BYTES) return { ok: false, code: "file_too_small" };
+  const mime = (f.type || "").toLowerCase();
+  const ext = fileExt(f.name);
+  const mimeOk = ALLOWED_MIME.includes(mime);
+  const extOk = ALLOWED_EXT.includes(ext);
+  if (!mimeOk && !extOk) return { ok: false, code: "unsupported_type" };
+  return { ok: true };
+}
+
+async function convertHeicToJpeg(file: File): Promise<File> {
+  const mod = await import("heic2any");
+  const heic2any = (mod as any).default ?? (mod as any);
+  const out = await heic2any({ blob: file, toType: "image/jpeg", quality: 0.9 });
+  const blob: Blob = Array.isArray(out) ? out[0] : out;
+  const base = file.name.replace(/\.(heic|heif)$/i, "") || "photo";
+  return new File([blob], `${base}.jpg`, { type: "image/jpeg" });
+}
+
 
 // Client-side resize + EXIF strip via canvas re-encode (canvas does not
 // preserve EXIF, so re-encoded output is automatically EXIF-free).
