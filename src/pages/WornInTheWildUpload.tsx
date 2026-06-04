@@ -419,10 +419,23 @@ function UploadForm(props: {
 }) {
   const s = props.state as any;
   const isSubmitting = props.state.kind === "submitting";
-  const currentStep: SubmitStep | null = isSubmitting ? (props.state as any).step : null;
-  const progressPct = currentStep
-    ? Math.round(((STEP_ORDER.indexOf(currentStep) + 1) / STEP_ORDER.length) * 100)
+  const currentStep: SubmitStep | null = isSubmitting ? s.step : null;
+  const uploadPct: number = isSubmitting ? (s.uploadPct ?? 0) : 0;
+  const uploadedBytes: number = isSubmitting ? (s.uploadedBytes ?? 0) : 0;
+  const totalBytes: number = isSubmitting ? (s.totalBytes ?? 0) : 0;
+  const progressPct =
+    currentStep === "prepare" ? 10
+    : currentStep === "upload" ? Math.round(10 + uploadPct * 0.8)
+    : currentStep === "finalize" ? 95
     : 0;
+  const kb = (n: number) => Math.max(0, Math.round(n / 1024));
+  const submitLabel =
+    currentStep === "prepare" ? "Preparing…"
+    : currentStep === "upload" ? `Uploading ${uploadPct}%`
+    : currentStep === "finalize" ? "Finishing up…"
+    : "Submit";
+  const submitDisabled = !props.file || !props.consent || isSubmitting || props.isConverting;
+
 
   return (
     <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease: EASE }}>
