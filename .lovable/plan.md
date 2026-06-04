@@ -1,47 +1,29 @@
-# Fix: Stripe `return_url` rejected — checkout still broken
+## Goal
 
-## What I found
+Send Parker (parker@veepo.ca) review copies of both order confirmation emails that get generated on a paid order:
+1. The customer-facing "Your armor is on the way" email
+2. The internal Line of Judah admin notification email
 
-Previous `customer_update` fix worked — Stripe no longer rejects on `automatic_tax`. But the latest log shows a **new** Stripe error blocking every checkout:
+So he can review the design/copy in his own inbox.
 
-```
-StripeInvalidRequestError: Invalid URL: An explicit scheme (such as https) must be provided.
-param: "return_url"
-```
+## Approach
 
-The client builds `returnUrl` as:
-```ts
-`${window.location.origin}/checkout/success?session_id={CHECKOUT_SESSION_ID}`
-```
+Add a tiny one-off edge function `preview-order-emails` that:
+- Loads the most recent paid order (or an `orderId` passed in the body) plus its items.
+- Renders both HTML templates using the existing builders in `send-order-confirmation` (extracted into `_shared/order-email-templates.ts` so we don't duplicate code).
+- Sends both emails via Resend to `parker@veepo.ca` only, with subjects prefixed `[REVIEW — Customer Email]` and `[REVIEW — Admin Notification]` so they're obvious in the inbox.
+- Returns `{ success, customerEmailId, adminEmailId }`.
 
-In the Lovable preview iframe (and some sandboxed iframes), `window.location.origin` returns the string `"null"`, so the value sent to Stripe becomes `null/checkout/success?...` — no scheme, hence the rejection. Webhooks are fine; the session never gets created, so there is nothing for webhooks to receive.
+Then invoke it once via `supabase--curl_edge_functions` so Parker gets both emails immediately. No client UI, no changes to live order flow.
 
-## Fix
+## Files
 
-### 1. Harden `returnUrl` on the client (`src/hooks/useStripeCheckout.ts`)
-- Detect when `window.location.origin` is falsy or equals `"null"`.
-- Fall back to `window.location.href` parsed origin, then to the published domain `https://lineofjudah.clothing`.
-- Guarantee the final string starts with `https://`.
+- New: `supabase/functions/_shared/order-email-templates.ts` — exports `buildOrderConfirmationHtml`, `buildAdminNotificationHtml`, `formatCurrency`, types.
+- Edit: `supabase/functions/send-order-confirmation/index.ts` — import from shared module instead of inlining (no behavior change).
+- New: `supabase/functions/preview-order-emails/index.ts` — the review-send endpoint described above.
+- Deploy both functions, then trigger once.
 
-### 2. Validate + normalize on the server (`supabase/functions/create-checkout-session/index.ts`)
-- Before calling Stripe, run `new URL(body.returnUrl)`; if it throws or scheme is not `http(s)`, rebuild it using:
-  1. `req.headers.get("origin")` if absolute, else
-  2. hard fallback `https://lineofjudah.clothing/checkout/success?session_id={CHECKOUT_SESSION_ID}`.
-- Preserve the `{CHECKOUT_SESSION_ID}` placeholder.
-- This is defense-in-depth so stale clients or odd iframes can never break checkout again.
+## Notes
 
-### 3. Surface Stripe's real error
-Already returning `error: stripeErr.message` from the catch — verify it's reaching the client so future failures show "Invalid URL…" instead of generic "non-2xx".
-
-### 4. Verify
-- Deploy `create-checkout-session`.
-- Call it via `curl_edge_functions` with a deliberately bad `returnUrl: "/foo"` → expect `success: true` (normalized) and a `clientSecret`.
-- Call it once with a real cart from the preview, confirm `clientSecret` returned and embedded Stripe iframe mounts.
-- Check `create-checkout-session` logs for zero new errors.
-- Confirm `payments-webhook` is registered and receives events on test card completion (logs currently empty because no session has ever succeeded).
-
-## Files touched
-- `src/hooks/useStripeCheckout.ts`
-- `supabase/functions/create-checkout-session/index.ts`
-
-No DB migrations, no UI changes, no business-logic changes.
+- Live order data is used so Parker sees realistic rendering. No PII risk — he already receives the admin copy of every order.
+- This is a one-shot tool; leaving the function deployed lets you re-trigger anytime by calling it again. No cron, no schedule.
