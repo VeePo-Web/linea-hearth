@@ -111,6 +111,28 @@ Deno.serve(async (req) => {
       });
     }
 
+    // Normalize returnUrl: Stripe requires an absolute http(s) URL.
+    // Stale clients or sandboxed iframes (where window.location.origin === "null")
+    // can send relative or scheme-less values that Stripe rejects.
+    const FALLBACK_RETURN_URL = "https://lineofjudah.clothing/checkout/success?session_id={CHECKOUT_SESSION_ID}";
+    const isAbsoluteHttp = (u: string) => {
+      try {
+        const parsed = new URL(u);
+        return parsed.protocol === "https:" || parsed.protocol === "http:";
+      } catch {
+        return false;
+      }
+    };
+    if (!isAbsoluteHttp(body.returnUrl)) {
+      const reqOrigin = req.headers.get("origin") ?? "";
+      if (isAbsoluteHttp(reqOrigin)) {
+        body.returnUrl = `${reqOrigin.replace(/\/$/, "")}/checkout/success?session_id={CHECKOUT_SESSION_ID}`;
+      } else {
+        body.returnUrl = FALLBACK_RETURN_URL;
+      }
+      console.warn("create-checkout-session: normalized invalid returnUrl ->", body.returnUrl);
+    }
+
     const environment: StripeEnv = body.environment === "live" ? "live" : "sandbox";
     const stripe = createStripeClient(environment);
 
