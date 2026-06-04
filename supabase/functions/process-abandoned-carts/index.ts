@@ -253,8 +253,8 @@ function getEmail1Html(cart: AbandonedCart, recoveryUrl: string, siteUrl: string
               <!-- Brand Quote -->
               <tr>
                 <td style="padding:32px 40px;background:#FAFAF9;border-top:1px solid #E7E5E4;">
-                  <p style="margin:0;font-size:14px;font-style:italic;color:#78716C;text-align:center;line-height:1.6;">
-                    "Every outfit is an open door."
+                  <p style="margin:0;font-size:14px;font-style:italic;color:#78716C;text-align:center;line-height:1.7;">
+                    "The Lion of the tribe of Judah has triumphed." — Revelation 5:5
                   </p>
                 </td>
               </tr>
