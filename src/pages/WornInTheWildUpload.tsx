@@ -28,10 +28,12 @@ const MAX_BYTES = 10 * 1024 * 1024;
 
 function friendlyError(code?: string): string {
   switch (code) {
+    case "heic_unsupported":
+      return "iPhone HEIC photos can't be processed in-browser. In iOS Settings → Camera → Formats, switch to 'Most Compatible', then retake — or pick a JPG/PNG from your library.";
     case "file_too_large":
       return "That photo is over 10MB. Please choose a smaller one.";
     case "unsupported_type":
-      return "Only JPG, PNG, WebP, or HEIC photos are accepted.";
+      return "Only JPG, PNG, or WebP photos are accepted.";
     case "invalid_image":
       return "We couldn't read that image. Try a different file.";
     case "invalid_token":
@@ -47,6 +49,13 @@ function friendlyError(code?: string): string {
     default:
       return code ? `Something went wrong (${code}). Try again.` : "Something went wrong. Try again.";
   }
+}
+
+function isHeic(f: File): boolean {
+  const t = (f.type || "").toLowerCase();
+  if (t.includes("heic") || t.includes("heif")) return true;
+  const name = f.name.toLowerCase();
+  return name.endsWith(".heic") || name.endsWith(".heif");
 }
 
 // Client-side resize + EXIF strip via canvas re-encode (canvas does not
@@ -105,13 +114,6 @@ export default function WornInTheWildUpload() {
     }
     (async () => {
       try {
-        const { data, error } = await supabase.functions.invoke("validate-worn-token", {
-          method: "GET" as never,
-          headers: {},
-          body: undefined,
-          // @ts-ignore - pass token via query
-        });
-        // Fall back to direct fetch since invoke doesn't easily handle GET with query
         const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/validate-worn-token?token=${encodeURIComponent(
           token,
         )}`;
@@ -119,7 +121,6 @@ export default function WornInTheWildUpload() {
           headers: { apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY },
         });
         const json = await res.json();
-        void data; void error;
         if (!json.valid) {
           setState({ kind: json.reason === "invalid_or_expired" ? "expired" : "invalid" });
           return;
@@ -144,6 +145,10 @@ export default function WornInTheWildUpload() {
   const onPickFile = (f: File | null) => {
     setError(null);
     if (!f) return;
+    if (isHeic(f)) {
+      setError(friendlyError("heic_unsupported"));
+      return;
+    }
     if (f.size > MAX_BYTES) {
       setError("Photo is too large. Max 10MB.");
       return;

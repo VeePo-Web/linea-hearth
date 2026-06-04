@@ -1,32 +1,31 @@
-## Goal
-Polish 404 typography for perfect optical centering and readability.
+## Worn-in-the-Wild upload — audit
 
-## Changes to `src/pages/NotFound.tsx`
+Flow traced end-to-end:
+`process-worn-in-the-wild-invites` (signs JWT with `SUPABASE_SERVICE_ROLE_KEY`, HS256) → email link → `/worn-in-the-wild/upload?token=…` → `validate-worn-token` (verifies with same key) → client `resizeAndStrip` (canvas re-encode → JPEG, strips EXIF) → `submit-worn-photo` (size + MIME + magic-byte check → upload to private `worn-in-the-wild` bucket → insert submission + create one-time 15% `WORN-XXXXXX` discount → mark invite submitted) → admin moderates in `/ops-portal/worn-in-the-wild` → `review-worn-submission` copies file to public `product-images` bucket under `worn-in-the-wild/…`.
 
-**Verse (centerpiece)**
-- Narrow column: `max-w-[420px]` → `max-w-[440px]` (slightly wider for better line breaks)
-- Size: `text-xl md:text-2xl` → `text-[22px] md:text-[28px]` (more presence on desktop)
-- Leading: `1.6` → `1.5` (tighter, more poetic)
-- Tracking: `-0.01em` → `-0.015em`
-- Weight: keep `font-light`; bump opacity `text-foreground/90` → `text-foreground/95`
+**Working correctly:**
+- JWT sign/verify use the same secret + algorithm ✓
+- Server enforces 10MB cap, MIME allow-list, magic-byte sniff, 5/hr rate limit, single-submission per invite ✓
+- EXIF stripped via canvas re-encode (server comment acknowledges this) ✓
+- `submit-worn-photo` registered in `supabase/config.toml` with `verify_jwt = false` ✓
+- Storage uses service-role; bucket stays private until approval ✓
+- Reward code uniqueness checked, 60-day expiry ✓
 
-**Hairline divider**
-- `mt-10` → `mt-12`; width `40%` → `48px` (fixed hairline, more editorial)
-- `bg-foreground/20` → `bg-foreground/30`
+**Issues found:**
 
-**Citation**
-- `mt-6` → `mt-5`; tracking `0.4em` → `0.45em`
+1. **HEIC photos silently fail.** Input accepts `image/heic,image/heif` and `capture="environment"` (iPhone default = HEIC), but `resizeAndStrip` decodes with `new Image()`, which Safari/Chrome can't decode for HEIC. The throw is caught and surfaced as a generic "Upload failed. Please check your connection…" — misleading on a working connection.
+   - **Fix:** detect HEIC before resize (`file.type` includes `heic`/`heif` or extension match). Show a friendly inline message: "iPhone HEIC photos aren't supported yet — in Camera settings switch Formats to 'Most Compatible', or pick a JPG." Don't even attempt the canvas path.
 
-**404 superscript (top)**
-- `top-8` → `top-10`; remove `<sup>` wrapper (already small); tracking `0.4em` → `0.5em`
+2. **Wasted/confusing `supabase.functions.invoke` call.** The `useEffect` in `WornInTheWildUpload.tsx` (lines 107–113) invokes `validate-worn-token` with empty body, then immediately does a direct `fetch` for the real call. The first invoke fires a no-token POST that the function logs as invalid. Pure dead code.
+   - **Fix:** remove the `supabase.functions.invoke` block; keep only the direct `fetch` GET.
 
-**Lion sigil + Return link (bottom)**
-- `bottom-16` → `bottom-12`; gap `gap-6` → `gap-5`
-- Sigil opacity `0.8` → `0.7` for quieter presence
-- Return link: tracking `0.45em`; add tiny silver hairline under on hover (chrome underline pattern)
+**Not changing (intentional or out of scope):**
+- Keeping HEIC in the `<input accept>` so iOS users can still pick the file and see the friendly error rather than have it greyed out — open to flipping if you'd rather hide it entirely.
+- `validate-worn-token` GET via direct fetch (rather than `invoke`) — `invoke` doesn't cleanly support GET + query string, so this stays.
+- Server's symmetric reuse of `SUPABASE_SERVICE_ROLE_KEY` as JWT HMAC secret — works, but if you want a dedicated `WORN_INVITE_JWT_SECRET` later that's a separate hardening pass.
 
-**Optical centering fix**
-- Wrap verse block + reserve symmetric bottom space so the verse sits at true visual center (the absolute-positioned sigil currently pulls weight downward without offsetting the layout). Add `pb-32` to main and remove absolute positioning ambiguity — keep sigil absolute but ensure verse stays vertically centered relative to viewport, not pushed up.
+## Files touched
 
-## Files
-- `src/pages/NotFound.tsx` (edit only)
+- `src/pages/WornInTheWildUpload.tsx` — drop dead `invoke`, add HEIC pre-check + friendly copy in `friendlyError` / `onPickFile`.
+
+No backend, schema, or storage changes.
