@@ -209,10 +209,10 @@ function getEmail1Html(cart: AbandonedCart, recoveryUrl: string, siteUrl: string
               <tr>
                 <td style="padding:48px 40px 32px;text-align:center;">
                   <h1 style="margin:0 0 16px;font-size:28px;font-weight:300;letter-spacing:0.02em;color:#1C1917;">
-                    Did the page time out?
+                    You left something behind.
                   </h1>
                   <p style="margin:0;font-size:15px;line-height:1.6;color:#57534E;">
-                    No pressure — your selection is saved.<br/>Pick up where you left off when you're ready.
+                    No pressure — your selection is saved.<br/>Pick up where you left off whenever you're ready.
                   </p>
                 </td>
               </tr>
