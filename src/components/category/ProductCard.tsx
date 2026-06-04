@@ -22,6 +22,7 @@ interface ProductImage {
 }
 
 interface ProductVariant {
+  id?: string;
   size: string | null;
   color: string | null;
   stock_quantity: number;

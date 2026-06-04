@@ -51,8 +51,18 @@ export const useStripeCheckout = () => {
       }
 
       try {
+        const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+        const invalid = items.filter((it) => !it.productId || !UUID_RE.test(it.productId));
+        if (invalid.length) {
+          const msg =
+            "Some items in your cart are out of date. Please remove them and add them again before checking out.";
+          setError(msg);
+          setIsLoading(false);
+          return { success: false, error: msg };
+        }
+
         const checkoutItems = items.map((item) => ({
-          productId: item.productId || item.id?.toString() || "",
+          productId: item.productId!,
           variantId: item.variantId,
           name: item.name,
           image: item.image?.startsWith("http")
