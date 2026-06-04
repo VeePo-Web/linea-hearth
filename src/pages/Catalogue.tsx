@@ -10,17 +10,8 @@ import QuickViewModal from "@/components/category/QuickViewModal";
 import AuthModal from "@/components/auth/AuthModal";
 import { supabase } from "@/integrations/supabase/client";
 
-interface Product {
-  id: string;
-  name: string;
-  slug: string;
-  price: number;
-  sale_price: number | null;
-  is_on_sale: boolean;
+interface Product extends ProductCardData {
   is_featured: boolean;
-  created_at: string;
-  categories: { name: string; slug: string } | null;
-  product_images: Array<{ image_url: string; is_primary: boolean }>;
 }
 
 type SortOption = "newest" | "price-asc" | "price-desc" | "featured";
