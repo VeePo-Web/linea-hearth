@@ -96,18 +96,23 @@ function buildCustomerHtml(order: any, items: any[], siteUrl: string): string {
     <tr><td colspan="2" style="padding:12px 0 0;"><div style="border-top:2px solid #1C1917;"></div></td></tr>
     <tr><td style="padding:12px 0 0;font-size:18px;font-weight:700;color:#1C1917;">Total</td><td align="right" style="padding:12px 0 0;font-size:18px;font-weight:700;color:#1C1917;">${formatCurrency(order.total_cents, order.currency)}</td></tr>
   </table></td></tr>
-  <tr><td style="padding:0 40px 40px;"><div style="background:#FAFAF9;border-radius:8px;padding:24px;">
-    <p style="margin:0 0 16px;font-size:12px;font-weight:700;letter-spacing:2px;color:#78716C;text-transform:uppercase;">ETA TO THE FRONT LINE</p>
-    <p style="margin:0 0 20px;font-size:18px;font-weight:600;color:#1C1917;">📦 ${delivery.start} – ${delivery.end}</p>
+  <tr><td style="padding:0 40px 40px;"><div style="background:#FAFAF9;padding:24px;">
+    <p style="margin:0 0 16px;font-size:12px;font-weight:700;letter-spacing:2px;color:#78716C;text-transform:uppercase;">ESTIMATED ARRIVAL</p>
+    <p style="margin:0 0 20px;font-size:18px;font-weight:600;color:#1C1917;">${delivery.start} – ${delivery.end}</p>
     <p style="margin:0 0 4px;font-size:13px;font-weight:600;color:#78716C;text-transform:uppercase;">Shipping to:</p>
     ${addressLines.map((line) => `<p style="margin:0;font-size:15px;color:#44403C;line-height:1.5;">${escapeHtml(line)}</p>`).join("")}
   </div></td></tr>
   <tr><td align="center" style="padding:0 40px 40px;">
     <a href="${siteUrl}/account/orders" style="display:inline-block;background:#1C1917;color:#fff;text-decoration:none;padding:16px 32px;font-size:14px;font-weight:600;letter-spacing:0.5px;">TRACK YOUR ORDER →</a>
   </td></tr>
+  <tr><td style="padding:0 40px 48px;"><div style="border-top:1px solid #E7E5E4;padding-top:32px;text-align:center;">
+    <p style="margin:0 0 12px;font-size:16px;font-weight:700;color:#1C1917;letter-spacing:0.5px;">More than clothing. A statement of faith.</p>
+    <p style="margin:0;font-size:14px;font-style:italic;color:#78716C;line-height:1.7;">"The Lion of the tribe of Judah has triumphed."<br/><span style="font-size:12px;letter-spacing:0.05em;">— Revelation 5:5</span></p>
+  </div></td></tr>
   <tr><td style="background:#1C1917;padding:32px 40px;text-align:center;">
     <p style="margin:0 0 4px;font-size:12px;font-weight:700;letter-spacing:2px;color:#fff;text-transform:uppercase;">LINE OF JUDAH</p>
-    <p style="margin:0;font-size:13px;color:#A8A29E;font-style:italic;">— Parker &amp; the Line of Judah team</p>
+    <p style="margin:0 0 8px;font-size:13px;color:#A8A29E;">Faith you can wear.</p>
+    <p style="margin:0;font-size:13px;color:#A8A29E;font-style:italic;">Walk in it. — Parker &amp; the Line of Judah team</p>
   </td></tr>
 </table></td></tr></table></body></html>`;
 }
