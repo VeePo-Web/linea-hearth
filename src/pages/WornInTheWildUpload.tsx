@@ -13,7 +13,7 @@ type State =
   | { kind: "expired" }
   | { kind: "already" }
   | { kind: "ready"; firstName: string | null; productName: string | null; productImage: string | null }
-  | { kind: "submitting"; step: SubmitStep; firstName: string | null; productName: string | null; productImage: string | null }
+  | { kind: "submitting"; step: SubmitStep; uploadPct: number; uploadedBytes: number; totalBytes: number; firstName: string | null; productName: string | null; productImage: string | null }
   | { kind: "done"; rewardCode: string; rewardPercent: number };
 
 const STEP_ORDER: SubmitStep[] = ["prepare", "upload", "finalize"];
@@ -71,6 +71,32 @@ async function convertHeicToJpeg(file: File): Promise<File> {
   const base = file.name.replace(/\.(heic|heif)$/i, "") || "photo";
   return new File([blob], `${base}.jpg`, { type: "image/jpeg" });
 }
+
+function uploadWithProgress(
+  url: string,
+  form: FormData,
+  headers: Record<string, string>,
+  onProgress: (uploadedBytes: number, totalBytes: number) => void,
+): Promise<{ status: number; body: any }> {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", url);
+    Object.entries(headers).forEach(([k, v]) => xhr.setRequestHeader(k, v));
+    xhr.timeout = 60_000;
+    xhr.upload.onprogress = (e) => {
+      if (e.lengthComputable) onProgress(e.loaded, e.total);
+    };
+    xhr.onload = () => {
+      let body: any = null;
+      try { body = JSON.parse(xhr.responseText); } catch { body = { error: "submission_failed" }; }
+      resolve({ status: xhr.status, body });
+    };
+    xhr.onerror = () => reject(new Error("network_error"));
+    xhr.ontimeout = () => reject(new Error("timeout"));
+    xhr.send(form);
+  });
+}
+
 
 function friendlyError(code?: string): string {
   switch (code) {
@@ -235,10 +261,9 @@ export default function WornInTheWildUpload() {
       productImage: (state as any).productImage ?? null,
     };
     setError(null);
-    setState({ kind: "submitting", step: "prepare", ...ctx });
+    setState({ kind: "submitting", step: "prepare", uploadPct: 0, uploadedBytes: 0, totalBytes: 0, ...ctx });
     try {
       const stripped = await resizeAndStrip(file);
-      setState({ kind: "submitting", step: "upload", ...ctx });
 
       const form = new FormData();
       form.append("token", token);
@@ -247,26 +272,55 @@ export default function WornInTheWildUpload() {
       form.append("city", city.slice(0, 80));
       form.append("consent", "true");
 
-      const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/submit-worn-photo`;
-      const res = await fetch(url, {
-        method: "POST",
-        headers: { apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY },
-        body: form,
+      setState({
+        kind: "submitting",
+        step: "upload",
+        uploadPct: 0,
+        uploadedBytes: 0,
+        totalBytes: stripped.size,
+        ...ctx,
       });
-      setState({ kind: "submitting", step: "finalize", ...ctx });
-      const json = await res.json();
-      if (!res.ok || !json.ok) {
-        setError(friendlyError(json.error));
+
+      const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/submit-worn-photo`;
+      const { status, body: json } = await uploadWithProgress(
+        url,
+        form,
+        { apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY },
+        (loaded, total) => {
+          const pct = total > 0 ? Math.min(100, Math.round((loaded / total) * 100)) : 0;
+          setState({
+            kind: "submitting",
+            step: "upload",
+            uploadPct: pct,
+            uploadedBytes: loaded,
+            totalBytes: total,
+            ...ctx,
+          });
+        },
+      );
+
+      setState({
+        kind: "submitting",
+        step: "finalize",
+        uploadPct: 100,
+        uploadedBytes: stripped.size,
+        totalBytes: stripped.size,
+        ...ctx,
+      });
+
+      if (status < 200 || status >= 300 || !json?.ok) {
+        setError(friendlyError(json?.error));
         setState({ kind: "ready", ...ctx });
         return;
       }
       setState({ kind: "done", rewardCode: json.rewardCode, rewardPercent: json.rewardPercent });
     } catch (e) {
       console.error(e);
-      setError("Upload failed. Please check your connection and try again.");
+      setError(friendlyError("upload_failed"));
       setState({ kind: "ready", ...ctx });
     }
   };
+
 
   return (
     <>
@@ -365,10 +419,23 @@ function UploadForm(props: {
 }) {
   const s = props.state as any;
   const isSubmitting = props.state.kind === "submitting";
-  const currentStep: SubmitStep | null = isSubmitting ? (props.state as any).step : null;
-  const progressPct = currentStep
-    ? Math.round(((STEP_ORDER.indexOf(currentStep) + 1) / STEP_ORDER.length) * 100)
+  const currentStep: SubmitStep | null = isSubmitting ? s.step : null;
+  const uploadPct: number = isSubmitting ? (s.uploadPct ?? 0) : 0;
+  const uploadedBytes: number = isSubmitting ? (s.uploadedBytes ?? 0) : 0;
+  const totalBytes: number = isSubmitting ? (s.totalBytes ?? 0) : 0;
+  const progressPct =
+    currentStep === "prepare" ? 10
+    : currentStep === "upload" ? Math.round(10 + uploadPct * 0.8)
+    : currentStep === "finalize" ? 95
     : 0;
+  const kb = (n: number) => Math.max(0, Math.round(n / 1024));
+  const submitLabel =
+    currentStep === "prepare" ? "Preparing…"
+    : currentStep === "upload" ? `Uploading ${uploadPct}%`
+    : currentStep === "finalize" ? "Finishing up…"
+    : "Submit";
+  const submitDisabled = !props.file || !props.consent || isSubmitting || props.isConverting;
+
 
   return (
     <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease: EASE }}>
@@ -424,10 +491,12 @@ function UploadForm(props: {
             <button
               type="button"
               onClick={props.onPickClick}
-              className="absolute top-3 right-3 bg-white/90 backdrop-blur px-3 py-2 text-[10px] uppercase tracking-[0.18em] border border-neutral-300"
+              disabled={isSubmitting}
+              className="absolute top-3 right-3 bg-white/90 backdrop-blur px-3 py-2 text-[10px] uppercase tracking-[0.18em] border border-neutral-300 disabled:opacity-40 disabled:cursor-not-allowed disabled:pointer-events-none"
             >
               Change
             </button>
+
           </div>
         )}
       </div>
@@ -517,14 +586,21 @@ function UploadForm(props: {
               </p>
               <p className="text-[10px] tabular-nums text-neutral-500">{progressPct}%</p>
             </div>
-            <div className="h-px bg-neutral-200 mb-4 overflow-hidden">
+            <div className="h-px bg-neutral-200 mb-2 overflow-hidden">
               <motion.div
                 className="h-full bg-[#4CAF50]"
                 initial={false}
                 animate={{ width: `${progressPct}%` }}
-                transition={{ duration: 0.4, ease: EASE }}
+                transition={{ duration: 0.15, ease: "linear" }}
               />
             </div>
+            {currentStep === "upload" && totalBytes > 0 && (
+              <p className="text-[10px] uppercase tracking-[0.18em] text-neutral-500 tabular-nums mb-4">
+                {kb(uploadedBytes).toLocaleString()} / {kb(totalBytes).toLocaleString()} KB
+              </p>
+            )}
+            {currentStep !== "upload" && <div className="mb-4" />}
+
             <ul className="space-y-2">
               {STEP_ORDER.map((step) => {
                 const idx = STEP_ORDER.indexOf(step);
@@ -552,19 +628,21 @@ function UploadForm(props: {
       {/* Submit */}
       <button
         type="button"
-        disabled={!props.file || !props.consent || isSubmitting}
+        disabled={submitDisabled}
+        aria-busy={isSubmitting}
         onClick={props.onSubmit}
-        className="w-full bg-[#4CAF50] text-white text-xs uppercase tracking-[0.2em] font-medium py-4 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#449e48] transition-colors relative overflow-hidden"
+        className="w-full bg-[#4CAF50] text-white text-xs uppercase tracking-[0.2em] font-medium py-4 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#449e48] transition-colors relative overflow-hidden tabular-nums"
       >
         {isSubmitting ? (
           <span className="inline-flex items-center justify-center gap-2">
             <Loader2 className="h-3.5 w-3.5 animate-spin" />
-            Sending…
+            {submitLabel}
           </span>
         ) : (
           "Submit"
         )}
       </button>
+
 
       <p className="text-[10px] text-neutral-400 text-center mt-6 uppercase tracking-[0.2em]">
         One photo · One submission
