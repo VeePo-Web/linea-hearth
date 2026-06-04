@@ -1,31 +1,62 @@
-## Worn-in-the-Wild upload — audit
+## Add client-side validation + HEIC conversion to Worn-in-the-Wild upload
 
-Flow traced end-to-end:
-`process-worn-in-the-wild-invites` (signs JWT with `SUPABASE_SERVICE_ROLE_KEY`, HS256) → email link → `/worn-in-the-wild/upload?token=…` → `validate-worn-token` (verifies with same key) → client `resizeAndStrip` (canvas re-encode → JPEG, strips EXIF) → `submit-worn-photo` (size + MIME + magic-byte check → upload to private `worn-in-the-wild` bucket → insert submission + create one-time 15% `WORN-XXXXXX` discount → mark invite submitted) → admin moderates in `/ops-portal/worn-in-the-wild` → `review-worn-submission` copies file to public `product-images` bucket under `worn-in-the-wild/…`.
+Scope: `src/pages/WornInTheWildUpload.tsx` only. No backend, schema, or storage changes. Server-side validation in `submit-worn-photo` stays as the source of truth — this is defense in depth and a better UX (catch problems before the user waits for the upload).
 
-**Working correctly:**
-- JWT sign/verify use the same secret + algorithm ✓
-- Server enforces 10MB cap, MIME allow-list, magic-byte sniff, 5/hr rate limit, single-submission per invite ✓
-- EXIF stripped via canvas re-encode (server comment acknowledges this) ✓
-- `submit-worn-photo` registered in `supabase/config.toml` with `verify_jwt = false` ✓
-- Storage uses service-role; bucket stays private until approval ✓
-- Reward code uniqueness checked, 60-day expiry ✓
+### What changes
 
-**Issues found:**
+**1. Centralized validation constants**
+At the top of the file, define:
+- `ALLOWED_MIME = ["image/jpeg","image/png","image/webp"]`
+- `ALLOWED_EXT = ["jpg","jpeg","png","webp"]`
+- `HEIC_MIME = ["image/heic","image/heif"]`, `HEIC_EXT = ["heic","heif"]`
+- `MAX_BYTES = 10 * 1024 * 1024` (already exists)
+- `MIN_BYTES = 5 * 1024` (rejects 0-byte / obviously broken picks)
 
-1. **HEIC photos silently fail.** Input accepts `image/heic,image/heif` and `capture="environment"` (iPhone default = HEIC), but `resizeAndStrip` decodes with `new Image()`, which Safari/Chrome can't decode for HEIC. The throw is caught and surfaced as a generic "Upload failed. Please check your connection…" — misleading on a working connection.
-   - **Fix:** detect HEIC before resize (`file.type` includes `heic`/`heif` or extension match). Show a friendly inline message: "iPhone HEIC photos aren't supported yet — in Camera settings switch Formats to 'Most Compatible', or pick a JPG." Don't even attempt the canvas path.
+**2. New `validateFile(f)` helper**
+Returns `{ ok: true } | { ok: false, code: "unsupported_type" | "file_too_large" | "file_too_small" | "empty_file" }`. Checks, in order:
+- `f.size === 0` → `empty_file`
+- `f.size > MAX_BYTES` → `file_too_large`
+- `f.size < MIN_BYTES` → `file_too_small`
+- MIME OR extension must match an allowed image type (HEIC handled separately, not rejected here)
+- Anything else → `unsupported_type`
 
-2. **Wasted/confusing `supabase.functions.invoke` call.** The `useEffect` in `WornInTheWildUpload.tsx` (lines 107–113) invokes `validate-worn-token` with empty body, then immediately does a direct `fetch` for the real call. The first invoke fires a no-token POST that the function logs as invalid. Pure dead code.
-   - **Fix:** remove the `supabase.functions.invoke` block; keep only the direct `fetch` GET.
+**3. HEIC conversion via `heic2any` (dynamic import)**
+- Add dependency: `heic2any` (~50KB, browser-only, no peer deps).
+- New `convertHeicToJpeg(file)`: `await import("heic2any")`, convert to JPEG at quality 0.9, wrap the resulting `Blob` back into a `File` named `<basename>.jpg` with `type: "image/jpeg"`. Dynamic import keeps the bundle lean — only loaded when an iPhone user picks HEIC.
+- Wrapped in try/catch → surfaces `heic_conversion_failed` friendly error.
 
-**Not changing (intentional or out of scope):**
-- Keeping HEIC in the `<input accept>` so iOS users can still pick the file and see the friendly error rather than have it greyed out — open to flipping if you'd rather hide it entirely.
-- `validate-worn-token` GET via direct fetch (rather than `invoke`) — `invoke` doesn't cleanly support GET + query string, so this stays.
-- Server's symmetric reuse of `SUPABASE_SERVICE_ROLE_KEY` as JWT HMAC secret — works, but if you want a dedicated `WORN_INVITE_JWT_SECRET` later that's a separate hardening pass.
+**4. New `onPickFile` flow** (replaces current one)
+```text
+setError(null)
+if (!f) return
+if (isHeic(f)):
+    setState busy "Converting iPhone photo…"  // brief inline status
+    f = await convertHeicToJpeg(f)            // may throw → friendly error
+end
+res = validateFile(f)
+if (!res.ok): setError(friendlyError(res.code)); return
+setFile(f); setPreview(URL.createObjectURL(f))
+```
+- Revoke any previous `preview` URL before assigning a new one (small leak fix while we're here).
+- Add a lightweight `isConverting` boolean so the upload tile shows "Converting iPhone photo…" with a spinner instead of looking frozen during the (1–3s) HEIC decode.
 
-## Files touched
+**5. Friendly error copy additions**
+Add to the `friendlyError` switch:
+- `file_too_small` → "That photo looks corrupted or empty. Try another."
+- `empty_file` → same as above
+- `heic_conversion_failed` → "We couldn't convert that iPhone HEIC photo. In iOS Settings → Camera → Formats, switch to 'Most Compatible', then retake — or pick a JPG/PNG."
+- Keep existing `heic_unsupported` entry but it becomes unreachable (conversion now handles HEIC) — leave it in as a safety net.
 
-- `src/pages/WornInTheWildUpload.tsx` — drop dead `invoke`, add HEIC pre-check + friendly copy in `friendlyError` / `onPickFile`.
+**6. `onSubmit` defense-in-depth**
+Re-run `validateFile(file)` at the top of `onSubmit` before `resizeAndStrip`. If the file was somehow mutated or stale, fail fast with the same friendly error instead of letting the server reject it after the upload.
 
-No backend, schema, or storage changes.
+### Out of scope
+
+- No change to `<input accept>` — keeps HEIC selectable on iOS so we can convert it.
+- No change to `resizeAndStrip` — it already re-encodes to JPEG and strips EXIF, which now happens after HEIC conversion.
+- No server changes — `submit-worn-photo` remains the authoritative MIME/magic-byte gate.
+
+### Files touched
+
+- `src/pages/WornInTheWildUpload.tsx`
+- `package.json` (adds `heic2any`)
