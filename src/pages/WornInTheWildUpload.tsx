@@ -628,19 +628,21 @@ function UploadForm(props: {
       {/* Submit */}
       <button
         type="button"
-        disabled={!props.file || !props.consent || isSubmitting}
+        disabled={submitDisabled}
+        aria-busy={isSubmitting}
         onClick={props.onSubmit}
-        className="w-full bg-[#4CAF50] text-white text-xs uppercase tracking-[0.2em] font-medium py-4 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#449e48] transition-colors relative overflow-hidden"
+        className="w-full bg-[#4CAF50] text-white text-xs uppercase tracking-[0.2em] font-medium py-4 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#449e48] transition-colors relative overflow-hidden tabular-nums"
       >
         {isSubmitting ? (
           <span className="inline-flex items-center justify-center gap-2">
             <Loader2 className="h-3.5 w-3.5 animate-spin" />
-            Sending…
+            {submitLabel}
           </span>
         ) : (
           "Submit"
         )}
       </button>
+
 
       <p className="text-[10px] text-neutral-400 text-center mt-6 uppercase tracking-[0.2em]">
         One photo · One submission
