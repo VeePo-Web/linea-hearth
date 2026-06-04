@@ -69,6 +69,37 @@ async function convertHeicToJpeg(file: File): Promise<File> {
   return new File([blob], `${base}.jpg`, { type: "image/jpeg" });
 }
 
+function friendlyError(code?: string): string {
+  switch (code) {
+    case "heic_unsupported":
+      return "iPhone HEIC photos can't be processed in-browser. In iOS Settings → Camera → Formats, switch to 'Most Compatible', then retake — or pick a JPG/PNG from your library.";
+    case "heic_conversion_failed":
+      return "We couldn't convert that iPhone HEIC photo. In iOS Settings → Camera → Formats, switch to 'Most Compatible', then retake — or pick a JPG/PNG.";
+    case "file_too_large":
+      return "That photo is over 10MB. Please choose a smaller one.";
+    case "file_too_small":
+    case "empty_file":
+      return "That photo looks corrupted or empty. Try another.";
+    case "unsupported_type":
+      return "Only JPG, PNG, or WebP photos are accepted.";
+    case "invalid_image":
+      return "We couldn't read that image. Try a different file.";
+    case "invalid_token":
+    case "invite_not_found":
+      return "This invite link is no longer valid.";
+    case "already_submitted":
+      return "A photo has already been submitted for this order.";
+    case "rate_limited":
+      return "Too many attempts. Please wait a moment and try again.";
+    case "upload_failed":
+    case "submission_failed":
+      return "We couldn't save your photo. Please try again.";
+    default:
+      return code ? `Something went wrong (${code}). Try again.` : "Something went wrong. Try again.";
+  }
+}
+
+
 
 // Client-side resize + EXIF strip via canvas re-encode (canvas does not
 // preserve EXIF, so re-encoded output is automatically EXIF-free).
