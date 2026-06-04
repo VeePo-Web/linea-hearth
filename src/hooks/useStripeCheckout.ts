@@ -75,7 +75,19 @@ export const useStripeCheckout = () => {
         }));
 
 
-        const returnUrl = `${window.location.origin}/checkout/success?session_id={CHECKOUT_SESSION_ID}`;
+        const rawOrigin = window.location.origin;
+        let originBase: string;
+        if (rawOrigin && rawOrigin !== "null" && /^https?:\/\//.test(rawOrigin)) {
+          originBase = rawOrigin;
+        } else {
+          try {
+            const parsed = new URL(window.location.href);
+            originBase = /^https?:$/.test(parsed.protocol) ? parsed.origin : "https://lineofjudah.clothing";
+          } catch {
+            originBase = "https://lineofjudah.clothing";
+          }
+        }
+        const returnUrl = `${originBase}/checkout/success?session_id={CHECKOUT_SESSION_ID}`;
 
         const { data: result, error: invokeErr } = await supabase.functions.invoke(
           "create-checkout-session",
