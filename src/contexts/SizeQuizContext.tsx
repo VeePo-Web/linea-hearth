@@ -50,7 +50,8 @@ const SIZE_MEMORY_KEY = 'loj-size-memory';
 const DEFAULT_ANSWERS: QuizAnswers = {
   heightRange: null,
   fitPreference: null,
-  primaryCategory: null,
+  // We only sell tops/hats — auto-set so the 2-step quiz completes.
+  primaryCategory: 'tops',
 };
 
 // ============= Helper Functions =============
@@ -179,7 +180,7 @@ export const SizeQuizProvider = ({ children }: SizeQuizProviderProps) => {
   }, []);
 
   const nextStep = useCallback(() => {
-    setCurrentStep(prev => Math.min(prev + 1, 2));
+    setCurrentStep(prev => Math.min(prev + 1, 1));
   }, []);
 
   const prevStep = useCallback(() => {

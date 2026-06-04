@@ -81,12 +81,6 @@ const fitOptions: { value: FitPreference; label: string; description: string }[]
   { value: 'oversized', label: "Oversized", description: "Extra roomy, streetwear vibe" },
 ];
 
-const categoryOptions: { value: PrimaryCategory; label: string; description: string }[] = [
-  { value: 'tops', label: "Mostly Tops", description: "Tees, hoodies, crewnecks" },
-  { value: 'bottoms', label: "Mostly Bottoms", description: "Joggers, shorts, pants" },
-  { value: 'both', label: "Both Equally", description: "Full fits, head to toe" },
-];
-
 interface StepConfig {
   title: string;
   subtitle: string;
@@ -106,12 +100,6 @@ const steps: StepConfig[] = [
     subtitle: "Everyone has their preference",
     options: fitOptions,
     answerKey: 'fitPreference',
-  },
-  {
-    title: "What do you shop for most?",
-    subtitle: "We'll prioritize these sizes",
-    options: categoryOptions,
-    answerKey: 'primaryCategory',
   },
 ];
 
@@ -216,8 +204,8 @@ const SizeQuizModal = ({
                 <div className="text-xs text-muted-foreground">Tops</div>
               </div>
               <div className="text-center">
-                <div className="text-lg font-medium">{recommendedSizes.bottoms}</div>
-                <div className="text-xs text-muted-foreground">Bottoms</div>
+                <div className="text-lg font-medium">{recommendedSizes.hats}</div>
+                <div className="text-xs text-muted-foreground">Hats</div>
               </div>
             </div>
           </motion.div>

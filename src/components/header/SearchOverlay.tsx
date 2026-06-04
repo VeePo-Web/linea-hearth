@@ -47,7 +47,7 @@ const itemVariants = {
 
 const popularSearches = [
   "Stay Holy",
-  "Heavenly Crewneck",
+  "Heavenly Cap",
   "Black Hoodies",
   "Premium Tees",
 ];
