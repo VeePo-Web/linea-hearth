@@ -236,6 +236,102 @@ async function handleDispute(dispute: any, env: StripeEnv) {
   }
 }
 
+// === ADMIN ALERT DISPATCHERS ===
+async function alertPaymentFailed(
+  event: { id: string; type: string; data: { object: any } },
+  env: StripeEnv,
+) {
+  const obj = event.data.object;
+  const isSession = event.type.startsWith("checkout.session");
+  const amount = isSession ? obj.amount_total : obj.amount;
+  const orderId = obj.metadata?.orderId ?? "(no orderId)";
+  const reason =
+    obj.last_payment_error?.message ??
+    obj.last_payment_error?.code ??
+    obj.failure_message ??
+    "Unknown failure reason";
+  const declineCode = obj.last_payment_error?.decline_code ?? null;
+  const email = isSession ? obj.customer_details?.email : obj.receipt_email;
+
+  await sendAdminAlert({
+    subject: `[LOJ Alert] Payment failed — ${orderId} — ${cad(amount)}`,
+    idempotencyKey: event.id,
+    context: { eventType: event.type, eventId: event.id, env },
+    html: alertShell(
+      "Payment failed",
+      [
+        ["Order", orderId],
+        ["Amount", cad(amount)],
+        ["Customer", email ?? "(unknown)"],
+        ["Reason", reason],
+        ...(declineCode ? [["Decline code", declineCode]] as Array<[string, string]> : []),
+        ["Stripe event", event.type],
+        ["Environment", env],
+        ["When", new Date().toISOString()],
+      ],
+      orderId !== "(no orderId)"
+        ? opsOrderLink(orderId)
+        : dashboardLink(env, `events/${event.id}`),
+      orderId !== "(no orderId)" ? "Open order" : "Open Stripe event",
+    ),
+  });
+}
+
+async function alertRefund(
+  event: { id: string; type: string; data: { object: any } },
+  env: StripeEnv,
+) {
+  const charge = event.data.object;
+  await sendAdminAlert({
+    subject: `[LOJ Alert] Refund processed — ${cad(charge.amount_refunded)}`,
+    idempotencyKey: event.id,
+    context: { eventId: event.id, env },
+    html: alertShell(
+      "Refund processed",
+      [
+        ["Charge", charge.id],
+        ["Refunded", cad(charge.amount_refunded)],
+        ["Original amount", cad(charge.amount)],
+        ["Customer", charge.billing_details?.email ?? charge.receipt_email ?? "(unknown)"],
+        ["Payment intent", charge.payment_intent ?? "(none)"],
+        ["Environment", env],
+      ],
+      dashboardLink(env, `payments/${charge.payment_intent ?? ""}`),
+      "Open in Stripe",
+    ),
+  });
+}
+
+async function alertDispute(
+  event: { id: string; type: string; data: { object: any } },
+  env: StripeEnv,
+) {
+  const d = event.data.object;
+  await sendAdminAlert({
+    subject: `[LOJ Alert] Dispute opened — ${cad(d.amount)} — ${d.reason ?? "unknown reason"}`,
+    idempotencyKey: event.id,
+    context: { eventId: event.id, env },
+    html: alertShell(
+      "Dispute opened",
+      [
+        ["Dispute", d.id],
+        ["Amount", cad(d.amount)],
+        ["Reason", d.reason ?? "(unknown)"],
+        ["Status", d.status ?? "(unknown)"],
+        ["Charge", d.charge ?? "(unknown)"],
+        ["Evidence due", d.evidence_details?.due_by
+          ? new Date(d.evidence_details.due_by * 1000).toISOString()
+          : "(none)"],
+        ["Environment", env],
+      ],
+      dashboardLink(env, `disputes/${d.id}`),
+      "Open dispute",
+    ),
+  });
+}
+
+
+
 Deno.serve(async (req) => {
   console.log("stripe-webhook hit:", req.method, req.url);
   if (req.method !== "POST") return new Response("Method not allowed", { status: 405 });
