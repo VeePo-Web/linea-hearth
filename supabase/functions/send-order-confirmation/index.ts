@@ -449,7 +449,7 @@ Deno.serve(async (req) => {
     
     // Build the email HTML
     const emailHtml = buildOrderConfirmationHtml(order as Order, (items || []) as OrderItem[], siteUrl);
-    const subject = `Your armor is on the way - Order #${orderId.slice(0, 8).toUpperCase()}`;
+    const subject = `Your order is on its way — #${orderId.slice(0, 8).toUpperCase()}`;
     
     // Check if Resend API key is configured
     const resendApiKey = Deno.env.get("RESEND_API_KEY");
