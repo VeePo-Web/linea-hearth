@@ -160,7 +160,7 @@ export function SwipeableLookCard({
               delay={100} 
               variant="circle-check"
               filled
-              backgroundColor="hsl(var(--green-600))"
+              backgroundColor="hsl(var(--primary))"
             />
             
             <div className="text-center">

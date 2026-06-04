@@ -105,8 +105,8 @@ const PostPurchaseOffer = ({ isOpen, offer, customerEmail, onClose, onAccepted }
   return (
     <Dialog open={isOpen} onOpenChange={(open) => { if (!open) { closedRef.current = true; onClose(); } }}>
       <DialogContent className="sm:max-w-md p-0 gap-0 overflow-hidden rounded-none border-foreground/20">
-        {/* Timer header — Forest Green */}
-        <div className="bg-[#4CAF50] text-white px-4 py-2 flex items-center justify-center gap-2">
+        {/* Timer header — Chrome */}
+        <div className="bg-foreground text-background px-4 py-2 flex items-center justify-center gap-2">
           <Clock className="h-4 w-4" />
           <span className="text-xs font-medium tracking-wide uppercase">
             {state === "idle" || state === "submitting" ? (
@@ -139,7 +139,7 @@ const PostPurchaseOffer = ({ isOpen, offer, customerEmail, onClose, onAccepted }
               <div className="mt-2 flex items-baseline gap-2">
                 <span className="text-lg font-medium text-foreground">{price(offer.priceCents)}</span>
                 <span className="text-sm text-muted-foreground line-through">{price(offer.originalPriceCents)}</span>
-                <span className="text-xs bg-[#4CAF50]/10 text-[#2E7D32] px-2 py-0.5">
+                <span className="text-xs bg-muted text-foreground px-2 py-0.5">
                   −{offer.discountPct}%
                 </span>
               </div>
@@ -148,7 +148,7 @@ const PostPurchaseOffer = ({ isOpen, offer, customerEmail, onClose, onAccepted }
 
           {state === "idle" || state === "submitting" ? (
             <>
-              <div className="text-xs text-muted-foreground bg-muted/30 p-3 space-y-1 border-l-2 border-[#4CAF50]/40">
+              <div className="text-xs text-muted-foreground bg-muted/30 p-3 space-y-1 border-l-2 border-foreground/40">
                 <p>— One tap. No re-entering payment.</p>
                 <p>— Ships together with your order.</p>
                 <p>— Charged to the card you just used.</p>
@@ -168,8 +168,8 @@ const PostPurchaseOffer = ({ isOpen, offer, customerEmail, onClose, onAccepted }
               </button>
             </>
           ) : state === "success" ? (
-            <div className="flex items-start gap-3 p-4 bg-[#4CAF50]/10 border-l-2 border-[#4CAF50]">
-              <CheckCircle2 className="h-5 w-5 text-[#2E7D32] mt-0.5" />
+            <div className="flex items-start gap-3 p-4 bg-muted border-l-2 border-foreground">
+              <CheckCircle2 className="h-5 w-5 text-foreground mt-0.5" />
               <div className="text-sm">
                 <p className="font-medium text-foreground">Added — ships with your order.</p>
                 <p className="text-xs text-muted-foreground mt-1">Confirmation sent to {customerEmail}.</p>

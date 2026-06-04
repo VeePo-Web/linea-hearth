@@ -147,15 +147,15 @@ export const AvatarPreview = ({ config, onNameChange }: AvatarPreviewProps) => {
         </div>
         <div className="space-y-1.5 text-xs text-muted-foreground">
           <div className="flex items-center gap-2">
-            <Check className="w-3 h-3 text-green-500" />
+            <Check className="w-3 h-3 text-foreground" />
             <span>Body configured with your measurements</span>
           </div>
           <div className="flex items-center gap-2">
-            <Check className="w-3 h-3 text-green-500" />
+            <Check className="w-3 h-3 text-foreground" />
             <span>Face customized to your preferences</span>
           </div>
           <div className="flex items-center gap-2">
-            <Check className="w-3 h-3 text-green-500" />
+            <Check className="w-3 h-3 text-foreground" />
             <span>Hair style and color selected</span>
           </div>
         </div>

@@ -219,10 +219,10 @@ const CompleteTheLookBundle = ({ currentProductId }: Props) => {
               {ctl.bundleSaving > 0 && (
                 <div className="flex items-center justify-between text-foreground">
                   <span className="inline-flex items-center gap-1.5">
-                    <span className="inline-block w-1.5 h-1.5 bg-[#4CAF50]" />
+                    <span className="inline-block w-1.5 h-1.5 bg-foreground" />
                     Save as a set
                   </span>
-                  <span className="text-[#4CAF50]">−{fmt(ctl.bundleSaving)}</span>
+                  <span className="text-foreground">−{fmt(ctl.bundleSaving)}</span>
                 </div>
               )}
               <div className="flex items-center justify-between text-foreground pt-2 border-t border-border">
