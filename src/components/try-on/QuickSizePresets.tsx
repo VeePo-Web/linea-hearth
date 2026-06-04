@@ -95,7 +95,7 @@ export const QuickSizePresets = ({
           animate={{ opacity: 1, y: 0 }}
           className="text-[10px] text-muted-foreground flex items-center gap-1"
         >
-          <span className="w-1.5 h-1.5 bg-green-500 rounded-full" />
+          <span className="w-1.5 h-1.5 bg-primary rounded-full" />
           Using {quickPresets[selectedPresetId]?.label} preset
         </motion.p>
       )}

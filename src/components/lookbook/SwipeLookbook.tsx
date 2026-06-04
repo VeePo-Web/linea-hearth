@@ -151,9 +151,9 @@ export default function SwipeLookbook({
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
                         transition={{ type: 'spring', stiffness: 400, damping: 20, delay: 0.2 }}
-                        className="w-20 h-20 bg-green-500/20 flex items-center justify-center mb-6"
+                        className="w-20 h-20 bg-primary/20 flex items-center justify-center mb-6"
                       >
-                        <DrawCheckIcon size="xl" color="green" animate delay={0.3} />
+                        <DrawCheckIcon size="xl" color="white" animate delay={0.3} />
                       </motion.div>
                       
                       <motion.h2

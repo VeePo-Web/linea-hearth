@@ -132,7 +132,7 @@ export default function SwipeProgress({
             style={{ left: '50%' }}
           />
           <div 
-            className="absolute top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-green-500/50 border border-green-500"
+            className="absolute top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-primary/50 border border-primary"
             style={{ left: '100%', transform: 'translate(-100%, -50%)' }}
           />
         </div>
@@ -144,7 +144,7 @@ export default function SwipeProgress({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="text-[11px] text-green-400 font-medium flex items-center gap-1"
+              className="text-[11px] text-primary font-medium flex items-center gap-1"
             >
               <Sparkles className="w-3 h-3" />
               Free shipping unlocked!
