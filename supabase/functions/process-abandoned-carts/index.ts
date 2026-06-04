@@ -432,7 +432,7 @@ function getEmail3Html(cart: AbandonedCart, recoveryUrl: string, discountCode: s
               <tr>
                 <td style="padding:24px 40px 48px;text-align:center;">
                   <a href="${recoveryUrl}" style="display:inline-block;background:#1C1917;color:#FFFFFF;text-decoration:none;padding:16px 48px;font-size:12px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;border-radius:4px;">
-                    CLAIM YOUR REINFORCEMENT
+                    CLAIM YOUR 15% OFF
                   </a>
                   <p style="margin:16px 0 0;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;font-size:12px;color:#A8A29E;">
                     Offer expires in 24 hours
@@ -443,8 +443,8 @@ function getEmail3Html(cart: AbandonedCart, recoveryUrl: string, discountCode: s
               <!-- Brand Quote -->
               <tr>
                 <td style="padding:32px 40px;background:#FAFAF9;border-top:1px solid #E7E5E4;">
-                  <p style="margin:0;font-size:14px;font-style:italic;color:#78716C;text-align:center;line-height:1.6;">
-                    "This isn't just clothing. It's armor."
+                  <p style="margin:0;font-size:14px;font-style:italic;color:#78716C;text-align:center;line-height:1.7;">
+                    More than clothing. A statement of faith.
                   </p>
                 </td>
               </tr>
