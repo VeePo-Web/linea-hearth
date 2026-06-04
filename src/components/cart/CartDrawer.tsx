@@ -239,8 +239,8 @@ const CartDrawer = ({ onViewFavorites }: CartDrawerProps) => {
                   >
                     <Button
                       asChild
-                      variant="outline"
-                      className="rounded-none"
+                      variant="default"
+                      className="rounded-none bg-primary text-primary-foreground hover:bg-primary-hover hover:text-primary-foreground"
                       onClick={closeCart}
                     >
                       <Link to="/category/shop">Explore Collection</Link>
