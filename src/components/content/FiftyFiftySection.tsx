@@ -41,7 +41,7 @@ const FiftyFiftySection = () => {
           </Link>
           <div className="">
             <h3 className="text-sm font-normal text-foreground mb-1">
-              Crewnecks & Tees
+              Tees & Tops
             </h3>
             <p className="text-sm font-light text-foreground">
               Everyday essentials that make a statement
