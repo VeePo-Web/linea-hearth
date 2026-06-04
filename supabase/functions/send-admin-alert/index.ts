@@ -100,15 +100,14 @@ Deno.serve(async (req) => {
     metadata: { subject, context: context ?? null },
   }).then(() => {}).catch(() => {});
 
-  const lovableKey = Deno.env.get("LOVABLE_API_KEY");
   const resendKey = Deno.env.get("RESEND_API_KEY");
-  if (!lovableKey || !resendKey) {
+  if (!resendKey) {
     await supabase.from("email_send_log").insert({
       message_id: messageId,
       template_name: "admin-alert",
       recipient_email: ADMIN_RECIPIENTS.join(","),
       status: "failed",
-      error_message: "Missing LOVABLE_API_KEY or RESEND_API_KEY",
+      error_message: "Missing RESEND_API_KEY",
     }).then(() => {}).catch(() => {});
     return new Response(JSON.stringify({ error: "Email provider not configured" }), {
       status: 500,
@@ -116,12 +115,11 @@ Deno.serve(async (req) => {
     });
   }
 
-  const res = await fetch(`${GATEWAY_URL}/emails`, {
+  const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": `Bearer ${lovableKey}`,
-      "X-Connection-Api-Key": resendKey,
+      "Authorization": `Bearer ${resendKey}`,
     },
     body: JSON.stringify({
       from: ADMIN_FROM,
