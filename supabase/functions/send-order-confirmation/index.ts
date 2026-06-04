@@ -336,12 +336,12 @@ function buildOrderConfirmationHtml(order: Order, items: OrderItem[], siteUrl: s
             </td>
           </tr>
           
-          <!-- Mission Quote -->
+          <!-- Scripture / Mission -->
           <tr>
             <td style="padding:0 40px 48px;">
               <div style="border-top:1px solid #E7E5E4;padding-top:32px;text-align:center;">
-                <p style="margin:0 0 16px;font-size:15px;font-style:italic;color:#78716C;line-height:1.6;">"Every outfit is an open door. You don't preach—you spark curiosity. They ask. You answer."</p>
-                <p style="margin:0;font-size:16px;font-weight:700;color:#1C1917;">This isn't just clothing. It's armor.</p>
+                <p style="margin:0 0 12px;font-size:16px;font-weight:700;color:#1C1917;letter-spacing:0.5px;">More than clothing. A statement of faith.</p>
+                <p style="margin:0;font-size:14px;font-style:italic;color:#78716C;line-height:1.7;">"The Lion of the tribe of Judah has triumphed."<br/><span style="font-size:12px;letter-spacing:0.05em;">— Revelation 5:5</span></p>
               </div>
             </td>
           </tr>
