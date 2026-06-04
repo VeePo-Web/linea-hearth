@@ -28,6 +28,8 @@ const Catalogue = () => {
   const [sort, setSort] = useState<SortOption>("newest");
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [sortOpen, setSortOpen] = useState(false);
+  const [quickViewProduct, setQuickViewProduct] = useState<ProductCardData | null>(null);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   const { data: products = [], isLoading } = useQuery({
     queryKey: ["catalogue-all-products"],
@@ -35,15 +37,16 @@ const Catalogue = () => {
       const { data, error } = await supabase
         .from("products")
         .select(`
-          id, name, slug, price, sale_price, is_on_sale, is_featured, created_at,
-          categories ( name, slug ),
-          product_images ( image_url, is_primary )
+          id, name, slug, price, sale_price, is_on_sale, is_featured, status, material, created_at,
+          categories:category_id ( name, slug ),
+          product_images ( image_url, is_primary, display_order ),
+          product_variants ( size, color, stock_quantity )
         `)
         .eq("status", "active")
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      return (data || []) as Product[];
+      return (data || []) as unknown as Product[];
     },
   });
 
@@ -80,11 +83,6 @@ const Catalogue = () => {
 
     return list;
   }, [products, selectedCategory, sort]);
-
-  const primaryImage = (p: Product) =>
-    p.product_images.find((i) => i.is_primary)?.image_url ||
-    p.product_images[0]?.image_url ||
-    null;
 
   return (
     <Layout>
