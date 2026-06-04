@@ -1,5 +1,42 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { createStripeClient, verifyWebhook, type StripeEnv } from "../_shared/stripe.ts";
+import { sendAdminAlert } from "../_shared/admin-alert.ts";
+
+// === Alert formatting helpers ===
+const cad = (cents?: number | null) =>
+  typeof cents === "number"
+    ? `$${(cents / 100).toFixed(2)} CAD`
+    : "(unknown amount)";
+
+const dashboardLink = (env: StripeEnv, path: string) =>
+  env === "live"
+    ? `https://dashboard.stripe.com/${path}`
+    : `https://dashboard.stripe.com/test/${path}`;
+
+const opsOrderLink = (orderId: string) =>
+  `https://lineofjudah.clothing/ops-portal/orders/${orderId}`;
+
+function alertShell(title: string, rows: Array<[string, string]>, ctaUrl?: string, ctaLabel?: string) {
+  const rowsHtml = rows
+    .map(
+      ([k, v]) =>
+        `<tr><td style="padding:6px 12px 6px 0;color:#666;font-size:13px;white-space:nowrap;vertical-align:top;">${k}</td><td style="padding:6px 0;color:#111;font-size:13px;word-break:break-word;">${v}</td></tr>`,
+    )
+    .join("");
+  const cta = ctaUrl
+    ? `<p style="margin:24px 0 0;"><a href="${ctaUrl}" style="display:inline-block;padding:10px 18px;background:#111;color:#fff;text-decoration:none;font-size:13px;letter-spacing:0.04em;">${ctaLabel ?? "Open"}</a></p>`
+    : "";
+  return `<!doctype html><html><body style="margin:0;padding:32px;background:#f5f5f5;font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif;">
+  <div style="max-width:560px;margin:0 auto;background:#fff;padding:28px 32px;border:1px solid #e5e5e5;">
+    <p style="margin:0 0 4px;font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:#888;">Line of Judah · Ops Alert</p>
+    <h1 style="margin:0 0 20px;font-size:20px;font-weight:600;color:#111;letter-spacing:-0.01em;">${title}</h1>
+    <table style="border-collapse:collapse;width:100%;">${rowsHtml}</table>
+    ${cta}
+    <hr style="margin:24px 0 12px;border:none;border-top:1px solid #eee;"/>
+    <p style="margin:0;font-size:11px;color:#999;">Automated message · do not reply directly</p>
+  </div></body></html>`;
+}
+
 
 let _supabase: ReturnType<typeof createClient> | null = null;
 function getSupabase() {
