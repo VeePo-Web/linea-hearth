@@ -292,7 +292,7 @@ export default function AccountOrderDetail() {
                 </span>
               </div>
               {order.discount_cents > 0 && (
-                <div className="flex justify-between text-green-600">
+                <div className="flex justify-between text-foreground">
                   <span>Discount</span>
                   <span>-${(order.discount_cents / 100).toFixed(2)}</span>
                 </div>
