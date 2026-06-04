@@ -235,7 +235,7 @@ Deno.serve(async (req) => {
         method: "POST",
         headers: { "Authorization": `Bearer ${resendApiKey}`, "Content-Type": "application/json" },
         body: JSON.stringify({
-          from: "Line of Judah Review <orders@lineofjudah.com>",
+          from: "Line of Judah Review <onboarding@resend.dev>",
           to: [REVIEW_RECIPIENT],
           subject,
           html,
