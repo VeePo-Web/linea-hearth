@@ -321,8 +321,8 @@ function buildOrderConfirmationHtml(order: Order, items: OrderItem[], siteUrl: s
           <tr>
             <td style="padding:0 40px 40px;">
               <div style="background:#FAFAF9;border-radius:8px;padding:24px;">
-                <p style="margin:0 0 16px;font-size:12px;font-weight:700;letter-spacing:2px;color:#78716C;text-transform:uppercase;">ETA TO THE FRONT LINE</p>
-                <p style="margin:0 0 20px;font-size:18px;font-weight:600;color:#1C1917;">📦 ${delivery.start} – ${delivery.end}</p>
+                <p style="margin:0 0 16px;font-size:12px;font-weight:700;letter-spacing:2px;color:#78716C;text-transform:uppercase;">ESTIMATED ARRIVAL</p>
+                <p style="margin:0 0 20px;font-size:18px;font-weight:600;color:#1C1917;">${delivery.start} – ${delivery.end}</p>
                 <p style="margin:0 0 4px;font-size:13px;font-weight:600;color:#78716C;text-transform:uppercase;">Shipping to:</p>
                 ${addressLines.map((line) => `<p style="margin:0;font-size:15px;color:#44403C;line-height:1.5;">${line}</p>`).join("")}
               </div>
