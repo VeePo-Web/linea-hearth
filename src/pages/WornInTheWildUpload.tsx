@@ -209,10 +209,11 @@ export default function WornInTheWildUpload() {
     }
 
     const res = validateFile(f);
-    if (!res.ok) {
+    if (res.ok === false) {
       setError(friendlyError(res.code));
       return;
     }
+
 
     if (preview) URL.revokeObjectURL(preview);
     setFile(f);
