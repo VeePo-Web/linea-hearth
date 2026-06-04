@@ -27,32 +27,32 @@ const NotFound = () => {
         <meta name="robots" content="noindex" />
       </Helmet>
 
-      <main className="relative h-[100dvh] w-full bg-background text-foreground flex flex-col items-center justify-center px-6 overflow-hidden">
+      <main className="relative h-[100dvh] w-full bg-background text-foreground flex flex-col items-center justify-center px-6 pb-32 overflow-hidden">
         {/* 404 superscript reference mark */}
         <motion.span
           {...fade(0.2)}
-          className="absolute top-8 left-1/2 -translate-x-1/2 text-[10px] tracking-[0.4em] uppercase text-muted-foreground/50"
+          className="absolute top-10 left-1/2 -translate-x-1/2 text-[10px] tracking-[0.5em] uppercase text-muted-foreground/50"
         >
-          <sup>404</sup>
+          404
         </motion.span>
 
         {/* Verse — the centerpiece */}
-        <div className="max-w-[420px] w-full text-center">
+        <div className="max-w-[440px] w-full text-center">
           <motion.p
             {...fade(0.4)}
-            className="font-serif italic text-xl md:text-2xl font-light leading-[1.6] tracking-[-0.01em] text-foreground/90"
+            className="font-serif italic text-[22px] md:text-[28px] font-light leading-[1.5] tracking-[-0.015em] text-foreground/95"
           >
             “And thou shalt make holy garments for Aaron thy brother, for glory and for beauty.”
           </motion.p>
 
           <motion.div
             {...fade(1.2)}
-            className="mx-auto mt-10 h-px w-[40%] bg-foreground/20"
+            className="mx-auto mt-12 h-px w-12 bg-foreground/30"
           />
 
           <motion.p
             {...fade(1.4)}
-            className="mt-6 text-[10px] tracking-[0.4em] uppercase text-muted-foreground"
+            className="mt-5 text-[10px] tracking-[0.45em] uppercase text-muted-foreground"
           >
             Exodus 28:2 — ASV
           </motion.p>
@@ -61,7 +61,7 @@ const NotFound = () => {
         {/* Lion sigil */}
         <motion.div
           {...fade(2)}
-          className="absolute bottom-16 left-1/2 -translate-x-1/2 flex flex-col items-center gap-6"
+          className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-5"
         >
           <img
             src="/favicon-192.png"
@@ -69,7 +69,7 @@ const NotFound = () => {
             aria-hidden="true"
             width={36}
             height={36}
-            className="w-9 h-9 opacity-80"
+            className="w-9 h-9 opacity-70"
           />
 
           <motion.div
@@ -79,13 +79,15 @@ const NotFound = () => {
           >
             <Link
               to="/home"
-              className="text-[10px] tracking-[0.4em] uppercase text-muted-foreground hover:text-foreground transition-colors duration-500"
+              className="group relative text-[10px] tracking-[0.45em] uppercase text-muted-foreground hover:text-foreground transition-colors duration-500"
             >
               Return
+              <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 h-px w-0 bg-foreground/60 transition-all duration-500 group-hover:w-[40%]" />
             </Link>
           </motion.div>
         </motion.div>
       </main>
+
     </>
   );
 };
