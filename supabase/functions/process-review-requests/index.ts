@@ -56,7 +56,7 @@ function buildEmail(order: EligibleOrder, siteUrl: string): { subject: string; h
   `).join('');
 
 
-  const subject = 'How did your armor serve you?';
+  const subject = 'How does it wear?';
   const html = `<!DOCTYPE html>
 <html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${subject}</title></head>
 <body style="margin:0;padding:0;background:#F5F5F4;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;">
@@ -90,7 +90,7 @@ function buildEmail(order: EligibleOrder, siteUrl: string): { subject: string; h
       </td></tr>
       <tr><td style="background:#1C1917;padding:32px 40px;text-align:center;">
         <p style="margin:0 0 4px;font-size:12px;font-weight:700;letter-spacing:2px;color:#FFFFFF;text-transform:uppercase;">LINE OF JUDAH</p>
-        <p style="margin:0 0 16px;font-size:13px;color:#78716C;">For those who walk different.</p>
+        <p style="margin:0 0 16px;font-size:13px;color:#78716C;">Faith you can wear.</p>
         <p style="margin:0;font-size:12px;color:#57534E;">
           <a href="#" style="color:#57534E;text-decoration:underline;">Unsubscribe</a>
         </p>

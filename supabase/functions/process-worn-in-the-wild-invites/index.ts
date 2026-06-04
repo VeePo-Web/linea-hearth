@@ -69,7 +69,7 @@ function renderEmail(opts: {
       </p>
 
       <p style="font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.65;color:#1a1a1a;margin:0 0 16px;">
-        We're building an archive of how this armor actually lives. Not models. Not studios. The people it was made for.
+        We're building an archive of how this collection is worn in real life — by the people it was made for.
       </p>
 
       <p style="font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.65;color:#1a1a1a;margin:0 0 32px;">

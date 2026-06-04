@@ -189,7 +189,7 @@ function getEmail1Html(cart: AbandonedCart, recoveryUrl: string, siteUrl: string
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <meta name="color-scheme" content="light">
-      <title>Your armor is waiting | Line of Judah</title>
+      <title>You left something behind | Line of Judah</title>
     </head>
     <body style="margin:0;padding:0;background:#FAFAF9;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;">
       <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background:#FAFAF9;">
@@ -209,10 +209,10 @@ function getEmail1Html(cart: AbandonedCart, recoveryUrl: string, siteUrl: string
               <tr>
                 <td style="padding:48px 40px 32px;text-align:center;">
                   <h1 style="margin:0 0 16px;font-size:28px;font-weight:300;letter-spacing:0.02em;color:#1C1917;">
-                    Did the page time out?
+                    You left something behind.
                   </h1>
                   <p style="margin:0;font-size:15px;line-height:1.6;color:#57534E;">
-                    No pressure — your selection is saved.<br/>Pick up where you left off when you're ready.
+                    No pressure — your selection is saved.<br/>Pick up where you left off whenever you're ready.
                   </p>
                 </td>
               </tr>
@@ -253,8 +253,8 @@ function getEmail1Html(cart: AbandonedCart, recoveryUrl: string, siteUrl: string
               <!-- Brand Quote -->
               <tr>
                 <td style="padding:32px 40px;background:#FAFAF9;border-top:1px solid #E7E5E4;">
-                  <p style="margin:0;font-size:14px;font-style:italic;color:#78716C;text-align:center;line-height:1.6;">
-                    "Every outfit is an open door."
+                  <p style="margin:0;font-size:14px;font-style:italic;color:#78716C;text-align:center;line-height:1.7;">
+                    "The Lion of the tribe of Judah has triumphed." — Revelation 5:5
                   </p>
                 </td>
               </tr>
@@ -277,7 +277,7 @@ function getEmail2Html(cart: AbandonedCart, recoveryUrl: string, siteUrl: string
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <meta name="color-scheme" content="light">
-      <title>The mission continues | Line of Judah</title>
+      <title>Still thinking it over? | Line of Judah</title>
     </head>
     <body style="margin:0;padding:0;background:#FAFAF9;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;">
       <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background:#FAFAF9;">
@@ -300,7 +300,7 @@ function getEmail2Html(cart: AbandonedCart, recoveryUrl: string, siteUrl: string
                     Still thinking it over?
                   </h1>
                   <p style="margin:0;font-size:15px;line-height:1.6;color:#57534E;">
-                    Sixty-seven others picked up theirs this week.<br/>Yours is still here, exactly as you left it.
+                    Your selection is still here — exactly as you left it.<br/>Whenever you're ready, we're here.
                   </p>
                 </td>
               </tr>
@@ -330,7 +330,7 @@ function getEmail2Html(cart: AbandonedCart, recoveryUrl: string, siteUrl: string
               <tr>
                 <td style="padding:16px 40px 48px;text-align:center;">
                   <a href="${recoveryUrl}" style="display:inline-block;background:#1C1917;color:#FFFFFF;text-decoration:none;padding:16px 48px;font-size:12px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;border-radius:4px;">
-                    GEAR UP NOW
+                    PICK UP WHERE YOU LEFT OFF
                   </a>
                 </td>
               </tr>
@@ -338,8 +338,8 @@ function getEmail2Html(cart: AbandonedCart, recoveryUrl: string, siteUrl: string
               <!-- Brand Quote -->
               <tr>
                 <td style="padding:32px 40px;background:#FAFAF9;border-top:1px solid #E7E5E4;">
-                  <p style="margin:0;font-size:14px;font-style:italic;color:#78716C;text-align:center;line-height:1.6;">
-                    "You don't preach—you spark curiosity. They ask. You answer."
+                  <p style="margin:0;font-size:14px;font-style:italic;color:#78716C;text-align:center;line-height:1.7;">
+                    "Faith you can wear."
                   </p>
                 </td>
               </tr>
@@ -364,7 +364,7 @@ function getEmail3Html(cart: AbandonedCart, recoveryUrl: string, discountCode: s
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <meta name="color-scheme" content="light">
-      <title>15% reinforcement—your final call | Line of Judah</title>
+      <title>15% off — your final call | Line of Judah</title>
     </head>
     <body style="margin:0;padding:0;background:#FAFAF9;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;">
       <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background:#FAFAF9;">
@@ -432,7 +432,7 @@ function getEmail3Html(cart: AbandonedCart, recoveryUrl: string, discountCode: s
               <tr>
                 <td style="padding:24px 40px 48px;text-align:center;">
                   <a href="${recoveryUrl}" style="display:inline-block;background:#1C1917;color:#FFFFFF;text-decoration:none;padding:16px 48px;font-size:12px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;border-radius:4px;">
-                    CLAIM YOUR REINFORCEMENT
+                    CLAIM YOUR 15% OFF
                   </a>
                   <p style="margin:16px 0 0;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;font-size:12px;color:#A8A29E;">
                     Offer expires in 24 hours
@@ -443,8 +443,8 @@ function getEmail3Html(cart: AbandonedCart, recoveryUrl: string, discountCode: s
               <!-- Brand Quote -->
               <tr>
                 <td style="padding:32px 40px;background:#FAFAF9;border-top:1px solid #E7E5E4;">
-                  <p style="margin:0;font-size:14px;font-style:italic;color:#78716C;text-align:center;line-height:1.6;">
-                    "This isn't just clothing. It's armor."
+                  <p style="margin:0;font-size:14px;font-style:italic;color:#78716C;text-align:center;line-height:1.7;">
+                    More than clothing. A statement of faith.
                   </p>
                 </td>
               </tr>
@@ -595,7 +595,7 @@ Deno.serve(async (req) => {
       .is('email_1_sent_at', null)
       .lt('created_at', email1Threshold.toISOString());
     for (const cart of email1Carts || []) {
-      const r = await processCart(deps, cart as AbandonedCart, 1, 'Your armor is waiting | Line of Judah', (url) => ({
+      const r = await processCart(deps, cart as AbandonedCart, 1, 'You left something behind | Line of Judah', (url) => ({
         html: getEmail1Html(cart as AbandonedCart, url, siteUrl),
       }));
       tally(r, 1);
@@ -610,7 +610,7 @@ Deno.serve(async (req) => {
       .is('email_2_sent_at', null)
       .lt('created_at', email2Threshold.toISOString());
     for (const cart of email2Carts || []) {
-      const r = await processCart(deps, cart as AbandonedCart, 2, 'The mission continues | Line of Judah', (url) => ({
+      const r = await processCart(deps, cart as AbandonedCart, 2, 'Still thinking it over? | Line of Judah', (url) => ({
         html: getEmail2Html(cart as AbandonedCart, url, siteUrl),
       }));
       tally(r, 2);
@@ -626,7 +626,7 @@ Deno.serve(async (req) => {
       .lt('created_at', email3Threshold.toISOString());
     for (const cart of email3Carts || []) {
       const discountCode = generateDiscountCode();
-      const r = await processCart(deps, cart as AbandonedCart, 3, '15% reinforcement—your final call | Line of Judah', (url) => ({
+      const r = await processCart(deps, cart as AbandonedCart, 3, '15% off — your final call | Line of Judah', (url) => ({
         html: getEmail3Html(cart as AbandonedCart, url, discountCode, siteUrl),
         discountCode,
       }));

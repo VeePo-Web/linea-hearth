@@ -60,24 +60,33 @@ function buildCustomerHtml(order: any, items: any[], siteUrl: string): string {
     </td></tr>`).join("");
   return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Order Confirmation</title></head>
 <body style="margin:0;padding:0;background:#FAFAF9;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif;">
+<div style="display:none;max-height:0;overflow:hidden;mso-hide:all;">Your order is on its way. Order #${orderNumber} confirmed — thank you for walking with us.</div>
 <table width="100%" cellpadding="0" cellspacing="0" style="background:#FAFAF9;"><tr><td align="center" style="padding:40px 20px;">
 <table width="600" cellpadding="0" cellspacing="0" style="background:#fff;max-width:600px;box-shadow:0 1px 3px rgba(0,0,0,0.05);">
   <tr><td align="center" style="padding:48px 40px 32px;">
-    <p style="margin:0;font-size:14px;font-weight:700;letter-spacing:3px;color:#1C1917;text-transform:uppercase;">LINE OF JUDAH</p>
+    <table cellpadding="0" cellspacing="0" border="0" style="margin:0 auto;"><tr>
+      <td style="vertical-align:middle;padding-right:10px;line-height:0;">
+        <img src="https://lineofjudah.clothing/favicon-180.png" width="22" height="22" alt="" style="display:block;border:0;" />
+      </td>
+      <td style="vertical-align:middle;">
+        <p style="margin:0;font-size:14px;font-weight:700;letter-spacing:3px;color:#1C1917;text-transform:uppercase;">LINE OF JUDAH</p>
+      </td>
+    </tr></table>
     <div style="width:60px;height:1px;background:#C5C7CA;margin:14px auto 0;opacity:0.7;"></div>
   </td></tr>
   <tr><td align="center" style="padding:0 40px 32px;">
-    <h1 style="margin:0 0 8px;font-size:28px;font-weight:700;color:#1C1917;letter-spacing:-0.5px;">YOUR ARMOR IS ON THE WAY</h1>
-    <p style="margin:0;font-size:14px;color:#78716C;">Order #${orderNumber}</p>
+    <h1 style="margin:0 0 8px;font-size:28px;font-weight:700;color:#1C1917;letter-spacing:-0.5px;">YOUR ORDER IS ON ITS WAY</h1>
+    <p style="margin:0 0 4px;font-size:14px;color:#78716C;">Order #${orderNumber}</p>
+    <p style="margin:8px 0 0;font-size:13px;color:#78716C;font-style:italic;">Worn faith, sent with care.</p>
   </td></tr>
   <tr><td style="padding:0 40px 40px;">
     <p style="margin:0 0 16px;font-size:16px;line-height:1.6;color:#1C1917;">Hey ${escapeHtml(firstName)},</p>
-    <p style="margin:0 0 16px;font-size:16px;line-height:1.6;color:#44403C;">You didn't just place an order — you made a declaration. Every thread you wear is a statement. Every stitch is a stand.</p>
-    <p style="margin:0 0 16px;font-size:16px;line-height:1.6;color:#44403C;font-weight:600;">Welcome in. You're one of us now.</p>
-    <p style="margin:0;font-size:15px;line-height:1.6;color:#57534E;">Your purchase keeps independent craft alive. Thank you.</p>
+    <p style="margin:0 0 16px;font-size:16px;line-height:1.6;color:#44403C;">You didn't just place an order — you took a stand. Every thread is a testimony. Every stitch, a step in faith.</p>
+    <p style="margin:0 0 16px;font-size:16px;line-height:1.6;color:#44403C;font-weight:600;">Called, chosen, clothed. Welcome to the family.</p>
+    <p style="margin:0;font-size:15px;line-height:1.6;color:#57534E;">Your purchase keeps independent, faith-rooted craft alive. Thank you.</p>
   </td></tr>
   <tr><td style="padding:0 40px;"><div style="border-top:1px solid #E7E5E4;padding-top:32px;">
-    <p style="margin:0 0 20px;font-size:12px;font-weight:700;letter-spacing:2px;color:#78716C;text-transform:uppercase;">WHAT YOU'RE WEARING INTO BATTLE</p>
+    <p style="margin:0 0 20px;font-size:12px;font-weight:700;letter-spacing:2px;color:#78716C;text-transform:uppercase;">WHAT YOU'LL BE WEARING</p>
     <table width="100%" cellpadding="0" cellspacing="0">${itemsHtml}</table>
   </div></td></tr>
   <tr><td style="padding:32px 40px;"><table width="100%" cellpadding="0" cellspacing="0">
@@ -87,18 +96,23 @@ function buildCustomerHtml(order: any, items: any[], siteUrl: string): string {
     <tr><td colspan="2" style="padding:12px 0 0;"><div style="border-top:2px solid #1C1917;"></div></td></tr>
     <tr><td style="padding:12px 0 0;font-size:18px;font-weight:700;color:#1C1917;">Total</td><td align="right" style="padding:12px 0 0;font-size:18px;font-weight:700;color:#1C1917;">${formatCurrency(order.total_cents, order.currency)}</td></tr>
   </table></td></tr>
-  <tr><td style="padding:0 40px 40px;"><div style="background:#FAFAF9;border-radius:8px;padding:24px;">
-    <p style="margin:0 0 16px;font-size:12px;font-weight:700;letter-spacing:2px;color:#78716C;text-transform:uppercase;">ETA TO THE FRONT LINE</p>
-    <p style="margin:0 0 20px;font-size:18px;font-weight:600;color:#1C1917;">📦 ${delivery.start} – ${delivery.end}</p>
+  <tr><td style="padding:0 40px 40px;"><div style="background:#FAFAF9;padding:24px;">
+    <p style="margin:0 0 16px;font-size:12px;font-weight:700;letter-spacing:2px;color:#78716C;text-transform:uppercase;">ESTIMATED ARRIVAL</p>
+    <p style="margin:0 0 20px;font-size:18px;font-weight:600;color:#1C1917;">${delivery.start} – ${delivery.end}</p>
     <p style="margin:0 0 4px;font-size:13px;font-weight:600;color:#78716C;text-transform:uppercase;">Shipping to:</p>
     ${addressLines.map((line) => `<p style="margin:0;font-size:15px;color:#44403C;line-height:1.5;">${escapeHtml(line)}</p>`).join("")}
   </div></td></tr>
   <tr><td align="center" style="padding:0 40px 40px;">
     <a href="${siteUrl}/account/orders" style="display:inline-block;background:#1C1917;color:#fff;text-decoration:none;padding:16px 32px;font-size:14px;font-weight:600;letter-spacing:0.5px;">TRACK YOUR ORDER →</a>
   </td></tr>
+  <tr><td style="padding:0 40px 48px;"><div style="border-top:1px solid #E7E5E4;padding-top:32px;text-align:center;">
+    <p style="margin:0 0 12px;font-size:16px;font-weight:700;color:#1C1917;letter-spacing:0.5px;">More than clothing. A statement of faith.</p>
+    <p style="margin:0;font-size:14px;font-style:italic;color:#78716C;line-height:1.7;">"The Lion of the tribe of Judah has triumphed."<br/><span style="font-size:12px;letter-spacing:0.05em;">— Revelation 5:5</span></p>
+  </div></td></tr>
   <tr><td style="background:#1C1917;padding:32px 40px;text-align:center;">
     <p style="margin:0 0 4px;font-size:12px;font-weight:700;letter-spacing:2px;color:#fff;text-transform:uppercase;">LINE OF JUDAH</p>
-    <p style="margin:0;font-size:13px;color:#A8A29E;font-style:italic;">— Parker &amp; the Line of Judah team</p>
+    <p style="margin:0 0 8px;font-size:13px;color:#A8A29E;">Faith you can wear.</p>
+    <p style="margin:0;font-size:13px;color:#A8A29E;font-style:italic;">Walk in it. — Parker &amp; the Line of Judah team</p>
   </td></tr>
 </table></td></tr></table></body></html>`;
 }
@@ -121,6 +135,14 @@ function buildAdminHtml(order: any, items: any[], siteUrl: string): string {
     .filter((l) => l && String(l).trim().length > 0).map((l) => escapeHtml(l)).join("<br>");
   return `<!DOCTYPE html><html><body style="font-family:-apple-system,Segoe UI,Roboto,sans-serif;background:#f5f5f4;margin:0;padding:24px;color:#1c1917;">
   <div style="max-width:680px;margin:0 auto;background:#fff;padding:32px;border:1px solid #e7e5e4;">
+    <table cellpadding="0" cellspacing="0" border="0" style="margin:0 0 20px;"><tr>
+      <td style="vertical-align:middle;padding-right:10px;line-height:0;">
+        <img src="https://lineofjudah.clothing/favicon-180.png" width="22" height="22" alt="" style="display:block;border:0;" />
+      </td>
+      <td style="vertical-align:middle;">
+        <p style="margin:0;font-size:12px;font-weight:700;letter-spacing:2px;color:#1c1917;text-transform:uppercase;">LINE OF JUDAH — OPS</p>
+      </td>
+    </tr></table>
     <h1 style="margin:0 0 4px;font-size:20px;">New order #${orderNumber}</h1>
     <p style="margin:0 0 24px;color:#78716c;font-size:13px;">Placed ${escapeHtml(placedAt)} • Payment: <strong>${escapeHtml(order.payment_status)}</strong></p>
     <h2 style="font-size:14px;margin:24px 0 8px;text-transform:uppercase;letter-spacing:1px;color:#57534e;">Customer</h2>
