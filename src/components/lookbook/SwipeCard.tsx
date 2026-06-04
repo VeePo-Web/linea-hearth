@@ -256,10 +256,10 @@ export default function SwipeCard({
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="absolute inset-0 bg-green-500/90 flex flex-col items-center justify-center gap-3"
+                className="absolute inset-0 bg-foreground/90 flex flex-col items-center justify-center gap-3"
               >
                 <DrawCheckIcon size="xl" color="white" animate delay={0} />
-                <span className="text-white text-lg font-medium">Added to Bag</span>
+                <span className="text-background text-lg font-medium">Added to Bag</span>
               </motion.div>
             )}
           </AnimatePresence>
