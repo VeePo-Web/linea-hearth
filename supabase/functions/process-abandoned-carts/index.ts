@@ -626,7 +626,7 @@ Deno.serve(async (req) => {
       .lt('created_at', email3Threshold.toISOString());
     for (const cart of email3Carts || []) {
       const discountCode = generateDiscountCode();
-      const r = await processCart(deps, cart as AbandonedCart, 3, '15% reinforcement—your final call | Line of Judah', (url) => ({
+      const r = await processCart(deps, cart as AbandonedCart, 3, '15% off — your final call | Line of Judah', (url) => ({
         html: getEmail3Html(cart as AbandonedCart, url, discountCode, siteUrl),
         discountCode,
       }));
