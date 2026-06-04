@@ -200,7 +200,9 @@ async function handleDispute(dispute: any, env: StripeEnv) {
 }
 
 Deno.serve(async (req) => {
+  console.log("stripe-webhook hit:", req.method, req.url);
   if (req.method !== "POST") return new Response("Method not allowed", { status: 405 });
+
 
   // HARD-FAIL on unknown env. Routing a live event to sandbox creds
   // makes signature verification fail silently and Stripe retries for
