@@ -1,35 +1,42 @@
-# Green Audit Report & Conversion Plan
+# Pre-Owner-Review Punch List
 
-Found **43 remaining green references** across 14 files. Grouped by intent below.
+Quick audit of what still needs attention before you hand the draft to the owner.
 
-## A. Customer-facing — convert to chrome/foreground
+## 1. Catalog mismatch (highest priority)
 
-These leaked through the prior pass and should be neutralized.
+You asked earlier to show **only Heavenly Cap** and no crewneck variants. That was done at the **image-mapping** layer, but the database still has **19 active products** (multiple hoodies, tees, sweaters, other caps). On the live site they will still render via PLP/category queries.
 
-1. **`src/components/account/OrderReorderButton.tsx:198`** — `bg-green-600` success state on Buy Again button → `bg-primary text-primary-foreground border-primary`.
-2. **`src/components/lookbook/SwipeableLookCard.tsx:163`** — `backgroundColor="hsl(var(--green-600))"` (broken token, renders transparent) → `hsl(var(--primary))`.
-3. **`src/components/try-on/SizeRecommendation.tsx`** (lines 26, 88–90) — green confidence bar + "Perfect fit" callout panel → chrome bar (`bg-primary`) + neutral panel (`bg-muted border-border text-foreground`).
-4. **`src/components/try-on/avatar-creator/AvatarPreview.tsx`** (lines 150, 154, 158) — three green check icons → `text-foreground`.
-5. **`src/components/product/CompleteTheLookBundle.tsx`** (lines 222, 225) — bundle savings dot + price `text-[#4CAF50]` → `text-foreground` / `bg-foreground`.
-6. **`src/components/checkout/PostPurchaseOffer.tsx`** (lines 109, 142, 151, 171) — `#4CAF50` banner, discount pill, callout border, info box → chrome (`bg-foreground text-background` for banner, `bg-muted text-foreground` for pills, `border-foreground/40` for accents).
+Options — pick one:
+- **A.** Set all non-Heavenly products to `status='draft'` (or `archived`) so only "Heavenly" Khaki Low-Profile Cap is shoppable.
+- **B.** Keep the full catalog visible (revert/relax the image-mapping restriction so other products show real imagery instead of falling back).
 
-## B. Brand exceptions — KEEP green (per existing memory)
+Recommended: **A** if the owner is reviewing a focused launch; **B** if they're reviewing the full assortment.
 
-These are intentional Forest Green brand usage. No change unless you say otherwise.
+## 2. Payment mode banner
 
-7. **Worn in the Wild campaign pages** — `WornInTheWildUpload.tsx` (14 refs), `WornInTheWildGallery.tsx` (1 ref). Campaign visual identity.
-8. **Footer Veepo attribution** — `Footer.tsx:175, 186`. Memory `mem://brand/veepo-attribution-spec` mandates `#4CAF50` for Veepo hover.
+`src/components/PaymentTestModeBanner.tsx` shows a bright **orange** "test mode" bar whenever `VITE_PAYMENTS_CLIENT_TOKEN` starts with `pk_test_`. `.env.development` uses a test key, `.env.production` uses a live key — so the preview URL the owner sees will display the orange strip. Confirm:
+- Share the **published** URL (`lineofjudah.clothing`) for owner review, OR
+- Temporarily restyle the banner to chrome/neutral so it doesn't clash with the editorial aesthetic.
 
-## C. Admin / ops portal — KEEP green (status semantics)
+## 3. Try-On 3D references to "crewneck"
 
-Internal-only screens at `/ops-portal/*`. Green = success/active/paid is the conventional admin signal.
+`src/components/try-on/GarmentLayer.tsx`, `garments/CrewneckGeometry.tsx`, `hooks/useGarmentTexture.tsx`, `utils/uvProjection.ts` still contain crewneck geometry/type code. These are internal 3D fallbacks (not user-visible product names) — safe to leave, but flagging since you asked for "no crewneck variants." No change recommended unless you want the fallback renamed.
 
-9. `AdminProducts.tsx:122`, `AdminLookbook.tsx:328`, `AdminOrders.tsx:82/91/93`, `AdminOrderDetail.tsx:192`, `AdminWornInTheWild.tsx` (5 refs), `ImageUploader.tsx:82`.
+## 4. Remaining greens — intentional, confirm with owner
 
-## Confirm before I build
+Per earlier audit these were kept on purpose. Worth a sanity check before the review:
+- **Footer Veepo attribution** (`Footer.tsx` lines 175, 186) — `#4CAF50` hover, mandated by brand spec.
+- **Worn in the Wild** campaign pages — green retained as campaign identity.
+- **Admin / Ops Portal** status badges — green = paid/active.
 
-- Group **A** → convert to chrome (default).
-- Group **B** (Worn in the Wild + Veepo footer) → keep green. Reply if you want these flipped too.
-- Group **C** (admin) → keep green. Reply if you want admin neutralized too.
+If the owner wants a 100% chrome surface even on these, we can flip them.
 
-Once you approve, I'll execute Group A only (≈11 edits across 6 files).
+## 5. Nice-to-have checks (low risk, quick wins)
+
+- Spell-check the catalog: `"Salvation belongs"` has a double space in `Embroidered`.
+- Hero/featured product hardcoded references: confirm `CollectionHero` and `FiftyFiftySection` (edited last loop) point to Heavenly Cap and not a stale slug.
+- Run a quick mobile pass on `/index` (your current viewport) — confirm no green leaked back into Lookbook swipe cards after recent edits.
+
+---
+
+**Next step:** tell me which of items **1** and **2** you want me to act on, and whether to leave items **3–4** as-is. Then I'll execute in build mode.
