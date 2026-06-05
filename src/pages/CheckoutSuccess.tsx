@@ -276,7 +276,11 @@ const CheckoutSuccess = () => {
               <Package className="w-8 h-8 text-muted-foreground" />
             </div>
             <h1 className="text-2xl font-light">
-              {stripeNotPaid ? "Payment not completed" : "Order processing"}
+              {terminalState === "stripe_not_paid"
+                ? "Payment not completed"
+                : terminalState === "reconcile_failed"
+                  ? "We can't confirm right now"
+                  : "Order processing"}
             </h1>
             <p className="text-muted-foreground">
               {error || "Your order is being processed. You will receive an email confirmation shortly."}
