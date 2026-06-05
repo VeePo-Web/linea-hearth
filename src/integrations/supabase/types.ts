@@ -774,6 +774,7 @@ export type Database = {
       orders: {
         Row: {
           billing_address: Json | null
+          confirmation_email_sent_at: string | null
           created_at: string
           currency: string
           customer_email: string
@@ -789,6 +790,7 @@ export type Database = {
           metadata: Json | null
           notes: string | null
           payment_status: string
+          refund_email_sent_at: string | null
           review_request_sent_at: string | null
           shipped_at: string | null
           shipping_address: Json
@@ -808,6 +810,7 @@ export type Database = {
         }
         Insert: {
           billing_address?: Json | null
+          confirmation_email_sent_at?: string | null
           created_at?: string
           currency?: string
           customer_email: string
@@ -823,6 +826,7 @@ export type Database = {
           metadata?: Json | null
           notes?: string | null
           payment_status?: string
+          refund_email_sent_at?: string | null
           review_request_sent_at?: string | null
           shipped_at?: string | null
           shipping_address: Json
@@ -842,6 +846,7 @@ export type Database = {
         }
         Update: {
           billing_address?: Json | null
+          confirmation_email_sent_at?: string | null
           created_at?: string
           currency?: string
           customer_email?: string
@@ -857,6 +862,7 @@ export type Database = {
           metadata?: Json | null
           notes?: string | null
           payment_status?: string
+          refund_email_sent_at?: string | null
           review_request_sent_at?: string | null
           shipped_at?: string | null
           shipping_address?: Json
