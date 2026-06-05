@@ -93,11 +93,17 @@ async function handleCheckoutCompleted(session: any, env: StripeEnv) {
   if (existing && (existing as any).payment_status === "paid") return;
 
   const stripe = createStripeClient(env);
+  // Note: `shipping_details` cannot be expanded on API version 2026-03-25.dahlia
+  // (it's now nested under `collected_information`). Only expand fields the
+  // current API allows; the shipping/customer details come back by default.
   const full = await stripe.checkout.sessions.retrieve(session.id, {
-    expand: ["total_details", "shipping_cost", "customer_details", "shipping_details"],
+    expand: ["total_details", "shipping_cost", "collected_information"],
   });
 
-  const stripeShipping = mapStripeAddress((full as any).shipping_details?.address);
+  const stripeShipping = mapStripeAddress(
+    (full as any).collected_information?.shipping_details?.address
+      ?? (full as any).shipping_details?.address,
+  );
   const stripeBilling = mapStripeAddress(full.customer_details?.address);
 
   await sb
