@@ -199,10 +199,16 @@ export function useQuickAdd(
     return 'tops'; // Default fallback
   }, [categoryOverride, product?.category_slug, product?.position]);
 
+  // Sizeless products (hats, accessories) don't require a size selection
+  const isSizeless = useMemo(() => {
+    return SIZELESS_CATEGORIES.includes(categorySlug);
+  }, [categorySlug]);
+
   // Size memory
   const rememberedSize = useMemo(() => {
+    if (isSizeless) return null;
     return getRememberedSize(categorySlug);
-  }, [getRememberedSize, categorySlug]);
+  }, [getRememberedSize, categorySlug, isSizeless]);
 
   // Get stock for a specific variant
   const getStockForVariant = useCallback((size?: string, color?: string): number => {
