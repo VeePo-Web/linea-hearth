@@ -61,6 +61,9 @@ verify_jwt = false
 [functions.send-admin-alert]
 verify_jwt = false
 
+[functions.send-refund-confirmation]
+verify_jwt = false
+
 
 
 
