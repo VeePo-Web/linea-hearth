@@ -345,7 +345,7 @@ export function useQuickAdd(
       }, SUCCESS_ANIMATION_DURATION);
 
     }, ADDING_DELAY);
-  }, [product, rememberedSize, displayPrice, categorySlug, addItem, rememberSize, showToast, onSuccess]);
+  }, [product, rememberedSize, displayPrice, categorySlug, addItem, rememberSize, showToast, onSuccess, isSizeless]);
 
   // Quick add handler - one-tap if possible, else opens picker or quiz
   const handleQuickAdd = useCallback((e: React.MouseEvent) => {
