@@ -101,6 +101,7 @@ interface QuickAddFeedback {
 export type UseQuickAddReturn = QuickAddState & QuickAddActions & QuickAddFeedback;
 
 const DEFAULT_SIZES = ['S', 'M', 'L', 'XL'];
+const SIZELESS_CATEGORIES = ['hats', 'accessories', 'headwear', 'caps'];
 const SUCCESS_ANIMATION_DURATION = 2000;
 const ADDING_DELAY = 150;
 

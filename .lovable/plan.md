@@ -1,42 +1,28 @@
-# Pre-Owner-Review Punch List
+# One-click Quick Add for hats
 
-Quick audit of what still needs attention before you hand the draft to the owner.
+## Problem
+The `+` quick-add button on hat cards opens the size picker instead of adding straight to cart. Hats (and any other one-size item) shouldn't ask for a size — one tap should drop them in the bag.
 
-## 1. Catalog mismatch (highest priority)
+Root cause in `src/hooks/useQuickAdd.ts`:
+- All hat variants in the DB have `size = NULL`, so `availableSizes` falls back to the default `['S','M','L','XL']` list.
+- With 4 "sizes" and no remembered size, `handleQuickAdd` opens the inline picker instead of adding.
+- `addToCart` also bails to the picker if there's no size string.
 
-You asked earlier to show **only Heavenly Cap** and no crewneck variants. That was done at the **image-mapping** layer, but the database still has **19 active products** (multiple hoodies, tees, sweaters, other caps). On the live site they will still render via PLP/category queries.
+## Fix (frontend only, scoped to `useQuickAdd`)
 
-Options — pick one:
-- **A.** Set all non-Heavenly products to `status='draft'` (or `archived`) so only "Heavenly" Khaki Low-Profile Cap is shoppable.
-- **B.** Keep the full catalog visible (revert/relax the image-mapping restriction so other products show real imagery instead of falling back).
+1. Introduce a `SIZELESS_CATEGORIES` constant: `['hats', 'accessories', 'headwear']`.
+2. Derive `isSizeless = SIZELESS_CATEGORIES.includes(categorySlug)` (also true when every variant has `size === null` AND the category is not a known apparel category — belt-and-suspenders).
+3. When `isSizeless` is true:
+   - Override `availableSizes` to `[]` so size UI never renders.
+   - In `addToCart`, skip the "no size → open picker" guard and add the item with `size: undefined`.
+   - In `handleQuickAdd`, short-circuit straight to `addToCart({})` (no size, no picker, no size-quiz prompt).
+   - Report `canOneTap: true` so the button label stays clean ("Add" / check on success).
+4. Leave tees, hoodies, sweaters, long-sleeves untouched — they still get the picker/size-memory flow.
 
-Recommended: **A** if the owner is reviewing a focused launch; **B** if they're reviewing the full assortment.
+## Verification
+- Open `/` and hit `+` on a hat card in Recently Viewed / featured → item should land in cart immediately, toast appears, no picker.
+- Hit `+` on a tee/hoodie card → picker still appears (unchanged behavior).
+- Confirm cart line shows the hat with no size label and correct image/price.
 
-## 2. Payment mode banner
-
-`src/components/PaymentTestModeBanner.tsx` shows a bright **orange** "test mode" bar whenever `VITE_PAYMENTS_CLIENT_TOKEN` starts with `pk_test_`. `.env.development` uses a test key, `.env.production` uses a live key — so the preview URL the owner sees will display the orange strip. Confirm:
-- Share the **published** URL (`lineofjudah.clothing`) for owner review, OR
-- Temporarily restyle the banner to chrome/neutral so it doesn't clash with the editorial aesthetic.
-
-## 3. Try-On 3D references to "crewneck"
-
-`src/components/try-on/GarmentLayer.tsx`, `garments/CrewneckGeometry.tsx`, `hooks/useGarmentTexture.tsx`, `utils/uvProjection.ts` still contain crewneck geometry/type code. These are internal 3D fallbacks (not user-visible product names) — safe to leave, but flagging since you asked for "no crewneck variants." No change recommended unless you want the fallback renamed.
-
-## 4. Remaining greens — intentional, confirm with owner
-
-Per earlier audit these were kept on purpose. Worth a sanity check before the review:
-- **Footer Veepo attribution** (`Footer.tsx` lines 175, 186) — `#4CAF50` hover, mandated by brand spec.
-- **Worn in the Wild** campaign pages — green retained as campaign identity.
-- **Admin / Ops Portal** status badges — green = paid/active.
-
-If the owner wants a 100% chrome surface even on these, we can flip them.
-
-## 5. Nice-to-have checks (low risk, quick wins)
-
-- Spell-check the catalog: `"Salvation belongs"` has a double space in `Embroidered`.
-- Hero/featured product hardcoded references: confirm `CollectionHero` and `FiftyFiftySection` (edited last loop) point to Heavenly Cap and not a stale slug.
-- Run a quick mobile pass on `/index` (your current viewport) — confirm no green leaked back into Lookbook swipe cards after recent edits.
-
----
-
-**Next step:** tell me which of items **1** and **2** you want me to act on, and whether to leave items **3–4** as-is. Then I'll execute in build mode.
+## Files touched
+- `src/hooks/useQuickAdd.ts` (only)
