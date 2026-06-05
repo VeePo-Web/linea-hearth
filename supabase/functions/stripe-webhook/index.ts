@@ -277,7 +277,8 @@ async function handleCheckoutCompleted(session: any, env: StripeEnv) {
 async function handlePaymentFailed(paymentIntent: any) {
   const orderId = paymentIntent.metadata?.orderId;
   if (!orderId) return;
-  await getSupabase()
+  const sb = getSupabase();
+  const { data: updated } = await sb
     .from("orders")
     .update({
       status: "cancelled",
@@ -285,7 +286,12 @@ async function handlePaymentFailed(paymentIntent: any) {
       notes: paymentIntent.last_payment_error?.message ?? "Payment failed",
     })
     .eq("id", orderId)
-    .neq("payment_status", "paid");
+    .neq("payment_status", "paid")
+    .select("id")
+    .maybeSingle();
+  if (updated) {
+    await triggerRetryEmail(orderId, "payment_failed");
+  }
 }
 
 async function handleRefund(charge: any) {
@@ -307,11 +313,16 @@ async function handleSessionExpired(session: any) {
   const sb = getSupabase();
   const sessionId = session.id;
   if (!sessionId) return;
-  await sb
+  const { data: updated } = await sb
     .from("orders")
     .update({ status: "expired" })
     .eq("stripe_checkout_session_id", sessionId)
-    .neq("payment_status", "paid");
+    .neq("payment_status", "paid")
+    .select("id")
+    .maybeSingle();
+  if (updated && (updated as any).id) {
+    await triggerRetryEmail((updated as any).id, "expired");
+  }
 }
 
 async function handleDispute(dispute: any, env: StripeEnv) {
