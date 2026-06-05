@@ -111,8 +111,12 @@ Deno.serve(async (req) => {
   let full: any;
   try {
     const stripe = createStripeClient(environment);
+    // Note: `shipping_details` cannot be expanded on API version 2026-03-25.dahlia
+    // (it's now nested under `collected_information`). Only expand fields the
+    // current API allows; `customer_details` and `shipping_details` are returned
+    // by default without needing expand.
     full = await stripe.checkout.sessions.retrieve(sessionId, {
-      expand: ["total_details", "shipping_cost", "customer_details", "shipping_details"],
+      expand: ["total_details", "shipping_cost", "collected_information"],
     });
   } catch (e) {
     console.error("Stripe retrieve failed", e);
@@ -134,7 +138,10 @@ Deno.serve(async (req) => {
     );
   }
 
-  const stripeShipping = mapStripeAddress(full.shipping_details?.address);
+  const stripeShipping = mapStripeAddress(
+    full.collected_information?.shipping_details?.address
+      ?? full.shipping_details?.address,
+  );
   const stripeBilling = mapStripeAddress(full.customer_details?.address);
 
   const { error: updErr } = await supabase
