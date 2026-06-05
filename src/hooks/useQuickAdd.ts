@@ -281,7 +281,7 @@ export function useQuickAdd(
     if (!product) return;
 
     const sizeToUse = size || rememberedSize;
-    if (!sizeToUse) {
+    if (!sizeToUse && !isSizeless) {
       setIsPickerOpen(true);
       return;
     }
