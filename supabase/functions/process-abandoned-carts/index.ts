@@ -633,11 +633,60 @@ Deno.serve(async (req) => {
       tally(r, 3);
     }
 
+
+    // === Payment retry follow-up: 24h after first retry email ===
+    // For orders that hit checkout but failed/expired, the webhook sent a
+    // first retry email immediately. If still unpaid after 24h, send one
+    // more nudge. retry_email_followup_sent_at is the one-shot guard.
+    let retryFollowupSent = 0;
+    let retryFollowupErrors = 0;
+    const retryFollowupCutoff = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+    const retryWindowFloor = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const { data: retryOrders } = await supabase
+      .from('orders')
+      .select('id')
+      .eq('payment_status', 'unpaid')
+      .in('status', ['expired', 'cancelled'])
+      .not('retry_email_sent_at', 'is', null)
+      .is('retry_email_followup_sent_at', null)
+      .lt('retry_email_sent_at', retryFollowupCutoff.toISOString())
+      .gt('created_at', retryWindowFloor.toISOString());
+
+    for (const row of (retryOrders as Array<{ id: string }>) || []) {
+      // Atomic claim — losing racers no-op.
+      const { data: claimed } = await supabase
+        .from('orders')
+        .update({ retry_email_followup_sent_at: new Date().toISOString() })
+        .eq('id', row.id)
+        .is('retry_email_followup_sent_at', null)
+        .select('id')
+        .maybeSingle();
+      if (!claimed) continue;
+
+      try {
+        const res = await fetch(`${FUNCTIONS_BASE}/send-retry-payment-email`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ orderId: row.id, isFollowup: true }),
+        });
+        if (!res.ok) throw new Error(`status ${res.status}`);
+        retryFollowupSent++;
+      } catch (e) {
+        console.error('Retry follow-up failed for', row.id, e);
+        // Roll back the claim so the next cron tick can retry.
+        await supabase
+          .from('orders')
+          .update({ retry_email_followup_sent_at: null })
+          .eq('id', row.id);
+        retryFollowupErrors++;
+      }
+    }
+
     return new Response(
       JSON.stringify({
         success: true,
         message: 'Abandoned cart processing complete',
-        results,
+        results: { ...results, retryFollowupSent, retryFollowupErrors },
         note: resendApiKey ? 'Emails sent via Resend' : 'Emails stubbed (RESEND_API_KEY not configured)',
       }),
       { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },

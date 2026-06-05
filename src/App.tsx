@@ -73,6 +73,7 @@ const Lookbook = lazyWithRetry(() => import("./pages/Lookbook"));
 const TryOnRoom = lazyWithRetry(() => import("./pages/TryOnRoom"));
 const Ambassador = lazyWithRetry(() => import("./pages/Ambassador"));
 const RecoverCart = lazyWithRetry(() => import("./pages/RecoverCart"));
+const RecoverPayment = lazyWithRetry(() => import("./pages/RecoverPayment"));
 const ResetPassword = lazyWithRetry(() => import("./pages/ResetPassword"));
 const AdminLogin = lazyWithRetry(() => import("./pages/admin/AdminLogin"));
 const AdminDashboard = lazyWithRetry(() => import("./pages/admin/AdminDashboard"));
@@ -139,6 +140,7 @@ const AnimatedRoutes = () => {
         <Route path="/try-on/saved/:outfitId" element={<PageTransition><TryOnRoom /></PageTransition>} />
         <Route path="/ambassador" element={<PageTransition><Ambassador /></PageTransition>} />
         <Route path="/recover-cart" element={<PageTransition><RecoverCart /></PageTransition>} />
+        <Route path="/recover-payment" element={<PageTransition><RecoverPayment /></PageTransition>} />
         <Route path="/reset-password" element={<PageTransition><ResetPassword /></PageTransition>} />
         <Route path="/worn-in-the-wild" element={<PageTransition><WornInTheWildGallery /></PageTransition>} />
         <Route path="/worn-in-the-wild/upload" element={<PageTransition><WornInTheWildUpload /></PageTransition>} />

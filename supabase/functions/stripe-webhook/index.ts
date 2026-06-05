@@ -108,6 +108,57 @@ async function sendRefundEmail(orderId: string) {
   }
 }
 
+// Generates a retry_token (if missing), sets retry_reason, then atomically
+// claims retry_email_sent_at so a racing webhook/replay can't double-send.
+async function triggerRetryEmail(
+  orderId: string,
+  reason: "expired" | "payment_failed",
+) {
+  const sb = getSupabase();
+
+  // Ensure the order has a token + reason. Only set token if absent (don't
+  // rotate on a second event for the same order).
+  const token = crypto.randomUUID().replace(/-/g, "") + crypto.randomUUID().replace(/-/g, "");
+  const { data: tokenRow } = await sb
+    .from("orders")
+    .update({ retry_token: token, retry_reason: reason })
+    .eq("id", orderId)
+    .is("retry_token", null)
+    .select("id")
+    .maybeSingle();
+
+  // If the token already existed, just refresh the reason (latest event wins).
+  if (!tokenRow) {
+    await sb.from("orders").update({ retry_reason: reason }).eq("id", orderId);
+  }
+
+  // One-shot claim of the email slot.
+  const { data: claimed } = await sb
+    .from("orders")
+    .update({ retry_email_sent_at: new Date().toISOString() })
+    .eq("id", orderId)
+    .is("retry_email_sent_at", null)
+    .select("id, customer_email")
+    .maybeSingle();
+  if (!claimed) return;
+  if (!(claimed as any).customer_email) return;
+
+  try {
+    const url = `${Deno.env.get("SUPABASE_URL")}/functions/v1/send-retry-payment-email`;
+    await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ orderId }),
+    });
+  } catch (e) {
+    console.error("Failed to trigger retry email", e);
+    await sb
+      .from("orders")
+      .update({ retry_email_sent_at: null })
+      .eq("id", orderId);
+  }
+}
+
 // Stripe `Address` -> our jsonb shape
 function mapStripeAddress(
   stripeAddr: { line1?: string | null; line2?: string | null; city?: string | null; postal_code?: string | null; country?: string | null; state?: string | null } | null | undefined,
@@ -226,7 +277,8 @@ async function handleCheckoutCompleted(session: any, env: StripeEnv) {
 async function handlePaymentFailed(paymentIntent: any) {
   const orderId = paymentIntent.metadata?.orderId;
   if (!orderId) return;
-  await getSupabase()
+  const sb = getSupabase();
+  const { data: updated } = await sb
     .from("orders")
     .update({
       status: "cancelled",
@@ -234,7 +286,12 @@ async function handlePaymentFailed(paymentIntent: any) {
       notes: paymentIntent.last_payment_error?.message ?? "Payment failed",
     })
     .eq("id", orderId)
-    .neq("payment_status", "paid");
+    .neq("payment_status", "paid")
+    .select("id")
+    .maybeSingle();
+  if (updated) {
+    await triggerRetryEmail(orderId, "payment_failed");
+  }
 }
 
 async function handleRefund(charge: any) {
@@ -256,11 +313,16 @@ async function handleSessionExpired(session: any) {
   const sb = getSupabase();
   const sessionId = session.id;
   if (!sessionId) return;
-  await sb
+  const { data: updated } = await sb
     .from("orders")
     .update({ status: "expired" })
     .eq("stripe_checkout_session_id", sessionId)
-    .neq("payment_status", "paid");
+    .neq("payment_status", "paid")
+    .select("id")
+    .maybeSingle();
+  if (updated && (updated as any).id) {
+    await triggerRetryEmail((updated as any).id, "expired");
+  }
 }
 
 async function handleDispute(dispute: any, env: StripeEnv) {

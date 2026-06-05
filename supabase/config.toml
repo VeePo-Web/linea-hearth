@@ -64,6 +64,12 @@ verify_jwt = false
 [functions.send-refund-confirmation]
 verify_jwt = false
 
+[functions.send-retry-payment-email]
+verify_jwt = false
+
+[functions.recover-payment]
+verify_jwt = false
+
 
 
 

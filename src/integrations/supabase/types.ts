@@ -791,6 +791,10 @@ export type Database = {
           notes: string | null
           payment_status: string
           refund_email_sent_at: string | null
+          retry_email_followup_sent_at: string | null
+          retry_email_sent_at: string | null
+          retry_reason: string | null
+          retry_token: string | null
           review_request_sent_at: string | null
           shipped_at: string | null
           shipping_address: Json
@@ -827,6 +831,10 @@ export type Database = {
           notes?: string | null
           payment_status?: string
           refund_email_sent_at?: string | null
+          retry_email_followup_sent_at?: string | null
+          retry_email_sent_at?: string | null
+          retry_reason?: string | null
+          retry_token?: string | null
           review_request_sent_at?: string | null
           shipped_at?: string | null
           shipping_address: Json
@@ -863,6 +871,10 @@ export type Database = {
           notes?: string | null
           payment_status?: string
           refund_email_sent_at?: string | null
+          retry_email_followup_sent_at?: string | null
+          retry_email_sent_at?: string | null
+          retry_reason?: string | null
+          retry_token?: string | null
           review_request_sent_at?: string | null
           shipped_at?: string | null
           shipping_address?: Json
