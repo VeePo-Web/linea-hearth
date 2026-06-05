@@ -101,6 +101,7 @@ interface QuickAddFeedback {
 export type UseQuickAddReturn = QuickAddState & QuickAddActions & QuickAddFeedback;
 
 const DEFAULT_SIZES = ['S', 'M', 'L', 'XL'];
+const SIZELESS_CATEGORIES = ['hats', 'accessories', 'headwear', 'caps'];
 const SUCCESS_ANIMATION_DURATION = 2000;
 const ADDING_DELAY = 150;
 
@@ -198,10 +199,16 @@ export function useQuickAdd(
     return 'tops'; // Default fallback
   }, [categoryOverride, product?.category_slug, product?.position]);
 
+  // Sizeless products (hats, accessories) don't require a size selection
+  const isSizeless = useMemo(() => {
+    return SIZELESS_CATEGORIES.includes(categorySlug);
+  }, [categorySlug]);
+
   // Size memory
   const rememberedSize = useMemo(() => {
+    if (isSizeless) return null;
     return getRememberedSize(categorySlug);
-  }, [getRememberedSize, categorySlug]);
+  }, [getRememberedSize, categorySlug, isSizeless]);
 
   // Get stock for a specific variant
   const getStockForVariant = useCallback((size?: string, color?: string): number => {
@@ -274,7 +281,7 @@ export function useQuickAdd(
     if (!product) return;
 
     const sizeToUse = size || rememberedSize;
-    if (!sizeToUse) {
+    if (!sizeToUse && !isSizeless) {
       setIsPickerOpen(true);
       return;
     }
@@ -304,8 +311,8 @@ export function useQuickAdd(
         quantity,
       });
 
-      // Remember size for future
-      rememberSize(categorySlug, sizeToUse);
+      // Remember size for future (skip for sizeless items)
+      if (sizeToUse) rememberSize(categorySlug, sizeToUse);
 
       // Haptic feedback
       triggerHapticFeedback();
@@ -338,7 +345,7 @@ export function useQuickAdd(
       }, SUCCESS_ANIMATION_DURATION);
 
     }, ADDING_DELAY);
-  }, [product, rememberedSize, displayPrice, categorySlug, addItem, rememberSize, showToast, onSuccess]);
+  }, [product, rememberedSize, displayPrice, categorySlug, addItem, rememberSize, showToast, onSuccess, isSizeless]);
 
   // Quick add handler - one-tap if possible, else opens picker or quiz
   const handleQuickAdd = useCallback((e: React.MouseEvent) => {
@@ -347,12 +354,18 @@ export function useQuickAdd(
 
     if (!product || isAdding || isAdded || isInCart) return;
 
+    // Sizeless items (hats, accessories): one-tap, no picker, no quiz
+    if (isSizeless) {
+      addToCart({});
+      return;
+    }
+
     // Check if we should trigger size quiz for first-time users
     if (sizeQuizContext && !hasPromptedQuizRef.current && sizeQuizContext.shouldTriggerQuiz()) {
       hasPromptedQuizRef.current = true;
       sizeQuizContext.openQuizWithPending({
         productId: product.id,
-        categorySlug: categorySlug, // Pass category for correct size resolution
+        categorySlug: categorySlug,
         callback: (size: string, color?: string) => {
           addToCart({ size, color });
         },
@@ -361,19 +374,15 @@ export function useQuickAdd(
     }
 
     if (canOneTap && rememberedSize) {
-      // One-tap add
       addToCart({ size: rememberedSize });
     } else if (suggestedFallback) {
-      // Print-on-demand: never say "sold out". Use fallback silently.
       addToCart({ size: suggestedFallback });
     } else if (availableSizes.length === 1) {
-      // Only one size available, auto-select
       addToCart({ size: availableSizes[0] });
     } else {
-      // Show size picker
       setIsPickerOpen(true);
     }
-  }, [product, isAdding, isAdded, isInCart, canOneTap, rememberedSize, suggestedFallback, availableSizes, addToCart, showToast, sizeQuizContext]);
+  }, [product, isAdding, isAdded, isInCart, isSizeless, canOneTap, rememberedSize, suggestedFallback, availableSizes, addToCart, showToast, sizeQuizContext, categorySlug]);
 
   // Handle size selection from picker
   const handleSizeSelect = useCallback((size: string, e?: React.MouseEvent) => {
@@ -400,10 +409,10 @@ export function useQuickAdd(
 
   return {
     // State
-    canOneTap,
+    canOneTap: isSizeless ? true : canOneTap,
     rememberedSize,
     rememberedColor: null, // Future: implement color memory
-    availableSizes,
+    availableSizes: isSizeless ? [] : availableSizes,
     availableColors,
     stockForRemembered,
     totalStock,
