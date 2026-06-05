@@ -32,6 +32,20 @@ function mapStripeAddress(a: any) {
 }
 
 async function sendConfirmation(orderId: string) {
+  // One-shot guard — matches stripe-webhook. Prevents duplicate emails
+  // when both paths race after a recovered payment.
+  const supabase = sb();
+  const { data: claimed } = await supabase
+    .from("orders")
+    .update({ confirmation_email_sent_at: new Date().toISOString() })
+    .eq("id", orderId)
+    .is("confirmation_email_sent_at", null)
+    .select("id")
+    .maybeSingle();
+  if (!claimed) {
+    console.log("Confirmation already sent for", orderId, "— skipping");
+    return;
+  }
   try {
     await fetch(
       `${Deno.env.get("SUPABASE_URL")}/functions/v1/send-order-confirmation`,
@@ -43,6 +57,10 @@ async function sendConfirmation(orderId: string) {
     );
   } catch (e) {
     console.error("send-order-confirmation trigger failed", e);
+    await supabase
+      .from("orders")
+      .update({ confirmation_email_sent_at: null })
+      .eq("id", orderId);
   }
 }
 

@@ -1,76 +1,74 @@
-# Payment Edge Case Audit & Hardening
+# Payment Edge Case Fixes
 
-Following the checkout/confirmation audit, this pass focuses on **money-handling edge cases** — the scenarios where Stripe behaves correctly but our app can still drop, double-charge, mis-credit, or mis-fulfill an order.
+Implementing all five gaps from the audit.
 
-## Scope: 18 edge cases, grouped by risk
+## 1. Duplicate confirmation emails (MED)
 
-### A. Duplicate / double-charge risk (HIGH)
-1. **Double-click "Pay"** — `create-checkout-session` called twice in <1s → two Stripe sessions, two charges if user completes both tabs.
-2. **Browser back → re-submit** — user pays, hits back, resubmits cart.
-3. **Webhook + reconcile race** — both flip same order to `paid` concurrently → duplicate confirmation email, duplicate inventory decrement, duplicate Printful submission.
-4. **Stripe webhook retries** — Stripe re-delivers `checkout.session.completed` (network blip, 5xx). Without idempotency, email/fulfillment fires N times.
-5. **Multiple `payment_intent.succeeded` events** — Stripe sends both `checkout.session.completed` AND `payment_intent.succeeded`; current handler may process both.
+**Problem:** Webhook and reconcile both fire `send-order-confirmation` with no guard. Reconcile-rescued orders get two customer emails.
 
-### B. Wrong amount / wrong order (HIGH)
-6. **Cart mutated between session create and payment** — user opens checkout, changes cart in another tab, pays old amount.
-7. **Discount code applied client-side only** — server doesn't re-validate `SUMMER2026` at session creation → user pays discounted, we ship full.
-8. **Shipping tier mismatch** — client picks Express ($15), server computes Standard ($10) from cart weight/total.
-9. **Free-shipping threshold gaming** — cart at $98, free-ship coupon stacked, edge-function math disagrees with cart math.
-10. **Currency drift** — any line item still in USD/EUR after CAD migration.
+**Fix:**
+- Migration: add `confirmation_email_sent_at timestamptz` to `orders`.
+- In both `stripe-webhook` (`handleCheckoutCompleted`) and `reconcile-session`, before triggering email run:
+  ```sql
+  UPDATE orders SET confirmation_email_sent_at = now()
+   WHERE id = $1 AND confirmation_email_sent_at IS NULL
+   RETURNING id
+  ```
+  Only call `send-order-confirmation` when the UPDATE returns a row. The losing caller is a no-op.
 
-### C. Payment lifecycle (MED)
-11. **`payment_intent.payment_failed`** — card declined after session created. UI polls forever; order should flip to `payment_failed` and user prompted to retry with same session or new session.
-12. **3DS / SCA challenge abandoned** — session stays `open`, intent stays `requires_action`. Should expire gracefully.
-13. **Stripe session expires (24h)** — `checkout.session.expired` should mark order `cancelled` and release reserved inventory.
-14. **Refund issued in Stripe Dashboard** — `charge.refunded` webhook should update order status and trigger refund email.
-15. **Dispute / chargeback** — `charge.dispute.created` should flag order, notify ops.
+## 2. Faster "card declined" UX (LOW UX)
 
-### D. Fulfillment & post-purchase (MED)
-16. **Confirmation email send fails** (Resend down) — order marked `paid` but customer never notified; no retry queue.
-17. **Guest checkout email typo** — order paid, confirmation bounces, no way for customer to find order.
-18. **Inventory oversell** — two buyers race for last unit; both Stripe-paid, only one shippable.
+**Problem:** `CheckoutSuccess.tsx` only recognizes `paid`. On declined payment, user waits the full 40s timeout.
 
-## Investigation deliverables
+**Fix:** In `loadPaidOrder` / poll loop in `CheckoutSuccess.tsx`, when `get-order-by-session` returns an order with `status='cancelled'` and `payment_status='unpaid'`, immediately set terminal state to a new `"payment_declined"` and render: "Your card was declined. No charge was made — please try a different card." with a "Back to checkout" CTA.
 
-For each case I will:
-- Read the relevant code path (edge function + DB writes).
-- Document **current behavior** (what actually happens today).
-- Mark **severity** (HIGH / MED / LOW) and **likelihood**.
-- Specify the **fix** (code change, DB constraint, or webhook handler).
+Also update `get-order-by-session` to return the order even when not paid (currently returns `not_found` to hide unpaid orders — relax this to also return `cancelled/unpaid` rows).
 
-## Proposed remediation phases (after audit, separate approval)
+## 3. `checkout.session.expired` handler (LOW)
 
-**Phase 1 — Stop double-charges & duplicate fulfillment (HIGH)**
-- Add `processed_webhook_events` table keyed by `stripe_event_id` for idempotency.
-- Wrap order state transitions in a single SQL function (`mark_order_paid(session_id, source)`) that uses `UPDATE ... WHERE status != 'paid' RETURNING` so only one writer wins. Email + Printful trigger off the row that actually transitioned.
-- Add idempotency key to `create-checkout-session` (hash of `user_id + cart_hash` within 60s window) to dedupe double-clicks.
+**Problem:** No case in webhook switch. 24h-old abandoned sessions leave orders as `pending/unpaid` forever.
 
-**Phase 2 — Server-authoritative pricing (HIGH)**
-- `create-checkout-session` recomputes: line totals, discount, shipping tier, free-ship threshold from DB product prices + shipping rules. Client-provided totals are ignored.
-- Reject session creation if client total ≠ server total (log discrepancy).
+**Fix:** Add case in `stripe-webhook/index.ts`:
+```ts
+case "checkout.session.expired":
+  await handleSessionExpired(event.data.object);
+  break;
+```
+Handler updates `orders` SET `status='expired'` WHERE `stripe_checkout_session_id = session.id` AND `payment_status != 'paid'`.
 
-**Phase 3 — Full lifecycle handlers (MED)**
-- Add webhook handlers: `checkout.session.expired`, `payment_intent.payment_failed`, `charge.refunded`, `charge.dispute.created`.
-- New order statuses: `payment_failed`, `expired`, `refunded`, `disputed`.
-- `CheckoutSuccess.tsx` recognizes `payment_failed` → "Card declined, try another" with retry CTA.
+## 4. Double-click / orphan-draft cleanup (LOW)
 
-**Phase 4 — Post-purchase resilience (MED)**
-- Confirmation email queued via DB row (`email_outbox`) + cron retry, not fire-and-forget from webhook.
-- Bounce webhook from Resend marks order `email_bounced`, surfaces in ops portal.
-- Inventory: reserve on session create (15-min hold), commit on `paid`, release on `expired/failed`.
+**Problem:** Rapid double-click on Pay creates two draft orders + two Stripe sessions.
 
-## Files I'd touch (Phases 1–4)
+**Fix:**
+- Client (`Checkout.tsx`): disable Pay button the moment the click handler fires; only re-enable on error response. Already partially there — verify and tighten. (No new round-trip dedupe needed; Stripe still only charges the completed session.)
+- Server cleanup: weekly cron is overkill. Skip the cron; instead, add an index `(payment_status, status, created_at)` and rely on existing `pending/unpaid` orders aging naturally. They're already invisible in customer-facing pages.
 
-- `supabase/functions/stripe-webhook/index.ts` (new event types + idempotency)
-- `supabase/functions/create-checkout-session/index.ts` (server-authoritative totals, idempotency key)
-- `supabase/functions/reconcile-session/index.ts` (call shared `mark_order_paid`)
-- `supabase/functions/send-order-confirmation/index.ts` (read from outbox)
-- New migration: `processed_webhook_events`, `email_outbox`, `mark_order_paid()` SQL function, new order statuses, inventory reserve columns
-- `src/pages/CheckoutSuccess.tsx` (recognize `payment_failed`/`expired`)
+## 5. Customer refund email (LOW polish)
 
-## What I need from you
+**Problem:** `charge.refunded` updates DB + alerts admin, but customer gets no notification.
 
-1. **Approve the audit** — I'll run through all 18 cases and report findings (read-only, no code changes).
-2. After the report, you pick which phases to implement.
+**Fix:** In `handleRefund` (stripe-webhook), after the order update, look up the order's email and call a new edge function `send-refund-confirmation` (templated like `send-order-confirmation`, Stone/Amber palette per memory, mission-driven copy). Guard with same one-shot pattern — add `refund_email_sent_at` column.
 
-Or, if you want me to skip the formal report and **go straight to Phase 1 + 2** (the HIGH-severity fixes), say "do Phase 1+2 now."
+## Files touched
+
+- New migration: add `confirmation_email_sent_at`, `refund_email_sent_at` to `orders`; add `'expired'` to allowed status values (text column, no enum change needed).
+- `supabase/functions/stripe-webhook/index.ts` — one-shot email guards, `session.expired` case, refund email trigger.
+- `supabase/functions/reconcile-session/index.ts` — one-shot email guard.
+- `supabase/functions/get-order-by-session/index.ts` — return cancelled/unpaid orders too.
+- `src/pages/CheckoutSuccess.tsx` — `payment_declined` terminal state + UI.
+- `src/pages/Checkout.tsx` — verify Pay button disable-on-click.
+- New: `supabase/functions/send-refund-confirmation/index.ts` + `supabase/config.toml` entry.
+
+## Out of scope
+
+- Resend bounce webhook (#17) — separate effort, requires Resend webhook config.
+- Inventory reservation (#18) — N/A, print-on-demand.
+
+## Verification
+
+After deploy:
+1. Test sandbox checkout with `4242 4242 4242 4242` → one confirmation email (not two).
+2. Test sandbox with declined card `4000 0000 0000 0002` → success page shows "Card declined" within ~3s, not 40s timeout.
+3. Refund an order in Stripe Dashboard → customer gets refund email, admin alert still fires.
+4. Expire a session (wait or manually trigger via Stripe CLI) → order shows `expired`.

@@ -51,6 +51,7 @@ const RECONCILE_RETRY_MS = 12000;
 const HARD_TIMEOUT_MS = 40000;
 
 type TerminalState =
+  | "payment_declined"     // Stripe reported a definitive failure — order is cancelled/unpaid in DB
   | "stripe_not_paid"      // Stripe says card was declined / session incomplete
   | "webhook_delayed"      // Reconcile succeeded but DB still unpaid (rare)
   | "reconcile_failed"     // Edge function errored — we can't reach the processor
@@ -90,6 +91,18 @@ const CheckoutSuccess = () => {
         return false;
       }
       const payload = data as { order: OrderDetails | null; items: OrderItem[]; status: string };
+      // Terminal failure: the order exists but Stripe reported failure or expiry.
+      // Stop polling immediately and surface the right message.
+      if (payload?.status === "cancelled" || payload?.status === "expired") {
+        setTerminalState("payment_declined");
+        setError(
+          payload.status === "expired"
+            ? "Your checkout session expired before payment completed. No charge was made — please try again."
+            : "Your card was declined. No charge was made — please try a different card.",
+        );
+        setLoading(false);
+        return true; // signal "we're done" to stop pollers
+      }
       if (payload?.status !== "paid" || !payload.order) return false;
       setOrder({
         ...payload.order,
@@ -276,11 +289,13 @@ const CheckoutSuccess = () => {
               <Package className="w-8 h-8 text-muted-foreground" />
             </div>
             <h1 className="text-2xl font-light">
-              {terminalState === "stripe_not_paid"
-                ? "Payment not completed"
-                : terminalState === "reconcile_failed"
-                  ? "We can't confirm right now"
-                  : "Order processing"}
+              {terminalState === "payment_declined"
+                ? "Payment didn't go through"
+                : terminalState === "stripe_not_paid"
+                  ? "Payment not completed"
+                  : terminalState === "reconcile_failed"
+                    ? "We can't confirm right now"
+                    : "Order processing"}
             </h1>
             <p className="text-muted-foreground">
               {error || "Your order is being processed. You will receive an email confirmation shortly."}
@@ -292,7 +307,7 @@ const CheckoutSuccess = () => {
             )}
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Button variant="outline" onClick={() => navigate("/checkout")} className="rounded-none">
-                Back to checkout
+                {terminalState === "payment_declined" ? "Try a different card" : "Back to checkout"}
               </Button>
               <Button onClick={() => navigate("/")} className="rounded-none">
                 Return to home

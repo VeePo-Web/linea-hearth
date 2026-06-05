@@ -50,6 +50,21 @@ function getSupabase() {
 }
 
 async function sendConfirmationEmail(orderId: string) {
+  // One-shot guard: atomically claim the "we sent it" slot. If another
+  // path (webhook vs. reconcile) raced us and already won, the UPDATE
+  // returns zero rows and we no-op — preventing duplicate emails.
+  const sb = getSupabase();
+  const { data: claimed } = await sb
+    .from("orders")
+    .update({ confirmation_email_sent_at: new Date().toISOString() })
+    .eq("id", orderId)
+    .is("confirmation_email_sent_at", null)
+    .select("id")
+    .maybeSingle();
+  if (!claimed) {
+    console.log("Confirmation email already sent for", orderId, "— skipping");
+    return;
+  }
   try {
     const url = `${Deno.env.get("SUPABASE_URL")}/functions/v1/send-order-confirmation`;
     await fetch(url, {
@@ -59,6 +74,37 @@ async function sendConfirmationEmail(orderId: string) {
     });
   } catch (e) {
     console.error("Failed to trigger confirmation email", e);
+    // Roll back the claim so a retry can re-send.
+    await sb
+      .from("orders")
+      .update({ confirmation_email_sent_at: null })
+      .eq("id", orderId);
+  }
+}
+
+async function sendRefundEmail(orderId: string) {
+  const sb = getSupabase();
+  const { data: claimed } = await sb
+    .from("orders")
+    .update({ refund_email_sent_at: new Date().toISOString() })
+    .eq("id", orderId)
+    .is("refund_email_sent_at", null)
+    .select("id")
+    .maybeSingle();
+  if (!claimed) return;
+  try {
+    const url = `${Deno.env.get("SUPABASE_URL")}/functions/v1/send-refund-confirmation`;
+    await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ orderId }),
+    });
+  } catch (e) {
+    console.error("Failed to trigger refund email", e);
+    await sb
+      .from("orders")
+      .update({ refund_email_sent_at: null })
+      .eq("id", orderId);
   }
 }
 
@@ -194,10 +240,27 @@ async function handlePaymentFailed(paymentIntent: any) {
 async function handleRefund(charge: any) {
   const paymentIntentId = charge.payment_intent;
   if (!paymentIntentId) return;
-  await getSupabase()
+  const sb = getSupabase();
+  const { data: updated } = await sb
     .from("orders")
     .update({ status: "refunded", payment_status: "refunded" })
-    .eq("stripe_payment_intent_id", paymentIntentId);
+    .eq("stripe_payment_intent_id", paymentIntentId)
+    .select("id")
+    .maybeSingle();
+  if (updated && (updated as any).id) {
+    await sendRefundEmail((updated as any).id);
+  }
+}
+
+async function handleSessionExpired(session: any) {
+  const sb = getSupabase();
+  const sessionId = session.id;
+  if (!sessionId) return;
+  await sb
+    .from("orders")
+    .update({ status: "expired" })
+    .eq("stripe_checkout_session_id", sessionId)
+    .neq("payment_status", "paid");
 }
 
 async function handleDispute(dispute: any, env: StripeEnv) {
@@ -398,6 +461,9 @@ Deno.serve(async (req) => {
       case "payment_intent.payment_failed":
         await handlePaymentFailed(event.data.object);
         await alertPaymentFailed(event, env);
+        break;
+      case "checkout.session.expired":
+        await handleSessionExpired(event.data.object);
         break;
       case "charge.refunded":
       case "charge.refund.updated":
