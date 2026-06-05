@@ -311,8 +311,8 @@ export function useQuickAdd(
         quantity,
       });
 
-      // Remember size for future
-      rememberSize(categorySlug, sizeToUse);
+      // Remember size for future (skip for sizeless items)
+      if (sizeToUse) rememberSize(categorySlug, sizeToUse);
 
       // Haptic feedback
       triggerHapticFeedback();
