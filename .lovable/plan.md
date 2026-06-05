@@ -1,28 +1,34 @@
-# One-click Quick Add for hats
+# Fix "new page opens scrolled down" bug
 
-## Problem
-The `+` quick-add button on hat cards opens the size picker instead of adding straight to cart. Hats (and any other one-size item) shouldn't ask for a size — one tap should drop them in the bag.
+## Root cause
+When a modal/drawer (CartDrawer, QuickViewModal/AuthModal, FavoritesDrawer, SearchOverlay, MobileMenu, FullScreenNav) is open and the user navigates — e.g. tapping "Full Details" in QuickView, "Checkout" in the cart drawer, a search result, or a nav link — two scroll operations race:
 
-Root cause in `src/hooks/useQuickAdd.ts`:
-- All hat variants in the DB have `size = NULL`, so `availableSizes` falls back to the default `['S','M','L','XL']` list.
-- With 4 "sizes" and no remembered size, `handleQuickAdd` opens the inline picker instead of adding.
-- `addToCart` also bails to the picker if there's no size string.
+1. React Router updates the pathname → `ScrollToTop` (`src/components/ScrollToTop.tsx`) fires `window.scrollTo(0, 0)`.
+2. The overlay unmounts → its cleanup calls `unlockScroll()` (`src/lib/scrollLock.ts:18`), which runs `window.scrollTo(0, savedScrollY)` — restoring the scroll position from the *previous* page.
 
-## Fix (frontend only, scoped to `useQuickAdd`)
+Step 2 runs after step 1, so the new page lands at the old page's Y offset — often near the bottom. The browser's default `history.scrollRestoration = 'auto'` can also re-apply a remembered position on top of our reset.
 
-1. Introduce a `SIZELESS_CATEGORIES` constant: `['hats', 'accessories', 'headwear']`.
-2. Derive `isSizeless = SIZELESS_CATEGORIES.includes(categorySlug)` (also true when every variant has `size === null` AND the category is not a known apparel category — belt-and-suspenders).
-3. When `isSizeless` is true:
-   - Override `availableSizes` to `[]` so size UI never renders.
-   - In `addToCart`, skip the "no size → open picker" guard and add the item with `size: undefined`.
-   - In `handleQuickAdd`, short-circuit straight to `addToCart({})` (no size, no picker, no size-quiz prompt).
-   - Report `canOneTap: true` so the button label stays clean ("Add" / check on success).
-4. Leave tees, hoodies, sweaters, long-sleeves untouched — they still get the picker/size-memory flow.
+## Fix
 
-## Verification
-- Open `/` and hit `+` on a hat card in Recently Viewed / featured → item should land in cart immediately, toast appears, no picker.
-- Hit `+` on a tee/hoodie card → picker still appears (unchanged behavior).
-- Confirm cart line shows the hat with no size label and correct image/price.
+1. **`src/lib/scrollLock.ts`** — track the pathname captured at lock time. On unlock, only restore `savedScrollY` when the pathname is unchanged. If the route changed during the lock, skip the `scrollTo` (the new page handles its own scroll). Also clamp restore to `Math.min(savedScrollY, document.documentElement.scrollHeight - innerHeight)` so it never goes out of bounds.
+
+2. **`src/components/ScrollToTop.tsx`** — 
+   - Set `history.scrollRestoration = 'manual'` once on mount so the browser never auto-restores.
+   - Use `useLayoutEffect` instead of `useEffect` so the reset happens before paint.
+   - Add a follow-up `requestAnimationFrame` `scrollTo(0, 0)` to defeat any late restore (e.g. async unlockScroll from an unmounting modal).
+   - Skip the reset when the new URL has a `#hash` (so deep links to FAQ/Legal anchors still land on the anchor).
+
+3. **Verification pass** — walk through these flows and confirm each lands at top:
+   - Cart drawer → Checkout button → `/checkout`
+   - QuickViewModal → "Full Details" → `/product/:slug`
+   - Search overlay → product result → PDP
+   - Mobile menu / FullScreenNav → any link
+   - Favorites drawer → product link → PDP
+   - Auth modal closing while a redirect fires
+   - Hash links (`/faq#shipping`, `/legal/...#section`) still scroll to the anchor, not top
 
 ## Files touched
-- `src/hooks/useQuickAdd.ts` (only)
+- `src/lib/scrollLock.ts`
+- `src/components/ScrollToTop.tsx`
+
+No changes to overlay components themselves — the lock/unlock contract still works the same; we just stop it from clobbering the new page's scroll position.
