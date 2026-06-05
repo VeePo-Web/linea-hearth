@@ -140,6 +140,7 @@ const AnimatedRoutes = () => {
         <Route path="/try-on/saved/:outfitId" element={<PageTransition><TryOnRoom /></PageTransition>} />
         <Route path="/ambassador" element={<PageTransition><Ambassador /></PageTransition>} />
         <Route path="/recover-cart" element={<PageTransition><RecoverCart /></PageTransition>} />
+        <Route path="/recover-payment" element={<PageTransition><RecoverPayment /></PageTransition>} />
         <Route path="/reset-password" element={<PageTransition><ResetPassword /></PageTransition>} />
         <Route path="/worn-in-the-wild" element={<PageTransition><WornInTheWildGallery /></PageTransition>} />
         <Route path="/worn-in-the-wild/upload" element={<PageTransition><WornInTheWildUpload /></PageTransition>} />
