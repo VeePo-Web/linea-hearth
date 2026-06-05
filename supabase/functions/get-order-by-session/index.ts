@@ -72,13 +72,16 @@ Deno.serve(async (req) => {
 
   const paid = (order as any).payment_status === "paid";
   const cancelled = (order as any).status === "cancelled";
+  const expired = (order as any).status === "expired";
 
+  // Surface terminal failure states to the client so it can stop polling
+  // and show a useful message immediately (e.g. "Your card was declined").
   if (!paid) {
     return new Response(
       JSON.stringify({
-        order: null,
+        order: cancelled || expired ? order : null,
         items: [],
-        status: cancelled ? "cancelled" : "pending",
+        status: cancelled ? "cancelled" : expired ? "expired" : "pending",
       }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
