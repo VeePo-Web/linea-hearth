@@ -409,10 +409,10 @@ export function useQuickAdd(
 
   return {
     // State
-    canOneTap,
+    canOneTap: isSizeless ? true : canOneTap,
     rememberedSize,
     rememberedColor: null, // Future: implement color memory
-    availableSizes,
+    availableSizes: isSizeless ? [] : availableSizes,
     availableColors,
     stockForRemembered,
     totalStock,
