@@ -1,60 +1,76 @@
-# Deep Stress-Test Audit — Checkout Confirmation Flow
+# Payment Edge Case Audit & Hardening
 
-## Scope
-Audit every path from "Pay" click → success page resolution, simulate every realistic failure mode, and propose targeted fixes. Read-only investigation completed; this plan covers what to harden.
+Following the checkout/confirmation audit, this pass focuses on **money-handling edge cases** — the scenarios where Stripe behaves correctly but our app can still drop, double-charge, mis-credit, or mis-fulfill an order.
 
-## Findings — Stress Test Matrix
+## Scope: 18 edge cases, grouped by risk
 
-| # | Scenario | Current Behavior | Severity |
-|---|----------|------------------|----------|
-| 1 | Webhook arrives within 6s | ✅ Clean resolve via Realtime/poll | OK |
-| 2 | Webhook delayed 6–40s | Reconcile fires, flips order, resolves | OK |
-| 3 | Webhook never arrives (wrong URL / missing `?env=live`) | 40s timeout → "Order processing" generic | **HIGH** |
-| 4 | Webhook signature secret mismatch | Silent 400, same as #3 | **HIGH** |
-| 5 | Card actually declined | Reconcile sets `stripeNotPaid` → clear message | OK if reconcile runs |
-| 6 | `VITE_PAYMENTS_CLIENT_TOKEN` missing in prod | `getStripeEnvironment()` throws → reconcile never runs → generic timeout even on declines | **HIGH** |
-| 7 | RLS blocks anon SELECT on `orders` by session_id | Poll + Realtime both silently return null → always times out | **CRITICAL** |
-| 8 | `orders` not in Realtime publication | Falls back to 2s poll only (acceptable) | LOW |
-| 9 | Race: webhook flips `paid` before `create-checkout-session` writes `stripe_checkout_session_id` | Poll can't find row by session_id → timeout | MED |
-| 10 | Reconcile edge function itself errors (network/500) | No `stripeNotPaid` set → generic timeout message hides real cause | MED |
-| 11 | `payment_intent.payment_failed` webhook | Sets order `cancelled/unpaid` but UI only polls for `paid` → still waits full 40s | MED |
-| 12 | User closes tab mid-flow then returns | No resume path; new visit to `/checkout/success?session_id=…` works only if order row exists | LOW |
-| 13 | Duplicate webhook delivery | Idempotent upsert by `orderId` — OK | OK |
-| 14 | Clock skew > 5 min between Stripe + edge | Signature rejected | LOW |
-| 15 | Stripe API version drift (`shipping_details` regression) | Already fixed last turn | OK |
+### A. Duplicate / double-charge risk (HIGH)
+1. **Double-click "Pay"** — `create-checkout-session` called twice in <1s → two Stripe sessions, two charges if user completes both tabs.
+2. **Browser back → re-submit** — user pays, hits back, resubmits cart.
+3. **Webhook + reconcile race** — both flip same order to `paid` concurrently → duplicate confirmation email, duplicate inventory decrement, duplicate Printful submission.
+4. **Stripe webhook retries** — Stripe re-delivers `checkout.session.completed` (network blip, 5xx). Without idempotency, email/fulfillment fires N times.
+5. **Multiple `payment_intent.succeeded` events** — Stripe sends both `checkout.session.completed` AND `payment_intent.succeeded`; current handler may process both.
 
-## Remediation Plan
+### B. Wrong amount / wrong order (HIGH)
+6. **Cart mutated between session create and payment** — user opens checkout, changes cart in another tab, pays old amount.
+7. **Discount code applied client-side only** — server doesn't re-validate `SUMMER2026` at session creation → user pays discounted, we ship full.
+8. **Shipping tier mismatch** — client picks Express ($15), server computes Standard ($10) from cart weight/total.
+9. **Free-shipping threshold gaming** — cart at $98, free-ship coupon stacked, edge-function math disagrees with cart math.
+10. **Currency drift** — any line item still in USD/EUR after CAD migration.
 
-### Phase 1 — Critical correctness (do first)
-1. **Audit `orders` RLS for session-id lookups.** Verify anon + authenticated can SELECT rows by `stripe_checkout_session_id`. If not, add a scoped policy or move the success-page read behind a public edge function (`get-order-by-session`) using service role + session-id verification against Stripe.
-2. **Confirm `orders` is in `supabase_realtime` publication** (migration last turn added it — re-verify against live DB).
-3. **Verify Stripe Dashboard webhook URL** ends with `?env=live` and points at `stripe-webhook` (user-side check — surface this clearly).
+### C. Payment lifecycle (MED)
+11. **`payment_intent.payment_failed`** — card declined after session created. UI polls forever; order should flip to `payment_failed` and user prompted to retry with same session or new session.
+12. **3DS / SCA challenge abandoned** — session stays `open`, intent stays `requires_action`. Should expire gracefully.
+13. **Stripe session expires (24h)** — `checkout.session.expired` should mark order `cancelled` and release reserved inventory.
+14. **Refund issued in Stripe Dashboard** — `charge.refunded` webhook should update order status and trigger refund email.
+15. **Dispute / chargeback** — `charge.dispute.created` should flag order, notify ops.
 
-### Phase 2 — Eliminate silent failure modes
-4. **Reorder `create-checkout-session`**: write `stripe_checkout_session_id` to the order row *before* returning client secret (close race #9).
-5. **Make reconcile fire earlier and retry**: drop `RECONCILE_AFTER_MS` from 6s → 3s; on reconcile error, retry once at 12s instead of waiting for 40s timeout.
-6. **Surface reconcile failures**: when reconcile throws, set a distinct `reconcileFailed` state so the UI shows "We couldn't reach the payment processor — refresh in a minute" instead of generic "Order processing".
+### D. Fulfillment & post-purchase (MED)
+16. **Confirmation email send fails** (Resend down) — order marked `paid` but customer never notified; no retry queue.
+17. **Guest checkout email typo** — order paid, confirmation bounces, no way for customer to find order.
+18. **Inventory oversell** — two buyers race for last unit; both Stripe-paid, only one shippable.
 
-### Phase 3 — Better user messaging
-7. **Differentiate three terminal states** on `CheckoutSuccess.tsx`:
-   - `stripeNotPaid` → "Payment not completed, card not charged, try again" (existing)
-   - `webhookDelayed` (reconcile succeeded but DB still unpaid) → "Payment received, finalizing your order — safe to close, email coming"
-   - `unknown` (reconcile failed or never ran) → "We can't confirm right now. Check your email or contact support with session ID `cs_...`"
-8. **Listen for `payment_intent.payment_failed`** on client: subscribe to order row updates for `payment_status='failed'` so declines surface in <5s instead of 40s.
+## Investigation deliverables
 
-### Phase 4 — Observability
-9. **Add structured logs** in `stripe-webhook` and `reconcile-session` (sessionId, env, action taken, latency) — already partially in place; verify and extend.
-10. **Add a `checkout_attempts` audit row** when create-checkout-session is called and when reconcile is called, so support can trace any stuck order end-to-end.
+For each case I will:
+- Read the relevant code path (edge function + DB writes).
+- Document **current behavior** (what actually happens today).
+- Mark **severity** (HIGH / MED / LOW) and **likelihood**.
+- Specify the **fix** (code change, DB constraint, or webhook handler).
 
-### Phase 5 — Optional resilience
-11. **Background reconcile sweep**: cron edge function every 5 min to reconcile orders stuck `pending/unpaid` < 1h old. Catches webhooks that drop entirely.
-12. **Idempotency keys** on `create-checkout-session` to prevent duplicate orders if user double-clicks Pay.
+## Proposed remediation phases (after audit, separate approval)
 
-## Technical Notes
-- Files touched: `src/pages/CheckoutSuccess.tsx`, `supabase/functions/create-checkout-session/index.ts`, `supabase/functions/reconcile-session/index.ts`, `supabase/functions/stripe-webhook/index.ts`, new migration for RLS + (optional) cron, possible new `get-order-by-session` function.
-- No schema-breaking changes; additive RLS policy + column reads only.
-- Will preserve existing idempotency guarantees on webhook upserts and email sends.
+**Phase 1 — Stop double-charges & duplicate fulfillment (HIGH)**
+- Add `processed_webhook_events` table keyed by `stripe_event_id` for idempotency.
+- Wrap order state transitions in a single SQL function (`mark_order_paid(session_id, source)`) that uses `UPDATE ... WHERE status != 'paid' RETURNING` so only one writer wins. Email + Printful trigger off the row that actually transitioned.
+- Add idempotency key to `create-checkout-session` (hash of `user_id + cart_hash` within 60s window) to dedupe double-clicks.
 
-## What I need from you before building
-1. Confirm in **Stripe Dashboard → Webhooks**: live endpoint URL ends with `?env=live` and is enabled. (1-minute check.)
-2. Approve scope — full Phase 1–4, or just Phase 1–2 (critical fixes) for now?
+**Phase 2 — Server-authoritative pricing (HIGH)**
+- `create-checkout-session` recomputes: line totals, discount, shipping tier, free-ship threshold from DB product prices + shipping rules. Client-provided totals are ignored.
+- Reject session creation if client total ≠ server total (log discrepancy).
+
+**Phase 3 — Full lifecycle handlers (MED)**
+- Add webhook handlers: `checkout.session.expired`, `payment_intent.payment_failed`, `charge.refunded`, `charge.dispute.created`.
+- New order statuses: `payment_failed`, `expired`, `refunded`, `disputed`.
+- `CheckoutSuccess.tsx` recognizes `payment_failed` → "Card declined, try another" with retry CTA.
+
+**Phase 4 — Post-purchase resilience (MED)**
+- Confirmation email queued via DB row (`email_outbox`) + cron retry, not fire-and-forget from webhook.
+- Bounce webhook from Resend marks order `email_bounced`, surfaces in ops portal.
+- Inventory: reserve on session create (15-min hold), commit on `paid`, release on `expired/failed`.
+
+## Files I'd touch (Phases 1–4)
+
+- `supabase/functions/stripe-webhook/index.ts` (new event types + idempotency)
+- `supabase/functions/create-checkout-session/index.ts` (server-authoritative totals, idempotency key)
+- `supabase/functions/reconcile-session/index.ts` (call shared `mark_order_paid`)
+- `supabase/functions/send-order-confirmation/index.ts` (read from outbox)
+- New migration: `processed_webhook_events`, `email_outbox`, `mark_order_paid()` SQL function, new order statuses, inventory reserve columns
+- `src/pages/CheckoutSuccess.tsx` (recognize `payment_failed`/`expired`)
+
+## What I need from you
+
+1. **Approve the audit** — I'll run through all 18 cases and report findings (read-only, no code changes).
+2. After the report, you pick which phases to implement.
+
+Or, if you want me to skip the formal report and **go straight to Phase 1 + 2** (the HIGH-severity fixes), say "do Phase 1+2 now."
