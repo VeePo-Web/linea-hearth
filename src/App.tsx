@@ -73,6 +73,7 @@ const Lookbook = lazyWithRetry(() => import("./pages/Lookbook"));
 const TryOnRoom = lazyWithRetry(() => import("./pages/TryOnRoom"));
 const Ambassador = lazyWithRetry(() => import("./pages/Ambassador"));
 const RecoverCart = lazyWithRetry(() => import("./pages/RecoverCart"));
+const RecoverPayment = lazyWithRetry(() => import("./pages/RecoverPayment"));
 const ResetPassword = lazyWithRetry(() => import("./pages/ResetPassword"));
 const AdminLogin = lazyWithRetry(() => import("./pages/admin/AdminLogin"));
 const AdminDashboard = lazyWithRetry(() => import("./pages/admin/AdminDashboard"));
