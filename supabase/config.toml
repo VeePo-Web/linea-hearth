@@ -55,6 +55,9 @@ verify_jwt = false
 [functions.reconcile-session]
 verify_jwt = false
 
+[functions.get-order-by-session]
+verify_jwt = false
+
 [functions.send-admin-alert]
 verify_jwt = false
 

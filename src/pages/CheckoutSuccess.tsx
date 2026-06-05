@@ -46,8 +46,15 @@ interface OrderItem {
 }
 
 const POLL_INTERVAL_MS = 2000;
-const RECONCILE_AFTER_MS = 6000;
+const RECONCILE_AFTER_MS = 3000;
+const RECONCILE_RETRY_MS = 12000;
 const HARD_TIMEOUT_MS = 40000;
+
+type TerminalState =
+  | "stripe_not_paid"      // Stripe says card was declined / session incomplete
+  | "webhook_delayed"      // Reconcile succeeded but DB still unpaid (rare)
+  | "reconcile_failed"     // Edge function errored — we can't reach the processor
+  | "unknown";             // Timed out with no signal at all
 
 const CheckoutSuccess = () => {
   const [searchParams] = useSearchParams();
@@ -58,45 +65,51 @@ const CheckoutSuccess = () => {
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [stripeNotPaid, setStripeNotPaid] = useState(false);
+  const [terminalState, setTerminalState] = useState<TerminalState | null>(null);
   const [showSignupPrompt, setShowSignupPrompt] = useState(true);
   const [upsellOffer, setUpsellOffer] = useState<UpsellOffer | null>(null);
   const [upsellOpen, setUpsellOpen] = useState(false);
   const upsellRequestedRef = useRef(false);
+  const stripeNotPaidRef = useRef(false);
+  const reconcileFailedRef = useRef(false);
 
   const sessionId = searchParams.get("session_id");
 
-  // Fetch order + line items, then mark loading done. Returns true if paid.
+  // Fetch order + line items via the public edge function (service-role read).
+  // This bypasses RLS, which is mandatory for guest checkouts where user_id is
+  // null and the per-row policy `user_id = auth.uid()` would otherwise fail.
   const loadPaidOrder = async (cancelledRef: { current: boolean }): Promise<boolean> => {
     if (!sessionId) return false;
-    const { data: orderData } = await supabase
-      .from("orders")
-      .select("*")
-      .eq("stripe_checkout_session_id", sessionId)
-      .maybeSingle();
-    if (cancelledRef.current) return false;
-    if (!orderData || (orderData as any).payment_status !== "paid") return false;
-
-    setOrder({
-      ...(orderData as any),
-      shipping_address: ((orderData as any).shipping_address as ShippingAddress) || {},
-    } as OrderDetails);
-
-    const { data: items } = await supabase
-      .from("order_items")
-      .select("*")
-      .eq("order_id", (orderData as any).id);
-    if (!cancelledRef.current && items) setOrderItems(items as OrderItem[]);
-    clearCart();
-    setLoading(false);
-    return true;
+    try {
+      const { data, error: fnErr } = await supabase.functions.invoke("get-order-by-session", {
+        body: { sessionId },
+      });
+      if (cancelledRef.current) return false;
+      if (fnErr) {
+        console.warn("get-order-by-session error", fnErr);
+        return false;
+      }
+      const payload = data as { order: OrderDetails | null; items: OrderItem[]; status: string };
+      if (payload?.status !== "paid" || !payload.order) return false;
+      setOrder({
+        ...payload.order,
+        shipping_address: (payload.order.shipping_address as ShippingAddress) || {},
+      });
+      setOrderItems(payload.items ?? []);
+      clearCart();
+      setLoading(false);
+      return true;
+    } catch (e) {
+      console.warn("loadPaidOrder threw", e);
+      return false;
+    }
   };
 
   // ===== Primary effect: resolve the paid order =====
   // 1. Subscribe to Realtime UPDATE on this order's row (instant flip when webhook lands).
-  // 2. Poll every 2s as a fallback (covers Realtime hiccups).
-  // 3. After 6s with no result, call reconcile-session to ask Stripe directly — self-heal if the webhook missed.
-  // 4. Hard timeout at 40s with a clear, honest error message.
+  // 2. Poll every 2s as a fallback (covers Realtime hiccups + first paint).
+  // 3. At 3s + 12s, call reconcile-session to ask Stripe directly — self-heal a missed webhook.
+  // 4. Hard timeout at 40s with a state-specific message.
   useEffect(() => {
     if (!sessionId) {
       setError("No session ID provided");
@@ -105,12 +118,14 @@ const CheckoutSuccess = () => {
     }
 
     const cancelledRef = { current: false };
-    let reconcileFired = false;
     let pollTimer: ReturnType<typeof setTimeout> | null = null;
     let reconcileTimer: ReturnType<typeof setTimeout> | null = null;
+    let retryTimer: ReturnType<typeof setTimeout> | null = null;
     let hardTimer: ReturnType<typeof setTimeout> | null = null;
 
-    // Realtime subscription on the order row matched by session id.
+    // Realtime: still useful when the user is the order owner. Anonymous
+    // guests won't receive events due to RLS — that's fine, the 2s poll
+    // covers them.
     const channel = supabase
       .channel(`order-paid-${sessionId}`)
       .on(
@@ -135,37 +150,50 @@ const CheckoutSuccess = () => {
       }
     };
 
-    const runReconcile = async () => {
-      if (cancelledRef.current || reconcileFired) return;
-      reconcileFired = true;
+    const runReconcile = async (isRetry: boolean) => {
+      if (cancelledRef.current) return;
       try {
-        const { data } = await supabase.functions.invoke("reconcile-session", {
+        const { data, error: fnErr } = await supabase.functions.invoke("reconcile-session", {
           body: { sessionId, environment: getStripeEnvironment() },
         });
         if (cancelledRef.current) return;
+        if (fnErr) throw fnErr;
         if ((data as any)?.notPaid) {
-          setStripeNotPaid(true);
+          stripeNotPaidRef.current = true;
+        } else {
+          // Reconcile succeeded — poll picks up the row on the next tick.
+          await loadPaidOrder(cancelledRef);
         }
-        // Whether reconcile updated the row or not, the poll/Realtime will pick it up.
-        await loadPaidOrder(cancelledRef);
       } catch (e) {
-        console.warn("reconcile-session failed", e);
+        console.warn(`reconcile-session ${isRetry ? "retry" : "first"} failed`, e);
+        if (isRetry) {
+          reconcileFailedRef.current = true;
+        }
       }
     };
 
-    // Kick off immediate fetch (covers fast webhook), then schedule reconcile + hard timeout.
     pollOnce();
-    reconcileTimer = setTimeout(runReconcile, RECONCILE_AFTER_MS);
+    reconcileTimer = setTimeout(() => runReconcile(false), RECONCILE_AFTER_MS);
+    retryTimer = setTimeout(() => runReconcile(true), RECONCILE_RETRY_MS);
     hardTimer = setTimeout(() => {
       if (cancelledRef.current) return;
       setLoading((stillLoading) => {
-        if (stillLoading) {
-          setError(
-            stripeNotPaid
-              ? "Your payment didn't complete. Your card was not charged. Please try again."
-              : "We couldn't confirm your payment in time. Check your email — if you don't see a confirmation within a few minutes, contact support with your session ID below.",
-          );
+        if (!stillLoading) return false;
+        // Pick the most specific terminal state we have evidence for.
+        let state: TerminalState;
+        let message: string;
+        if (stripeNotPaidRef.current) {
+          state = "stripe_not_paid";
+          message = "Your payment didn't complete. Your card was not charged. Please try again.";
+        } else if (reconcileFailedRef.current) {
+          state = "reconcile_failed";
+          message = "We couldn't reach the payment processor to confirm your order. Refresh this page in a minute, or contact support with the session ID below — we'll have your order on our side either way.";
+        } else {
+          state = "unknown";
+          message = "We couldn't confirm your payment in time. Check your email — if you don't see a confirmation within a few minutes, contact support with your session ID below.";
         }
+        setTerminalState(state);
+        setError(message);
         return false;
       });
     }, HARD_TIMEOUT_MS);
@@ -174,6 +202,7 @@ const CheckoutSuccess = () => {
       cancelledRef.current = true;
       if (pollTimer) clearTimeout(pollTimer);
       if (reconcileTimer) clearTimeout(reconcileTimer);
+      if (retryTimer) clearTimeout(retryTimer);
       if (hardTimer) clearTimeout(hardTimer);
       supabase.removeChannel(channel);
     };
@@ -247,7 +276,11 @@ const CheckoutSuccess = () => {
               <Package className="w-8 h-8 text-muted-foreground" />
             </div>
             <h1 className="text-2xl font-light">
-              {stripeNotPaid ? "Payment not completed" : "Order processing"}
+              {terminalState === "stripe_not_paid"
+                ? "Payment not completed"
+                : terminalState === "reconcile_failed"
+                  ? "We can't confirm right now"
+                  : "Order processing"}
             </h1>
             <p className="text-muted-foreground">
               {error || "Your order is being processed. You will receive an email confirmation shortly."}
