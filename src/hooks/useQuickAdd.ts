@@ -354,12 +354,18 @@ export function useQuickAdd(
 
     if (!product || isAdding || isAdded || isInCart) return;
 
+    // Sizeless items (hats, accessories): one-tap, no picker, no quiz
+    if (isSizeless) {
+      addToCart({});
+      return;
+    }
+
     // Check if we should trigger size quiz for first-time users
     if (sizeQuizContext && !hasPromptedQuizRef.current && sizeQuizContext.shouldTriggerQuiz()) {
       hasPromptedQuizRef.current = true;
       sizeQuizContext.openQuizWithPending({
         productId: product.id,
-        categorySlug: categorySlug, // Pass category for correct size resolution
+        categorySlug: categorySlug,
         callback: (size: string, color?: string) => {
           addToCart({ size, color });
         },
@@ -368,19 +374,15 @@ export function useQuickAdd(
     }
 
     if (canOneTap && rememberedSize) {
-      // One-tap add
       addToCart({ size: rememberedSize });
     } else if (suggestedFallback) {
-      // Print-on-demand: never say "sold out". Use fallback silently.
       addToCart({ size: suggestedFallback });
     } else if (availableSizes.length === 1) {
-      // Only one size available, auto-select
       addToCart({ size: availableSizes[0] });
     } else {
-      // Show size picker
       setIsPickerOpen(true);
     }
-  }, [product, isAdding, isAdded, isInCart, canOneTap, rememberedSize, suggestedFallback, availableSizes, addToCart, showToast, sizeQuizContext]);
+  }, [product, isAdding, isAdded, isInCart, isSizeless, canOneTap, rememberedSize, suggestedFallback, availableSizes, addToCart, showToast, sizeQuizContext, categorySlug]);
 
   // Handle size selection from picker
   const handleSizeSelect = useCallback((size: string, e?: React.MouseEvent) => {
