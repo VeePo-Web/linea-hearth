@@ -132,7 +132,7 @@ const LegalPageLayout = ({
       
       {/* Print-only Document Footer */}
       <div className="print-only print-footer hidden">
-        lineofjudah.com | 1.lineofjudah.1@gmail.com
+        lineofjudah.clothing | 1.lineofjudah.1@gmail.com
       </div>
     </div>
   );

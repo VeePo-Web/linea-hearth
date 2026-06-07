@@ -169,7 +169,7 @@ const TermsOfService = () => {
         </p>
         <div className="mt-4 space-y-1">
           <p className="text-foreground">Email: 1.lineofjudah.1@gmail.com</p>
-          <p className="text-foreground">Website: lineofjudah.com</p>
+          <p className="text-foreground">Website: lineofjudah.clothing</p>
         </div>
       </LegalSection>
     </LegalPageLayout>

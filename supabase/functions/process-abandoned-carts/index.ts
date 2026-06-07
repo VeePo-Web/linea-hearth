@@ -92,12 +92,12 @@ async function sendEmail(
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: 'Line of Judah <noreply@lineofjudah.com>',
+        from: 'Line of Judah <noreply@lineofjudah.clothing>',
         to: [to],
         subject,
         html: finalHtml,
         headers: {
-          'List-Unsubscribe': `<${unsubscribeUrl}>, <mailto:unsubscribe@lineofjudah.com>`,
+          'List-Unsubscribe': `<${unsubscribeUrl}>, <mailto:unsubscribe@lineofjudah.clothing>`,
           'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
         },
       }),
@@ -128,7 +128,7 @@ function getEmailFooter(siteUrl: string): string {
           <tr>
             <td align="center">
               <p style="margin:0 0 4px;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;font-size:14px;color:#A8A29E;">Questions? We've got your back.</p>
-              <a href="mailto:hello@lineofjudah.com" style="font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;font-size:14px;color:#FFFFFF;text-decoration:none;">hello@lineofjudah.com</a>
+              <a href="mailto:hello@lineofjudah.clothing" style="font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;font-size:14px;color:#FFFFFF;text-decoration:none;">hello@lineofjudah.clothing</a>
             </td>
           </tr>
           <tr>

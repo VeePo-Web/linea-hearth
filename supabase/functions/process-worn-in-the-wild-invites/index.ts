@@ -9,7 +9,7 @@ const corsHeaders = {
 };
 
 const SITE_URL = "https://lineofjudah-clothing.lovable.app";
-const FROM_EMAIL = "Line of Judah <noreply@lineofjudah.com>";
+const FROM_EMAIL = "Line of Judah <noreply@lineofjudah.clothing>";
 
 async function getJwtKey(secret: string) {
   return await crypto.subtle.importKey(
