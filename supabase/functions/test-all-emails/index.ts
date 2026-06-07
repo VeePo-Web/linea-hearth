@@ -109,7 +109,7 @@ function buildOrderConfirmationHtml(order: any, items: any[], siteUrl: string): 
         <p style="margin:0;font-size:16px;font-weight:700;color:#1C1917;">More than clothing. A statement of faith.</p>
       </div></td></tr>
       <tr><td style="background:#1C1917;padding:32px 40px;"><table width="100%" cellpadding="0" cellspacing="0">
-        <tr><td align="center"><p style="margin:0 0 4px;font-size:14px;color:#A8A29E;">Questions? We've got your back.</p><a href="mailto:hello@lineofjudah.com" style="font-size:14px;color:#FFFFFF;text-decoration:none;">hello@lineofjudah.com</a></td></tr>
+        <tr><td align="center"><p style="margin:0 0 4px;font-size:14px;color:#A8A29E;">Questions? We've got your back.</p><a href="mailto:hello@lineofjudah.clothing" style="font-size:14px;color:#FFFFFF;text-decoration:none;">hello@lineofjudah.clothing</a></td></tr>
         <tr><td align="center" style="padding-top:24px;"><p style="margin:0 0 4px;font-size:12px;font-weight:700;letter-spacing:2px;color:#FFFFFF;text-transform:uppercase;">LINE OF JUDAH</p><p style="margin:0;font-size:13px;color:#78716C;">Faith you can wear.</p></td></tr>
       </table></td></tr>
     </table>
@@ -153,7 +153,7 @@ function renderWornInvite(opts: { firstName: string | null; heroImage: string | 
 // ============================================================================
 function getEmailFooter(siteUrl: string): string {
   return `<tr><td style="background:#1C1917;padding:32px 40px;"><table width="100%" cellpadding="0" cellspacing="0" role="presentation">
-    <tr><td align="center"><p style="margin:0 0 4px;font-size:14px;color:#A8A29E;">Questions? We've got your back.</p><a href="mailto:hello@lineofjudah.com" style="font-size:14px;color:#FFFFFF;text-decoration:none;">hello@lineofjudah.com</a></td></tr>
+    <tr><td align="center"><p style="margin:0 0 4px;font-size:14px;color:#A8A29E;">Questions? We've got your back.</p><a href="mailto:hello@lineofjudah.clothing" style="font-size:14px;color:#FFFFFF;text-decoration:none;">hello@lineofjudah.clothing</a></td></tr>
     <tr><td align="center" style="padding-top:24px;"><p style="margin:0 0 4px;font-size:12px;font-weight:700;letter-spacing:2px;color:#FFFFFF;text-transform:uppercase;">LINE OF JUDAH</p><p style="margin:0;font-size:13px;color:#78716C;">Faith you can wear.</p></td></tr>
     <tr><td align="center" style="padding-top:24px;"><p style="margin:0;font-size:12px;color:#57534E;">© 2026 Line of Judah. All rights reserved.</p><p style="margin:8px 0 0;"><a href="${siteUrl}/privacy-policy" style="font-size:12px;color:#57534E;text-decoration:none;">Privacy</a><span style="color:#44403C;margin:0 8px;">•</span><a href="${siteUrl}/terms-of-service" style="font-size:12px;color:#57534E;text-decoration:none;">Terms</a><span style="color:#44403C;margin:0 8px;">•</span><a href="${SITE_URL}/unsubscribe?test=1" style="font-size:12px;color:#57534E;text-decoration:none;">Unsubscribe</a></p></td></tr>
   </table></td></tr>`;

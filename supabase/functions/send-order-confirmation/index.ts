@@ -361,7 +361,7 @@ function buildOrderConfirmationHtml(order: Order, items: OrderItem[], siteUrl: s
                 <tr>
                   <td align="center">
                     <p style="margin:0 0 4px;font-size:14px;color:#A8A29E;">Questions? We've got your back.</p>
-                    <a href="mailto:hello@lineofjudah.com" style="font-size:14px;color:#FFFFFF;text-decoration:none;">hello@lineofjudah.com</a>
+                    <a href="mailto:hello@lineofjudah.clothing" style="font-size:14px;color:#FFFFFF;text-decoration:none;">hello@lineofjudah.clothing</a>
                   </td>
                 </tr>
                 <tr>
@@ -411,7 +411,7 @@ Deno.serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const siteUrl = Deno.env.get("SITE_URL") || "https://lineofjudah.com";
+    const siteUrl = Deno.env.get("SITE_URL") || "https://lineofjudah.clothing";
     
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     
@@ -493,7 +493,7 @@ Deno.serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: "Line of Judah <orders@lineofjudah.com>",
+        from: "Line of Judah <orders@lineofjudah.clothing>",
         to: [order.customer_email],
         subject: subject,
         html: emailHtml,
@@ -523,7 +523,7 @@ Deno.serve(async (req) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          from: "Line of Judah Orders <orders@lineofjudah.com>",
+          from: "Line of Judah Orders <orders@lineofjudah.clothing>",
           to: INTERNAL_NOTIFY_RECIPIENTS,
           reply_to: order.customer_email,
           subject: adminSubject,

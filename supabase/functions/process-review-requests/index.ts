@@ -116,12 +116,12 @@ async function sendViaResend(
       method: 'POST',
       headers: { Authorization: `Bearer ${resendApiKey}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        from: 'Line of Judah <noreply@lineofjudah.com>',
+        from: 'Line of Judah <noreply@lineofjudah.clothing>',
         to: [to],
         subject,
         html: finalHtml,
         headers: {
-          'List-Unsubscribe': `<${unsubscribeUrl}>, <mailto:unsubscribe@lineofjudah.com>`,
+          'List-Unsubscribe': `<${unsubscribeUrl}>, <mailto:unsubscribe@lineofjudah.clothing>`,
           'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
         },
       }),
