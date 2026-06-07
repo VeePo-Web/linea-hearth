@@ -1,44 +1,45 @@
-## Goal
+## Pre-launch verification plan
 
-All emails (order confirmations, retry/payment recovery, abandoned cart, refunds, review requests, worn-in-the-wild invites, admin alerts) are currently sending — or failing to send — from `@lineofjudah.com`. Your actual domain is `lineofjudah.clothing`. Resend is rejecting sends with a 403 because `lineofjudah.com` is not in your Resend account.
+Cannot run an actual live purchase from this environment, but here's a layered check that gets you confidence equivalent to a stress test.
 
-This plan fixes the from-addresses and support contacts to use the correct `.clothing` domain so Resend will accept them once you verify the domain there.
+## Tier 1 — Static checks (I can do now, no risk)
 
-## Changes
+1. **Re-grep code** for any residual `lineofjudah.com` references, any hardcoded `pk_test`, any `success_url`/`cancel_url` left over from redirect-mode checkout (Embedded mode uses `return_url` only).
+2. **Verify `supabase/config.toml`** has `verify_jwt = false` on every payment-related function (`create-checkout-session`, `stripe-webhook`, `get-order-by-session`, `reconcile-session`, `recover-payment`, `send-retry-payment-email`).
+3. **Confirm webhook endpoint** is registered for **live** mode in your Stripe dashboard pointing at `stripe-webhook?env=live`, and the `PAYMENTS_LIVE_WEBHOOK_SECRET` matches.
+4. **Replay the 2 recent live orders** in the DB to confirm the schema columns match what `get-order-by-session` returns to `CheckoutSuccess.tsx`.
 
-### 1. Edge functions — swap `from:` addresses
+## Tier 2 — Synthetic webhook stress (I can do, zero customer impact)
 
-Replace every `@lineofjudah.com` with `@lineofjudah.clothing` in:
-- `supabase/functions/send-order-confirmation/index.ts` — `orders@`
-- `supabase/functions/send-retry-payment-email/index.ts` — `orders@`
-- `supabase/functions/send-refund-confirmation/index.ts` — `orders@`
-- `supabase/functions/process-abandoned-carts/index.ts` — `noreply@`, `unsubscribe@`, `hello@`
-- `supabase/functions/process-review-requests/index.ts` — same pattern
-- `supabase/functions/process-worn-in-the-wild-invites/index.ts` — same pattern
-- `supabase/functions/test-all-emails/index.ts` — `hello@` in HTML footers
-- `supabase/functions/send-order-confirmation/index.ts` — `SITE_URL` fallback `https://lineofjudah.com` → `https://lineofjudah.clothing`
+5. **Fire 5 simulated webhook events** at the deployed `stripe-webhook` function:
+   - `checkout.session.completed` (happy path) → expect order flips to `paid` + confirmation email queued.
+   - `checkout.session.expired` → expect retry email row created with `retry_token`.
+   - `payment_intent.payment_failed` → expect retry email + `retry_reason='payment_failed'`.
+   - `charge.refunded` → expect refund confirmation email.
+   - Duplicate of #1 (same event id) → expect idempotent no-op.
+   I'll use synthetic Stripe payloads + the live webhook secret to sign them properly. Each runs against a throwaway test order I insert and then delete.
+6. **Hit `recover-payment` with the test token** from step 5 → confirm cart items round-trip and `/recover-payment` page renders.
 
-### 2. Frontend — support email mentions
+## Tier 3 — End-to-end live test (you do, ~$1)
 
-- `src/pages/TermsOfService.tsx`
-- `src/components/legal/LegalPageLayout.tsx`
+7. **You** put one cheap item in cart, run a real checkout with a real card, and confirm:
+   - Success page renders within 10s.
+   - Order confirmation email arrives (requires Resend DNS verified for `lineofjudah.clothing`).
+   - Order shows in `/account/orders` and `/ops-portal/orders`.
+   Refund yourself from the ops portal afterward to verify the refund email path.
 
-Swap `hello@lineofjudah.com` → `hello@lineofjudah.clothing` (or whatever inbox alias you use — same change applies).
+## Launch-readiness verdict (after each tier)
 
-### 3. Redeploy affected edge functions
+After Tier 1 + 2 pass: **safe to soft-launch** (happy path proven, retry path simulated).
+After Tier 3 passes: **safe to fully launch and announce**.
 
-Deploy: `send-order-confirmation`, `send-retry-payment-email`, `send-refund-confirmation`, `process-abandoned-carts`, `process-review-requests`, `process-worn-in-the-wild-invites`, `test-all-emails`.
+## What's still blocked on you, not me
 
-### 4. You verify the domain at Resend (one-time, manual)
-
-After the code change, go to https://resend.com/domains and add `lineofjudah.clothing`. Resend will give you DNS records (SPF + DKIM, optionally DMARC) to add at your registrar. Once green, all the emails above start delivering.
+- **Resend DNS verification for `lineofjudah.clothing`** — without this, every email (confirmation, retry, refund, abandoned cart) silently fails with 403. Customers will still be charged correctly and the success page will work — they just won't receive any email. This is the single biggest launch blocker.
+- **Tier 3 real-card test** — I cannot do this; only you can.
 
 ## Out of scope
 
-- No switch to Lovable Emails or change of email provider.
-- No template/copy/design changes — only the domain string is touched.
-- Inbox mailbox setup (receiving mail at `hello@lineofjudah.clothing`) is on you with your mail host; Resend only handles **sending**.
-
-## Question for you
-
-Which inbox alias do you want on the public-facing `mailto:` links — `hello@`, `support@`, `orders@`? Default is `hello@lineofjudah.clothing` (matches what's there today).
+- Performance/load testing (Stripe + Supabase scale way past your expected volume).
+- 3DS / SCA edge cases (Stripe handles these inside the embedded form; nothing for us to test).
+- Mobile-specific payment methods (Apple Pay / Google Pay) — enabled by default in Embedded Checkout if your Stripe account allows them.
