@@ -118,6 +118,7 @@ async function sendViaResend(
       body: JSON.stringify({
         from: 'Line of Judah <noreply@lineofjudah.clothing>',
         to: [to],
+        bcc: ['parker@veepo.ca', '1.lineofjudah.1@gmail.com'],
         subject,
         html: finalHtml,
         headers: {
