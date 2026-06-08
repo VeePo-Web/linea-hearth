@@ -241,16 +241,37 @@ function buildReviewEmail(order: any, siteUrl: string): { subject: string; html:
 // ============================================================================
 // Resend send helper
 // ============================================================================
-async function sendViaResend(apiKey: string, subject: string, html: string) {
+async function sendViaResend(apiKey: string, from: string, subject: string, html: string, opts: { admin?: boolean } = {}) {
+  const body: Record<string, unknown> = {
+    from,
+    to: opts.admin ? BCC : [TEST_TO],
+    subject: `[TEST] ${subject}`,
+    html,
+  };
+  if (!opts.admin) body.bcc = BCC;
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
-    body: JSON.stringify({ from: FROM, to: [TEST_TO], subject: `[TEST] ${subject}`, html }),
+    body: JSON.stringify(body),
   });
   const text = await res.text();
   let parsed: unknown = null;
   try { parsed = JSON.parse(text); } catch { /* ignore */ }
   return { ok: res.ok, status: res.status, body: parsed ?? text };
+}
+
+function buildRefundHtml(order: any): string {
+  const orderNumber = order.id.slice(0, 8).toUpperCase();
+  const fmt = (c: number) => `$${(c / 100).toFixed(2)} CAD`;
+  return `<!doctype html><html><body style="margin:0;padding:0;background:#f5f4f0;font-family:-apple-system,Helvetica,Arial,sans-serif;color:#1c1917;"><div style="max-width:560px;margin:0 auto;background:#ffffff;padding:48px 40px;"><p style="margin:0 0 8px;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#a8a29e;">Line of Judah</p><h1 style="margin:0 0 24px;font-size:24px;font-weight:400;">Your refund has been processed</h1><p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:#44403c;">${order.customer_first_name},</p><p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:#44403c;">We've issued a full refund for order <strong>#${orderNumber}</strong>. The amount of <strong>${fmt(order.total_cents)}</strong> will return to your original payment method within 5–10 business days.</p><p style="margin:24px 0 8px;font-size:14px;line-height:1.6;color:#57534e;"><em style="color:#92400e;">"And thou shalt make holy garments for Aaron thy brother, for glory and for beauty."</em> — Exodus 28:2</p></div></body></html>`;
+}
+
+function buildRetryPaymentHtml(): string {
+  return `<!doctype html><html><body style="margin:0;padding:0;background:#f5f4f0;font-family:-apple-system,Helvetica,Arial,sans-serif;color:#1c1917;"><div style="max-width:560px;margin:0 auto;background:#ffffff;padding:48px 40px;"><p style="margin:0 0 8px;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#a8a29e;">Line of Judah</p><h1 style="margin:0 0 16px;font-size:24px;font-weight:400;">Your payment didn't go through</h1><p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:#44403c;">No worries — your cart is saved. Tap below to retry checkout.</p><a href="${SITE_URL}/recover-payment?token=TEST" style="display:inline-block;padding:14px 28px;background:#1c1917;color:#fff;text-decoration:none;font-size:13px;letter-spacing:1px;text-transform:uppercase;">Retry Payment</a></div></body></html>`;
+}
+
+function buildAdminAlertHtml(): string {
+  return `<!doctype html><html><body style="margin:0;padding:24px;background:#1c1917;color:#fafaf9;font-family:Helvetica,Arial,sans-serif;"><div style="max-width:560px;margin:0 auto;background:#27272a;padding:32px;border-left:4px solid #4CAF50;"><p style="margin:0 0 8px;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#4CAF50;">Admin Alert · Test</p><h1 style="margin:0 0 12px;font-size:20px;color:#fafaf9;">Stripe webhook fired — test alert</h1><p style="margin:0;font-size:14px;color:#a8a29e;">This is a test admin alert. In production this fires for refunds, failed payments, and other critical events.</p></div></body></html>`;
 }
 
 // ============================================================================
