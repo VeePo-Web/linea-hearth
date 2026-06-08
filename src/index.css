@@ -1639,3 +1639,23 @@ html.scroll-locked body {
     color: #444 !important;
   }
 }
+
+/* ====== Pre-sale marquee ====== */
+@media (min-width: 768px) {
+  :root { --marquee-height: 28px; }
+}
+@keyframes marquee-scroll {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-50%, 0, 0); }
+}
+.animate-marquee {
+  animation: marquee-scroll 40s linear infinite;
+  will-change: transform;
+}
+@media (min-width: 768px) {
+  .animate-marquee { animation-duration: 60s; }
+}
+.animate-marquee:hover { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee { animation: none; justify-content: center; width: 100%; }
+}
