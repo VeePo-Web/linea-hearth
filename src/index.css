@@ -23,10 +23,15 @@ html.scroll-locked body {
 @layer base {
   :root {
     /* Header Height System */
+    --marquee-height: 24px;
     --status-bar-height: 36px;
     --nav-height: 64px;
-    --header-height: 100px;
+    --header-height: calc(100px + var(--marquee-height));
     --header-height-scrolled: 64px;
+
+    /* Pre-sale marquee */
+    --marquee-bg: 350 86% 42%;
+    --marquee-fg: 0 0% 100%;
     /* Tracks header reveal state — sticky sub-nav consumes this */
     --sticky-top: var(--header-height);
     
@@ -1633,4 +1638,24 @@ html.scroll-locked body {
   .bg-stone-900 .text-white\/70 {
     color: #444 !important;
   }
+}
+
+/* ====== Pre-sale marquee ====== */
+@media (min-width: 768px) {
+  :root { --marquee-height: 28px; }
+}
+@keyframes marquee-scroll {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-50%, 0, 0); }
+}
+.animate-marquee {
+  animation: marquee-scroll 40s linear infinite;
+  will-change: transform;
+}
+@media (min-width: 768px) {
+  .animate-marquee { animation-duration: 60s; }
+}
+.animate-marquee:hover { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee { animation: none; justify-content: center; width: 100%; }
 }

@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import StatusBar from "./StatusBar";
 import Navigation from "./Navigation";
+import PreSaleMarquee from "./PreSaleMarquee";
 import { useScrollDirection } from "@/hooks/useScrollDirection";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { cn } from "@/lib/utils";
@@ -62,6 +63,7 @@ const Header = () => {
             }
       }
     >
+      <PreSaleMarquee />
       <StatusBar />
       <Navigation />
     </motion.header>
