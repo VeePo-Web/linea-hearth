@@ -203,8 +203,11 @@ html.scroll-locked body {
     transition: text-decoration-color 0.3s ease;
   }
 
-  .marquee-underline:hover {
+  .marquee-underline:hover,
+  .marquee-underline:focus,
+  .marquee-underline:focus-visible {
     text-decoration-color: hsl(0 0% 100% / 1);
+    outline: none;
   }
   
   /* Editorial Grid Layouts */
