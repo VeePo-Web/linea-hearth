@@ -23,10 +23,15 @@ html.scroll-locked body {
 @layer base {
   :root {
     /* Header Height System */
+    --marquee-height: 24px;
     --status-bar-height: 36px;
     --nav-height: 64px;
-    --header-height: 100px;
+    --header-height: calc(100px + var(--marquee-height));
     --header-height-scrolled: 64px;
+
+    /* Pre-sale marquee */
+    --marquee-bg: 350 86% 42%;
+    --marquee-fg: 0 0% 100%;
     /* Tracks header reveal state — sticky sub-nav consumes this */
     --sticky-top: var(--header-height);
     

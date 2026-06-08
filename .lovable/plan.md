@@ -1,38 +1,75 @@
-## Add Internal BCC to All Customer-Facing Emails
+## Scrolling Pre-Sale Marquee Bar
 
-Goal: Every automated email sent from `lineofjudah.clothing` via Resend silently copies both `parker@veepo.ca` AND `1.lineofjudah.1@gmail.com` so the team has a full record of every customer touchpoint.
+A thin red bar sits at the very top of every page — above the existing black announcement bar — with copy continuously scrolling right-to-left to build pre-sale urgency until the July 1st ship date.
 
-### Current state
-- ✅ `send-order-confirmation` — already sends a separate admin copy to both inboxes
-- ❌ `send-refund-confirmation` — customer only
-- ❌ `send-retry-payment-email` — customer only
-- ❌ `process-abandoned-carts` (3 emails) — customer only
-- ❌ `process-review-requests` — customer only
-- ❌ `process-worn-in-the-wild-invites` — customer only
-- ⚠️ `send-admin-alert` — sends only to parker, still uses unverified `onboarding@resend.dev` From, gmail recipient commented out
+### Scope
+- **Only new visual element.** No other page changes.
+- Appears site-wide above `StatusBar` (which sits above `Navigation`).
+- Permanent (no close button). Shows on every page including the portal.
 
-### Change: add `bcc` to every Resend call
-For each customer-facing send above, add:
-```ts
-bcc: ['parker@veepo.ca', '1.lineofjudah.1@gmail.com'],
+### Copy (Ogilvy-meets-Brunson tone, on-brand)
+A single string with bullet separators (`◆`) loops seamlessly. Final copy:
+
+> **PRE-SALE NOW LIVE ◆ FIRST DROP SHIPS JULY 1ST ◆ RESERVE YOUR ARMOR BEFORE THE GATE CLOSES ◆ LIMITED FIRST-RUN — ONCE IT'S GONE, IT'S GONE ◆ EXODUS 28:2 ◆**
+
+Reasons it works:
+- Ogilvy: concrete date, definite scarcity, plain verbs.
+- Brunson: future-pace ("RESERVE"), loss-aversion ("GATE CLOSES", "ONCE IT'S GONE"), stack of reasons.
+- On-brand: "armor" (not "comfort"), Exodus 28:2 anchor, no emojis, all-caps editorial.
+
+### Visual Spec
+- Height: **24px** (mobile) / **28px** (md+). Slim — does not eat hero space.
+- Background: **#C8102E** (editorial red — matches existing `--destructive` HSL `0 62% 50%` family but more saturated print-red). Implemented as a new token `--marquee-bg: 350 86% 42%` and `--marquee-fg: 0 0% 100%`.
+- Text: white, `font-mono` or `Inter`, `text-[10px] md:text-[11px]`, `tracking-[0.2em]`, `font-medium uppercase`.
+- Sharp edges (no radius — matches editorial system). Subtle 1px black hairline border-bottom.
+- No grain overlay (kept clean so it reads instantly).
+
+### Motion
+- Pure CSS keyframe `marquee-scroll` translating `-50%` over **40s linear infinite** (mobile slightly faster — `30s` — since less visible text fits).
+- Track contains the copy duplicated twice for a seamless loop.
+- Respects `prefers-reduced-motion`: animation pauses and content centers statically.
+- Pauses on hover (desktop only) via `:hover { animation-play-state: paused }`.
+
+### Layout / Header Integration
+Current header chain inside `Header.tsx`:
+```text
+<motion.header fixed top-0>
+  <StatusBar />      // 36px
+  <Navigation />     // 64px
+</motion.header>
 ```
-to the Resend `body` JSON alongside `from` / `to`. BCC keeps the customer email clean — they never see the internal addresses, but both inboxes get a perfect copy of what the customer received.
 
-### Change: fix `send-admin-alert`
-- Flip `ADMIN_FROM` from `onboarding@resend.dev` → `Line of Judah Alerts <alerts@lineofjudah.clothing>` (domain is now verified)
-- Uncomment `1.lineofjudah.1@gmail.com` in `ADMIN_RECIPIENTS` so admin alerts go to both
-- Remove the stale "re-enable once verified" comments
+New chain:
+```text
+<motion.header fixed top-0>
+  <PreSaleMarquee /> // 24px mobile / 28px desktop
+  <StatusBar />
+  <Navigation />
+</motion.header>
+```
 
-### Deploy
-Redeploy the 6 touched edge functions:
-`send-refund-confirmation`, `send-retry-payment-email`, `process-abandoned-carts`, `process-review-requests`, `process-worn-in-the-wild-invites`, `send-admin-alert`.
+CSS variables in `index.css` updated so every downstream sticky element tracks the new total height:
+- Add `--marquee-height: 24px` (with `@media (min-width: 768px) { --marquee-height: 28px }`)
+- Update `--header-height` from `100px` → `calc(100px + var(--marquee-height))`
+- `--sticky-top` already derives from `--header-height`, so sub-nav filter bars, story filters, PDP sticky CTA all adjust automatically (per Sticky Z-Layer System).
+- `--header-height-scrolled` stays `64px` (marquee + status bar hide together when header retracts on scroll-down — already handled by existing `shouldHide` logic since the marquee lives inside the same `motion.header`).
+
+### Files
+
+**New**
+- `src/components/header/PreSaleMarquee.tsx` — component (~40 lines, single export, no props).
+
+**Edited**
+- `src/components/header/Header.tsx` — render `<PreSaleMarquee />` as the first child inside `motion.header`, before `<StatusBar />`.
+- `src/index.css` —
+  - Add `--marquee-height`, `--marquee-bg`, `--marquee-fg` tokens in `:root` (and `.light` variant if present — same values, the bar stays red on both).
+  - Update `--header-height` calc.
+  - Add `@keyframes marquee-scroll { from { transform: translateX(0) } to { transform: translateX(-50%) } }` and `.animate-marquee { animation: marquee-scroll 40s linear infinite; will-change: transform } @media (min-width:768px){.animate-marquee{animation-duration:30s}} @media (prefers-reduced-motion: reduce){.animate-marquee{animation:none;justify-content:center}}`.
+
+### Accessibility
+- Wrapping `<div role="marquee" aria-label="Pre-sale announcement">` with `aria-live="off"` (it's decorative urgency copy, not a notification).
+- Visually-hidden static `<span class="sr-only">` mirrors the copy once for screen readers — no looping announcement.
 
 ### Verification
-- Grep confirms every Resend `fetch('https://api.resend.com/emails', …)` call in those 6 files now contains a `bcc` array with both addresses.
-- Trigger `test-all-emails` after deploy → both inboxes receive copies of every template.
-- No customer-visible change; To/From headers and rendered HTML are untouched.
-
-### Out of scope
-- Auth emails (Supabase magic links / password reset) — those go through Supabase Auth's own provider, not these Resend functions.
-- The contact form (one-off, already routed to parker).
-- The 3-recipient setup only applies to outbound automated mail. Customer inbound replies still land at the `reply_to` you already have configured.
+- View `/home`, `/shop`, `/lookbook`, `/` (portal), one PDP, `/checkout` at 390×844 and 1366×768.
+- Confirm: marquee visible at top, copy scrolls smoothly, no layout shift on hero, sticky filter bars on Category page still pin correctly below the new total header height, header still auto-hides on scroll-down and reveals on scroll-up as one unit.
