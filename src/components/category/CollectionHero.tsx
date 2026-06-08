@@ -192,7 +192,7 @@ const CollectionHero = ({ category, productCount }: CollectionHeroProps) => {
         };
 
   return (
-    <section className={`collection-hero relative w-full h-[55dvh] md:h-[62vh] lg:h-[68vh] ${content.bgClass} overflow-hidden`}>
+    <section className={`collection-hero relative w-full h-[60dvh] min-h-[460px] md:h-[64vh] md:min-h-[520px] lg:h-[70vh] ${content.bgClass} overflow-hidden`}>
       {/* Subtle pattern overlay */}
       <div className="absolute inset-0 opacity-10">
         <div
@@ -203,63 +203,65 @@ const CollectionHero = ({ category, productCount }: CollectionHeroProps) => {
         />
       </div>
 
-      {/* Scripture layer — Genesis 49:9-10 */}
-      <div className="absolute inset-0 z-[5] pointer-events-none">
-        {/* Top-left eyebrow */}
-        <motion.div
-          {...fade(0.05)}
-          className="absolute top-6 left-4 md:top-10 md:left-10 text-[10px] tracking-[0.3em] text-white/40 uppercase"
-        >
-          Genesis 49:9–10 · ESV
-        </motion.div>
+      {/* Two-zone layout: scripture (top ~55%) + title block (bottom ~45%).
+          No absolute %-positioned text — prevents fragment/title collision at any viewport. */}
+      <div className="relative z-10 h-full grid grid-rows-[55%_45%]">
+        {/* Scripture zone */}
+        <div className="relative pointer-events-none px-4 md:px-10 pt-6 md:pt-10">
+          <motion.div
+            {...fade(0.05)}
+            className="text-[10px] tracking-[0.3em] text-white/40 uppercase"
+          >
+            Genesis 49:9–10 · ESV
+          </motion.div>
 
-        {/* Fragment A — large serif */}
-        <motion.p
-          {...fade(0.15)}
-          className="absolute top-[22%] left-4 right-4 md:left-10 md:right-auto md:max-w-[60%] text-white/35 font-light leading-[1.15] text-2xl sm:text-3xl md:text-5xl lg:text-6xl"
-          style={{ fontFamily: "'Instrument Serif', 'Cormorant Garamond', serif" }}
-        >
-          "Judah is a lion's cub; he stooped down, he crouched as a lion."
-        </motion.p>
+          <motion.p
+            {...fade(0.15)}
+            className="mt-6 md:mt-8 text-white/35 font-light leading-[1.15] max-w-[92%] sm:max-w-[80%] md:max-w-[60%] lg:max-w-[55%]"
+            style={{
+              fontFamily: "'Instrument Serif', 'Cormorant Garamond', serif",
+              fontSize: "clamp(1.25rem, 4.2vw, 3.5rem)",
+            }}
+          >
+            "Judah is a lion's cub; he stooped down, he crouched as a lion."
+          </motion.p>
 
-        {/* Fragment B — italic, offset right */}
-        <motion.p
-          {...fade(0.3)}
-          className="absolute top-[52%] right-4 md:right-10 md:top-[48%] text-white/55 italic text-lg md:text-2xl lg:text-3xl text-right max-w-[70%] md:max-w-none"
-          style={{ fontFamily: "'Instrument Serif', 'Cormorant Garamond', serif" }}
-        >
-          who dares rouse him?
-        </motion.p>
+          <motion.p
+            {...fade(0.3)}
+            className="absolute right-4 md:right-10 bottom-2 md:bottom-4 text-white/55 italic text-right max-w-[55%] md:max-w-[40%]"
+            style={{
+              fontFamily: "'Instrument Serif', 'Cormorant Garamond', serif",
+              fontSize: "clamp(0.95rem, 2.1vw, 1.75rem)",
+            }}
+          >
+            who dares rouse him?
+          </motion.p>
+        </div>
 
-        {/* Fragment C — tracked all-caps (desktop only to protect mobile fold) */}
-        <motion.p
-          {...fade(0.45)}
-          className="hidden md:block absolute md:bottom-[28%] lg:bottom-[26%] left-1/2 -translate-x-1/2 text-[11px] tracking-[0.25em] text-white/30 uppercase whitespace-nowrap"
-        >
-          The scepter shall not depart from Judah
-        </motion.p>
-
-        {/* Hairline divider above title block */}
-        <div className="absolute bottom-[34%] md:bottom-[36%] left-1/2 -translate-x-1/2 w-12 h-px bg-[hsl(var(--forest-500))]/30" />
-      </div>
-
-      {/* Content — existing title block (unchanged position semantics) */}
-      <div className="relative z-10 h-full flex flex-col justify-end items-center text-center px-4 md:px-6 pb-12 md:pb-16 lg:pb-20">
-        <p className="text-white/70 text-sm md:text-sm uppercase tracking-[0.3em] mb-3 md:mb-4 animate-fade-in">
-          {content.tagline}
-        </p>
-        <h1 className="text-3xl xs:text-4xl md:text-5xl lg:text-6xl font-light text-white tracking-wide animate-fade-in">
-          {content.title}
-        </h1>
-        {productCount !== undefined && productCount > 0 && (
-          <p className="text-white/60 text-sm md:text-base font-light mt-4 md:mt-6 animate-fade-in">
-            {productCount} {productCount === 1 ? "product" : "products"}
+        {/* Title zone — fully reserved, scripture can never overlap */}
+        <div className="relative flex flex-col items-center justify-end text-center px-4 md:px-6 pb-12 md:pb-16 lg:pb-20">
+          {/* Tracked all-caps + hairline — only inside title zone, never overlaps title */}
+          <p className="hidden md:block text-[11px] tracking-[0.25em] text-white/30 uppercase mb-4 whitespace-nowrap">
+            The scepter shall not depart from Judah
           </p>
-        )}
+          <div className="w-12 h-px bg-[hsl(var(--forest-500))]/40 mb-5 md:mb-6" />
+
+          <p className="text-white/70 text-xs md:text-sm uppercase tracking-[0.3em] mb-3 md:mb-4 animate-fade-in">
+            {content.tagline}
+          </p>
+          <h1 className="text-3xl xs:text-4xl md:text-5xl lg:text-6xl font-light text-white tracking-wide animate-fade-in">
+            {content.title}
+          </h1>
+          {productCount !== undefined && productCount > 0 && (
+            <p className="text-white/60 text-sm md:text-base font-light mt-3 md:mt-5 animate-fade-in">
+              {productCount} {productCount === 1 ? "product" : "products"}
+            </p>
+          )}
+        </div>
       </div>
 
       {/* Bottom gradient fade */}
-      <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-background to-transparent" />
+      <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-background to-transparent pointer-events-none" />
     </section>
   );
 };
