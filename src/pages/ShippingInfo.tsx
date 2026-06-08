@@ -57,14 +57,14 @@ const shippingOptions = [
     title: "EXPRESS",
     description: "4-7 business days total (includes production + 2-3 day shipping).",
     variant: "default" as const,
-    badge: "$12.99"
+    badge: "$20"
   },
   {
     icon: Rocket,
     title: "OVERNIGHT",
     description: "3-6 business days total (includes production + overnight shipping).",
     variant: "accent" as const,
-    badge: "$24.99"
+    badge: "$35"
   },
   {
     icon: Globe,

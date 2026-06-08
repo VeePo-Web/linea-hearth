@@ -34,14 +34,6 @@ export const BRAND = {
       handle: "@lineofjudahwear",
       url: "https://instagram.com/lineofjudahwear",
     },
-    tiktok: {
-      handle: "@lineofjudah",
-      url: "https://tiktok.com/@lineofjudah",
-    },
-    youtube: {
-      handle: "@lineofjudah",
-      url: "https://youtube.com/@lineofjudah",
-    },
     twitter: {
       handle: "@lineofjudah",
       url: "https://twitter.com/lineofjudah",

@@ -46,8 +46,8 @@ interface RequestBody {
 
 
 const SHIPPING_RATES = {
-  standard: 1000,
-  express: 1500,
+  standard: 1500,
+  express: 2000,
   overnight: 3500,
 } as const;
 
