@@ -116,7 +116,7 @@ const Checkout = () => {
       case "overnight":
         return 35;
       default:
-        return hasFreeShipping ? 0 : 10;
+        return hasFreeShipping ? 0 : 15;
     }
   };
   

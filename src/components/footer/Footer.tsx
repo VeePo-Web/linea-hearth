@@ -28,7 +28,7 @@ const Footer = () => {
                 </a>
               </div>
               {/* Social Links - Larger touch targets */}
-              <div className="flex gap-6 mt-4">
+              <div className="flex gap-6 mt-4 items-center">
                 <a 
                   href="https://instagram.com/lineofjudahwear" 
                   className="text-white/70 hover:text-white transition-colors touch-target-sm py-2"
@@ -36,20 +36,7 @@ const Footer = () => {
                 >
                   Instagram
                 </a>
-                <a 
-                  href="https://tiktok.com/@lineofjudah" 
-                  className="text-white/70 hover:text-white transition-colors touch-target-sm py-2"
-                  aria-label="TikTok"
-                >
-                  TikTok
-                </a>
-                <a 
-                  href="https://youtube.com/@lineofjudah" 
-                  className="text-white/70 hover:text-white transition-colors touch-target-sm py-2"
-                  aria-label="YouTube"
-                >
-                  YouTube
-                </a>
+                <span className="text-white/40 text-xs tracking-wide">Coming Soon</span>
               </div>
             </div>
           </div>
