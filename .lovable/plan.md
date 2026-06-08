@@ -1,15 +1,26 @@
-Replace the cheesy "RESERVE YOUR ARMOR" phrase in the pre-sale marquee with tribal, community-driven copy that builds hype and FOMO without sounding forced. Keep the exact same red minimal marquee styling, animation, and placement — only the text changes. No other files touched.
+## Subtle Urgency Cues in Pre-Sale Marquee
 
-**Proposed new copy:**
-```
-PRE-SALE NOW LIVE ◆ FIRST DROP SHIPS JULY 1ST ◆ JOIN THE TRIBE — FOUNDING MEMBER ACCESS CLOSES SOON ◆ LIMITED FIRST-RUN — ONCE IT'S GONE, IT'S GONE ◆ EXODUS 28:2 ◆
-```
+Add clean, editorial visual hierarchy to the red scrolling marquee so key deadline and scarcity phrases catch the eye without feeling cheesy.
 
-**Rationale:**
-- "Join the tribe" feels organic, community-driven, and aspirational rather than gimmicky.
-- "Founding member access" adds exclusivity and urgency (FOMO).
-- "Closes soon" is a classic Brunson urgency trigger without being aggressive.
-- Maintains the Ogilvy-level directness and spiritual anchor (Exodus 28:2).
+### Changes
 
-**Files:**
-- `src/components/header/PreSaleMarquee.tsx` — single string constant edit.
+1. **Rewrite `src/components/header/PreSaleMarquee.tsx`**
+   - Replace the flat `MARQUEE_COPY` string with a structured JSX helper that returns `<span>` segments.
+   - Wrap urgency phrases in spans with an underline class:
+     - `FIRST DROP SHIPS JULY 1ST` — hard deadline, highest urgency
+     - `FOUNDING MEMBER ACCESS CLOSES SOON` — scarcity on tribe access
+   - Keep the existing `sr-only` span as plain text for screen-reader accessibility.
+   - Preserve the 4x repeat inside the `animate-marquee` container and all existing styling (height, bg, border, font size, tracking).
+
+2. **Add CSS utility in `src/index.css`**
+   - Introduce `.marquee-underline` in the `@layer components` block, placed directly after the existing `.animate-marquee` rules.
+   - Style: `text-decoration: underline`, `text-decoration-color: hsl(0 0% 100% / 0.6)`, `text-underline-offset: 3px`.
+   - On hover, bump underline opacity to 100% for a subtle interaction cue.
+
+### Scope
+- Only `PreSaleMarquee.tsx` and `index.css` are touched.
+- No changes to animation speed, marquee height, colors, or any other page.
+- No new dependencies.
+
+### Visual Result
+Scrolling red bar where "FIRST DROP SHIPS JULY 1ST" and "FOUNDING MEMBER ACCESS CLOSES SOON" carry a thin white underline at ~60% opacity — clean, editorial, immediately readable.
