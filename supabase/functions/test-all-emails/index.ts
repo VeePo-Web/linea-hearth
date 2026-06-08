@@ -329,23 +329,25 @@ Deno.serve(async (req) => {
   const review = buildReviewEmail(mockReviewOrder, SITE_URL);
 
   const tests = [
-    { name: "1-order-confirmation", subject: "Your order is on its way", html: buildOrderConfirmationHtml(mockOrder, mockOrderItems, SITE_URL) },
-    { name: "2-worn-in-the-wild-invite", subject: "Worn in the wild", html: renderWornInvite({ firstName: "Olliver", heroImage: "https://lineofjudah.clothing/og-image.jpg", productName: "Lion of Judah Tee — Forest", uploadUrl: `${SITE_URL}/worn/upload?t=TEST` }) },
-    { name: "3-abandoned-cart-1-gentle-reminder", subject: "You left something behind", html: getEmail1Html(mockCart, recoveryUrl, SITE_URL) },
-    { name: "4-abandoned-cart-2-social-proof", subject: "Still thinking it over?", html: getEmail2Html(mockCart, recoveryUrl, SITE_URL) },
-    { name: "5-abandoned-cart-3-discount", subject: "15% off — last call on your cart", html: getEmail3Html(mockCart, recoveryUrl, "LOJ15-TEST00", SITE_URL) },
-    { name: "6-review-request", subject: review.subject, html: review.html },
+    { name: "1-order-confirmation", from: FROM_ORDERS, subject: "Your order is on its way", html: buildOrderConfirmationHtml(mockOrder, mockOrderItems, SITE_URL) },
+    { name: "2-worn-in-the-wild-invite", from: FROM_NOREPLY, subject: "Worn in the wild", html: renderWornInvite({ firstName: "Olliver", heroImage: "https://lineofjudah.clothing/og-image.jpg", productName: "Lion of Judah Tee — Forest", uploadUrl: `${SITE_URL}/worn/upload?t=TEST` }) },
+    { name: "3-abandoned-cart-1-gentle-reminder", from: FROM_NOREPLY, subject: "You left something behind", html: getEmail1Html(mockCart, recoveryUrl, SITE_URL) },
+    { name: "4-abandoned-cart-2-social-proof", from: FROM_NOREPLY, subject: "Still thinking it over?", html: getEmail2Html(mockCart, recoveryUrl, SITE_URL) },
+    { name: "5-abandoned-cart-3-discount", from: FROM_NOREPLY, subject: "15% off — last call on your cart", html: getEmail3Html(mockCart, recoveryUrl, "LOJ15-TEST00", SITE_URL) },
+    { name: "6-review-request", from: FROM_NOREPLY, subject: review.subject, html: review.html },
+    { name: "7-refund-confirmation", from: FROM_ORDERS, subject: `Your refund for order #${mockOrder.id.slice(0,8).toUpperCase()}`, html: buildRefundHtml(mockOrder) },
+    { name: "8-retry-payment", from: FROM_ORDERS, subject: "Your payment didn't go through", html: buildRetryPaymentHtml() },
+    { name: "9-admin-alert", from: FROM_ALERTS, subject: "Admin alert — webhook test", html: buildAdminAlertHtml(), admin: true },
   ];
 
   const results: any[] = [];
   for (const t of tests) {
     try {
-      const r = await sendViaResend(apiKey, t.subject, t.html);
+      const r = await sendViaResend(apiKey, t.from, t.subject, t.html, { admin: (t as any).admin });
       results.push({ template: t.name, ok: r.ok, status: r.status, response: r.body });
     } catch (e) {
       results.push({ template: t.name, ok: false, error: (e as Error).message });
     }
-    // Throttle to stay under Resend's 5 req/s limit
     await new Promise((res) => setTimeout(res, 300));
   }
 
