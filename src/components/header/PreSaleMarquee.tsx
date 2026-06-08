@@ -5,9 +5,9 @@ const Segment = () => (
   <span className="pr-12 inline-flex items-center gap-3">
     <span>PRE-SALE NOW LIVE</span>
     <span aria-hidden="true" className="opacity-60">◆</span>
-    <span className="marquee-underline">FIRST DROP SHIPS JULY 1ST</span>
+    <span className="marquee-underline" tabIndex={0}>FIRST DROP SHIPS JULY 1ST</span>
     <span aria-hidden="true" className="opacity-60">◆</span>
-    <span>JOIN THE TRIBE — <span className="marquee-underline">FOUNDING MEMBER ACCESS CLOSES SOON</span></span>
+    <span>JOIN THE TRIBE — <span className="marquee-underline" tabIndex={0}>FOUNDING MEMBER ACCESS CLOSES SOON</span></span>
     <span aria-hidden="true" className="opacity-60">◆</span>
     <span>LIMITED FIRST-RUN — ONCE IT'S GONE, IT'S GONE</span>
     <span aria-hidden="true" className="opacity-60">◆</span>
