@@ -194,6 +194,18 @@ html.scroll-locked body {
   .animate-marquee:hover {
     animation-play-state: paused;
   }
+
+  .marquee-underline {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-decoration-color: hsl(0 0% 100% / 0.6);
+    text-underline-offset: 3px;
+    transition: text-decoration-color 0.3s ease;
+  }
+
+  .marquee-underline:hover {
+    text-decoration-color: hsl(0 0% 100% / 1);
+  }
   
   /* Editorial Grid Layouts */
   .grid-editorial {
