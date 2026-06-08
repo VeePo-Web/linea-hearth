@@ -10,7 +10,10 @@ const corsHeaders = {
 };
 
 const TEST_TO = "parker@veepo.ca";
-const FROM = "Line of Judah <onboarding@resend.dev>";
+const BCC = ["parker@veepo.ca", "1.lineofjudah.1@gmail.com"];
+const FROM_ORDERS = "Line of Judah <orders@lineofjudah.clothing>";
+const FROM_NOREPLY = "Line of Judah <noreply@lineofjudah.clothing>";
+const FROM_ALERTS = "Line of Judah Alerts <alerts@lineofjudah.clothing>";
 const SITE_URL = "https://lineofjudah.clothing";
 
 // ============================================================================
@@ -238,16 +241,37 @@ function buildReviewEmail(order: any, siteUrl: string): { subject: string; html:
 // ============================================================================
 // Resend send helper
 // ============================================================================
-async function sendViaResend(apiKey: string, subject: string, html: string) {
+async function sendViaResend(apiKey: string, from: string, subject: string, html: string, opts: { admin?: boolean } = {}) {
+  const body: Record<string, unknown> = {
+    from,
+    to: opts.admin ? BCC : [TEST_TO],
+    subject: `[TEST] ${subject}`,
+    html,
+  };
+  if (!opts.admin) body.bcc = BCC;
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
-    body: JSON.stringify({ from: FROM, to: [TEST_TO], subject: `[TEST] ${subject}`, html }),
+    body: JSON.stringify(body),
   });
   const text = await res.text();
   let parsed: unknown = null;
   try { parsed = JSON.parse(text); } catch { /* ignore */ }
   return { ok: res.ok, status: res.status, body: parsed ?? text };
+}
+
+function buildRefundHtml(order: any): string {
+  const orderNumber = order.id.slice(0, 8).toUpperCase();
+  const fmt = (c: number) => `$${(c / 100).toFixed(2)} CAD`;
+  return `<!doctype html><html><body style="margin:0;padding:0;background:#f5f4f0;font-family:-apple-system,Helvetica,Arial,sans-serif;color:#1c1917;"><div style="max-width:560px;margin:0 auto;background:#ffffff;padding:48px 40px;"><p style="margin:0 0 8px;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#a8a29e;">Line of Judah</p><h1 style="margin:0 0 24px;font-size:24px;font-weight:400;">Your refund has been processed</h1><p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:#44403c;">${order.customer_first_name},</p><p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:#44403c;">We've issued a full refund for order <strong>#${orderNumber}</strong>. The amount of <strong>${fmt(order.total_cents)}</strong> will return to your original payment method within 5–10 business days.</p><p style="margin:24px 0 8px;font-size:14px;line-height:1.6;color:#57534e;"><em style="color:#92400e;">"And thou shalt make holy garments for Aaron thy brother, for glory and for beauty."</em> — Exodus 28:2</p></div></body></html>`;
+}
+
+function buildRetryPaymentHtml(): string {
+  return `<!doctype html><html><body style="margin:0;padding:0;background:#f5f4f0;font-family:-apple-system,Helvetica,Arial,sans-serif;color:#1c1917;"><div style="max-width:560px;margin:0 auto;background:#ffffff;padding:48px 40px;"><p style="margin:0 0 8px;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#a8a29e;">Line of Judah</p><h1 style="margin:0 0 16px;font-size:24px;font-weight:400;">Your payment didn't go through</h1><p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:#44403c;">No worries — your cart is saved. Tap below to retry checkout.</p><a href="${SITE_URL}/recover-payment?token=TEST" style="display:inline-block;padding:14px 28px;background:#1c1917;color:#fff;text-decoration:none;font-size:13px;letter-spacing:1px;text-transform:uppercase;">Retry Payment</a></div></body></html>`;
+}
+
+function buildAdminAlertHtml(): string {
+  return `<!doctype html><html><body style="margin:0;padding:24px;background:#1c1917;color:#fafaf9;font-family:Helvetica,Arial,sans-serif;"><div style="max-width:560px;margin:0 auto;background:#27272a;padding:32px;border-left:4px solid #4CAF50;"><p style="margin:0 0 8px;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#4CAF50;">Admin Alert · Test</p><h1 style="margin:0 0 12px;font-size:20px;color:#fafaf9;">Stripe webhook fired — test alert</h1><p style="margin:0;font-size:14px;color:#a8a29e;">This is a test admin alert. In production this fires for refunds, failed payments, and other critical events.</p></div></body></html>`;
 }
 
 // ============================================================================
@@ -305,23 +329,25 @@ Deno.serve(async (req) => {
   const review = buildReviewEmail(mockReviewOrder, SITE_URL);
 
   const tests = [
-    { name: "1-order-confirmation", subject: "Your order is on its way", html: buildOrderConfirmationHtml(mockOrder, mockOrderItems, SITE_URL) },
-    { name: "2-worn-in-the-wild-invite", subject: "Worn in the wild", html: renderWornInvite({ firstName: "Olliver", heroImage: "https://lineofjudah.clothing/og-image.jpg", productName: "Lion of Judah Tee — Forest", uploadUrl: `${SITE_URL}/worn/upload?t=TEST` }) },
-    { name: "3-abandoned-cart-1-gentle-reminder", subject: "You left something behind", html: getEmail1Html(mockCart, recoveryUrl, SITE_URL) },
-    { name: "4-abandoned-cart-2-social-proof", subject: "Still thinking it over?", html: getEmail2Html(mockCart, recoveryUrl, SITE_URL) },
-    { name: "5-abandoned-cart-3-discount", subject: "15% off — last call on your cart", html: getEmail3Html(mockCart, recoveryUrl, "LOJ15-TEST00", SITE_URL) },
-    { name: "6-review-request", subject: review.subject, html: review.html },
+    { name: "1-order-confirmation", from: FROM_ORDERS, subject: "Your order is on its way", html: buildOrderConfirmationHtml(mockOrder, mockOrderItems, SITE_URL) },
+    { name: "2-worn-in-the-wild-invite", from: FROM_NOREPLY, subject: "Worn in the wild", html: renderWornInvite({ firstName: "Olliver", heroImage: "https://lineofjudah.clothing/og-image.jpg", productName: "Lion of Judah Tee — Forest", uploadUrl: `${SITE_URL}/worn/upload?t=TEST` }) },
+    { name: "3-abandoned-cart-1-gentle-reminder", from: FROM_NOREPLY, subject: "You left something behind", html: getEmail1Html(mockCart, recoveryUrl, SITE_URL) },
+    { name: "4-abandoned-cart-2-social-proof", from: FROM_NOREPLY, subject: "Still thinking it over?", html: getEmail2Html(mockCart, recoveryUrl, SITE_URL) },
+    { name: "5-abandoned-cart-3-discount", from: FROM_NOREPLY, subject: "15% off — last call on your cart", html: getEmail3Html(mockCart, recoveryUrl, "LOJ15-TEST00", SITE_URL) },
+    { name: "6-review-request", from: FROM_NOREPLY, subject: review.subject, html: review.html },
+    { name: "7-refund-confirmation", from: FROM_ORDERS, subject: `Your refund for order #${mockOrder.id.slice(0,8).toUpperCase()}`, html: buildRefundHtml(mockOrder) },
+    { name: "8-retry-payment", from: FROM_ORDERS, subject: "Your payment didn't go through", html: buildRetryPaymentHtml() },
+    { name: "9-admin-alert", from: FROM_ALERTS, subject: "Admin alert — webhook test", html: buildAdminAlertHtml(), admin: true },
   ];
 
   const results: any[] = [];
   for (const t of tests) {
     try {
-      const r = await sendViaResend(apiKey, t.subject, t.html);
+      const r = await sendViaResend(apiKey, t.from, t.subject, t.html, { admin: (t as any).admin });
       results.push({ template: t.name, ok: r.ok, status: r.status, response: r.body });
     } catch (e) {
       results.push({ template: t.name, ok: false, error: (e as Error).message });
     }
-    // Throttle to stay under Resend's 5 req/s limit
     await new Promise((res) => setTimeout(res, 300));
   }
 
