@@ -29,6 +29,7 @@ import DeclarationBlock from "@/components/accessibility/DeclarationBlock";
 import KeyboardShortcuts from "@/components/accessibility/KeyboardShortcuts";
 import AccessibleToolsGrid from "@/components/accessibility/AccessibleToolsGrid";
 import AccessibilityFeedback from "@/components/accessibility/AccessibilityFeedback";
+import PageSEO from "@/components/seo/PageSEO";
 
 // Hero value props
 const heroValueProps = [
@@ -162,7 +163,13 @@ const Accessibility = () => {
   };
 
   return (
-    <ServicePageLayout
+    <>
+      <PageSEO
+        title="Accessibility | Line of Judah"
+        description="Our commitment to accessibility. Line of Judah aims to meet WCAG 2.1 AA so every visitor can shop comfortably."
+        path="/accessibility"
+      />
+      <ServicePageLayout
       title="Accessible to Everyone."
       subtitle="We're committed to making our site usable for all visitors. WCAG 2.1 AA compliant."
       eyebrow="ACCESSIBILITY"
@@ -311,6 +318,7 @@ const Accessibility = () => {
         ]}
       />
     </ServicePageLayout>
+    </>
   );
 };
 

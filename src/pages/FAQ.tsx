@@ -274,7 +274,13 @@ const FAQ = () => {
   };
 
   return (
-    <ServicePageLayout
+    <>
+      <PageSEO
+        title="FAQ | Line of Judah"
+        description="Answers to common questions about shipping, returns, sizing, materials and orders at Line of Judah."
+        path="/faq"
+      />
+      <ServicePageLayout
       title="MISSION INTEL. DECODED."
       subtitle="The answers you need to stay battle-ready. Search the archives or browse by operation."
       eyebrow="TACTICAL INTELLIGENCE"
@@ -340,6 +346,7 @@ const FAQ = () => {
         onClose={() => setIsAskModalOpen(false)}
       />
     </ServicePageLayout>
+    </>
   );
 };
 

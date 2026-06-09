@@ -111,7 +111,13 @@ const ShippingInfo = () => {
   };
 
   return (
-    <ServicePageLayout
+    <>
+      <PageSEO
+        title="Shipping Info | Line of Judah"
+        description="Shipping rates, delivery windows and tracking for Canada and worldwide. Free standard shipping on orders over $99 CAD."
+        path="/shipping"
+      />
+      <ServicePageLayout
       title="Reliable Delivery. Every Order."
       subtitle="Free shipping on orders over $99. Full tracking included. Designed in Calgary, delivered worldwide."
       eyebrow="SHIPPING & DELIVERY"
@@ -212,6 +218,7 @@ const ShippingInfo = () => {
         ]}
       />
     </ServicePageLayout>
+    </>
   );
 };
 

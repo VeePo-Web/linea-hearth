@@ -8,6 +8,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import PageSEO from "@/components/seo/PageSEO";
 
 const returnSteps = [
   {
@@ -77,7 +78,13 @@ const ReturnsExchanges = () => {
   };
 
   return (
-    <ServicePageLayout
+    <>
+      <PageSEO
+        title="Returns & Exchanges | Line of Judah"
+        description="Easy returns within 30 days. Read the Line of Judah returns and exchanges policy and start a return."
+        path="/returns"
+      />
+      <ServicePageLayout
       title="Simple Returns. No Hassle."
       subtitle="Something not right? We'll make it right. Contact us within 30 days of delivery."
       eyebrow="RETURNS & EXCHANGES"
@@ -206,6 +213,7 @@ const ReturnsExchanges = () => {
         ]}
       />
     </ServicePageLayout>
+    </>
   );
 };
 
