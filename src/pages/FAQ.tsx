@@ -7,6 +7,7 @@ import FAQCategoryTabs from "@/components/faq/FAQCategoryTabs";
 import FAQAccordionGroup from "@/components/faq/FAQAccordionGroup";
 import AskUsModal from "@/components/faq/AskUsModal";
 import { Button } from "@/components/ui/button";
+import PageSEO from "@/components/seo/PageSEO";
 
 export interface FAQItem {
   id: string;

@@ -10,6 +10,7 @@ import OperatingHours from "@/components/contact/OperatingHours";
 import ContactForm from "@/components/contact/ContactForm";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useToast } from "@/hooks/use-toast";
+import PageSEO from "@/components/seo/PageSEO";
 
 const heroValueProps = [
   { icon: Clock, text: "24h Response" },

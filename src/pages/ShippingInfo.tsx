@@ -9,6 +9,7 @@ import ShippingCalculator from "@/components/shipping/ShippingCalculator";
 import ShippingFAQ from "@/components/shipping/ShippingFAQ";
 import { CheckCircle } from "lucide-react";
 import { toast } from "sonner";
+import PageSEO from "@/components/seo/PageSEO";
 
 const heroValueProps = [
   { icon: Truck, text: "Free Over $99" },
