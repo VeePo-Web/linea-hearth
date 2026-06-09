@@ -12,5 +12,30 @@ Allow: /
 
 User-agent: *
 Allow: /
+Disallow: /ops-portal/
+Disallow: /ops-portal
+Disallow: /account/
+Disallow: /account
+Disallow: /checkout
+Disallow: /checkout/
+Disallow: /recover-cart
+Disallow: /recover-payment
+Disallow: /reset-password
+Disallow: /try-on
+Disallow: /try-on/
+Disallow: /worn-in-the-wild/upload
+Disallow: /*?*utm_
+Disallow: /*?*auth=
+Disallow: /*?*session_id=
+
+# AI training crawlers — allow product discovery, block heavy scraping
+User-agent: GPTBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
 
 Sitemap: https://lineofjudah.clothing/sitemap.xml
