@@ -1,5 +1,6 @@
 import { useParams } from "react-router-dom";
 import { Link } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import Layout from "@/components/layout/Layout";
