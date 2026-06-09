@@ -1,5 +1,6 @@
 import { useParams } from "react-router-dom";
 import { Link } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import Layout from "@/components/layout/Layout";
@@ -134,9 +135,75 @@ const ProductDetail = () => {
     );
   }
 
+  const primaryImage = product.product_images?.find((img) => img.is_primary) || product.product_images?.[0];
+  const canonicalUrl = `https://lineofjudah.clothing/product/${product.slug}`;
+  const seoTitle = `${product.name} | Line of Judah`;
+  const seoDescription =
+    (product.description && String(product.description).replace(/\s+/g, " ").slice(0, 158)) ||
+    `${product.name} — premium faith-based streetwear from Line of Judah.`;
+  const totalStock = (product.product_variants || []).reduce(
+    (sum: number, v: { stock_quantity?: number }) => sum + (v.stock_quantity || 0),
+    0,
+  );
+  const availability = totalStock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock";
+
+  const productJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.name,
+    description: seoDescription,
+    image: primaryImage?.image_url ? [primaryImage.image_url] : undefined,
+    sku: product.id,
+    brand: { "@type": "Brand", name: "Line of Judah" },
+    category: product.categories?.name,
+    offers: {
+      "@type": "Offer",
+      url: canonicalUrl,
+      priceCurrency: "CAD",
+      price: String(displayPrice),
+      availability,
+      itemCondition: "https://schema.org/NewCondition",
+      seller: { "@type": "Organization", name: "Line of Judah" },
+    },
+  };
+
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: "https://lineofjudah.clothing/" },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: product.categories?.name || "Shop",
+        item: `https://lineofjudah.clothing/category/${product.categories?.slug || "all"}`,
+      },
+      { "@type": "ListItem", position: 3, name: product.name, item: canonicalUrl },
+    ],
+  };
+
   return (
     <Layout>
+      <Helmet>
+        <title>{seoTitle}</title>
+        <meta name="description" content={seoDescription} />
+        <link rel="canonical" href={canonicalUrl} />
+        <meta property="og:type" content="product" />
+        <meta property="og:title" content={seoTitle} />
+        <meta property="og:description" content={seoDescription} />
+        <meta property="og:url" content={canonicalUrl} />
+        {primaryImage?.image_url && <meta property="og:image" content={primaryImage.image_url} />}
+        <meta property="product:price:amount" content={String(displayPrice)} />
+        <meta property="product:price:currency" content="CAD" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={seoTitle} />
+        <meta name="twitter:description" content={seoDescription} />
+        {primaryImage?.image_url && <meta name="twitter:image" content={primaryImage.image_url} />}
+        <script type="application/ld+json">{JSON.stringify(productJsonLd)}</script>
+        <script type="application/ld+json">{JSON.stringify(breadcrumbJsonLd)}</script>
+      </Helmet>
       <section className="w-full px-6">
+
         {/* Breadcrumb - Show above image on smaller screens */}
         <div className="lg:hidden mb-6">
           <Breadcrumb>

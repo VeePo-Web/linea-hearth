@@ -1,4 +1,5 @@
 import Layout from "@/components/layout/Layout";
+import PageSEO from "@/components/seo/PageSEO";
 import EditorialHero from "../components/homepage/EditorialHero";
 import ValueStackBanner from "../components/homepage/ValueStackBanner";
 import FeaturedDrop from "../components/homepage/FeaturedDrop";
@@ -15,6 +16,11 @@ import RecentlyViewed from "../components/homepage/RecentlyViewed";
 const Index = () => {
   return (
     <Layout immersiveHero>
+      <PageSEO
+        title="Line of Judah — Premium Faith-Based Streetwear"
+        description="Shop premium faith-based streetwear designed for those who walk different. Hoodies, tees and more. Free shipping on orders over $99 CAD."
+        path="/home"
+      />
       {/* Editorial Hero - Asymmetric split layout */}
       <EditorialHero />
       

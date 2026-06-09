@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import LegalPageLayout from "@/components/legal/LegalPageLayout";
 import { LegalSection, ImportantCallout } from "@/components/legal/LegalSection";
+import PageSEO from "@/components/seo/PageSEO";
 
 const tocSections = [
   { id: "agreement", title: "Agreement to Terms" },
@@ -25,7 +26,13 @@ const TermsOfService = () => {
   }, []);
 
   return (
-    <LegalPageLayout
+    <>
+      <PageSEO
+        title="Terms of Service | Line of Judah"
+        description="The terms governing your use of the Line of Judah website and purchases. Read before placing an order."
+        path="/terms-of-service"
+      />
+      <LegalPageLayout
       title="Terms of Service"
       subtitle="Please read these terms carefully before using our website or services."
       lastUpdated="January 15, 2024"
@@ -173,6 +180,7 @@ const TermsOfService = () => {
         </div>
       </LegalSection>
     </LegalPageLayout>
+    </>
   );
 };
 

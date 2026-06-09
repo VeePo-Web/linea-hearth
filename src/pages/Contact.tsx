@@ -10,6 +10,7 @@ import OperatingHours from "@/components/contact/OperatingHours";
 import ContactForm from "@/components/contact/ContactForm";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useToast } from "@/hooks/use-toast";
+import PageSEO from "@/components/seo/PageSEO";
 
 const heroValueProps = [
   { icon: Clock, text: "24h Response" },
@@ -151,7 +152,13 @@ const Contact = () => {
   };
   
   return (
-    <ServicePageLayout
+    <>
+      <PageSEO
+        title="Contact Us | Line of Judah"
+        description="Get in touch with the Line of Judah team. Order help, sizing questions, partnerships — answered within 24 hours."
+        path="/contact"
+      />
+      <ServicePageLayout
       title="We're Here When You Need Us."
       subtitle="Questions answered within 24 hours. Order issues prioritized same-day."
       eyebrow="CUSTOMER SUPPORT"
@@ -365,6 +372,7 @@ const Contact = () => {
         />
       </div>
     </ServicePageLayout>
+    </>
   );
 };
 

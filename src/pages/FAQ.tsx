@@ -7,6 +7,7 @@ import FAQCategoryTabs from "@/components/faq/FAQCategoryTabs";
 import FAQAccordionGroup from "@/components/faq/FAQAccordionGroup";
 import AskUsModal from "@/components/faq/AskUsModal";
 import { Button } from "@/components/ui/button";
+import PageSEO from "@/components/seo/PageSEO";
 
 export interface FAQItem {
   id: string;
@@ -273,7 +274,13 @@ const FAQ = () => {
   };
 
   return (
-    <ServicePageLayout
+    <>
+      <PageSEO
+        title="FAQ | Line of Judah"
+        description="Answers to common questions about shipping, returns, sizing, materials and orders at Line of Judah."
+        path="/faq"
+      />
+      <ServicePageLayout
       title="MISSION INTEL. DECODED."
       subtitle="The answers you need to stay battle-ready. Search the archives or browse by operation."
       eyebrow="TACTICAL INTELLIGENCE"
@@ -339,6 +346,7 @@ const FAQ = () => {
         onClose={() => setIsAskModalOpen(false)}
       />
     </ServicePageLayout>
+    </>
   );
 };
 

@@ -8,6 +8,7 @@ import InfoCard from "@/components/service/InfoCard";
 import ActionCTA from "@/components/service/ActionCTA";
 import UnitToggle from "@/components/size-guide/UnitToggle";
 import SizeChartTable from "@/components/size-guide/SizeChartTable";
+import PageSEO from "@/components/seo/PageSEO";
 
 // Hero value props
 const heroValueProps = [
@@ -92,7 +93,13 @@ const SizeGuide = () => {
   };
 
   return (
-    <ServicePageLayout
+    <>
+      <PageSEO
+        title="Size Guide | Line of Judah"
+        description="Find your perfect fit. Detailed size charts in inches and centimeters for all Line of Judah hoodies, tees and apparel."
+        path="/about/size-guide"
+      />
+      <ServicePageLayout
       title="CALIBRATE YOUR ARMOR."
       subtitle="Every piece is cut for combat. Know your dimensions. Trust the fit."
       eyebrow="TACTICAL CALIBRATION"
@@ -168,6 +175,7 @@ const SizeGuide = () => {
         ]}
       />
     </ServicePageLayout>
+    </>
   );
 };
 

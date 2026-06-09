@@ -1,5 +1,6 @@
 import { useRef } from "react";
 import Layout from "@/components/layout/Layout";
+import PageSEO from "@/components/seo/PageSEO";
 import StoryHero from "@/components/about/StoryHero";
 import StoryCallingSection from "@/components/about/StoryCallingSection";
 import MissionStatement from "@/components/about/MissionStatement";
@@ -16,6 +17,12 @@ const OurStory = () => {
 
   return (
     <Layout>
+      <PageSEO
+        title="Our Story | Line of Judah"
+        description="The origin story behind Line of Judah — how a calling became premium faith-based streetwear designed for those who walk different."
+        path="/about/our-story"
+        type="article"
+      />
       <div ref={containerRef}>
         <ScrollProgress containerRef={containerRef} />
         <StoryHero />

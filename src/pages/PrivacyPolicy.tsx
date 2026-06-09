@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import LegalPageLayout from "@/components/legal/LegalPageLayout";
 import { LegalSection } from "@/components/legal/LegalSection";
 import DataSummaryCard from "@/components/legal/DataSummaryCard";
+import PageSEO from "@/components/seo/PageSEO";
 
 const tocSections = [
   { id: "introduction", title: "Introduction" },
@@ -21,7 +22,13 @@ const PrivacyPolicy = () => {
   }, []);
 
   return (
-    <LegalPageLayout
+    <>
+      <PageSEO
+        title="Privacy Policy | Line of Judah"
+        description="How Line of Judah collects, uses, and protects your personal information. Read our full privacy policy."
+        path="/privacy-policy"
+      />
+      <LegalPageLayout
       title="Privacy Policy"
       subtitle="Your privacy is important to us. This policy explains how we collect, use, and protect your personal information."
       lastUpdated="January 15, 2024"
@@ -148,6 +155,7 @@ const PrivacyPolicy = () => {
         </div>
       </LegalSection>
     </LegalPageLayout>
+    </>
   );
 };
 
