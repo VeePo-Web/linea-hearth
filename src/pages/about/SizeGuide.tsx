@@ -175,6 +175,7 @@ const SizeGuide = () => {
         ]}
       />
     </ServicePageLayout>
+    </>
   );
 };
 
