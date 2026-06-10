@@ -273,12 +273,26 @@ const FAQ = () => {
     }
   };
 
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqData.map((item) => ({
+      "@type": "Question",
+      name: item.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: item.answer,
+      },
+    })),
+  };
+
   return (
     <>
       <PageSEO
         title="FAQ | Line of Judah"
         description="Answers to common questions about shipping, returns, sizing, materials and orders at Line of Judah."
         path="/faq"
+        jsonLd={faqJsonLd}
       />
       <ServicePageLayout
       title="MISSION INTEL. DECODED."
