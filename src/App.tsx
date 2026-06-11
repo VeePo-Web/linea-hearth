@@ -172,6 +172,7 @@ const AnimatedRoutes = () => {
         <Route path="/ops-portal/worn-in-the-wild" element={<OpsPortalGate><ProtectedRoute requireAdmin><PageTransition><AdminWornInTheWild /></PageTransition></ProtectedRoute></OpsPortalGate>} />
         <Route path="/ops-portal/subscribers" element={<OpsPortalGate><ProtectedRoute requireAdmin><PageTransition><AdminSubscribers /></PageTransition></ProtectedRoute></OpsPortalGate>} />
         <Route path="/ops-portal/ambassadors" element={<OpsPortalGate><ProtectedRoute requireAdmin><PageTransition><AdminAmbassadors /></PageTransition></ProtectedRoute></OpsPortalGate>} />
+        <Route path="/ops-portal/financials" element={<OpsPortalGate><ProtectedRoute requireAdmin><PageTransition><AdminFinancials /></PageTransition></ProtectedRoute></OpsPortalGate>} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
       </Routes>
