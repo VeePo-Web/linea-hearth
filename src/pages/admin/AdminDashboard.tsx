@@ -208,15 +208,18 @@ const AdminDashboard = () => {
         {/* Revenue Row */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {revenueCards.map((card) => (
-            <Card key={card.title}>
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{card.title}</CardTitle>
-                <DollarSign className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-light">{loading ? '—' : formatCurrency(card.value)}</div>
-              </CardContent>
-            </Card>
+            <Link key={card.title} to="/ops-portal/financials">
+              <Card className="cursor-pointer hover:border-primary/50 transition-colors h-full">
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{card.title}</CardTitle>
+                  <DollarSign className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-light">{loading ? '—' : formatCurrency(card.value)}</div>
+                  <p className="text-xs text-muted-foreground mt-1">View financials →</p>
+                </CardContent>
+              </Card>
+            </Link>
           ))}
         </div>
 
