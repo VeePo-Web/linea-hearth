@@ -242,7 +242,7 @@ const Checkout = () => {
         postalCode: shippingAddress.postalCode,
         country: shippingAddress.country,
       },
-      shippingMethod: shippingOption as "standard" | "express" | "overnight",
+      shippingMethod: "standard",
       discountCodeId: appliedDiscount?.codeId || undefined,
       abandonedCartId: cartId || undefined,
     });
