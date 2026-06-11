@@ -211,6 +211,10 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     hasFreeShipping ? 'unlocked' :
     shippingProgress >= 90 ? 'almost' :
     shippingProgress >= 50 ? 'halfway' : 'start';
+  const isCanadaDestination = shippingCountry === 'CA';
+  const shippingCost = hasFreeShipping
+    ? 0
+    : (isCanadaDestination ? 15 : 35);
 
   return (
     <CartContext.Provider
@@ -229,6 +233,10 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         hasFreeShipping,
         shippingProgress,
         progressTier,
+        shippingCountry,
+        setShippingCountry,
+        isCanadaDestination,
+        shippingCost,
         isCartOpen,
         openCart,
         closeCart,
