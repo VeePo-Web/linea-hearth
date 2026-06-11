@@ -280,11 +280,19 @@ Deno.serve(async (req) => {
       (sum, { item, unitAmountCents }) => sum + unitAmountCents * item.quantity,
       0,
     );
-    // Regular shipping is the only active option for now. Force this server-side
-    // too, so stale clients or carts cannot request express/overnight rates.
+    // Single flat-rate shipping option driven by destination country.
+    // Force the method label server-side so stale clients can't game it.
+    const destCountry = (body.shippingAddress?.country || "CA").trim().toUpperCase();
+    const isCanada = destCountry === "CA" || destCountry === "CANADA";
+    const baseShippingCents = isCanada ? SHIPPING_RATE_CA_CENTS : SHIPPING_RATE_INTL_CENTS;
+    const isFreeShipping = subtotalCents >= FREE_SHIPPING_THRESHOLD_CENTS;
+    const shippingAmount = isFreeShipping ? 0 : baseShippingCents;
     const method: "standard" = "standard";
-    const isFreeShipping = subtotalCents >= FREE_SHIPPING_THRESHOLD_CENTS && method === "standard";
-    const shippingAmount = isFreeShipping ? 0 : SHIPPING_RATES[method];
+    const shippingDisplayName = isFreeShipping
+      ? "Free shipping"
+      : isCanada
+        ? "Standard — Canada (5–9 days)"
+        : "Standard — International (10–21 days)";
     const enableAutomaticTax = environment === "live";
 
     // Resolve + create discount (one-off Stripe coupon) if a valid code was applied
