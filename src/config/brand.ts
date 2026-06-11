@@ -68,7 +68,7 @@ export const BRAND = {
   // ═══════════════════════════════════════════════════════════
   promo: {
     discountPrefix: "LOJ",
-    statusBarMessage: "Free shipping on orders $99+",
+    statusBarMessage: "Free shipping on orders $250+",
     // Set to null to disable status bar promo
     currentPromo: null as string | null,
   },
