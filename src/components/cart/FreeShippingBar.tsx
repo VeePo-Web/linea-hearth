@@ -142,13 +142,13 @@ const FreeShippingBar = () => {
           {hasFreeShipping ? (
             <div className="flex items-center gap-2">
               <DrawCheckIcon size="sm" className="text-primary" delay={0} />
-              <span className="font-medium text-primary">Free shipping unlocked</span>
+              <span className="font-medium text-primary">Free shipping unlocked{regionLabel}</span>
             </div>
           ) : shippingProgress >= 90 ? (
             <>
               <Truck className="h-4 w-4 text-forest-400" />
               <span className="text-muted-foreground">
-                Almost there—<span className="font-medium text-forest-500">{formatPrice(amountToFreeShipping)}</span> more
+                Almost there—<span className="font-medium text-forest-500">{formatPrice(amountToFreeShipping)}</span> more{regionLabel}
               </span>
             </>
           ) : activeCelebration === 'halfway' ? (
@@ -159,7 +159,7 @@ const FreeShippingBar = () => {
             <>
               <Truck className="h-4 w-4 text-muted-foreground" />
               <span className="text-muted-foreground">
-                You're <span className="font-medium text-foreground">{formatPrice(amountToFreeShipping)}</span> away from FREE shipping
+                You're <span className="font-medium text-foreground">{formatPrice(amountToFreeShipping)}</span> away from FREE shipping{regionLabel}
               </span>
             </>
           )}
