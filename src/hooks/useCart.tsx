@@ -64,6 +64,22 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [lastAddedItem, setLastAddedItem] = useState<CartItem | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
+  const [shippingCountry, setShippingCountryState] = useState<string>('CA');
+
+  // Persist destination country so the free-shipping bar in the cart drawer
+  // reflects the user's last-entered country on revisit.
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(SHIPPING_COUNTRY_KEY);
+      if (stored) setShippingCountryState(stored);
+    } catch { /* ignore */ }
+  }, []);
+
+  const setShippingCountry = useCallback((code: string) => {
+    const next = (code || 'CA').trim().toUpperCase();
+    setShippingCountryState(next);
+    try { localStorage.setItem(SHIPPING_COUNTRY_KEY, next); } catch { /* ignore */ }
+  }, []);
 
   // Load cart from localStorage on mount
   useEffect(() => {
