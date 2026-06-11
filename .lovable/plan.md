@@ -1,31 +1,46 @@
-# Bag & Checkout Shipping Audit
+# Admin: Newsletter Subscribers & Ambassadors Pages
 
-Backend, cart drawer, Free Shipping Bar, Trust Row, Savings Summary, Checkout page, and edge function are already correct ($15 CA / $35 intl / FREE $250+). Three stale references remain — all small constants/copy, no UI change.
+The dashboard already shows counts for "Newsletter Subscribers" and "Pending Ambassadors" but the cards aren't clickable and no list view exists for either. Add two dedicated admin pages and make the dashboard cards link to them.
 
-## Findings
+## What's there today
 
-1. **`src/config/brand.ts:60`** — `trust.freeShippingThreshold: 99, // USD`
-   Stale constant from the old policy. Currency is now CAD and threshold is $250.
-
-2. **`src/components/lookbook/SwipeProgress.tsx:24`** — default param `freeShippingThreshold = 150`
-   Lookbook swipe progress falls back to $150 if no prop is passed. Should be $250.
-
-3. **`src/pages/Checkout.tsx`** — local `isCanadianShip` derivation duplicates logic now centralized in `src/lib/currency.ts` (`isCanada`, `getShippingCost`). Functionally correct today but drifts from the single source of truth.
-
-## Already verified correct (no changes)
-
-- `src/hooks/useCart.tsx` — `FREE_SHIPPING_THRESHOLD = 250`, `shippingCost` derived from country + subtotal
-- `src/components/cart/FreeShippingBar.tsx` — uses hook values, appends "(international)" label
-- `src/components/cart/TrustRow.tsx` — "Free over $250"
-- `src/components/cart/ThresholdUpsellCard.tsx`, `SmartUpsell.tsx` — use `amountToFreeShipping` from hook (dynamic)
-- `src/components/checkout/SavingsSummary.tsx` — `$15 / $35` by `isCanadaDestination`, copy reads `freeShippingThreshold`
-- `src/pages/Checkout.tsx` — flat-rate row, copy "Flat $15 CAD across Canada · Flat $35 CAD international · Free shipping on orders $250+", syncs country to cart context
-- `supabase/functions/create-checkout-session/index.ts` — `SHIPPING_RATE_CA_CENTS=1500`, `SHIPPING_RATE_INTL_CENTS=3500`, `FREE_SHIPPING_THRESHOLD_CENTS=25000`, country-driven, worldwide `allowed_countries`
+- `src/pages/admin/AdminDashboard.tsx` — counts only, cards not wrapped in `<Link>`
+- `newsletter_subscribers` table — `email`, `source`, `subscribed_at` (admin SELECT/DELETE policies already in place)
+- `ambassador_applications` table — full app fields incl. socials, `status`, `admin_notes` (admin SELECT/UPDATE/DELETE policies already in place)
+- No `AdminSubscribers.tsx` or `AdminAmbassadors.tsx` exists yet
 
 ## Plan
 
-1. `src/config/brand.ts` — set `trust.freeShippingThreshold: 250` and drop the `// USD` comment (currency is CAD).
-2. `src/components/lookbook/SwipeProgress.tsx` — change default `freeShippingThreshold = 250`.
-3. `src/pages/Checkout.tsx` — replace inline `isCanadianShip` + `getShippingCost` block with `isCanada(shippingAddress.country)` and `getShippingCost(country, subtotal)` from `@/lib/currency` so backend, cart, and checkout share one source of truth.
+### 1. New page: `src/pages/admin/AdminSubscribers.tsx`
+Route: `/ops-portal/subscribers`
 
-No UI/visual changes. No copy changes beyond the numeric threshold. No backend changes (already correct).
+- Header: "Newsletter Subscribers" + total count
+- Search box (filters by email substring, client-side)
+- Source filter chip row (All / homepage / footer / checkout — derived from distinct values)
+- Table: Email · Source · Subscribed (relative date) · Actions (Copy email, Delete)
+- "Export CSV" button → downloads filtered rows
+- Sorted by `subscribed_at` desc, paginated 50/page
+- Empty state when 0 results
+
+### 2. New page: `src/pages/admin/AdminAmbassadors.tsx`
+Route: `/ops-portal/ambassadors`
+
+- Header: "Ambassador Applications" + status counts (Pending / Approved / Rejected)
+- Status filter tabs (Pending default, Approved, Rejected, All)
+- Search box (name or email)
+- Table: Name · Email · Location · Followers · Submitted · Status badge
+- Click row → opens side drawer (Sheet) with full application: socials (clickable IG/TikTok/YouTube/Twitter links), content types, "Why represent", "Faith in content", "Content frequency", admin notes textarea, Approve / Reject buttons
+- Approve/Reject updates `status`, `reviewed_at = now()`, `reviewed_by = auth.uid()`
+- Sorted by `created_at` desc
+
+### 3. Wire up dashboard
+- Wrap both stat cards (`Newsletter Subscribers`, `Pending Ambassadors`) in `<Link>` to the new routes
+- Add hover state to match existing "Needs Fulfillment" card pattern
+
+### 4. Register routes in `src/App.tsx`
+Add lazy imports + two `<Route>` entries following the same `OpsPortalGate > ProtectedRoute requireAdmin > PageTransition` pattern as the other admin routes.
+
+## Out of scope
+- No schema/RLS changes (existing admin policies are sufficient)
+- No bulk email send / marketing trigger from these pages
+- No CSV import for subscribers
