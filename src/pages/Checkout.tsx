@@ -33,7 +33,7 @@ import { Address } from "@/types/account";
 const Checkout = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { items, subtotal, hasFreeShipping, updateQuantity, removeItem, clearCart, itemCount } = useCart();
+  const { items, subtotal, hasFreeShipping, updateQuantity, removeItem, clearCart, itemCount, setShippingCountry } = useCart();
   const { syncCart, markConverted, email: savedEmail, isSynced, cartId } = useAbandonedCart();
   const { initiateCheckout, isLoading: isStripeLoading, error: stripeError, clientSecret, resetCheckout } = useStripeCheckout();
   const { 
