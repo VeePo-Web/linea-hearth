@@ -39,6 +39,12 @@ interface CartContextType {
   hasFreeShipping: boolean;
   shippingProgress: number;
   progressTier: ShippingProgressTier;
+  /** ISO country code for the destination ("CA" default). Drives flat-rate shipping. */
+  shippingCountry: string;
+  setShippingCountry: (code: string) => void;
+  isCanadaDestination: boolean;
+  /** Flat shipping cost in dollars based on shippingCountry + subtotal */
+  shippingCost: number;
   isCartOpen: boolean;
   openCart: () => void;
   closeCart: () => void;
@@ -48,7 +54,8 @@ interface CartContextType {
 
 
 const CART_STORAGE_KEY = 'loj-cart';
-const FREE_SHIPPING_THRESHOLD = 99; // $99 CAD for free shipping
+const SHIPPING_COUNTRY_KEY = 'loj-ship-country';
+const FREE_SHIPPING_THRESHOLD = 250; // $250 CAD for free shipping (CA + intl)
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
@@ -57,6 +64,22 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [lastAddedItem, setLastAddedItem] = useState<CartItem | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
+  const [shippingCountry, setShippingCountryState] = useState<string>('CA');
+
+  // Persist destination country so the free-shipping bar in the cart drawer
+  // reflects the user's last-entered country on revisit.
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(SHIPPING_COUNTRY_KEY);
+      if (stored) setShippingCountryState(stored);
+    } catch { /* ignore */ }
+  }, []);
+
+  const setShippingCountry = useCallback((code: string) => {
+    const next = (code || 'CA').trim().toUpperCase();
+    setShippingCountryState(next);
+    try { localStorage.setItem(SHIPPING_COUNTRY_KEY, next); } catch { /* ignore */ }
+  }, []);
 
   // Load cart from localStorage on mount
   useEffect(() => {
@@ -188,6 +211,10 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     hasFreeShipping ? 'unlocked' :
     shippingProgress >= 90 ? 'almost' :
     shippingProgress >= 50 ? 'halfway' : 'start';
+  const isCanadaDestination = shippingCountry === 'CA';
+  const shippingCost = hasFreeShipping
+    ? 0
+    : (isCanadaDestination ? 15 : 35);
 
   return (
     <CartContext.Provider
@@ -206,6 +233,10 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         hasFreeShipping,
         shippingProgress,
         progressTier,
+        shippingCountry,
+        setShippingCountry,
+        isCanadaDestination,
+        shippingCost,
         isCartOpen,
         openCart,
         closeCart,

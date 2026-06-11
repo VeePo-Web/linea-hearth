@@ -22,21 +22,21 @@ const faqData: FAQItem[] = [
   {
     id: "ship-1",
     question: "How long does shipping take?",
-    answer: "Standard shipping takes 5-7 business days. Express shipping is 2-3 business days, and overnight delivery is available for orders placed before 12pm EST.",
+    answer: "Canadian orders arrive in 5-9 business days (2-5 days production + 3-4 days transit). International orders take 10-21 business days total. Every order ships with full tracking.",
     category: "shipping",
     keywords: ["delivery", "time", "days", "fast", "quick"]
   },
   {
     id: "ship-2",
-    question: "Is shipping free?",
-    answer: "Yes! We offer free standard shipping on all orders over $99. Orders under $99 have a flat rate of $10 for standard shipping.",
+    question: "How much is shipping?",
+    answer: "Flat $15 CAD across Canada. Flat $35 CAD anywhere outside Canada. Any order with a subtotal over $250 CAD ships FREE — Canada or international, no code needed.",
     category: "shipping",
-    keywords: ["free", "cost", "price", "charge"]
+    keywords: ["free", "cost", "price", "charge", "flat", "rate"]
   },
   {
     id: "ship-3",
     question: "Do you ship internationally?",
-    answer: "Designed in Calgary, we ship across Canada and to 50+ countries beyond. International shipping typically takes 7-14 business days. Duties and taxes are the responsibility of the customer.",
+    answer: "Yes — designed in Calgary, shipped worldwide. International shipping is a flat $35 CAD anywhere outside Canada and typically arrives in 10-21 business days. Duties and taxes are the responsibility of the recipient.",
     category: "shipping",
     keywords: ["international", "calgary", "canada", "overseas", "country"]
   },

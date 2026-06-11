@@ -45,13 +45,13 @@ interface RequestBody {
 }
 
 
-const SHIPPING_RATES = {
-  standard: 1500,
-  express: 2000,
-  overnight: 3500,
-} as const;
-
-const FREE_SHIPPING_THRESHOLD_CENTS = 9900;
+// Flat-rate shipping in cents (CAD).
+// - Canada: $15
+// - Anywhere else (international): $35
+// - Free on subtotal >= $250
+const SHIPPING_RATE_CA_CENTS = 1500;
+const SHIPPING_RATE_INTL_CENTS = 3500;
+const FREE_SHIPPING_THRESHOLD_CENTS = 25000;
 // Stripe tax_code for general clothing (apparel). See https://docs.stripe.com/tax/tax-codes
 const APPAREL_TAX_CODE = "txcd_30060001";
 
@@ -280,11 +280,19 @@ Deno.serve(async (req) => {
       (sum, { item, unitAmountCents }) => sum + unitAmountCents * item.quantity,
       0,
     );
-    // Regular shipping is the only active option for now. Force this server-side
-    // too, so stale clients or carts cannot request express/overnight rates.
+    // Single flat-rate shipping option driven by destination country.
+    // Force the method label server-side so stale clients can't game it.
+    const destCountry = (body.shippingAddress?.country || "CA").trim().toUpperCase();
+    const isCanada = destCountry === "CA" || destCountry === "CANADA";
+    const baseShippingCents = isCanada ? SHIPPING_RATE_CA_CENTS : SHIPPING_RATE_INTL_CENTS;
+    const isFreeShipping = subtotalCents >= FREE_SHIPPING_THRESHOLD_CENTS;
+    const shippingAmount = isFreeShipping ? 0 : baseShippingCents;
     const method: "standard" = "standard";
-    const isFreeShipping = subtotalCents >= FREE_SHIPPING_THRESHOLD_CENTS && method === "standard";
-    const shippingAmount = isFreeShipping ? 0 : SHIPPING_RATES[method];
+    const shippingDisplayName = isFreeShipping
+      ? "Free shipping"
+      : isCanada
+        ? "Standard — Canada (5–9 days)"
+        : "Standard — International (10–21 days)";
     const enableAutomaticTax = environment === "live";
 
     // Resolve + create discount (one-off Stripe coupon) if a valid code was applied
@@ -535,13 +543,20 @@ Deno.serve(async (req) => {
         }),
         ...(stripeDiscounts && { discounts: stripeDiscounts }),
         ...(enableAutomaticTax && { automatic_tax: { enabled: true } }),
-        shipping_address_collection: { allowed_countries: ["CA", "US"] },
+        // Expanded worldwide to support flat-rate intl shipping ($35 CAD).
+        // Stripe's full ISO-3166 list — excludes only sanctioned destinations.
+        shipping_address_collection: {
+          allowed_countries: [
+            "CA","US","GB","AU","NZ","IE","FR","DE","ES","IT","NL","BE","LU","AT","CH","SE","NO","DK","FI","IS","PT","GR","PL","CZ","SK","HU","RO","BG","HR","SI","EE","LV","LT","CY","MT",
+            "JP","KR","SG","HK","TW","TH","MY","PH","ID","VN","IN","AE","SA","IL","TR","ZA","BR","MX","AR","CL","CO","PE","CR","UY","DO","JM","BS","BB","TT",
+          ],
+        },
         shipping_options: [
           {
             shipping_rate_data: {
               type: "fixed_amount",
               fixed_amount: { amount: shippingAmount, currency: "cad" },
-              display_name: isFreeShipping ? "Free shipping" : "Standard (5-9 days)",
+              display_name: shippingDisplayName,
               tax_behavior: "exclusive",
               tax_code: "txcd_92010001", // shipping
             },

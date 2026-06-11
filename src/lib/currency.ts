@@ -10,15 +10,32 @@ export const CURRENCY = {
   symbol: '$',
   /** Locale for formatting */
   locale: 'en-CA',
-  /** Free shipping threshold in dollars */
-  freeShippingThreshold: 99,
-  /** Express shipping cost */
-  expressShippingCost: 15,
-  /** Overnight shipping cost */
-  overnightShippingCost: 35,
-  /** Standard shipping cost (under threshold) */
-  standardShippingCost: 10,
+  /** Free shipping threshold in dollars (applies in CAD to both domestic and international) */
+  freeShippingThreshold: 250,
+  /** Flat shipping cost for Canada (CAD) */
+  domesticShippingCost: 15,
+  /** Flat shipping cost for any non-Canada destination (CAD) */
+  intlShippingCost: 35,
 };
+
+/**
+ * Returns the flat shipping cost in dollars for a given country code and subtotal.
+ * - Canada: $15 flat
+ * - Everywhere else: $35 flat
+ * - Any order ≥ $250 CAD subtotal ships free
+ */
+export function getShippingCost(country: string | undefined, subtotal: number): number {
+  if (subtotal >= CURRENCY.freeShippingThreshold) return 0;
+  const isCanada = (country || 'CA').trim().toUpperCase() === 'CA';
+  return isCanada ? CURRENCY.domesticShippingCost : CURRENCY.intlShippingCost;
+}
+
+/**
+ * Returns true if a given country code is Canada (default treats undefined as CA).
+ */
+export function isCanada(country: string | undefined): boolean {
+  return (country || 'CA').trim().toUpperCase() === 'CA';
+}
 
 /**
  * Formats a numeric price as a CAD currency string

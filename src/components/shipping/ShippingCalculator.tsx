@@ -20,22 +20,17 @@ const ShippingCalculator = () => {
   const [isCalculating, setIsCalculating] = useState(false);
 
   const calculateDelivery = (zip: string): ShippingEstimate[] => {
-    // Client-side calculation based on ZIP code region
+    // Client-side calculation based on ZIP code region (Canadian postal codes
+    // use letter prefixes; US ZIPs are numeric — both flow through here as
+    // "domestic" for the calculator, since Canada is our home market).
     const firstDigit = zip[0];
     const isWestCoast = ["9", "8"].includes(firstDigit);
     const isMidwest = ["5", "6", "7"].includes(firstDigit);
-    
+
     // Shipping-only times (before adding production)
     let standardShipping = { min: 3, max: 4 };
-    let expressShipping = { min: 2, max: 3 };
-    
-    if (isWestCoast) {
-      standardShipping = { min: 4, max: 5 };
-      expressShipping = { min: 2, max: 3 };
-    } else if (isMidwest) {
-      standardShipping = { min: 3, max: 4 };
-      expressShipping = { min: 2, max: 3 };
-    }
+    if (isWestCoast) standardShipping = { min: 4, max: 5 };
+    else if (isMidwest) standardShipping = { min: 3, max: 4 };
 
     // Production time: 2-5 business days (Printful standard)
     const productionMin = 2;
@@ -43,29 +38,21 @@ const ShippingCalculator = () => {
 
     return [
       {
-        method: "Standard Shipping",
+        method: "Canada — Standard",
         minDays: productionMin + standardShipping.min,
         maxDays: productionMax + standardShipping.max,
-        price: "Free over $99",
-        carrier: "USPS Priority Mail",
+        price: "$15 flat · FREE over $250",
+        carrier: "Canada Post / USPS Priority",
         includesProduction: true
       },
       {
-        method: "Express Shipping",
-        minDays: productionMin + expressShipping.min,
-        maxDays: productionMax + expressShipping.max,
-        price: "$15",
-        carrier: "FedEx 2-Day",
+        method: "International — Standard",
+        minDays: productionMin + 7,
+        maxDays: productionMax + 14,
+        price: "$35 flat · FREE over $250",
+        carrier: "International tracked",
         includesProduction: true
       },
-      {
-        method: "Overnight",
-        minDays: productionMin + 1,
-        maxDays: productionMax + 2,
-        price: "$35",
-        carrier: "FedEx Overnight",
-        includesProduction: true
-      }
     ];
   };
 

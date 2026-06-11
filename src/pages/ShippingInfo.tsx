@@ -12,10 +12,10 @@ import { toast } from "sonner";
 import PageSEO from "@/components/seo/PageSEO";
 
 const heroValueProps = [
-  { icon: Truck, text: "Free Over $99" },
+  { icon: Truck, text: "Free Over $250" },
   { icon: Clock, text: "2-5 Days Production" },
   { icon: Package, text: "Full Tracking" },
-  { icon: Globe, text: "Canada & Beyond" },
+  { icon: Globe, text: "Canada & Worldwide" },
 ];
 
 const orderJourneySteps = [
@@ -48,32 +48,25 @@ const orderJourneySteps = [
 const shippingOptions = [
   {
     icon: Truck,
-    title: "STANDARD",
-    description: "5-9 business days total (includes 2-5 days production + 3-4 days shipping).",
+    title: "CANADA — STANDARD",
+    description: "Flat $15 CAD across Canada. 5-9 business days total (includes 2-5 days production + 3-4 days shipping). Full tracking.",
     variant: "default" as const,
-    badge: "FREE OVER $99"
-  },
-  {
-    icon: Zap,
-    title: "EXPRESS",
-    description: "4-7 business days total (includes production + 2-3 day shipping).",
-    variant: "default" as const,
-    badge: "$20"
-  },
-  {
-    icon: Rocket,
-    title: "OVERNIGHT",
-    description: "3-6 business days total (includes production + overnight shipping).",
-    variant: "accent" as const,
-    badge: "$35"
+    badge: "$15 FLAT"
   },
   {
     icon: Globe,
-    title: "INTERNATIONAL",
-    description: "10-21 business days total. Includes production time plus international transit.",
+    title: "INTERNATIONAL — STANDARD",
+    description: "Flat $35 CAD anywhere outside Canada. 10-21 business days total (includes 2-5 days production + international transit). Full tracking.",
     variant: "default" as const,
-    badge: "CALCULATED"
-  }
+    badge: "$35 FLAT"
+  },
+  {
+    icon: Rocket,
+    title: "FREE SHIPPING",
+    description: "Any order with a subtotal over $250 CAD ships free — Canada or international, no code needed.",
+    variant: "accent" as const,
+    badge: "OVER $250"
+  },
 ];
 
 const internationalRegions = [
@@ -114,12 +107,12 @@ const ShippingInfo = () => {
     <>
       <PageSEO
         title="Shipping Info | Line of Judah"
-        description="Shipping rates, delivery windows and tracking for Canada and worldwide. Free standard shipping on orders over $99 CAD."
+        description="Flat $15 CAD shipping across Canada. Flat $35 CAD international. Free shipping on orders over $250 CAD. Full tracking on every order."
         path="/shipping"
       />
       <ServicePageLayout
       title="Reliable Delivery. Every Order."
-      subtitle="Free shipping on orders over $99. Full tracking included. Designed in Calgary, delivered worldwide."
+      subtitle="Flat $15 across Canada · Flat $35 international · Free shipping over $250. Full tracking. Designed in Calgary, delivered worldwide."
       eyebrow="SHIPPING & DELIVERY"
       heroAlignment="center"
       heroValueProps={heroValueProps}

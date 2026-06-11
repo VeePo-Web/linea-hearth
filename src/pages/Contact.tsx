@@ -112,7 +112,7 @@ const quickFAQs = [
   {
     id: "shipping",
     question: "What are your shipping options and timeframes?",
-    answer: "Standard (5-9 business days, FREE over $99), Express (2-3 business days, $15), Overnight (next business day, $35). Designed in Calgary, shipped across Canada and beyond. All orders include tracking and insurance.",
+    answer: "Flat $15 CAD across Canada (5-9 business days) · Flat $35 CAD international (10-21 business days) · FREE shipping on any order over $250 CAD. Designed in Calgary, shipped worldwide. Every order includes full tracking.",
   },
   {
     id: "returns",

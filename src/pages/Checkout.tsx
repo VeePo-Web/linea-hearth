@@ -33,7 +33,7 @@ import { Address } from "@/types/account";
 const Checkout = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { items, subtotal, hasFreeShipping, updateQuantity, removeItem, clearCart, itemCount } = useCart();
+  const { items, subtotal, hasFreeShipping, updateQuantity, removeItem, clearCart, itemCount, setShippingCountry } = useCart();
   const { syncCart, markConverted, email: savedEmail, isSynced, cartId } = useAbandonedCart();
   const { initiateCheckout, isLoading: isStripeLoading, error: stripeError, clientSecret, resetCheckout } = useStripeCheckout();
   const { 
@@ -108,20 +108,28 @@ const Checkout = () => {
   }, [subtotal, appliedDiscount, customerDetails.email, validateCode]);
 
 
+  // Single flat-rate shipping: $15 Canada / $35 International / FREE on $250+
+  const isCanadianShip = (shippingAddress.country || '').trim().toUpperCase() === 'CA'
+    || (shippingAddress.country || '').trim().toLowerCase() === 'canada'
+    || !shippingAddress.country; // default to CA until country is entered
+
   const getShippingCost = () => {
-    if (hasFreeShipping && shippingOption === "standard") return 0;
-    switch (shippingOption) {
-      case "express":
-        return 15;
-      case "overnight":
-        return 35;
-      default:
-        return hasFreeShipping ? 0 : 15;
-    }
+    if (hasFreeShipping) return 0;
+    return isCanadianShip ? 15 : 35;
   };
-  
+
   const shipping = getShippingCost();
   const total = subtotal - discountAmount + shipping;
+
+  // Mirror the destination country into the cart context so the drawer's
+  // free-shipping bar and any other cart UI reflect intl pricing live.
+  useEffect(() => {
+    const raw = (shippingAddress.country || '').trim();
+    if (!raw) return;
+    const upper = raw.toUpperCase();
+    if (upper === 'CA' || raw.toLowerCase() === 'canada') setShippingCountry('CA');
+    else setShippingCountry(upper.slice(0, 2) || 'US');
+  }, [shippingAddress.country, setShippingCountry]);
 
   const handleDiscountSubmit = async () => {
     if (!discountCode.trim()) return;
@@ -234,7 +242,7 @@ const Checkout = () => {
         postalCode: shippingAddress.postalCode,
         country: shippingAddress.country,
       },
-      shippingMethod: shippingOption as "standard" | "express" | "overnight",
+      shippingMethod: "standard",
       discountCodeId: appliedDiscount?.codeId || undefined,
       abandonedCartId: cartId || undefined,
     });
@@ -824,33 +832,35 @@ const Checkout = () => {
                     </div>
                   </div>
 
-                  {/* Shipping Options */}
+                  {/* Shipping (flat-rate by country) */}
                   <div className="bg-muted/20 p-6 lg:p-8 rounded-none">
-                    <h2 className="text-lg font-light text-foreground mb-6">Shipping Options</h2>
-                    
-                    <RadioGroup 
-                      value={shippingOption} 
-                      onValueChange={setShippingOption}
-                      className="space-y-4"
-                    >
-                      <div className="flex items-center justify-between p-4 border border-muted-foreground/20 rounded-none">
-                        <div className="flex items-center space-x-3">
-                          <RadioGroupItem value="standard" id="standard" />
-                          <Label htmlFor="standard" className="font-light text-foreground">
-                            Standard Shipping
-                          </Label>
-                        </div>
-                        <div className="text-sm">
-                          {hasFreeShipping ? (
-                            <span className="text-foreground font-medium">Free</span>
-                          ) : (
-                            <span className="text-muted-foreground">{formatPrice(CURRENCY.standardShippingCost)} • 3-5 business days</span>
-                          )}
-                        </div>
-                      </div>
+                    <h2 className="text-lg font-light text-foreground mb-6">Shipping</h2>
 
-                    </RadioGroup>
+                    <div className="flex items-center justify-between p-4 border border-muted-foreground/20 rounded-none">
+                      <div>
+                        <p className="font-light text-foreground">
+                          {isCanadianShip ? 'Canada — Standard' : 'International — Standard'}
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {isCanadianShip
+                            ? '5–9 business days (includes 2–5 days production)'
+                            : '10–21 business days (includes 2–5 days production)'}
+                        </p>
+                      </div>
+                      <div className="text-sm text-right">
+                        {hasFreeShipping ? (
+                          <span className="text-foreground font-medium">FREE</span>
+                        ) : (
+                          <span className="text-muted-foreground">{formatPrice(shipping)}</span>
+                        )}
+                      </div>
+                    </div>
+
+                    <p className="text-xs text-muted-foreground mt-3">
+                      Flat $15 CAD across Canada · Flat $35 CAD international · Free shipping on orders $250+
+                    </p>
                   </div>
+
 
                   {/* Embedded Stripe Checkout opens in modal below on submit */}
 

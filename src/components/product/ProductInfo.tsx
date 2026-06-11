@@ -179,7 +179,7 @@ const ProductInfo = ({ product, variants = [], onColorChange, onAuthRequired, on
   };
 
   const trustSignals = [
-    { icon: Truck, label: "Free shipping $99+" },
+    { icon: Truck, label: "Free shipping $250+" },
     { icon: RotateCcw, label: "Easy 30-day returns" },
   ];
 
