@@ -832,33 +832,35 @@ const Checkout = () => {
                     </div>
                   </div>
 
-                  {/* Shipping Options */}
+                  {/* Shipping (flat-rate by country) */}
                   <div className="bg-muted/20 p-6 lg:p-8 rounded-none">
-                    <h2 className="text-lg font-light text-foreground mb-6">Shipping Options</h2>
-                    
-                    <RadioGroup 
-                      value={shippingOption} 
-                      onValueChange={setShippingOption}
-                      className="space-y-4"
-                    >
-                      <div className="flex items-center justify-between p-4 border border-muted-foreground/20 rounded-none">
-                        <div className="flex items-center space-x-3">
-                          <RadioGroupItem value="standard" id="standard" />
-                          <Label htmlFor="standard" className="font-light text-foreground">
-                            Standard Shipping
-                          </Label>
-                        </div>
-                        <div className="text-sm">
-                          {hasFreeShipping ? (
-                            <span className="text-foreground font-medium">Free</span>
-                          ) : (
-                            <span className="text-muted-foreground">{formatPrice(CURRENCY.standardShippingCost)} • 3-5 business days</span>
-                          )}
-                        </div>
-                      </div>
+                    <h2 className="text-lg font-light text-foreground mb-6">Shipping</h2>
 
-                    </RadioGroup>
+                    <div className="flex items-center justify-between p-4 border border-muted-foreground/20 rounded-none">
+                      <div>
+                        <p className="font-light text-foreground">
+                          {isCanadianShip ? 'Canada — Standard' : 'International — Standard'}
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {isCanadianShip
+                            ? '5–9 business days (includes 2–5 days production)'
+                            : '10–21 business days (includes 2–5 days production)'}
+                        </p>
+                      </div>
+                      <div className="text-sm text-right">
+                        {hasFreeShipping ? (
+                          <span className="text-foreground font-medium">FREE</span>
+                        ) : (
+                          <span className="text-muted-foreground">{formatPrice(shipping)}</span>
+                        )}
+                      </div>
+                    </div>
+
+                    <p className="text-xs text-muted-foreground mt-3">
+                      Flat $15 CAD across Canada · Flat $35 CAD international · Free shipping on orders $250+
+                    </p>
                   </div>
+
 
                   {/* Embedded Stripe Checkout opens in modal below on submit */}
 
