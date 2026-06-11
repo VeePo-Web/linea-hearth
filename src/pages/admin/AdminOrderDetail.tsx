@@ -41,6 +41,7 @@ const AdminOrderDetail = () => {
   const [items, setItems] = useState<OrderItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [resending, setResending] = useState(false);
 
   const [fulfillmentStatus, setFulfillmentStatus] = useState('unfulfilled');
   const [trackingNumber, setTrackingNumber] = useState('');
