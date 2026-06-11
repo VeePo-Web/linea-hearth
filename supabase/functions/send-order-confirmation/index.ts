@@ -59,6 +59,34 @@ function escapeHtml(s: unknown): string {
     .replace(/"/g, "&quot;");
 }
 
+function buildTapstitchBlock(order: Order, items: OrderItem[]): string {
+  const orderNumber = order.id.slice(0, 8).toUpperCase();
+  const date = new Date(order.created_at).toISOString().slice(0, 10);
+  const addr = order.shipping_address || {};
+  const fullName = `${order.customer_first_name || ""} ${order.customer_last_name || ""}`.trim() || "—";
+  const cityLine = `${addr.city || ""}${addr.state ? `, ${addr.state}` : ""}  ${addr.postalCode || ""}`.trim();
+  const itemLines = items.map((it) => {
+    const variant = [it.variant_size, it.variant_color].filter(Boolean).join(" / ") || "Default";
+    return `  ${it.quantity}x  ${it.product_name} — ${variant}`;
+  }).join("\n");
+  return [
+    `Order #${orderNumber} — ${date}`,
+    `Ship to:`,
+    `  ${fullName}`,
+    addr.address ? `  ${addr.address}` : null,
+    `  ${cityLine}`,
+    addr.country ? `  ${addr.country}` : null,
+    order.customer_phone ? `Phone: ${order.customer_phone}` : null,
+    `Email: ${order.customer_email}`,
+    `Items:`,
+    itemLines,
+    `Shipping: ${order.shipping_method || "Standard"} — ${formatCurrency(order.shipping_cents, order.currency)}`,
+    order.discount_cents > 0 ? `Discount${order.discount_code ? ` (${order.discount_code})` : ""}: -${formatCurrency(order.discount_cents, order.currency)}` : null,
+    `Total:    ${formatCurrency(order.total_cents, order.currency)}`,
+    `Stripe PI: ${order.stripe_payment_intent_id || "—"}`,
+  ].filter(Boolean).join("\n");
+}
+
 function buildAdminNotificationHtml(order: Order, items: OrderItem[], siteUrl: string): string {
   const orderNumber = order.id.slice(0, 8).toUpperCase();
   const addr = order.shipping_address || {};
