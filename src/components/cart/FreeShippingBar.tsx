@@ -14,8 +14,10 @@ const FreeShippingBar = () => {
     shippingProgress, 
     progressTier, 
     amountToFreeShipping, 
-    hasFreeShipping 
+    hasFreeShipping,
+    isCanadaDestination,
   } = useCart();
+  const regionLabel = isCanadaDestination ? '' : ' (international)';
   
   const prefersReducedMotion = useReducedMotion();
   
