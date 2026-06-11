@@ -45,13 +45,13 @@ interface RequestBody {
 }
 
 
-const SHIPPING_RATES = {
-  standard: 1500,
-  express: 2000,
-  overnight: 3500,
-} as const;
-
-const FREE_SHIPPING_THRESHOLD_CENTS = 9900;
+// Flat-rate shipping in cents (CAD).
+// - Canada: $15
+// - Anywhere else (international): $35
+// - Free on subtotal >= $250
+const SHIPPING_RATE_CA_CENTS = 1500;
+const SHIPPING_RATE_INTL_CENTS = 3500;
+const FREE_SHIPPING_THRESHOLD_CENTS = 25000;
 // Stripe tax_code for general clothing (apparel). See https://docs.stripe.com/tax/tax-codes
 const APPAREL_TAX_CODE = "txcd_30060001";
 
