@@ -48,32 +48,25 @@ const orderJourneySteps = [
 const shippingOptions = [
   {
     icon: Truck,
-    title: "STANDARD",
-    description: "5-9 business days total (includes 2-5 days production + 3-4 days shipping).",
+    title: "CANADA — STANDARD",
+    description: "Flat $15 CAD across Canada. 5-9 business days total (includes 2-5 days production + 3-4 days shipping). Full tracking.",
     variant: "default" as const,
-    badge: "FREE OVER $99"
-  },
-  {
-    icon: Zap,
-    title: "EXPRESS",
-    description: "4-7 business days total (includes production + 2-3 day shipping).",
-    variant: "default" as const,
-    badge: "$20"
-  },
-  {
-    icon: Rocket,
-    title: "OVERNIGHT",
-    description: "3-6 business days total (includes production + overnight shipping).",
-    variant: "accent" as const,
-    badge: "$35"
+    badge: "$15 FLAT"
   },
   {
     icon: Globe,
-    title: "INTERNATIONAL",
-    description: "10-21 business days total. Includes production time plus international transit.",
+    title: "INTERNATIONAL — STANDARD",
+    description: "Flat $35 CAD anywhere outside Canada. 10-21 business days total (includes 2-5 days production + international transit). Full tracking.",
     variant: "default" as const,
-    badge: "CALCULATED"
-  }
+    badge: "$35 FLAT"
+  },
+  {
+    icon: Rocket,
+    title: "FREE SHIPPING",
+    description: "Any order with a subtotal over $250 CAD ships free — Canada or international, no code needed.",
+    variant: "accent" as const,
+    badge: "OVER $250"
+  },
 ];
 
 const internationalRegions = [
