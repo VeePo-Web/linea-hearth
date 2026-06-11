@@ -39,6 +39,12 @@ interface CartContextType {
   hasFreeShipping: boolean;
   shippingProgress: number;
   progressTier: ShippingProgressTier;
+  /** ISO country code for the destination ("CA" default). Drives flat-rate shipping. */
+  shippingCountry: string;
+  setShippingCountry: (code: string) => void;
+  isCanadaDestination: boolean;
+  /** Flat shipping cost in dollars based on shippingCountry + subtotal */
+  shippingCost: number;
   isCartOpen: boolean;
   openCart: () => void;
   closeCart: () => void;
@@ -48,7 +54,8 @@ interface CartContextType {
 
 
 const CART_STORAGE_KEY = 'loj-cart';
-const FREE_SHIPPING_THRESHOLD = 99; // $99 CAD for free shipping
+const SHIPPING_COUNTRY_KEY = 'loj-ship-country';
+const FREE_SHIPPING_THRESHOLD = 250; // $250 CAD for free shipping (CA + intl)
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
