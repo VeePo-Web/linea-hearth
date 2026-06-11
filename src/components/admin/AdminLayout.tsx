@@ -26,6 +26,7 @@ const SESSION_TIMEOUT_MS = 30 * 60 * 1000; // 30 minutes
 const navItems = [
   { href: '/ops-portal', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/ops-portal/orders', label: 'Orders', icon: ShoppingBag },
+  { href: '/ops-portal/financials', label: 'Financials', icon: DollarSign },
   { href: '/ops-portal/products', label: 'Products', icon: Package },
   { href: '/ops-portal/categories', label: 'Categories', icon: Tags },
   { href: '/ops-portal/lookbook', label: 'Lookbook', icon: Images },
