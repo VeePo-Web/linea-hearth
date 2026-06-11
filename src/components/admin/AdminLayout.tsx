@@ -12,6 +12,8 @@ import {
   Percent,
   Images,
   Camera,
+  Mail,
+  Megaphone,
 } from 'lucide-react';
 
 interface AdminLayoutProps {
@@ -27,6 +29,8 @@ const navItems = [
   { href: '/ops-portal/categories', label: 'Categories', icon: Tags },
   { href: '/ops-portal/lookbook', label: 'Lookbook', icon: Images },
   { href: '/ops-portal/worn-in-the-wild', label: 'Worn', icon: Camera },
+  { href: '/ops-portal/subscribers', label: 'Subscribers', icon: Mail },
+  { href: '/ops-portal/ambassadors', label: 'Ambassadors', icon: Megaphone },
   { href: '/ops-portal/discounts', label: 'Discounts', icon: Percent },
 ];
 

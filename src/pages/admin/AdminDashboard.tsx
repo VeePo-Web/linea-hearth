@@ -254,24 +254,28 @@ const AdminDashboard = () => {
               </CardContent>
             </Card>
           </Link>
-          <Card>
-            <CardContent className="pt-5 pb-4 flex items-center gap-3">
-              <Users className="h-5 w-5 text-muted-foreground" />
-              <div>
-                <div className="text-lg font-light">{loading ? '—' : subscriberCount}</div>
-                <p className="text-xs text-muted-foreground">Newsletter Subscribers</p>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="pt-5 pb-4 flex items-center gap-3">
-              <Megaphone className={`h-5 w-5 ${pendingAmbassadors > 0 ? 'text-primary' : 'text-muted-foreground'}`} />
-              <div>
-                <div className="text-lg font-light">{loading ? '—' : pendingAmbassadors}</div>
-                <p className="text-xs text-muted-foreground">Pending Ambassadors</p>
-              </div>
-            </CardContent>
-          </Card>
+          <Link to="/ops-portal/subscribers">
+            <Card className="cursor-pointer hover:border-primary/50 transition-colors">
+              <CardContent className="pt-5 pb-4 flex items-center gap-3">
+                <Users className="h-5 w-5 text-muted-foreground" />
+                <div>
+                  <div className="text-lg font-light">{loading ? '—' : subscriberCount}</div>
+                  <p className="text-xs text-muted-foreground">Newsletter Subscribers</p>
+                </div>
+              </CardContent>
+            </Card>
+          </Link>
+          <Link to="/ops-portal/ambassadors">
+            <Card className={`cursor-pointer hover:border-primary/50 transition-colors ${pendingAmbassadors > 0 ? 'border-primary/50' : ''}`}>
+              <CardContent className="pt-5 pb-4 flex items-center gap-3">
+                <Megaphone className={`h-5 w-5 ${pendingAmbassadors > 0 ? 'text-primary' : 'text-muted-foreground'}`} />
+                <div>
+                  <div className="text-lg font-light">{loading ? '—' : pendingAmbassadors}</div>
+                  <p className="text-xs text-muted-foreground">Pending Ambassadors</p>
+                </div>
+              </CardContent>
+            </Card>
+          </Link>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
