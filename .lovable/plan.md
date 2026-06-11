@@ -1,46 +1,53 @@
-# Admin: Newsletter Subscribers & Ambassadors Pages
+# Admin Financials Dashboard
 
-The dashboard already shows counts for "Newsletter Subscribers" and "Pending Ambassadors" but the cards aren't clickable and no list view exists for either. Add two dedicated admin pages and make the dashboard cards link to them.
+A Stripe-style financials view inside the ops portal. Pure read-only aggregation from the existing `orders` table — no Stripe API calls needed (Stripe webhooks already populate `stripe_payment_intent_id`, `stripe_customer_id`, totals breakdown, etc.).
 
-## What's there today
+## What we have
 
-- `src/pages/admin/AdminDashboard.tsx` — counts only, cards not wrapped in `<Link>`
-- `newsletter_subscribers` table — `email`, `source`, `subscribed_at` (admin SELECT/DELETE policies already in place)
-- `ambassador_applications` table — full app fields incl. socials, `status`, `admin_notes` (admin SELECT/UPDATE/DELETE policies already in place)
-- No `AdminSubscribers.tsx` or `AdminAmbassadors.tsx` exists yet
+`orders` table already stores everything needed: `total_cents`, `subtotal_cents`, `shipping_cents`, `discount_cents`, `tax_cents`, `currency`, `payment_status`, `created_at`, `stripe_payment_intent_id`, `stripe_customer_id`, customer name/email.
 
 ## Plan
 
-### 1. New page: `src/pages/admin/AdminSubscribers.tsx`
-Route: `/ops-portal/subscribers`
+### 1. New page `src/pages/admin/AdminFinancials.tsx` → route `/ops-portal/financials`
 
-- Header: "Newsletter Subscribers" + total count
-- Search box (filters by email substring, client-side)
-- Source filter chip row (All / homepage / footer / checkout — derived from distinct values)
-- Table: Email · Source · Subscribed (relative date) · Actions (Copy email, Delete)
-- "Export CSV" button → downloads filtered rows
-- Sorted by `subscribed_at` desc, paginated 50/page
-- Empty state when 0 results
+Stripe-dashboard inspired layout, sharp-edged (rounded-none), forest/chrome palette:
 
-### 2. New page: `src/pages/admin/AdminAmbassadors.tsx`
-Route: `/ops-portal/ambassadors`
+**Header row**
+- Title: "Financials" + subtitle "Revenue from Stripe-settled orders"
+- Time-range tabs: 7D · 30D · 90D · 12M · All (default 30D)
+- Export CSV button (filtered transactions)
 
-- Header: "Ambassador Applications" + status counts (Pending / Approved / Rejected)
-- Status filter tabs (Pending default, Approved, Rejected, All)
-- Search box (name or email)
-- Table: Name · Email · Location · Followers · Submitted · Status badge
-- Click row → opens side drawer (Sheet) with full application: socials (clickable IG/TikTok/YouTube/Twitter links), content types, "Why represent", "Faith in content", "Content frequency", admin notes textarea, Approve / Reject buttons
-- Approve/Reject updates `status`, `reviewed_at = now()`, `reviewed_by = auth.uid()`
-- Sorted by `created_at` desc
+**KPI grid (4 cards)**
+- Gross Volume (sum of `total_cents` for `payment_status = 'paid'`)
+- Net Volume (gross − refunds; today refunds aren't tracked yet, so initially same as gross with a "refunds: $0" sub-line)
+- Successful Payments (count)
+- Average Order Value
+- Each card shows current period value + delta vs previous equal period (e.g. "+18.4% vs prior 30 days")
 
-### 3. Wire up dashboard
-- Wrap both stat cards (`Newsletter Subscribers`, `Pending Ambassadors`) in `<Link>` to the new routes
-- Add hover state to match existing "Needs Fulfillment" card pattern
+**Revenue trend chart**
+- Daily bar/area chart of gross volume across the selected range
+- Use existing `recharts` (already in project)
+- Hover tooltip: date + gross + count
 
-### 4. Register routes in `src/App.tsx`
-Add lazy imports + two `<Route>` entries following the same `OpsPortalGate > ProtectedRoute requireAdmin > PageTransition` pattern as the other admin routes.
+**Breakdown row (2 cards side-by-side)**
+- Revenue composition: stacked bars — Subtotal · Shipping · Tax · Discounts (negative)
+- Top customers: top 5 by lifetime spend within range, name + email + total
+
+**Transactions table**
+- Columns: Date · Customer · Email · Amount · Status · Stripe PI (truncated, copy button) · View
+- "View" links to existing `/ops-portal/orders/:orderId`
+- Search by email or Stripe ID
+- Status filter chips: All / paid / refunded / unpaid / failed
+- Paginated 25/page
+
+### 2. Wire-up
+- Add lazy import + route in `src/App.tsx` (same `OpsPortalGate > ProtectedRoute requireAdmin` pattern)
+- Add sidebar entry "Financials" with `DollarSign` icon in `src/components/admin/AdminLayout.tsx`
+- Add a clickable "Gross Volume (30D)" card on `AdminDashboard.tsx` that links to `/ops-portal/financials`
 
 ## Out of scope
-- No schema/RLS changes (existing admin policies are sufficient)
-- No bulk email send / marketing trigger from these pages
-- No CSV import for subscribers
+- Live Stripe API queries (data already mirrored to orders via webhook)
+- Refund tracking UI (no refunds table yet)
+- Payout / balance reporting
+- Invoice / subscription views (no subscription products)
+- No schema changes
