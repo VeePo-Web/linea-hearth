@@ -1,53 +1,41 @@
-# Admin Financials Dashboard
+# Order Email & Tapstitch Notification Audit
 
-A Stripe-style financials view inside the ops portal. Pure read-only aggregation from the existing `orders` table — no Stripe API calls needed (Stripe webhooks already populate `stripe_payment_intent_id`, `stripe_customer_id`, totals breakdown, etc.).
+Domain `lineofjudah.clothing` is now verified in Resend, so the 403s should stop. Three real code gaps remain so you reliably get the order email at both **1.lineofjudah.1@gmail.com** and **parker@veepo.ca** every time, with a paste-ready Tapstitch block.
 
-## What we have
+## Changes
 
-`orders` table already stores everything needed: `total_cents`, `subtotal_cents`, `shipping_cents`, `discount_cents`, `tax_cents`, `currency`, `payment_status`, `created_at`, `stripe_payment_intent_id`, `stripe_customer_id`, customer name/email.
+### 1. `supabase/functions/send-order-confirmation/index.ts`
+- Make the admin/Tapstitch send **independent** of the customer send. Today, if the customer email fails (bad address, Resend hiccup), the function returns 500 before the admin block runs — so you never hear about the order. New flow: run customer send and admin send in parallel, each in its own try/catch, return 200 if **either** succeeded, include both message IDs (or errors) in the response and console.
+- Add a **plain-text Tapstitch paste block** to the admin email inside a `<pre>` so you can one-shot copy it into Tapstitch:
+  ```
+  Order #ABCD1234 — 2026-06-11
+  Ship to:
+    Jane Doe
+    123 King St W, Apt 5
+    Toronto, ON  M5H 1A1
+    CA
+  Phone: +1 416-555-0123
+  Email: jane@example.com
+  Items:
+    1x  LION TEE — Black / L           SKU: LOJ-LT-BLK-L
+    2x  JUDAH HOODIE — Forest / M      SKU: LOJ-JH-FRG-M
+  Shipping: Standard — $15.00 CAD
+  Total:    $124.00 CAD
+  Stripe PI: pi_xxx
+  ```
+- Accept an optional `notifyAdminOnly: true` flag in the request body so the manual "Resend to ops" button can skip re-emailing the customer.
+- Log every attempt to console with order ID + recipient + Resend message ID, so the Edge Function logs are easy to grep.
 
-## Plan
+### 2. `src/pages/admin/AdminOrderDetail.tsx`
+- Add a small **"Re-send ops notification"** button in the right-column Status card. Invokes `send-order-confirmation` with `{ orderId, notifyAdminOnly: true }`. Shows toast on success/failure. Useful if a Tapstitch entry was lost or the original email got buried.
 
-### 1. New page `src/pages/admin/AdminFinancials.tsx` → route `/ops-portal/financials`
-
-Stripe-dashboard inspired layout, sharp-edged (rounded-none), forest/chrome palette:
-
-**Header row**
-- Title: "Financials" + subtitle "Revenue from Stripe-settled orders"
-- Time-range tabs: 7D · 30D · 90D · 12M · All (default 30D)
-- Export CSV button (filtered transactions)
-
-**KPI grid (4 cards)**
-- Gross Volume (sum of `total_cents` for `payment_status = 'paid'`)
-- Net Volume (gross − refunds; today refunds aren't tracked yet, so initially same as gross with a "refunds: $0" sub-line)
-- Successful Payments (count)
-- Average Order Value
-- Each card shows current period value + delta vs previous equal period (e.g. "+18.4% vs prior 30 days")
-
-**Revenue trend chart**
-- Daily bar/area chart of gross volume across the selected range
-- Use existing `recharts` (already in project)
-- Hover tooltip: date + gross + count
-
-**Breakdown row (2 cards side-by-side)**
-- Revenue composition: stacked bars — Subtotal · Shipping · Tax · Discounts (negative)
-- Top customers: top 5 by lifetime spend within range, name + email + total
-
-**Transactions table**
-- Columns: Date · Customer · Email · Amount · Status · Stripe PI (truncated, copy button) · View
-- "View" links to existing `/ops-portal/orders/:orderId`
-- Search by email or Stripe ID
-- Status filter chips: All / paid / refunded / unpaid / failed
-- Paginated 25/page
-
-### 2. Wire-up
-- Add lazy import + route in `src/App.tsx` (same `OpsPortalGate > ProtectedRoute requireAdmin` pattern)
-- Add sidebar entry "Financials" with `DollarSign` icon in `src/components/admin/AdminLayout.tsx`
-- Add a clickable "Gross Volume (30D)" card on `AdminDashboard.tsx` that links to `/ops-portal/financials`
+### 3. Sanity verification (after deploy, no code)
+- Re-run the most recent paid order through the manual resend button.
+- Confirm both inboxes receive the email and the Tapstitch block pastes cleanly.
+- Spot-check `Edge Function logs → send-order-confirmation` to see both "Customer email sent" and "Admin notification sent" lines.
 
 ## Out of scope
-- Live Stripe API queries (data already mirrored to orders via webhook)
-- Refund tracking UI (no refunds table yet)
-- Payout / balance reporting
-- Invoice / subscription views (no subscription products)
-- No schema changes
+- No schema changes.
+- No changes to `stripe-webhook` (its trigger path is already correct and idempotent via `confirmation_email_sent_at`).
+- No switch away from Resend or sender domain change — staying on `orders@lineofjudah.clothing` now that it's verified.
+- No changes to refund/dispute/failure alerts — those already send to both inboxes via `send-admin-alert`.

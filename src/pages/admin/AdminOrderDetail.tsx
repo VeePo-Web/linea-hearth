@@ -14,7 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { ArrowLeft, Loader2, Save } from 'lucide-react';
+import { ArrowLeft, Loader2, Save, Mail } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
@@ -41,6 +41,7 @@ const AdminOrderDetail = () => {
   const [items, setItems] = useState<OrderItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [resending, setResending] = useState(false);
 
   const [fulfillmentStatus, setFulfillmentStatus] = useState('unfulfilled');
   const [trackingNumber, setTrackingNumber] = useState('');
@@ -103,6 +104,24 @@ const AdminOrderDetail = () => {
       toast({ title: 'Error', description: 'Failed to update order', variant: 'destructive' });
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleResendOps = async () => {
+    if (!orderId) return;
+    setResending(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('send-order-confirmation', {
+        body: { orderId, notifyAdminOnly: true },
+      });
+      if (error) throw error;
+      const adminResult = (data as any)?.results?.find((r: any) => r.kind === 'admin');
+      if (adminResult && !adminResult.ok) throw new Error(adminResult.error || 'Send failed');
+      toast({ title: 'Ops notification sent', description: 'Re-sent to Line of Judah inbox and parker@veepo.ca.' });
+    } catch (e: any) {
+      toast({ title: 'Resend failed', description: e?.message || 'Unable to send', variant: 'destructive' });
+    } finally {
+      setResending(false);
     }
   };
 
@@ -281,6 +300,17 @@ const AdminOrderDetail = () => {
                     {order.payment_status}
                   </Badge>
                 </div>
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full text-xs uppercase tracking-wider"
+                  onClick={handleResendOps}
+                  disabled={resending}
+                >
+                  {resending ? <Loader2 className="h-3.5 w-3.5 mr-2 animate-spin" /> : <Mail className="h-3.5 w-3.5 mr-2" />}
+                  Re-send Ops Notification
+                </Button>
 
                 <div className="space-y-2">
                   <Label className="text-xs uppercase tracking-wider">Fulfillment</Label>

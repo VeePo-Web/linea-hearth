@@ -59,6 +59,34 @@ function escapeHtml(s: unknown): string {
     .replace(/"/g, "&quot;");
 }
 
+function buildTapstitchBlock(order: Order, items: OrderItem[]): string {
+  const orderNumber = order.id.slice(0, 8).toUpperCase();
+  const date = new Date(order.created_at).toISOString().slice(0, 10);
+  const addr = order.shipping_address || {};
+  const fullName = `${order.customer_first_name || ""} ${order.customer_last_name || ""}`.trim() || "—";
+  const cityLine = `${addr.city || ""}${addr.state ? `, ${addr.state}` : ""}  ${addr.postalCode || ""}`.trim();
+  const itemLines = items.map((it) => {
+    const variant = [it.variant_size, it.variant_color].filter(Boolean).join(" / ") || "Default";
+    return `  ${it.quantity}x  ${it.product_name} — ${variant}`;
+  }).join("\n");
+  return [
+    `Order #${orderNumber} — ${date}`,
+    `Ship to:`,
+    `  ${fullName}`,
+    addr.address ? `  ${addr.address}` : null,
+    `  ${cityLine}`,
+    addr.country ? `  ${addr.country}` : null,
+    order.customer_phone ? `Phone: ${order.customer_phone}` : null,
+    `Email: ${order.customer_email}`,
+    `Items:`,
+    itemLines,
+    `Shipping: ${order.shipping_method || "Standard"} — ${formatCurrency(order.shipping_cents, order.currency)}`,
+    order.discount_cents > 0 ? `Discount${order.discount_code ? ` (${order.discount_code})` : ""}: -${formatCurrency(order.discount_cents, order.currency)}` : null,
+    `Total:    ${formatCurrency(order.total_cents, order.currency)}`,
+    `Stripe PI: ${order.stripe_payment_intent_id || "—"}`,
+  ].filter(Boolean).join("\n");
+}
+
 function buildAdminNotificationHtml(order: Order, items: OrderItem[], siteUrl: string): string {
   const orderNumber = order.id.slice(0, 8).toUpperCase();
   const addr = order.shipping_address || {};
@@ -132,6 +160,9 @@ function buildAdminNotificationHtml(order: Order, items: OrderItem[], siteUrl: s
       <h2 style="font-size:14px;margin:24px 0 8px;text-transform:uppercase;letter-spacing:1px;color:#57534e;">Stripe</h2>
       <p style="margin:0 0 4px;font-family:monospace;font-size:12px;color:#57534e;">PI: ${escapeHtml(order.stripe_payment_intent_id || "—")}</p>
       <p style="margin:0 0 16px;font-family:monospace;font-size:12px;color:#57534e;">Session: ${escapeHtml(order.stripe_checkout_session_id || "—")}</p>
+
+      <h2 style="font-size:14px;margin:24px 0 8px;text-transform:uppercase;letter-spacing:1px;color:#57534e;">Tapstitch — copy &amp; paste</h2>
+      <pre style="background:#0c0a09;color:#fafaf9;padding:16px 20px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;line-height:1.55;white-space:pre-wrap;word-break:break-word;border:1px solid #1c1917;margin:0 0 16px;">${escapeHtml(buildTapstitchBlock(order, items))}</pre>
 
       <p style="margin:24px 0 0;"><a href="${siteUrl}/ops-portal/orders/${order.id}" style="display:inline-block;background:#1c1917;color:#fff;text-decoration:none;padding:12px 20px;font-size:13px;letter-spacing:0.5px;">Open in ops portal →</a></p>
     </div>
@@ -415,24 +446,24 @@ Deno.serve(async (req) => {
     
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     
-    const { orderId } = await req.json();
-    
+    const body = await req.json().catch(() => ({}));
+    const { orderId, notifyAdminOnly } = body as { orderId?: string; notifyAdminOnly?: boolean };
+
     if (!orderId) {
       return new Response(
         JSON.stringify({ error: "orderId is required" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
-    
-    console.log(`Generating order confirmation email for order: ${orderId}`);
-    
-    // Fetch order
+
+    console.log(`[send-order-confirmation] order=${orderId} notifyAdminOnly=${!!notifyAdminOnly}`);
+
+    // Fetch order + items
     const { data: order, error: orderError } = await supabase
       .from("orders")
       .select("*")
       .eq("id", orderId)
       .single();
-    
     if (orderError || !order) {
       console.error("Failed to fetch order:", orderError);
       return new Response(
@@ -440,13 +471,10 @@ Deno.serve(async (req) => {
         { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
-    
-    // Fetch order items
     const { data: items, error: itemsError } = await supabase
       .from("order_items")
       .select("*")
       .eq("order_id", orderId);
-    
     if (itemsError) {
       console.error("Failed to fetch order items:", itemsError);
       return new Response(
@@ -454,99 +482,91 @@ Deno.serve(async (req) => {
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
-    
-    // Build the email HTML
-    const emailHtml = buildOrderConfirmationHtml(order as Order, (items || []) as OrderItem[], siteUrl);
-    const subject = `Your order is on its way — #${orderId.slice(0, 8).toUpperCase()}`;
-    
-    // Check if Resend API key is configured
+
     const resendApiKey = Deno.env.get("RESEND_API_KEY");
-    
     if (!resendApiKey) {
-      // Stub mode - log email for testing
-      console.log("=".repeat(60));
-      console.log("RESEND_API_KEY not configured - Email logged for testing");
-      console.log("=".repeat(60));
-      console.log("To:", order.customer_email);
-      console.log("Subject:", subject);
-      console.log("=".repeat(60));
-      console.log("HTML Preview (first 500 chars):", emailHtml.substring(0, 500));
-      console.log("=".repeat(60));
-      
+      console.log("[send-order-confirmation] RESEND_API_KEY missing — stub mode");
       return new Response(
-        JSON.stringify({ 
-          success: true, 
-          mode: "stub",
-          message: "Email template generated (API key not configured)",
-          to: order.customer_email,
-          subject: subject,
-        }),
+        JSON.stringify({ success: true, mode: "stub", message: "API key not configured" }),
         { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
-    
-    // Send email via Resend using fetch (no external dependency needed)
-    const emailResponse = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${resendApiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        from: "Line of Judah <orders@lineofjudah.clothing>",
-        to: [order.customer_email],
-        subject: subject,
-        html: emailHtml,
-      }),
-    });
-    
-    const emailResult = await emailResponse.json();
-    
-    if (!emailResponse.ok) {
-      console.error("Failed to send email:", emailResult);
-      return new Response(
-        JSON.stringify({ error: "Failed to send email", details: emailResult }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-    
-    console.log("Order confirmation email sent:", emailResult);
 
-    // Fire-and-forget admin notification to Line of Judah inbox + parker@veepo.ca
-    try {
-      const adminHtml = buildAdminNotificationHtml(order as Order, (items || []) as OrderItem[], siteUrl);
-      const adminSubject = `New order #${orderId.slice(0, 8).toUpperCase()} — ${formatCurrency(order.total_cents, order.currency)} — ${(order.customer_first_name || "")} ${(order.customer_last_name || "")}`.trim();
-      const adminRes = await fetch("https://api.resend.com/emails", {
+    const orderTyped = order as Order;
+    const itemsTyped = (items || []) as OrderItem[];
+    const orderShort = orderId.slice(0, 8).toUpperCase();
+
+    async function sendCustomer() {
+      const emailHtml = buildOrderConfirmationHtml(orderTyped, itemsTyped, siteUrl);
+      const subject = `Your order is on its way — #${orderShort}`;
+      const res = await fetch("https://api.resend.com/emails", {
         method: "POST",
-        headers: {
-          "Authorization": `Bearer ${resendApiKey}`,
-          "Content-Type": "application/json",
-        },
+        headers: { "Authorization": `Bearer ${resendApiKey}`, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          from: "Line of Judah <orders@lineofjudah.clothing>",
+          to: [orderTyped.customer_email],
+          subject,
+          html: emailHtml,
+        }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(`Customer send failed: ${JSON.stringify(json)}`);
+      return json.id as string;
+    }
+
+    async function sendAdmin() {
+      const adminHtml = buildAdminNotificationHtml(orderTyped, itemsTyped, siteUrl);
+      const fullName = `${orderTyped.customer_first_name || ""} ${orderTyped.customer_last_name || ""}`.trim();
+      const adminSubject = `New order #${orderShort} — ${formatCurrency(orderTyped.total_cents, orderTyped.currency)}${fullName ? ` — ${fullName}` : ""}`;
+      const res = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: { "Authorization": `Bearer ${resendApiKey}`, "Content-Type": "application/json" },
         body: JSON.stringify({
           from: "Line of Judah Orders <orders@lineofjudah.clothing>",
           to: INTERNAL_NOTIFY_RECIPIENTS,
-          reply_to: order.customer_email,
+          reply_to: orderTyped.customer_email,
           subject: adminSubject,
           html: adminHtml,
         }),
       });
-      const adminResult = await adminRes.json();
-      if (!adminRes.ok) {
-        console.error("Admin notification failed:", adminResult);
-      } else {
-        console.log("Admin notification sent:", adminResult);
-      }
-    } catch (adminErr) {
-      console.error("Admin notification threw:", adminErr);
+      const json = await res.json();
+      if (!res.ok) throw new Error(`Admin send failed: ${JSON.stringify(json)}`);
+      return json.id as string;
     }
 
+    // Run customer + admin in parallel, each independent.
+    const tasks: Array<Promise<{ kind: string; ok: boolean; id?: string; error?: string }>> = [];
+    if (!notifyAdminOnly) {
+      tasks.push(
+        sendCustomer()
+          .then((id) => {
+            console.log(`[send-order-confirmation] customer ok order=${orderId} id=${id} to=${orderTyped.customer_email}`);
+            return { kind: "customer", ok: true, id };
+          })
+          .catch((e) => {
+            console.error(`[send-order-confirmation] customer FAILED order=${orderId}`, e);
+            return { kind: "customer", ok: false, error: String(e?.message ?? e) };
+          })
+      );
+    }
+    tasks.push(
+      sendAdmin()
+        .then((id) => {
+          console.log(`[send-order-confirmation] admin ok order=${orderId} id=${id} to=${INTERNAL_NOTIFY_RECIPIENTS.join(",")}`);
+          return { kind: "admin", ok: true, id };
+        })
+        .catch((e) => {
+          console.error(`[send-order-confirmation] admin FAILED order=${orderId}`, e);
+          return { kind: "admin", ok: false, error: String(e?.message ?? e) };
+        })
+    );
+
+    const results = await Promise.all(tasks);
+    const anyOk = results.some((r) => r.ok);
+
     return new Response(
-      JSON.stringify({
-        success: true,
-        mode: "live",
-        emailId: emailResult.id,
-      }),
-      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      JSON.stringify({ success: anyOk, mode: "live", results }),
+      { status: anyOk ? 200 : 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
     
   } catch (error: unknown) {
