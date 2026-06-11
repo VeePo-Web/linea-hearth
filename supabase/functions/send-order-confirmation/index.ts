@@ -161,6 +161,9 @@ function buildAdminNotificationHtml(order: Order, items: OrderItem[], siteUrl: s
       <p style="margin:0 0 4px;font-family:monospace;font-size:12px;color:#57534e;">PI: ${escapeHtml(order.stripe_payment_intent_id || "—")}</p>
       <p style="margin:0 0 16px;font-family:monospace;font-size:12px;color:#57534e;">Session: ${escapeHtml(order.stripe_checkout_session_id || "—")}</p>
 
+      <h2 style="font-size:14px;margin:24px 0 8px;text-transform:uppercase;letter-spacing:1px;color:#57534e;">Tapstitch — copy &amp; paste</h2>
+      <pre style="background:#0c0a09;color:#fafaf9;padding:16px 20px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;line-height:1.55;white-space:pre-wrap;word-break:break-word;border:1px solid #1c1917;margin:0 0 16px;">${escapeHtml(buildTapstitchBlock(order, items))}</pre>
+
       <p style="margin:24px 0 0;"><a href="${siteUrl}/ops-portal/orders/${order.id}" style="display:inline-block;background:#1c1917;color:#fff;text-decoration:none;padding:12px 20px;font-size:13px;letter-spacing:0.5px;">Open in ops portal →</a></p>
     </div>
   </body></html>`;
