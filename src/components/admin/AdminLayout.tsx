@@ -14,6 +14,7 @@ import {
   Camera,
   Mail,
   Megaphone,
+  DollarSign,
 } from 'lucide-react';
 
 interface AdminLayoutProps {
