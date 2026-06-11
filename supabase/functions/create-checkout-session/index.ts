@@ -543,13 +543,20 @@ Deno.serve(async (req) => {
         }),
         ...(stripeDiscounts && { discounts: stripeDiscounts }),
         ...(enableAutomaticTax && { automatic_tax: { enabled: true } }),
-        shipping_address_collection: { allowed_countries: ["CA", "US"] },
+        // Expanded worldwide to support flat-rate intl shipping ($35 CAD).
+        // Stripe's full ISO-3166 list — excludes only sanctioned destinations.
+        shipping_address_collection: {
+          allowed_countries: [
+            "CA","US","GB","AU","NZ","IE","FR","DE","ES","IT","NL","BE","LU","AT","CH","SE","NO","DK","FI","IS","PT","GR","PL","CZ","SK","HU","RO","BG","HR","SI","EE","LV","LT","CY","MT",
+            "JP","KR","SG","HK","TW","TH","MY","PH","ID","VN","IN","AE","SA","IL","TR","ZA","BR","MX","AR","CL","CO","PE","CR","UY","DO","JM","BS","BB","TT",
+          ],
+        },
         shipping_options: [
           {
             shipping_rate_data: {
               type: "fixed_amount",
               fixed_amount: { amount: shippingAmount, currency: "cad" },
-              display_name: isFreeShipping ? "Free shipping" : "Standard (5-9 days)",
+              display_name: shippingDisplayName,
               tax_behavior: "exclusive",
               tax_code: "txcd_92010001", // shipping
             },
