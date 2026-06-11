@@ -12,10 +12,10 @@ import { toast } from "sonner";
 import PageSEO from "@/components/seo/PageSEO";
 
 const heroValueProps = [
-  { icon: Truck, text: "Free Over $99" },
+  { icon: Truck, text: "Free Over $250" },
   { icon: Clock, text: "2-5 Days Production" },
   { icon: Package, text: "Full Tracking" },
-  { icon: Globe, text: "Canada & Beyond" },
+  { icon: Globe, text: "Canada & Worldwide" },
 ];
 
 const orderJourneySteps = [
