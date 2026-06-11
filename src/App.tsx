@@ -96,6 +96,8 @@ const AccountFavorites = lazyWithRetry(() => import("./pages/account/AccountFavo
 const WornInTheWildGallery = lazyWithRetry(() => import("./pages/WornInTheWildGallery"));
 const WornInTheWildUpload = lazyWithRetry(() => import("./pages/WornInTheWildUpload"));
 const AdminWornInTheWild = lazyWithRetry(() => import("./pages/admin/AdminWornInTheWild"));
+const AdminSubscribers = lazyWithRetry(() => import("./pages/admin/AdminSubscribers"));
+const AdminAmbassadors = lazyWithRetry(() => import("./pages/admin/AdminAmbassadors"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -167,6 +169,8 @@ const AnimatedRoutes = () => {
         <Route path="/ops-portal/orders" element={<OpsPortalGate><ProtectedRoute requireAdmin><PageTransition><AdminOrders /></PageTransition></ProtectedRoute></OpsPortalGate>} />
         <Route path="/ops-portal/orders/:orderId" element={<OpsPortalGate><ProtectedRoute requireAdmin><PageTransition><AdminOrderDetail /></PageTransition></ProtectedRoute></OpsPortalGate>} />
         <Route path="/ops-portal/worn-in-the-wild" element={<OpsPortalGate><ProtectedRoute requireAdmin><PageTransition><AdminWornInTheWild /></PageTransition></ProtectedRoute></OpsPortalGate>} />
+        <Route path="/ops-portal/subscribers" element={<OpsPortalGate><ProtectedRoute requireAdmin><PageTransition><AdminSubscribers /></PageTransition></ProtectedRoute></OpsPortalGate>} />
+        <Route path="/ops-portal/ambassadors" element={<OpsPortalGate><ProtectedRoute requireAdmin><PageTransition><AdminAmbassadors /></PageTransition></ProtectedRoute></OpsPortalGate>} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
       </Routes>
