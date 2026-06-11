@@ -301,6 +301,17 @@ const AdminOrderDetail = () => {
                   </Badge>
                 </div>
 
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full text-xs uppercase tracking-wider"
+                  onClick={handleResendOps}
+                  disabled={resending}
+                >
+                  {resending ? <Loader2 className="h-3.5 w-3.5 mr-2 animate-spin" /> : <Mail className="h-3.5 w-3.5 mr-2" />}
+                  Re-send Ops Notification
+                </Button>
+
                 <div className="space-y-2">
                   <Label className="text-xs uppercase tracking-wider">Fulfillment</Label>
                   <Select value={fulfillmentStatus} onValueChange={setFulfillmentStatus}>
