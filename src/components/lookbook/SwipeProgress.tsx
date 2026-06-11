@@ -21,7 +21,7 @@ export default function SwipeProgress({
   totalValue,
   currentIndex,
   totalProducts,
-  freeShippingThreshold = 150,
+  freeShippingThreshold = 250,
   bundleDiscountPercent = 0,
   onViewBag,
   onClose,
