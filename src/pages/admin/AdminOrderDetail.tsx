@@ -107,6 +107,24 @@ const AdminOrderDetail = () => {
     }
   };
 
+  const handleResendOps = async () => {
+    if (!orderId) return;
+    setResending(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('send-order-confirmation', {
+        body: { orderId, notifyAdminOnly: true },
+      });
+      if (error) throw error;
+      const adminResult = (data as any)?.results?.find((r: any) => r.kind === 'admin');
+      if (adminResult && !adminResult.ok) throw new Error(adminResult.error || 'Send failed');
+      toast({ title: 'Ops notification sent', description: 'Re-sent to Line of Judah inbox and parker@veepo.ca.' });
+    } catch (e: any) {
+      toast({ title: 'Resend failed', description: e?.message || 'Unable to send', variant: 'destructive' });
+    } finally {
+      setResending(false);
+    }
+  };
+
   if (loading) {
     return (
       <AdminLayout>
