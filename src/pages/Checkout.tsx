@@ -108,20 +108,28 @@ const Checkout = () => {
   }, [subtotal, appliedDiscount, customerDetails.email, validateCode]);
 
 
+  // Single flat-rate shipping: $15 Canada / $35 International / FREE on $250+
+  const isCanadianShip = (shippingAddress.country || '').trim().toUpperCase() === 'CA'
+    || (shippingAddress.country || '').trim().toLowerCase() === 'canada'
+    || !shippingAddress.country; // default to CA until country is entered
+
   const getShippingCost = () => {
-    if (hasFreeShipping && shippingOption === "standard") return 0;
-    switch (shippingOption) {
-      case "express":
-        return 15;
-      case "overnight":
-        return 35;
-      default:
-        return hasFreeShipping ? 0 : 15;
-    }
+    if (hasFreeShipping) return 0;
+    return isCanadianShip ? 15 : 35;
   };
-  
+
   const shipping = getShippingCost();
   const total = subtotal - discountAmount + shipping;
+
+  // Mirror the destination country into the cart context so the drawer's
+  // free-shipping bar and any other cart UI reflect intl pricing live.
+  useEffect(() => {
+    const raw = (shippingAddress.country || '').trim();
+    if (!raw) return;
+    const upper = raw.toUpperCase();
+    if (upper === 'CA' || raw.toLowerCase() === 'canada') setShippingCountry('CA');
+    else setShippingCountry(upper.slice(0, 2) || 'US');
+  }, [shippingAddress.country, setShippingCountry]);
 
   const handleDiscountSubmit = async () => {
     if (!discountCode.trim()) return;
