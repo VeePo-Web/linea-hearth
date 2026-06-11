@@ -57,7 +57,7 @@ export const BRAND = {
   // TRUST SIGNALS & POLICIES
   // ═══════════════════════════════════════════════════════════
   trust: {
-    freeShippingThreshold: 99, // USD
+    freeShippingThreshold: 250,
     returnDays: 30,
     warrantyDays: 365,
     exchangeDays: 30,

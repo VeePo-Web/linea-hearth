@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
 import { Minus, Plus, Check, ExternalLink, AlertCircle, X, Loader2 } from "lucide-react";
-import { formatPrice, CURRENCY } from "@/lib/currency";
+import { formatPrice, CURRENCY, getShippingCost, isCanada } from "@/lib/currency";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import CheckoutHeader from "../components/header/CheckoutHeader";
 import Footer from "../components/footer/Footer";
@@ -109,16 +109,12 @@ const Checkout = () => {
 
 
   // Single flat-rate shipping: $15 Canada / $35 International / FREE on $250+
-  const isCanadianShip = (shippingAddress.country || '').trim().toUpperCase() === 'CA'
-    || (shippingAddress.country || '').trim().toLowerCase() === 'canada'
-    || !shippingAddress.country; // default to CA until country is entered
-
-  const getShippingCost = () => {
-    if (hasFreeShipping) return 0;
-    return isCanadianShip ? 15 : 35;
-  };
-
-  const shipping = getShippingCost();
+  // Sourced from @/lib/currency so cart, checkout, and edge function stay aligned.
+  const normalizedCountry = (shippingAddress.country || '').trim().toLowerCase() === 'canada'
+    ? 'CA'
+    : (shippingAddress.country || 'CA');
+  const isCanadianShip = isCanada(normalizedCountry);
+  const shipping = getShippingCost(normalizedCountry, subtotal);
   const total = subtotal - discountAmount + shipping;
 
   // Mirror the destination country into the cart context so the drawer's
