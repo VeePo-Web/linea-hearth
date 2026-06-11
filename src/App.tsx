@@ -98,6 +98,7 @@ const WornInTheWildUpload = lazyWithRetry(() => import("./pages/WornInTheWildUpl
 const AdminWornInTheWild = lazyWithRetry(() => import("./pages/admin/AdminWornInTheWild"));
 const AdminSubscribers = lazyWithRetry(() => import("./pages/admin/AdminSubscribers"));
 const AdminAmbassadors = lazyWithRetry(() => import("./pages/admin/AdminAmbassadors"));
+const AdminFinancials = lazyWithRetry(() => import("./pages/admin/AdminFinancials"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
