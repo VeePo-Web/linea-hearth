@@ -400,6 +400,23 @@ const ProductInfo = ({ product, variants = [], onColorChange, onAuthRequired, on
         <TestimonialSnippet productId={product?.id} />
       </motion.div>
 
+      {/* Style Selector (only when >1 styles offered) */}
+      <AnimatePresence>
+        {styleOptions.length > 1 && (
+          <motion.div
+            variants={staggerContainerVariants}
+            initial="hidden"
+            animate="visible"
+          >
+            <StyleSelector
+              styles={styleOptions}
+              selectedStyle={selectedStyle}
+              onStyleChange={handleStyleChange}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Color Selector with stagger animation */}
       <AnimatePresence>
         {colors.length > 0 && (

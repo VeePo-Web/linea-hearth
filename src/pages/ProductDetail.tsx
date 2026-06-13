@@ -247,18 +247,20 @@ const ProductDetail = () => {
               }}
               variants={product.product_variants}
               onColorChange={setSelectedColor}
-              onAddToBag={({ size, color, quantity }) => {
+              onAddToBag={({ size, color, style, priceDelta, quantity }) => {
                 const primaryImage = product.product_images?.find(img => img.is_primary)
                   || product.product_images?.[0];
+                const linePrice = displayPrice + (priceDelta || 0);
                 addItem({
                   id: productIdToCartId(product.id),
                   name: product.name,
-                  price: displayPrice,
-                  priceFormatted: formatPrice(displayPrice),
+                  price: linePrice,
+                  priceFormatted: formatPrice(linePrice),
                   image: primaryImage?.image_url || '/placeholder.svg',
                   category: product.categories?.slug || 'tops',
                   size: size || undefined,
                   color: color || undefined,
+                  style: style || undefined,
                   quantity,
                   productId: product.id,
                 });
