@@ -17,6 +17,7 @@ interface CheckoutItem {
   quantity: number;
   size?: string;
   color?: string;
+  style?: string;
 }
 
 interface ClientBundleClaim {
@@ -253,7 +254,7 @@ Deno.serve(async (req) => {
 
 
     const lineItems = authorized.map(({ item, unitAmountCents }) => {
-      const descriptionBits = [item.size, item.color].filter(Boolean).join(" / ");
+      const descriptionBits = [item.style, item.color, item.size].filter(Boolean).join(" / ");
       return {
         price_data: {
           currency: "cad",
@@ -268,6 +269,7 @@ Deno.serve(async (req) => {
               ...(item.variantId && { variantId: item.variantId }),
               ...(item.size && { size: item.size }),
               ...(item.color && { color: item.color }),
+              ...(item.style && { style: item.style }),
             },
           },
         },
@@ -520,7 +522,7 @@ Deno.serve(async (req) => {
         product_name: item.name,
         product_image_url: resolveImageUrl(item.image),
         variant_size: item.size || null,
-        variant_color: item.color || null,
+        variant_color: [item.style, item.color].filter(Boolean).join(" / ") || null,
         unit_price_cents: unitAmountCents,
         quantity: item.quantity,
         total_cents: unitAmountCents * item.quantity,
