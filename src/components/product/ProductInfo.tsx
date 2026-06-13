@@ -285,7 +285,7 @@ const ProductInfo = ({ product, variants = [], onColorChange, onAuthRequired, on
 
           <ScarcityBadge productId={product?.id} size={selectedSize} />
 
-          <Button id="main-add-to-bag" disabled={!canAddToBag} onClick={() => onAddToBag?.({ size: selectedSize, color: selectedColor, quantity })} className="w-full h-12 bg-foreground text-background hover:bg-foreground/90 font-light rounded-none disabled:opacity-50 disabled:cursor-not-allowed">
+          <Button id="main-add-to-bag" disabled={!canAddToBag} onClick={() => onAddToBag?.({ size: selectedSize, color: selectedColor, style: selectedStyle, priceDelta: activeStyleDelta, quantity })} className="w-full h-12 bg-foreground text-background hover:bg-foreground/90 font-light rounded-none disabled:opacity-50 disabled:cursor-not-allowed">
             Add to Bag — ${totalPrice.toFixed(2)}
           </Button>
 
@@ -486,7 +486,7 @@ const ProductInfo = ({ product, variants = [], onColorChange, onAuthRequired, on
             id="main-add-to-bag"
             disabled={!canAddToBag}
             className="w-full h-12 bg-foreground text-background hover:bg-foreground/90 font-light rounded-none disabled:opacity-50 disabled:cursor-not-allowed transition-all hover:shadow-lg"
-            onClick={() => onAddToBag?.({ size: selectedSize, color: selectedColor, quantity })}
+            onClick={() => onAddToBag?.({ size: selectedSize, color: selectedColor, style: selectedStyle, priceDelta: activeStyleDelta, quantity })}
           >
             Add to Bag — ${totalPrice.toFixed(2)}
           </Button>
