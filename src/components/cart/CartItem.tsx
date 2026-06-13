@@ -58,7 +58,7 @@ const CartItem = ({ item }: CartItemProps) => {
   const handleConfirmRemove = () => {
     setIsRemoving(true);
     setShowConfirmation(false);
-    setTimeout(() => removeItem(item.id), prefersReducedMotion ? 0 : 200);
+    setTimeout(() => removeItem(lineKey), prefersReducedMotion ? 0 : 200);
   };
 
   const handleSaveForLater = async () => {
@@ -69,7 +69,7 @@ const CartItem = ({ item }: CartItemProps) => {
     
     // Remove from cart after saving
     setIsRemoving(true);
-    setTimeout(() => removeItem(item.id), prefersReducedMotion ? 0 : 200);
+    setTimeout(() => removeItem(lineKey), prefersReducedMotion ? 0 : 200);
   };
 
   const handleCancelConfirmation = () => {
@@ -80,7 +80,7 @@ const CartItem = ({ item }: CartItemProps) => {
     if (item.quantity === 1) {
       handleRemoveClick();
     } else {
-      updateQuantity(item.id, item.quantity - 1);
+      updateQuantity(lineKey, item.quantity - 1);
     }
   };
 
@@ -160,7 +160,7 @@ const CartItem = ({ item }: CartItemProps) => {
                 {item.quantity}
               </span>
               <button
-                onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                onClick={() => updateQuantity(lineKey, item.quantity + 1)}
                 className="p-2 hover:bg-muted/50 transition-colors"
                 aria-label="Increase quantity"
               >
