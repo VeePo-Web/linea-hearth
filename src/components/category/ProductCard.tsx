@@ -370,27 +370,41 @@ const ProductCard = ({ product, onQuickView, index = 0, onAuthRequired }: Produc
 
           {/* Color Swatches + Size Memory Hint */}
           <div className="flex items-center justify-between pt-1">
-            {colorSwatches.length > 1 && (
-              <div className="flex items-center gap-1.5">
-                {colorSwatches.slice(0, 4).map((c) => (
+            <div className="flex items-center gap-2">
+              {colorSwatches.length > 1 && (
+                <div className="flex items-center gap-1.5">
+                  {colorSwatches.slice(0, 4).map((c) => (
+                    <span
+                      key={c.name}
+                      className="relative w-4 h-4 md:w-3.5 md:h-3.5 rounded-full border border-border overflow-hidden"
+                      style={{ backgroundColor: c.hex }}
+                      title={c.name}
+                    >
+                      {c.image && (
+                        <img src={c.image} alt="" className="w-full h-full object-cover" />
+                      )}
+                    </span>
+                  ))}
+                  {colorSwatches.length > 4 && (
+                    <span className="text-[10px] text-muted-foreground">
+                      +{colorSwatches.length - 4}
+                    </span>
+                  )}
+                </div>
+              )}
+              {(() => {
+                const styleCount = product.product_styles?.[0]?.count ?? 0;
+                if (styleCount < 2) return null;
+                return (
                   <span
-                    key={c.name}
-                    className="relative w-4 h-4 md:w-3.5 md:h-3.5 rounded-full border border-border overflow-hidden"
-                    style={{ backgroundColor: c.hex }}
-                    title={c.name}
+                    className="px-1.5 py-0.5 text-[9px] uppercase tracking-[0.12em] text-foreground/70 border border-border/70 font-light"
+                    title={`${styleCount} garment styles available`}
                   >
-                    {c.image && (
-                      <img src={c.image} alt="" className="w-full h-full object-cover" />
-                    )}
+                    +{styleCount} styles
                   </span>
-                ))}
-                {colorSwatches.length > 4 && (
-                  <span className="text-[10px] text-muted-foreground">
-                    +{colorSwatches.length - 4}
-                  </span>
-                )}
-              </div>
-            )}
+                );
+              })()}
+            </div>
             {/* Size memory indicator */}
             {quickAdd.rememberedSize && quickAdd.stockForRemembered > 0 && (
               <span className="text-[10px] uppercase tracking-wide text-champagne-600 font-medium">
