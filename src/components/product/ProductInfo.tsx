@@ -266,6 +266,7 @@ const ProductInfo = ({ product, variants = [], onColorChange, onAuthRequired, on
         </div>
 
         <TestimonialSnippet productId={product?.id} />
+        {styleOptions.length > 1 && <StyleSelector styles={styleOptions} selectedStyle={selectedStyle} onStyleChange={handleStyleChange} />}
         {colors.length > 0 && <ColorSwatchSelector colors={colors} selectedColor={selectedColor} onColorChange={handleColorChange} />}
         {sizes.length > 0 && <SizeSelector sizes={sizes} selectedSize={selectedSize} onSizeChange={setSelectedSize} />}
 
