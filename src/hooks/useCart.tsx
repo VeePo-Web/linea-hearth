@@ -214,7 +214,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   const isCanadaDestination = shippingCountry === 'CA';
   const shippingCost = hasFreeShipping
     ? 0
-    : (isCanadaDestination ? 15 : 35);
+    : (isCanadaDestination ? 15 : 40);
 
   return (
     <CartContext.Provider

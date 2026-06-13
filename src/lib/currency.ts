@@ -15,13 +15,13 @@ export const CURRENCY = {
   /** Flat shipping cost for Canada (CAD) */
   domesticShippingCost: 15,
   /** Flat shipping cost for any non-Canada destination (CAD) */
-  intlShippingCost: 35,
+  intlShippingCost: 40,
 };
 
 /**
  * Returns the flat shipping cost in dollars for a given country code and subtotal.
  * - Canada: $15 flat
- * - Everywhere else: $35 flat
+ * - Everywhere else: $40 flat
  * - Any order ≥ $250 CAD subtotal ships free
  */
 export function getShippingCost(country: string | undefined, subtotal: number): number {

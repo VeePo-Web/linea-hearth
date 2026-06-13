@@ -9,7 +9,7 @@ const SavingsSummary = ({ discountAmount = 0 }: SavingsSummaryProps) => {
   const { hasFreeShipping, freeShippingThreshold, isCanadaDestination } = useCart();
 
   // Total savings = code discount + the flat shipping rate the user just dodged
-  const shippingValue = hasFreeShipping ? (isCanadaDestination ? 15 : 35) : 0;
+  const shippingValue = hasFreeShipping ? (isCanadaDestination ? 15 : 40) : 0;
   const totalSavings = discountAmount + shippingValue;
 
   if (totalSavings <= 0) return null;

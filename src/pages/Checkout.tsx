@@ -108,7 +108,7 @@ const Checkout = () => {
   }, [subtotal, appliedDiscount, customerDetails.email, validateCode]);
 
 
-  // Single flat-rate shipping: $15 Canada / $35 International / FREE on $250+
+  // Single flat-rate shipping: $15 Canada / $40 International / FREE on $250+
   // Sourced from @/lib/currency so cart, checkout, and edge function stay aligned.
   const normalizedCountry = (shippingAddress.country || '').trim().toLowerCase() === 'canada'
     ? 'CA'
@@ -853,7 +853,7 @@ const Checkout = () => {
                     </div>
 
                     <p className="text-xs text-muted-foreground mt-3">
-                      Flat $15 CAD across Canada · Flat $35 CAD international · Free shipping on orders $250+
+                      Flat $15 CAD across Canada · Flat $40 CAD international · Free shipping on orders $250+
                     </p>
                   </div>
 

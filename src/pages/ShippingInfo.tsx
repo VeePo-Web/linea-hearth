@@ -56,9 +56,9 @@ const shippingOptions = [
   {
     icon: Globe,
     title: "INTERNATIONAL — STANDARD",
-    description: "Flat $35 CAD anywhere outside Canada. 10-21 business days total (includes 2-5 days production + international transit). Full tracking.",
+    description: "Flat $40 CAD anywhere outside Canada. 10-21 business days total (includes 2-5 days production + international transit). Full tracking.",
     variant: "default" as const,
-    badge: "$35 FLAT"
+    badge: "$40 FLAT"
   },
   {
     icon: Rocket,
@@ -107,12 +107,12 @@ const ShippingInfo = () => {
     <>
       <PageSEO
         title="Shipping Info | Line of Judah"
-        description="Flat $15 CAD shipping across Canada. Flat $35 CAD international. Free shipping on orders over $250 CAD. Full tracking on every order."
+        description="Flat $15 CAD shipping across Canada. Flat $40 CAD international. Free shipping on orders over $250 CAD. Full tracking on every order."
         path="/shipping"
       />
       <ServicePageLayout
       title="Reliable Delivery. Every Order."
-      subtitle="Flat $15 across Canada · Flat $35 international · Free shipping over $250. Full tracking. Designed in Calgary, delivered worldwide."
+      subtitle="Flat $15 across Canada · Flat $40 international · Free shipping over $250. Full tracking. Designed in Calgary, delivered worldwide."
       eyebrow="SHIPPING & DELIVERY"
       heroAlignment="center"
       heroValueProps={heroValueProps}
