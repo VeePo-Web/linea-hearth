@@ -15,7 +15,7 @@ export const CURRENCY = {
   /** Flat shipping cost for Canada (CAD) */
   domesticShippingCost: 15,
   /** Flat shipping cost for any non-Canada destination (CAD) */
-  intlShippingCost: 35,
+  intlShippingCost: 40,
 };
 
 /**

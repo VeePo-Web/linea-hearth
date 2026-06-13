@@ -853,7 +853,7 @@ const Checkout = () => {
                     </div>
 
                     <p className="text-xs text-muted-foreground mt-3">
-                      Flat $15 CAD across Canada · Flat $35 CAD international · Free shipping on orders $250+
+                      Flat $15 CAD across Canada · Flat $40 CAD international · Free shipping on orders $250+
                     </p>
                   </div>
 

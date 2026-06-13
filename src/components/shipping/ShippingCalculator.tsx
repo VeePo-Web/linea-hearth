@@ -49,7 +49,7 @@ const ShippingCalculator = () => {
         method: "International — Standard",
         minDays: productionMin + 7,
         maxDays: productionMax + 14,
-        price: "$35 flat · FREE over $250",
+        price: "$40 flat · FREE over $250",
         carrier: "International tracked",
         includesProduction: true
       },

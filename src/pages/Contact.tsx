@@ -112,7 +112,7 @@ const quickFAQs = [
   {
     id: "shipping",
     question: "What are your shipping options and timeframes?",
-    answer: "Flat $15 CAD across Canada (5-9 business days) · Flat $35 CAD international (10-21 business days) · FREE shipping on any order over $250 CAD. Designed in Calgary, shipped worldwide. Every order includes full tracking.",
+    answer: "Flat $15 CAD across Canada (5-9 business days) · Flat $40 CAD international (10-21 business days) · FREE shipping on any order over $250 CAD. Designed in Calgary, shipped worldwide. Every order includes full tracking.",
   },
   {
     id: "returns",
