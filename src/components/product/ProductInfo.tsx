@@ -111,6 +111,20 @@ const ProductInfo = ({ product, variants = [], onColorChange, onAuthRequired, on
     }));
   }, [productColors, variants]);
 
+  // Style-aware availability: which colors actually exist for the active style?
+  // Returns null (= no restriction) for legacy products with no per-variant style data.
+  const colorsForActiveStyle = useMemo<Set<string> | null>(() => {
+    const hasAnyStyle = variants.some((v) => v.style);
+    if (!hasAnyStyle || !selectedStyle) return null;
+    const set = new Set<string>();
+    variants.forEach((v) => {
+      if (v.style?.toLowerCase() === selectedStyle.toLowerCase() && v.color) {
+        set.add(v.color.toLowerCase());
+      }
+    });
+    return set;
+  }, [variants, selectedStyle]);
+
   // Style options (admin-managed). When 0/1, the selector hides itself.
   const styleOptions = useMemo(() => {
     return productStyles.map((s) => ({
