@@ -273,7 +273,7 @@ const CartDrawer = ({ onViewFavorites }: CartDrawerProps) => {
                     <AnimatePresence mode="popLayout">
                       {items.map((item, index) => (
                         <motion.div
-                          key={`${item.id}-${item.size}-${item.color}`}
+                          key={`${item.id}-${item.size}-${item.color}-${item.style}`}
                           custom={index}
                           variants={itemVariants}
                           initial="hidden"
