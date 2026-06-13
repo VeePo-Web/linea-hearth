@@ -56,7 +56,8 @@ const ProductGrid = ({
           created_at,
           categories:category_id(name, slug),
           product_images(image_url, is_primary, display_order),
-          product_variants(id, size, color, stock_quantity)
+          product_variants(id, size, color, stock_quantity),
+          product_styles(count)
         `,
           { count: "exact" }
         )

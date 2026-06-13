@@ -28,17 +28,17 @@ export function useProductStyles(productId: string | null | undefined) {
     }
     setLoading(true);
     const { data, error } = await supabase
-      .from('product_styles' as never)
+      .from('product_styles')
       .select('id, product_id, name, label, icon_url, price_delta, position')
       .eq('product_id', productId)
       .order('position', { ascending: true });
     setLoading(false);
     if (!error && data) {
       // numeric comes back as string from PostgREST — coerce
-      const normalized = (data as unknown as ProductStyle[]).map((s) => ({
+      const normalized = data.map((s) => ({
         ...s,
         price_delta: Number(s.price_delta) || 0,
-      }));
+      })) as ProductStyle[];
       setStyles(normalized);
     }
   }, [productId]);

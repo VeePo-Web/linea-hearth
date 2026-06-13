@@ -716,6 +716,7 @@ export type Database = {
           variant_color: string | null
           variant_id: string | null
           variant_size: string | null
+          variant_style: string | null
         }
         Insert: {
           created_at?: string
@@ -731,6 +732,7 @@ export type Database = {
           variant_color?: string | null
           variant_id?: string | null
           variant_size?: string | null
+          variant_style?: string | null
         }
         Update: {
           created_at?: string
@@ -746,6 +748,7 @@ export type Database = {
           variant_color?: string | null
           variant_id?: string | null
           variant_size?: string | null
+          variant_style?: string | null
         }
         Relationships: [
           {

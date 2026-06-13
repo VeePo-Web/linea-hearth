@@ -37,13 +37,13 @@ const StyleManager = ({ productId }: StyleManagerProps) => {
     }
     setAdding(true);
     const { data, error } = await supabase
-      .from('product_styles' as never)
+      .from('product_styles')
       .insert({
         product_id: productId,
         name,
         position: styles.length,
         price_delta: 0,
-      } as never)
+      })
       .select()
       .single();
     setAdding(false);
@@ -58,8 +58,8 @@ const StyleManager = ({ productId }: StyleManagerProps) => {
   const patchStyle = async (id: string, patch: Partial<ProductStyle>) => {
     setStyles(styles.map((s) => (s.id === id ? { ...s, ...patch } : s)));
     const { error } = await supabase
-      .from('product_styles' as never)
-      .update(patch as never)
+      .from('product_styles')
+      .update(patch)
       .eq('id', id);
     if (error) {
       toast({ title: 'Error', description: 'Failed to save style', variant: 'destructive' });
@@ -77,7 +77,7 @@ const StyleManager = ({ productId }: StyleManagerProps) => {
     setStyles(reindexed);
     await Promise.all(
       reindexed.map((s) =>
-        supabase.from('product_styles' as never).update({ position: s.position } as never).eq('id', s.id),
+        supabase.from('product_styles').update({ position: s.position }).eq('id', s.id),
       ),
     );
   };
@@ -88,11 +88,11 @@ const StyleManager = ({ productId }: StyleManagerProps) => {
     if (target) {
       await supabase
         .from('product_variants')
-        .update({ style: null } as never)
+        .update({ style: null })
         .eq('product_id', productId!)
         .eq('style', target.name);
     }
-    const { error } = await supabase.from('product_styles' as never).delete().eq('id', id);
+    const { error } = await supabase.from('product_styles').delete().eq('id', id);
     if (error) {
       toast({ title: 'Error', description: 'Failed to delete style', variant: 'destructive' });
       return;
