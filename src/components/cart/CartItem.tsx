@@ -16,6 +16,7 @@ const CONFIRMATION_TIMEOUT = 4000; // Auto-collapse after 4 seconds
 
 const CartItem = ({ item }: CartItemProps) => {
   const { updateQuantity, removeItem, lastAddedItem } = useCart();
+  const lineKey = getCartLineKey(item);
   const { saveForLater } = useSavedForLater();
   const [isRemoving, setIsRemoving] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
