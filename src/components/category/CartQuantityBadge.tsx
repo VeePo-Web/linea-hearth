@@ -1,6 +1,6 @@
 import { Minus, Plus, ShoppingBag } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useCart } from "@/hooks/useCart";
+import { useCart, getCartLineKey } from "@/hooks/useCart";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
@@ -88,16 +88,16 @@ const CartQuantityBadge = ({
     e.preventDefault();
     e.stopPropagation();
     if (firstItem.quantity <= 1) {
-      removeItem(firstItem.id);
+      removeItem(getCartLineKey(firstItem));
     } else {
-      updateQuantity(firstItem.id, firstItem.quantity - 1);
+      updateQuantity(getCartLineKey(firstItem), firstItem.quantity - 1);
     }
   };
 
   const handleIncrement = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    updateQuantity(firstItem.id, firstItem.quantity + 1);
+    updateQuantity(getCartLineKey(firstItem), firstItem.quantity + 1);
   };
 
   return (

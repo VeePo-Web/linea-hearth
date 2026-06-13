@@ -163,6 +163,20 @@ const ProductInfo = ({ product, variants = [], onColorChange, onAuthRequired, on
   const handleStyleChange = (style: string) => {
     setSelectedStyle(style);
     setSelectedSize(null);
+    // If the active color isn't carried by the new style's variant matrix,
+    // clear it so the user must pick a valid color before adding to bag.
+    const styleHasAnyVariants = variants.some((v) => v.style);
+    if (styleHasAnyVariants && selectedColor) {
+      const validColors = new Set(
+        variants
+          .filter((v) => v.style?.toLowerCase() === style.toLowerCase() && v.color)
+          .map((v) => v.color!.toLowerCase())
+      );
+      if (validColors.size > 0 && !validColors.has(selectedColor.toLowerCase())) {
+        setSelectedColor(null);
+        onColorChange?.('');
+      }
+    }
   };
 
   // Calculate price (base ± selected style's delta)

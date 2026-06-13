@@ -21,6 +21,18 @@ export interface CartItem {
 }
 
 
+/**
+ * Stable, composite identity for a cart line.
+ * Two lines that share a product id but differ by size/color/style are
+ * distinct lines — removeItem / updateQuantity must key off this, not `id`,
+ * or mutating one Hoodie line would also mutate a Tee line of the same design.
+ */
+export function getCartLineKey(
+  item: Pick<CartItem, 'id' | 'size' | 'color' | 'style'>
+): string {
+  return `${item.id}|${item.size ?? ''}|${item.color ?? ''}|${item.style ?? ''}`;
+}
+
 export type ShippingProgressTier = 'start' | 'halfway' | 'almost' | 'unlocked';
 interface CartContextType {
   items: CartItem[];
@@ -31,8 +43,8 @@ interface CartContextType {
    * and don't fire 4 toasts when the user taps "Add the Look".
    */
   addItems: (items: Array<Omit<CartItem, 'quantity'> & { quantity?: number }>, options?: { openDrawer?: boolean }) => void;
-  removeItem: (id: number) => void;
-  updateQuantity: (id: number, quantity: number) => void;
+  removeItem: (lineKey: string) => void;
+  updateQuantity: (lineKey: string, quantity: number) => void;
   clearCart: () => void;
   itemCount: number;
   subtotal: number;
@@ -179,19 +191,19 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
 
-  const removeItem = useCallback((id: number) => {
-    setItems(currentItems => currentItems.filter(item => item.id !== id));
+  const removeItem = useCallback((lineKey: string) => {
+    setItems(currentItems => currentItems.filter(item => getCartLineKey(item) !== lineKey));
   }, []);
 
-  const updateQuantity = useCallback((id: number, quantity: number) => {
+  const updateQuantity = useCallback((lineKey: string, quantity: number) => {
     if (quantity <= 0) {
-      removeItem(id);
+      removeItem(lineKey);
       return;
     }
-    
+
     setItems(currentItems =>
       currentItems.map(item =>
-        item.id === id ? { ...item, quantity } : item
+        getCartLineKey(item) === lineKey ? { ...item, quantity } : item
       )
     );
   }, [removeItem]);
