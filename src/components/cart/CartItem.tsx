@@ -116,11 +116,13 @@ const CartItem = ({ item }: CartItemProps) => {
               <h3 className="text-sm font-medium text-foreground truncate">{item.name}</h3>
               
               {/* Variant info */}
-              {(item.size || item.color) && (
+              {(item.size || item.color || item.style) && (
                 <p className="text-xs text-muted-foreground mt-0.5">
-                  {item.size && <span>Size: {item.size}</span>}
-                  {item.size && item.color && <span> / </span>}
-                  {item.color && <span>Color: {item.color}</span>}
+                  {item.style && <span>{item.style}</span>}
+                  {item.style && item.color && <span> / </span>}
+                  {item.color && <span>{item.color}</span>}
+                  {(item.style || item.color) && item.size && <span> / </span>}
+                  {item.size && <span>Size {item.size}</span>}
                 </p>
               )}
               

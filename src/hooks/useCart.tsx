@@ -10,6 +10,8 @@ export interface CartItem {
   category: string;
   size?: string;
   color?: string;
+  /** Garment style — e.g. "Hoodie", "T-Shirt". Distinct cart line per style. */
+  style?: string;
   stock?: number;
   // Bundle tracking for lookbook items
   lookId?: string;
@@ -111,7 +113,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     
     setItems(currentItems => {
       const existingIndex = currentItems.findIndex(
-        item => item.id === newItem.id && item.size === newItem.size && item.color === newItem.color
+        item => item.id === newItem.id && item.size === newItem.size && item.color === newItem.color && item.style === newItem.style
       );
 
       if (existingIndex > -1) {
@@ -150,7 +152,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       for (const incoming of newItems) {
         const quantity = incoming.quantity || 1;
         const existingIndex = merged.findIndex(
-          item => item.id === incoming.id && item.size === incoming.size && item.color === incoming.color
+          item => item.id === incoming.id && item.size === incoming.size && item.color === incoming.color && item.style === incoming.style
         );
         if (existingIndex > -1) {
           merged[existingIndex] = {

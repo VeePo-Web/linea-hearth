@@ -1141,6 +1141,50 @@ export type Database = {
           },
         ]
       }
+      product_styles: {
+        Row: {
+          created_at: string
+          icon_url: string | null
+          id: string
+          label: string | null
+          name: string
+          position: number
+          price_delta: number
+          product_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          icon_url?: string | null
+          id?: string
+          label?: string | null
+          name: string
+          position?: number
+          price_delta?: number
+          product_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          icon_url?: string | null
+          id?: string
+          label?: string | null
+          name?: string
+          position?: number
+          price_delta?: number
+          product_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_styles_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       product_ugc: {
         Row: {
           caption: string | null

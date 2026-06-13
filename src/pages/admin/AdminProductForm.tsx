@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import AdminLayout from '@/components/admin/AdminLayout';
 import ImageUploader from '@/components/admin/ImageUploader';
 import VariantManager from '@/components/admin/VariantManager';
+import StyleManager from '@/components/admin/StyleManager';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -370,6 +371,17 @@ const AdminProductForm = () => {
                     <Label htmlFor="featured" className="text-sm cursor-pointer">Featured</Label>
                   </div>
                 </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-xs uppercase tracking-wider text-muted-foreground font-medium">
+                  Garment Styles
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <StyleManager productId={savedProductId} />
               </CardContent>
             </Card>
 
