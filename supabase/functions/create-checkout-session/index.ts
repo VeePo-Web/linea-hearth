@@ -47,10 +47,10 @@ interface RequestBody {
 
 // Flat-rate shipping in cents (CAD).
 // - Canada: $15
-// - Anywhere else (international): $35
+// - Anywhere else (international): $40
 // - Free on subtotal >= $250
 const SHIPPING_RATE_CA_CENTS = 1500;
-const SHIPPING_RATE_INTL_CENTS = 3500;
+const SHIPPING_RATE_INTL_CENTS = 4000;
 const FREE_SHIPPING_THRESHOLD_CENTS = 25000;
 // Stripe tax_code for general clothing (apparel). See https://docs.stripe.com/tax/tax-codes
 const APPAREL_TAX_CODE = "txcd_30060001";
