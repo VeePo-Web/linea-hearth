@@ -44,6 +44,8 @@ export interface ProductCardData {
   categories?: ProductCategory;
   product_images?: ProductImage[];
   product_variants?: ProductVariant[];
+  /** PostgREST count aggregate: `product_styles(count)` → `[{ count: N }]`. */
+  product_styles?: { count: number }[];
 }
 
 interface ProductCardProps {

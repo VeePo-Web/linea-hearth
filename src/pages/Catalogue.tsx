@@ -40,7 +40,8 @@ const Catalogue = () => {
           id, name, slug, price, sale_price, is_on_sale, is_featured, status, material, created_at,
           categories:category_id ( name, slug ),
           product_images ( image_url, is_primary, display_order ),
-          product_variants ( id, size, color, stock_quantity )
+          product_variants ( id, size, color, stock_quantity ),
+          product_styles ( count )
         `)
         .eq("status", "active")
         .order("created_at", { ascending: false });
