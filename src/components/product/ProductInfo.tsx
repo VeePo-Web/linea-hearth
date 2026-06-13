@@ -255,11 +255,11 @@ const ProductInfo = ({ product, variants = [], onColorChange, onAuthRequired, on
             <div className="text-right flex-shrink-0">
               {product?.is_on_sale && product?.sale_price ? (
                 <div className="space-y-0.5">
-                  <p className="text-xl font-light text-foreground">${product.sale_price.toFixed(2)}</p>
-                  <p className="text-sm font-light text-muted-foreground line-through">${product.price.toFixed(2)}</p>
+                  <p className="text-xl font-light text-foreground">${displayPrice.toFixed(2)}</p>
+                  <p className="text-sm font-light text-muted-foreground line-through">${(product.price + activeStyleDelta).toFixed(2)}</p>
                 </div>
               ) : (
-                <p className="text-xl font-light text-foreground">${(product?.price || 0).toFixed(2)}</p>
+                <p className="text-xl font-light text-foreground">${displayPrice.toFixed(2)}</p>
               )}
             </div>
           </div>
@@ -375,15 +375,15 @@ const ProductInfo = ({ product, variants = [], onColorChange, onAuthRequired, on
             {product?.is_on_sale && product?.sale_price ? (
               <div className="space-y-0.5">
                 <p className="text-xl font-light text-foreground">
-                  ${product.sale_price.toFixed(2)}
+                  ${displayPrice.toFixed(2)}
                 </p>
                 <p className="text-sm font-light text-muted-foreground line-through">
-                  ${product.price.toFixed(2)}
+                  ${(product.price + activeStyleDelta).toFixed(2)}
                 </p>
               </div>
             ) : (
               <p className="text-xl font-light text-foreground">
-                ${(product?.price || 0).toFixed(2)}
+                ${displayPrice.toFixed(2)}
               </p>
             )}
           </motion.div>
