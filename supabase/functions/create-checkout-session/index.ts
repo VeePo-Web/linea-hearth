@@ -246,19 +246,29 @@ Deno.serve(async (req) => {
         }
       }
       // Style delta (admin-managed garment-type adjustment).
+      // If the cart references a style the product no longer offers (admin
+      // renamed/deleted it after the user added to cart), fall back to a
+      // 0¢ delta AND tolerate the client price either including or omitting
+      // the (now-stale) delta — better to charge base than to 409 the cart.
       let styleAdjustment = 0;
-      if (item.style) {
-        styleAdjustment = stylesByProduct[prod.id]?.[item.style.toLowerCase()] ?? 0;
+      const styleKnown = item.style
+        ? stylesByProduct[prod.id] && item.style.toLowerCase() in stylesByProduct[prod.id]
+        : true;
+      if (item.style && styleKnown) {
+        styleAdjustment = stylesByProduct[prod.id][item.style.toLowerCase()];
       }
       const authorizedDollars = basePrice + variantAdjustment + styleAdjustment;
       const unitAmountCents = Math.round(authorizedDollars * 100);
       const clientCents = Math.round(item.price * 100);
-      if (clientCents !== unitAmountCents) {
+      const baseAuthorizedCents = Math.round((basePrice + variantAdjustment) * 100);
+      const priceOk = clientCents === unitAmountCents || (!styleKnown && clientCents === baseAuthorizedCents);
+      if (!priceOk) {
         console.warn("Price tampering blocked", {
           productId: prod.id,
           clientCents,
           authorizedCents: unitAmountCents,
           style: item.style,
+          styleKnown,
         });
         return new Response(
           JSON.stringify({
