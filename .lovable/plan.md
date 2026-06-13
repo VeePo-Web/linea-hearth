@@ -1,18 +1,30 @@
-# Verify Resend Is Actually Sending
+# Shipping Audit: $15 CA / $40 Worldwide
 
-`RESEND_API_KEY` is already configured as a secret, and you've verified `lineofjudah.clothing` in Resend. Nothing to add to the code — what's needed now is a live verification that emails are actually leaving and landing in both inboxes.
+Canada flat rate stays at **$15 CAD**. International flat rate changes from **$35 → $40 CAD**. Free shipping threshold ($250 CAD) is unchanged.
 
-## Steps
+## Source-of-truth changes
 
-1. **Find the most recent paid order** in the database to use as a test payload (read-only query, no data change).
-2. **Invoke `send-order-confirmation`** against that order with `notifyAdminOnly: true`. This sends only the ops/Tapstitch email to `1.lineofjudah.1@gmail.com` and `parker@veepo.ca` — the customer is not re-emailed.
-3. **Read the Edge Function logs** for `send-order-confirmation` and confirm we see an `admin ok order=… id=…` line (Resend message ID returned).
-4. **Report results** back to you:
-   - ✅ If logs show a Resend message ID → working. Check both inboxes (and spam) for the test email.
-   - ❌ If logs show `admin FAILED` with a 4xx/5xx from Resend → I'll surface the exact error (most likely a remaining domain/DNS issue) and recommend the fix.
-5. If there are no paid orders yet, I'll instead send a one-off test email directly through Resend from a temporary verification call to confirm the key+domain pair works end-to-end.
+1. **`src/lib/currency.ts`** — `intlShippingCost: 35` → `40`. All client UI that uses `getShippingCost()` updates automatically.
+2. **`src/hooks/useCart.tsx`** — `shippingCost` ternary `: 35` → `: 40` (cart drawer, free-shipping bar).
+3. **`src/components/checkout/SavingsSummary.tsx`** — `isCanadaDestination ? 15 : 35` → `: 40`.
+4. **`supabase/functions/create-checkout-session/index.ts`** — `SHIPPING_RATE_INTL_CENTS = 3500` → `4000`. Redeploy edge function so Stripe sessions charge the new rate.
 
-## Out of scope
-- No code changes — the pipeline was already wired up last turn.
-- No new secrets — `RESEND_API_KEY` is present.
-- No customer-facing emails will be triggered (admin-only).
+## Copy / SEO updates (all "$35" → "$40")
+
+- `src/pages/ShippingInfo.tsx` — international card description, page meta description, subtitle.
+- `src/pages/FAQ.tsx` — shipping cost answer + "Do you ship internationally?" answer.
+- `src/pages/Contact.tsx` — FAQ answer.
+- `src/pages/Checkout.tsx` — footer note line ("Flat $15 … $35 …").
+- `src/pages/Index.tsx` — homepage SEO description.
+- `src/components/shipping/ShippingCalculator.tsx` — "International — Standard" price string (`$35 flat · FREE over $250` → `$40 …`).
+
+## Verification
+
+- Grep `rg -n "\\$35"` after edits → should return zero shipping-related hits.
+- Load preview cart with intl destination + sub-$250 subtotal → drawer + checkout summary both show $40.
+- Invoke `create-checkout-session` with `country != CA` → Stripe line item shows 4000 cents.
+- Confirm Canada ($15) and free-over-$250 still work unchanged.
+
+## Memory
+
+Update `mem://index.md` Core line "Free shipping over $250" context is fine; no memory currently pins the $35 number, so nothing to rewrite.
