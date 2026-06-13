@@ -38,6 +38,7 @@ export interface OrderItem {
   product_image_url?: string;
   variant_size?: string;
   variant_color?: string;
+  variant_style?: string;
   sku?: string;
   quantity: number;
   unit_price_cents: number;
