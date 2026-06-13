@@ -12,6 +12,7 @@ interface OrderItem {
   product_image_url: string | null;
   variant_size: string | null;
   variant_color: string | null;
+  variant_style: string | null;
   quantity: number;
   unit_price_cents: number;
   total_cents: number;
@@ -66,7 +67,7 @@ function buildTapstitchBlock(order: Order, items: OrderItem[]): string {
   const fullName = `${order.customer_first_name || ""} ${order.customer_last_name || ""}`.trim() || "—";
   const cityLine = `${addr.city || ""}${addr.state ? `, ${addr.state}` : ""}  ${addr.postalCode || ""}`.trim();
   const itemLines = items.map((it) => {
-    const variant = [it.variant_size, it.variant_color].filter(Boolean).join(" / ") || "Default";
+    const variant = [it.variant_style, it.variant_color, it.variant_size].filter(Boolean).join(" / ") || "Default";
     return `  ${it.quantity}x  ${it.product_name} — ${variant}`;
   }).join("\n");
   return [
@@ -94,9 +95,11 @@ function buildAdminNotificationHtml(order: Order, items: OrderItem[], siteUrl: s
   const placedAt = new Date(order.created_at).toLocaleString("en-US", {
     dateStyle: "medium", timeStyle: "short", timeZone: "America/Toronto",
   });
+  const anyStyle = items.some((it) => it.variant_style);
   const itemsRows = items.map((it) => `
     <tr>
       <td style="padding:8px;border-bottom:1px solid #eee;">${escapeHtml(it.product_name)}</td>
+      ${anyStyle ? `<td style="padding:8px;border-bottom:1px solid #eee;">${escapeHtml(it.variant_style || "—")}</td>` : ""}
       <td style="padding:8px;border-bottom:1px solid #eee;">${escapeHtml(it.variant_size || "—")}</td>
       <td style="padding:8px;border-bottom:1px solid #eee;">${escapeHtml(it.variant_color || "—")}</td>
       <td style="padding:8px;border-bottom:1px solid #eee;text-align:center;">${it.quantity}</td>
@@ -140,7 +143,7 @@ function buildAdminNotificationHtml(order: Order, items: OrderItem[], siteUrl: s
       <h2 style="font-size:14px;margin:24px 0 8px;text-transform:uppercase;letter-spacing:1px;color:#57534e;">Items</h2>
       <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;font-size:13px;">
         <thead><tr style="background:#fafaf9;text-align:left;">
-          <th style="padding:8px;">Product</th><th style="padding:8px;">Size</th><th style="padding:8px;">Color</th>
+          <th style="padding:8px;">Product</th>${anyStyle ? `<th style="padding:8px;">Style</th>` : ""}<th style="padding:8px;">Size</th><th style="padding:8px;">Color</th>
           <th style="padding:8px;text-align:center;">Qty</th><th style="padding:8px;text-align:right;">Unit</th><th style="padding:8px;text-align:right;">Total</th>
         </tr></thead>
         <tbody>${itemsRows}</tbody>
@@ -244,7 +247,7 @@ function buildOrderConfirmationHtml(order: Order, items: OrderItem[], siteUrl: s
             <td style="padding-left:16px;vertical-align:top;">
               <p style="margin:0 0 4px;font-size:16px;font-weight:600;color:#1C1917;">${item.product_name}</p>
               <p style="margin:0 0 4px;font-size:14px;color:#78716C;">
-                ${[item.variant_size ? `Size: ${item.variant_size}` : null, item.variant_color ? `Color: ${item.variant_color}` : null].filter(Boolean).join(" / ")}
+                ${[item.variant_style ? `Style: ${item.variant_style}` : null, item.variant_size ? `Size: ${item.variant_size}` : null, item.variant_color ? `Color: ${item.variant_color}` : null].filter(Boolean).join(" / ")}
               </p>
               <p style="margin:0;font-size:14px;color:#78716C;">Qty: ${item.quantity}</p>
             </td>
