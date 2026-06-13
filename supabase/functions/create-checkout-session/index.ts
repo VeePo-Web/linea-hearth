@@ -192,6 +192,25 @@ Deno.serve(async (req) => {
       for (const v of dbVariants ?? []) variantsById[v.id] = v as any;
     }
 
+    // === STYLE PRICE DELTAS ===
+    // Load admin-managed style rows for any product whose line item carries a
+    // `style` value. The server adds the matching style's price_delta on top of
+    // the base price so the client-server price comparison passes for Hoodie /
+    // Crewneck / etc. variants. If a style name doesn't match any row, delta = 0.
+    const stylesByProduct: Record<string, Record<string, number>> = {};
+    const styleProductIds = Array.from(
+      new Set(body.items.filter((it) => it.style && it.productId).map((it) => it.productId!)),
+    );
+    if (styleProductIds.length) {
+      const { data: dbStyles } = await sbAdmin
+        .from("product_styles")
+        .select("product_id, name, price_delta")
+        .in("product_id", styleProductIds);
+      for (const s of (dbStyles ?? []) as Array<{ product_id: string; name: string; price_delta: number | string }>) {
+        const bucket = stylesByProduct[s.product_id] || (stylesByProduct[s.product_id] = {});
+        bucket[s.name.toLowerCase()] = Number(s.price_delta) || 0;
+      }
+    }
 
     const productsById: Record<string, typeof dbProducts[number]> = {};
     for (const p of dbProducts) productsById[p.id] = p;
@@ -226,7 +245,12 @@ Deno.serve(async (req) => {
           });
         }
       }
-      const authorizedDollars = basePrice + variantAdjustment;
+      // Style delta (admin-managed garment-type adjustment).
+      let styleAdjustment = 0;
+      if (item.style) {
+        styleAdjustment = stylesByProduct[prod.id]?.[item.style.toLowerCase()] ?? 0;
+      }
+      const authorizedDollars = basePrice + variantAdjustment + styleAdjustment;
       const unitAmountCents = Math.round(authorizedDollars * 100);
       const clientCents = Math.round(item.price * 100);
       if (clientCents !== unitAmountCents) {
@@ -234,6 +258,7 @@ Deno.serve(async (req) => {
           productId: prod.id,
           clientCents,
           authorizedCents: unitAmountCents,
+          style: item.style,
         });
         return new Response(
           JSON.stringify({
@@ -519,10 +544,10 @@ Deno.serve(async (req) => {
         order_id: order.id,
         product_id: item.productId || null,
         variant_id: item.variantId || null,
-        product_name: item.name,
+        product_name: item.style ? `${item.name} — ${item.style}` : item.name,
         product_image_url: resolveImageUrl(item.image),
         variant_size: item.size || null,
-        variant_color: [item.style, item.color].filter(Boolean).join(" / ") || null,
+        variant_color: item.color || null,
         unit_price_cents: unitAmountCents,
         quantity: item.quantity,
         total_cents: unitAmountCents * item.quantity,
