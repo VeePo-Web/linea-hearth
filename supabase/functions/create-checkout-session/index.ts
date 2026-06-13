@@ -543,7 +543,7 @@ Deno.serve(async (req) => {
         }),
         ...(stripeDiscounts && { discounts: stripeDiscounts }),
         ...(enableAutomaticTax && { automatic_tax: { enabled: true } }),
-        // Expanded worldwide to support flat-rate intl shipping ($35 CAD).
+        // Expanded worldwide to support flat-rate intl shipping ($40 CAD).
         // Stripe's full ISO-3166 list — excludes only sanctioned destinations.
         shipping_address_collection: {
           allowed_countries: [
