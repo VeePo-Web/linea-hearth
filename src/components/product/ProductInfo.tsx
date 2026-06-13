@@ -281,7 +281,7 @@ const ProductInfo = ({ product, variants = [], onColorChange, onAuthRequired, on
 
         <TestimonialSnippet productId={product?.id} />
         {styleOptions.length > 1 && <StyleSelector styles={styleOptions} selectedStyle={selectedStyle} onStyleChange={handleStyleChange} />}
-        {colors.length > 0 && <ColorSwatchSelector colors={colors} selectedColor={selectedColor} onColorChange={handleColorChange} />}
+        {colors.length > 0 && <ColorSwatchSelector colors={colors} selectedColor={selectedColor} onColorChange={handleColorChange} availableColorNames={colorsForActiveStyle} />}
         {sizes.length > 0 && <SizeSelector sizes={sizes} selectedSize={selectedSize} onSizeChange={setSelectedSize} />}
 
         <div className="space-y-4 pt-4">
@@ -443,6 +443,7 @@ const ProductInfo = ({ product, variants = [], onColorChange, onAuthRequired, on
               colors={colors}
               selectedColor={selectedColor}
               onColorChange={handleColorChange}
+              availableColorNames={colorsForActiveStyle}
             />
           </motion.div>
         )}
