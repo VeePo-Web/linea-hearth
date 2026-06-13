@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useCart } from "@/hooks/useCart";
+import { useCart, getCartLineKey } from "@/hooks/useCart";
 import { useAbandonedCart } from "@/hooks/useAbandonedCart";
 import { useStripeCheckout } from "@/hooks/useStripeCheckout";
 import { useDiscountCode, AppliedDiscount } from "@/hooks/useDiscountCode";
@@ -337,7 +337,7 @@ const Checkout = () => {
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                            onClick={() => updateQuantity(getCartLineKey(item), item.quantity - 1)}
                             className="h-7 w-7 p-0 rounded-none border-muted-foreground/20"
                           >
                             <Minus className="h-3 w-3" />
@@ -348,7 +348,7 @@ const Checkout = () => {
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                            onClick={() => updateQuantity(getCartLineKey(item), item.quantity + 1)}
                             className="h-7 w-7 p-0 rounded-none border-muted-foreground/20"
                           >
                             <Plus className="h-3 w-3" />
