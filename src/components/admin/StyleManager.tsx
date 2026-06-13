@@ -31,6 +31,9 @@ const StyleManager = ({ productId }: StyleManagerProps) => {
     }
     const name = newName.trim();
     if (!name) return;
+    // Case-insensitive dedupe: server lowercases for matching, and the DB
+    // UNIQUE (product_id, name) is case-sensitive, so "Hoodie" + "hoodie"
+    // would otherwise both insert and then collide silently downstream.
     if (styles.some((s) => s.name.toLowerCase() === name.toLowerCase())) {
       toast({ title: 'Style already added' });
       return;
@@ -56,6 +59,7 @@ const StyleManager = ({ productId }: StyleManagerProps) => {
   };
 
   const patchStyle = async (id: string, patch: Partial<ProductStyle>) => {
+    const prev = styles.find((s) => s.id === id);
     setStyles(styles.map((s) => (s.id === id ? { ...s, ...patch } : s)));
     const { error } = await supabase
       .from('product_styles')
@@ -64,6 +68,16 @@ const StyleManager = ({ productId }: StyleManagerProps) => {
     if (error) {
       toast({ title: 'Error', description: 'Failed to save style', variant: 'destructive' });
       refetch();
+      return;
+    }
+    // Cascade rename to any variants tagged with the old style name so the
+    // PDP variant matrix and existing carts stay aligned.
+    if (patch.name && prev && patch.name !== prev.name && productId) {
+      await supabase
+        .from('product_variants')
+        .update({ style: patch.name })
+        .eq('product_id', productId)
+        .eq('style', prev.name);
     }
   };
 
