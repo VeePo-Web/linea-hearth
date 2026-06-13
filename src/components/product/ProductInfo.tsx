@@ -13,6 +13,7 @@ import {
 import { Minus, Plus, Truck, RotateCcw } from "lucide-react";
 import SizeSelector from "./SizeSelector";
 import ColorSwatchSelector from "./ColorSwatchSelector";
+import StyleSelector from "./StyleSelector";
 import TestimonialSnippet from "./TestimonialSnippet";
 import ProductFAQ from "./ProductFAQ";
 import ShippingReturnsAccordion from "./ShippingReturnsAccordion";
@@ -23,12 +24,14 @@ import FavoriteButton from "@/components/favorites/FavoriteButton";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { easing } from "@/lib/animations";
 import { useProductColors } from "@/hooks/useProductColors";
+import { useProductStyles } from "@/hooks/useProductStyles";
 import { getColorHex } from "@/lib/cartUtils";
 
 interface ProductVariant {
   id: string;
   size: string | null;
   color: string | null;
+  style?: string | null;
   stock_quantity: number;
   price_adjustment: number | null;
 }
@@ -57,17 +60,19 @@ interface ProductInfoProps {
   variants?: ProductVariant[];
   onColorChange?: (color: string) => void;
   onAuthRequired?: () => void;
-  onAddToBag?: (details: { size: string | null; color: string | null; quantity: number }) => void;
+  onAddToBag?: (details: { size: string | null; color: string | null; style: string | null; priceDelta: number; quantity: number }) => void;
 }
 
 const ProductInfo = ({ product, variants = [], onColorChange, onAuthRequired, onAddToBag }: ProductInfoProps) => {
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
+  const [selectedStyle, setSelectedStyle] = useState<string | null>(null);
   const prefersReducedMotion = useReducedMotion();
 
-  // Load persisted colors for this product (admin-managed).
+  // Load persisted colors + styles for this product (admin-managed).
   const { colors: productColors } = useProductColors(product?.id);
+  const { styles: productStyles } = useProductStyles(product?.id);
 
   // Print-on-demand: never gate on stock.
   const sizes = useMemo(() => {
@@ -75,13 +80,14 @@ const ProductInfo = ({ product, variants = [], onColorChange, onAuthRequired, on
     variants.forEach((v) => {
       if (!v.size) return;
       if (selectedColor && v.color?.toLowerCase() !== selectedColor.toLowerCase()) return;
+      if (selectedStyle && v.style?.toLowerCase() !== selectedStyle.toLowerCase()) return;
       sizeSet.add(v.size);
     });
     const sizeOrder = ["XS", "S", "M", "L", "XL", "2XL", "3XL"];
     return Array.from(sizeSet)
       .map((size) => ({ size, stock: 999 }))
       .sort((a, b) => sizeOrder.indexOf(a.size) - sizeOrder.indexOf(b.size));
-  }, [variants, selectedColor]);
+  }, [variants, selectedColor, selectedStyle]);
 
   // Colors: prefer admin-managed product_colors; fall back to variant-derived.
   const colors = useMemo(() => {
@@ -105,6 +111,17 @@ const ProductInfo = ({ product, variants = [], onColorChange, onAuthRequired, on
     }));
   }, [productColors, variants]);
 
+  // Style options (admin-managed). When 0/1, the selector hides itself.
+  const styleOptions = useMemo(() => {
+    return productStyles.map((s) => ({
+      name: s.name,
+      label: s.label,
+      iconUrl: s.icon_url,
+      priceDelta: s.price_delta,
+      available: true,
+    }));
+  }, [productStyles]);
+
   // Auto-select color when only one option exists
   useEffect(() => {
     if (colors.length === 1 && !selectedColor) {
@@ -112,6 +129,13 @@ const ProductInfo = ({ product, variants = [], onColorChange, onAuthRequired, on
       onColorChange?.(colors[0].color);
     }
   }, [colors]);
+
+  // Auto-select style when only one option exists
+  useEffect(() => {
+    if (styleOptions.length === 1 && !selectedStyle) {
+      setSelectedStyle(styleOptions[0].name);
+    }
+  }, [styleOptions]);
 
   const incrementQuantity = () => setQuantity(prev => prev + 1);
   const decrementQuantity = () => setQuantity(prev => Math.max(1, prev - 1));
@@ -122,15 +146,23 @@ const ProductInfo = ({ product, variants = [], onColorChange, onAuthRequired, on
     onColorChange?.(color);
   };
 
-  // Calculate price
-  const displayPrice = product?.is_on_sale && product?.sale_price 
-    ? product.sale_price 
+  const handleStyleChange = (style: string) => {
+    setSelectedStyle(style);
+    setSelectedSize(null);
+  };
+
+  // Calculate price (base ± selected style's delta)
+  const basePrice = product?.is_on_sale && product?.sale_price
+    ? product.sale_price
     : product?.price || 0;
+  const activeStyleDelta = productStyles.find((s) => s.name === selectedStyle)?.price_delta || 0;
+  const displayPrice = basePrice + activeStyleDelta;
   const totalPrice = displayPrice * quantity;
 
   // Check if can add to bag
   const canAddToBag = variants.length === 0 || (
-    (colors.length === 0 || selectedColor) && 
+    (colors.length === 0 || selectedColor) &&
+    (styleOptions.length === 0 || selectedStyle) &&
     (sizes.length === 0 || selectedSize)
   );
 
