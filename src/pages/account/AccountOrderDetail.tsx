@@ -207,9 +207,9 @@ export default function AccountOrderDetail() {
                   <p className="text-sm font-medium text-foreground truncate">
                     {item.product_name}
                   </p>
-                  {(item.variant_size || item.variant_color) && (
+                  {(item.variant_style || item.variant_size || item.variant_color) && (
                     <p className="text-xs text-muted-foreground mt-0.5">
-                      {[item.variant_size, item.variant_color].filter(Boolean).join(' / ')}
+                      {[item.variant_style, item.variant_size, item.variant_color].filter(Boolean).join(' / ')}
                     </p>
                   )}
                   <p className="text-xs text-muted-foreground mt-1">Qty: {item.quantity}</p>

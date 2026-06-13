@@ -195,7 +195,7 @@ const AdminOrderDetail = () => {
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium truncate">{item.product_name}</p>
                       <p className="text-xs text-muted-foreground">
-                        {[item.variant_size, item.variant_color].filter(Boolean).join(' / ') || 'Default'}
+                        {[item.variant_style, item.variant_size, item.variant_color].filter(Boolean).join(' / ') || 'Default'}
                         {' · Qty: '}{item.quantity}
                       </p>
                     </div>
