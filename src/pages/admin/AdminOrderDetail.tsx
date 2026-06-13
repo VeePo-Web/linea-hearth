@@ -25,6 +25,7 @@ interface OrderItem {
   product_image_url: string | null;
   variant_size: string | null;
   variant_color: string | null;
+  variant_style: string | null;
   quantity: number;
   unit_price_cents: number;
   total_cents: number;
