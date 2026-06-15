@@ -81,8 +81,8 @@ const TermsOfService = () => {
         <h4 className="text-lg font-light text-foreground mb-2 mt-6">Payment Terms</h4>
         <p>
           Payment is due at the time of purchase. We accept major credit cards and other 
-          payment methods as displayed during checkout. All prices are in USD unless 
-          otherwise specified.
+          payment methods as displayed during checkout. All prices are in Canadian Dollars 
+          (CAD) unless otherwise specified.
         </p>
       </LegalSection>
 

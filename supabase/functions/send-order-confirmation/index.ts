@@ -178,9 +178,9 @@ function formatCurrency(cents: number, currency: string = "cad"): string {
   const amount = cents / 100;
   const symbols: Record<string, string> = {
     eur: "€",
-    usd: "$",
+    usd: "US$",
     gbp: "£",
-    cad: "C$",
+    cad: "$",
   };
   const symbol = symbols[currency.toLowerCase()] || "$";
   return `${symbol}${amount.toFixed(2)}`;

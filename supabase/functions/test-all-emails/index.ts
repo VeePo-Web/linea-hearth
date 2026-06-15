@@ -20,7 +20,7 @@ const SITE_URL = "https://lineofjudah.clothing";
 // Helpers (copied from send-order-confirmation)
 // ============================================================================
 function formatCurrency(cents: number, currency = "cad"): string {
-  const symbols: Record<string, string> = { eur: "€", usd: "$", gbp: "£", cad: "C$" };
+  const symbols: Record<string, string> = { eur: "€", usd: "US$", gbp: "£", cad: "$" };
   return `${symbols[currency.toLowerCase()] || "$"}${(cents / 100).toFixed(2)}`;
 }
 
