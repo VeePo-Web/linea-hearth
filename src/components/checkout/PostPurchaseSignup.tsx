@@ -337,11 +337,18 @@ export function PostPurchaseSignup({
           )}
         </AnimatePresence>
 
+        {/* Required acknowledgements */}
+        <LiabilityAcknowledgements
+          variant="account"
+          values={acks}
+          onChange={(k, v) => setAcks((prev) => ({ ...prev, [k]: v }))}
+        />
+
         {/* Submit button */}
         <Button
           type="submit"
           className="w-full rounded-none"
-          disabled={!isPasswordValid || state === "loading"}
+          disabled={!isPasswordValid || !acksOk || state === "loading"}
         >
           {state === "loading" ? (
             <span className="flex items-center gap-2">
