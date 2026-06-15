@@ -129,6 +129,8 @@ const AmbassadorForm = () => {
         faith_in_content: data.faith_in_content,
         content_frequency: data.content_frequency,
         agreed_to_terms: data.agreed_to_terms,
+        terms_accepted_at: nowIso,
+        account_security_ack_at: nowIso,
       });
 
       if (error) throw error;
