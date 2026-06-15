@@ -111,8 +111,10 @@ const AmbassadorForm = () => {
   });
 
   const onSubmit = async (data: FormData) => {
+    if (!acksOk) return;
     setIsSubmitting(true);
     try {
+      const nowIso = new Date().toISOString();
       const { error } = await supabase.from("ambassador_applications").insert({
         full_name: data.full_name,
         email: data.email,
