@@ -59,9 +59,17 @@ export default function CreateAccountForm({ onSuccess, onSwitchToSignIn }: Creat
   });
 
   const onSubmit = async (data: CreateAccountFormData) => {
+    if (!acksOk) {
+      setError('root', { message: 'Please confirm the acknowledgements below to continue.' });
+      return;
+    }
     setIsLoading(true);
     try {
-      const { data: signUpData, error } = await signUp(data.email, data.password, data.fullName);
+      const nowIso = new Date().toISOString();
+      const { data: signUpData, error } = await signUp(data.email, data.password, data.fullName, {
+        termsAcceptedAt: nowIso,
+        accountSecurityAckAt: nowIso,
+      });
 
       if (error) {
         if (error.message.includes('already registered')) {
