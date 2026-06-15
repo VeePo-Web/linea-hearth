@@ -93,13 +93,17 @@ export function PostPurchaseSignup({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!isPasswordValid) return;
+    if (!isPasswordValid || !acksOk) return;
 
     setState("loading");
     setErrorMessage(null);
 
     try {
-      const { error } = await signUp(orderEmail, password, orderFirstName || undefined);
+      const nowIso = new Date().toISOString();
+      const { error } = await signUp(orderEmail, password, orderFirstName || undefined, {
+        termsAcceptedAt: nowIso,
+        accountSecurityAckAt: nowIso,
+      });
 
       if (error) {
         if (error.message.includes("already registered")) {
