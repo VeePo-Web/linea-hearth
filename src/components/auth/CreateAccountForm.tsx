@@ -103,10 +103,30 @@ export default function CreateAccountForm({ onSuccess, onSwitchToSignIn }: Creat
     }
   };
 
+  const stashPendingAcks = () => {
+    if (typeof window === 'undefined') return;
+    const nowIso = new Date().toISOString();
+    window.sessionStorage.setItem(
+      'loj:pending-acks',
+      JSON.stringify({ termsAcceptedAt: nowIso, accountSecurityAckAt: nowIso }),
+    );
+  };
+
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-      {/* Google OAuth */}
-      <GoogleAuthButton onSuccess={onSuccess} label="Sign up with Google" />
+      {/* Google OAuth (gated by acknowledgements) */}
+      <GoogleAuthButton
+        onSuccess={onSuccess}
+        label="Sign up with Google"
+        disabled={!acksOk}
+        disabledHint="Please check the acknowledgement boxes below to continue."
+        onBeforeRedirect={stashPendingAcks}
+      />
+      {!acksOk && (
+        <p className="text-[11px] text-muted-foreground -mt-3">
+          Check the boxes below to enable Google sign-up.
+        </p>
+      )}
       
       <AuthDivider text="or create with email" />
 
