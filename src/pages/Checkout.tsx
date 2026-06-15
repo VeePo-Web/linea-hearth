@@ -29,6 +29,10 @@ import FreeShippingBar from "@/components/cart/FreeShippingBar";
 import EmailTypoSuggestion from "@/components/ui/EmailTypoSuggestion";
 import { toast } from "sonner";
 import { Address } from "@/types/account";
+import LiabilityAcknowledgements, {
+  areAllAccepted,
+  initialAckValues,
+} from "@/components/legal/LiabilityAcknowledgements";
 
 const Checkout = () => {
   const navigate = useNavigate();
