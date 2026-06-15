@@ -39,6 +39,8 @@ export function PostPurchaseSignup({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [discountCode, setDiscountCode] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [acks, setAcks] = useState<Record<string, boolean>>(() => initialAckValues("account"));
+  const acksOk = areAllAccepted("account", acks);
 
   const isPasswordValid = password.length >= 6;
 
