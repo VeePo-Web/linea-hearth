@@ -229,6 +229,10 @@ const Checkout = () => {
       toast.error("Please fill in all required shipping address fields");
       return;
     }
+    if (!paymentAcksOk) {
+      toast.error("Please confirm the payment acknowledgement to continue.");
+      return;
+    }
 
     setIsProcessing(true);
     setCurrentStep(3);
@@ -247,6 +251,7 @@ const Checkout = () => {
       shippingMethod: "standard",
       discountCodeId: appliedDiscount?.codeId || undefined,
       abandonedCartId: cartId || undefined,
+      paymentAckAt: new Date().toISOString(),
     });
 
     if (!result.success) {
