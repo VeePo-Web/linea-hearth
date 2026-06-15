@@ -205,11 +205,18 @@ export default function CreateAccountForm({ onSuccess, onSwitchToSignIn }: Creat
         </div>
       </div>
 
+      {/* Required acknowledgements */}
+      <LiabilityAcknowledgements
+        variant="account"
+        values={acks}
+        onChange={(k, v) => setAcks((prev) => ({ ...prev, [k]: v }))}
+      />
+
       {/* Submit */}
       <Button
         type="submit"
-        disabled={isLoading}
-        className="w-full h-12 bg-foreground text-background hover:bg-foreground/90 font-normal tracking-wide"
+        disabled={isLoading || !acksOk}
+        className="w-full h-12 bg-foreground text-background hover:bg-foreground/90 font-normal tracking-wide rounded-none disabled:opacity-50"
       >
         {isLoading ? (
           <>
