@@ -43,6 +43,8 @@ interface RequestBody {
   abandonedCartId?: string;
   returnUrl: string;
   environment?: StripeEnv;
+  /** ISO timestamp when the user accepted the payment liability acknowledgement. */
+  paymentAckAt?: string;
 }
 
 
