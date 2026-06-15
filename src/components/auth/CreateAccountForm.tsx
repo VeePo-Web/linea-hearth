@@ -12,6 +12,10 @@ import GoogleAuthButton from './GoogleAuthButton';
 import AuthDivider from './AuthDivider';
 import { useEmailTypoDetection } from '@/hooks/useEmailTypoDetection';
 import EmailTypoSuggestion from '@/components/ui/EmailTypoSuggestion';
+import LiabilityAcknowledgements, {
+  areAllAccepted,
+  initialAckValues,
+} from '@/components/legal/LiabilityAcknowledgements';
 
 const createAccountSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
