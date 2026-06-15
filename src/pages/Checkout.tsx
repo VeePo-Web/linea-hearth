@@ -51,6 +51,8 @@ const Checkout = () => {
   const [currentStep, setCurrentStep] = useState(2); // Start at "Details" step
   const [showDiscountInput, setShowDiscountInput] = useState(false);
   const [discountCode, setDiscountCode] = useState("");
+  const [paymentAcks, setPaymentAcks] = useState<Record<string, boolean>>(() => initialAckValues("checkout"));
+  const paymentAcksOk = areAllAccepted("checkout", paymentAcks);
   const [customerDetails, setCustomerDetails] = useState({
     email: "",
     firstName: "",
