@@ -8,6 +8,10 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { toast } from "@/hooks/use-toast";
+import LiabilityAcknowledgements, {
+  areAllAccepted,
+  initialAckValues,
+} from "@/components/legal/LiabilityAcknowledgements";
 
 interface PostPurchaseSignupProps {
   orderEmail: string;
