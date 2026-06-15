@@ -587,10 +587,20 @@ const AmbassadorForm = () => {
                 )}
               />
 
+              {/* Required legal acknowledgements */}
+              <div className="mb-8">
+                <LiabilityAcknowledgements
+                  variant="ambassador"
+                  values={acks}
+                  onChange={(k, v) => setAcks((prev) => ({ ...prev, [k]: v }))}
+                  inverted
+                />
+              </div>
+
               <Button
                 type="submit"
-                disabled={isSubmitting}
-                className="w-full md:w-auto bg-accent hover:bg-accent/90 text-accent-foreground px-12 py-6 text-sm tracking-[0.2em] uppercase font-medium group"
+                disabled={isSubmitting || !acksOk}
+                className="w-full md:w-auto bg-accent hover:bg-accent/90 text-accent-foreground px-12 py-6 text-sm tracking-[0.2em] uppercase font-medium group disabled:opacity-50"
               >
                 {isSubmitting ? (
                   "Submitting..."
