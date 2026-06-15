@@ -34,6 +34,8 @@ export default function CreateAccountForm({ onSuccess, onSwitchToSignIn }: Creat
   const { signUp } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [acks, setAcks] = useState<Record<string, boolean>>(() => initialAckValues('account'));
+  const acksOk = areAllAccepted('account', acks);
 
   const {
     register,
