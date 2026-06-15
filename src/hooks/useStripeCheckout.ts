@@ -19,6 +19,8 @@ interface CheckoutData {
   shippingMethod: "standard" | "express" | "overnight";
   discountCodeId?: string;
   abandonedCartId?: string;
+  /** ISO timestamp when the user checked the payment liability acknowledgement. */
+  paymentAckAt?: string;
 }
 
 interface CheckoutResult {
