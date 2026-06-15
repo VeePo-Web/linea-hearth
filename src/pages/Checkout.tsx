@@ -29,6 +29,10 @@ import FreeShippingBar from "@/components/cart/FreeShippingBar";
 import EmailTypoSuggestion from "@/components/ui/EmailTypoSuggestion";
 import { toast } from "sonner";
 import { Address } from "@/types/account";
+import LiabilityAcknowledgements, {
+  areAllAccepted,
+  initialAckValues,
+} from "@/components/legal/LiabilityAcknowledgements";
 
 const Checkout = () => {
   const navigate = useNavigate();
@@ -47,6 +51,8 @@ const Checkout = () => {
   const [currentStep, setCurrentStep] = useState(2); // Start at "Details" step
   const [showDiscountInput, setShowDiscountInput] = useState(false);
   const [discountCode, setDiscountCode] = useState("");
+  const [paymentAcks, setPaymentAcks] = useState<Record<string, boolean>>(() => initialAckValues("checkout"));
+  const paymentAcksOk = areAllAccepted("checkout", paymentAcks);
   const [customerDetails, setCustomerDetails] = useState({
     email: "",
     firstName: "",
@@ -223,6 +229,10 @@ const Checkout = () => {
       toast.error("Please fill in all required shipping address fields");
       return;
     }
+    if (!paymentAcksOk) {
+      toast.error("Please confirm the payment acknowledgement to continue.");
+      return;
+    }
 
     setIsProcessing(true);
     setCurrentStep(3);
@@ -241,6 +251,7 @@ const Checkout = () => {
       shippingMethod: "standard",
       discountCodeId: appliedDiscount?.codeId || undefined,
       abandonedCartId: cartId || undefined,
+      paymentAckAt: new Date().toISOString(),
     });
 
     if (!result.success) {
@@ -893,12 +904,19 @@ const Checkout = () => {
                         </div>
                       </div>
 
+                      {/* Required payment liability acknowledgement */}
+                      <LiabilityAcknowledgements
+                        variant="checkout"
+                        values={paymentAcks}
+                        onChange={(k, v) => setPaymentAcks((prev) => ({ ...prev, [k]: v }))}
+                      />
+
                       {/* Stripe Checkout Button - Primary */}
                       <div className="space-y-3">
                         <Button
                           onClick={handleStripeCheckout}
-                          disabled={isProcessing || isStripeLoading || !customerDetails.email || !customerDetails.firstName || !customerDetails.lastName || !shippingAddress.address}
-                          className="w-full rounded-none h-12 text-base bg-primary hover:bg-primary/90"
+                          disabled={isProcessing || isStripeLoading || !paymentAcksOk || !customerDetails.email || !customerDetails.firstName || !customerDetails.lastName || !shippingAddress.address}
+                          className="w-full rounded-none h-12 text-base bg-primary hover:bg-primary/90 disabled:opacity-50"
                         >
                           {isProcessing || isStripeLoading ? (
                             <>

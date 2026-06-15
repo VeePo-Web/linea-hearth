@@ -12,6 +12,10 @@ import GoogleAuthButton from './GoogleAuthButton';
 import AuthDivider from './AuthDivider';
 import { useEmailTypoDetection } from '@/hooks/useEmailTypoDetection';
 import EmailTypoSuggestion from '@/components/ui/EmailTypoSuggestion';
+import LiabilityAcknowledgements, {
+  areAllAccepted,
+  initialAckValues,
+} from '@/components/legal/LiabilityAcknowledgements';
 
 const createAccountSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -30,6 +34,8 @@ export default function CreateAccountForm({ onSuccess, onSwitchToSignIn }: Creat
   const { signUp } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [acks, setAcks] = useState<Record<string, boolean>>(() => initialAckValues('account'));
+  const acksOk = areAllAccepted('account', acks);
 
   const {
     register,
@@ -53,9 +59,17 @@ export default function CreateAccountForm({ onSuccess, onSwitchToSignIn }: Creat
   });
 
   const onSubmit = async (data: CreateAccountFormData) => {
+    if (!acksOk) {
+      setError('root', { message: 'Please confirm the acknowledgements below to continue.' });
+      return;
+    }
     setIsLoading(true);
     try {
-      const { data: signUpData, error } = await signUp(data.email, data.password, data.fullName);
+      const nowIso = new Date().toISOString();
+      const { data: signUpData, error } = await signUp(data.email, data.password, data.fullName, {
+        termsAcceptedAt: nowIso,
+        accountSecurityAckAt: nowIso,
+      });
 
       if (error) {
         if (error.message.includes('already registered')) {
@@ -191,11 +205,18 @@ export default function CreateAccountForm({ onSuccess, onSwitchToSignIn }: Creat
         </div>
       </div>
 
+      {/* Required acknowledgements */}
+      <LiabilityAcknowledgements
+        variant="account"
+        values={acks}
+        onChange={(k, v) => setAcks((prev) => ({ ...prev, [k]: v }))}
+      />
+
       {/* Submit */}
       <Button
         type="submit"
-        disabled={isLoading}
-        className="w-full h-12 bg-foreground text-background hover:bg-foreground/90 font-normal tracking-wide"
+        disabled={isLoading || !acksOk}
+        className="w-full h-12 bg-foreground text-background hover:bg-foreground/90 font-normal tracking-wide rounded-none disabled:opacity-50"
       >
         {isLoading ? (
           <>

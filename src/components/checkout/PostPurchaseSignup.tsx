@@ -8,6 +8,10 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { toast } from "@/hooks/use-toast";
+import LiabilityAcknowledgements, {
+  areAllAccepted,
+  initialAckValues,
+} from "@/components/legal/LiabilityAcknowledgements";
 
 interface PostPurchaseSignupProps {
   orderEmail: string;
@@ -35,6 +39,8 @@ export function PostPurchaseSignup({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [discountCode, setDiscountCode] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [acks, setAcks] = useState<Record<string, boolean>>(() => initialAckValues("account"));
+  const acksOk = areAllAccepted("account", acks);
 
   const isPasswordValid = password.length >= 6;
 
@@ -87,13 +93,17 @@ export function PostPurchaseSignup({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!isPasswordValid) return;
+    if (!isPasswordValid || !acksOk) return;
 
     setState("loading");
     setErrorMessage(null);
 
     try {
-      const { error } = await signUp(orderEmail, password, orderFirstName || undefined);
+      const nowIso = new Date().toISOString();
+      const { error } = await signUp(orderEmail, password, orderFirstName || undefined, {
+        termsAcceptedAt: nowIso,
+        accountSecurityAckAt: nowIso,
+      });
 
       if (error) {
         if (error.message.includes("already registered")) {
@@ -327,11 +337,18 @@ export function PostPurchaseSignup({
           )}
         </AnimatePresence>
 
+        {/* Required acknowledgements */}
+        <LiabilityAcknowledgements
+          variant="account"
+          values={acks}
+          onChange={(k, v) => setAcks((prev) => ({ ...prev, [k]: v }))}
+        />
+
         {/* Submit button */}
         <Button
           type="submit"
           className="w-full rounded-none"
-          disabled={!isPasswordValid || state === "loading"}
+          disabled={!isPasswordValid || !acksOk || state === "loading"}
         >
           {state === "loading" ? (
             <span className="flex items-center gap-2">

@@ -1,86 +1,85 @@
-# Garment Style — Stress Test & Audit
 
-I walked the full path: migration → admin CRUD (`StyleManager`) → variant tagging (`VariantManager.style`) → PDP (`ProductInfo` + `StyleSelector` + style-aware `ColorSwatchSelector`) → cart (`useCart`) → server checkout (`create-checkout-session`) → order rows (`order_items.variant_style`) → emails (`send-order-confirmation`) → admin/account order views.
+# Liability Acknowledgement Checkboxes — Signup, Ambassador, Checkout
 
-The wiring is end-to-end and consistent. Server price authority correctly adds `style.price_delta`, RLS + GRANTs on `product_styles` are correct, lowercase comparison on the server prevents casing drift, and emails render the Style column only when at least one item has one. **But three real bugs surfaced under stress, one of them critical.**
+## Goal
+Before any user can create an account, submit an ambassador application, or complete a payment, they must tick legally-worded acknowledgement boxes. They don't need to open or read the linked policies — just check the box. Submission is blocked until required boxes are ticked.
 
----
+## Where boxes appear
 
-## Critical
+1. **User signup** — `src/components/auth/CreateAccountForm.tsx` and `src/components/checkout/PostPurchaseSignup.tsx` (the 1-click post-purchase account create).
+2. **Ambassador application** — `src/components/ambassador/AmbassadorForm.tsx`.
+3. **Checkout / payment** — `src/pages/Checkout.tsx`, placed directly above the "Place Order / Continue to Payment" CTA (before the Stripe embedded checkout mounts).
 
-### 1. Cart `removeItem` / `updateQuantity` collide across styles of the same product
-`useCart.removeItem(id)` filters by `item.id` only — and `productIdToCartId(product.id)` returns the same numeric id for every style of a given product. `addItem` correctly creates a separate line per `(id, size, color, style)`, but removing or changing quantity on one Hoodie line will silently nuke/edit the matching T-Shirt line too.
+## Checkbox copy
 
-This bug also existed for color variants but was masked because most products only had one cart variant on screen at a time. With styles, a user can realistically have Hoodie + Tee of the same design in the cart, so it is now reproducible.
+Editorial, plain-English, links open Terms / Privacy in a new tab. Two boxes for account flows, one for checkout.
 
-Fix: switch `removeItem` / `updateQuantity` from `id` to a composite key (`id + size + color + style`), or assign each cart line a stable `lineKey` on add and key all mutations off that.
+### Account creation (User signup + Post-Purchase Signup)
+- [ ] **Account Security Acknowledgement** — I understand I am solely responsible for keeping my login credentials secure. **Line of Judah is not liable for any loss, damage, or unauthorized activity resulting from my account being accessed, compromised, or hacked.** ([Terms](/terms-of-service))
+- [ ] **Terms & Privacy** — I agree to the [Terms of Service](/terms-of-service) and [Privacy Policy](/privacy-policy).
 
----
+### Ambassador application
+- [ ] **Account Security Acknowledgement** (same as above)
+- [ ] **Ambassador Terms** — I agree to the [Terms of Service](/terms-of-service), [Privacy Policy](/privacy-policy), and understand my application is subject to review and approval.
 
-## High
+### Checkout (above payment CTA)
+- [ ] **Payment & Liability Acknowledgement** — I understand all payment and card information is processed and stored by **Stripe, Inc.** under its own terms. **Line of Judah does not collect, store, or have access to my card data and is not liable for issues arising from payment processing, fraud, or unauthorized card use.** I agree to the [Terms of Service](/terms-of-service) and [Privacy Policy](/privacy-policy).
 
-### 2. Renaming a style in admin orphans variants and breaks live carts
-`StyleManager.patchStyle({ name })` updates only the `product_styles` row. `product_variants.style` is a free-text mirror, so:
+## UX rules
+- Boxes are required; submit button stays disabled until all are checked (visual + `disabled` attr).
+- Use existing shadcn `Checkbox` + `Label` components. Sharp edges (rounded-none per project core rules).
+- Forest green check accent, silver chrome hairline border — matches editorial system. No yellow.
+- Inline validation: if a user clicks the disabled button area, show a short helper line ("Please confirm the acknowledgements above to continue.") in muted destructive color.
+- Mobile-friendly tap target (min 24px box, 44px row).
+- Links use `target="_blank" rel="noopener noreferrer"`; `e.stopPropagation()` so clicking the link doesn't toggle the box.
 
-- Existing variants tagged with the old name vanish from style-aware color/size filtering on the PDP.
-- Any cart item already holding the old name will hit checkout, the server will find no matching `product_styles` row, set `styleAdjustment = 0`, and (if the delta was nonzero) reject the whole cart with "Cart prices are out of date."
+## Implementation (technical)
 
-Fix: when the name changes in `patchStyle`, run a same-product `UPDATE product_variants SET style = newName WHERE style = oldName`.
+### New shared component
+`src/components/legal/LiabilityAcknowledgements.tsx`
+- Props: `variant: "account" | "ambassador" | "checkout"`, `values: Record<string, boolean>`, `onChange(key, checked)`, optional `className`.
+- Renders the appropriate set of rows from a single config map (single source of truth for legal copy).
+- Exposes `getRequiredKeys(variant)` and `areAllAccepted(variant, values)` helpers for parent forms.
 
-### 3. Deleting a style strands live carts the same way
-`deleteStyle` already clears `product_variants.style`, but it does nothing for users whose `localStorage` cart still references the deleted name. The server returns the same 409 with no clue what to do.
+### Form integrations
+For each form:
+- Add local state `const [acks, setAcks] = useState({ ... })`.
+- Render `<LiabilityAcknowledgements variant=... values={acks} onChange={...} />` above the submit button.
+- Gate submit: `disabled = submitting || !areAllAccepted(variant, acks)`.
+- On submit, double-check server-side gate is unnecessary (these are UI acknowledgements), BUT persist the acceptance for audit (see below).
 
-Fix (server side, smallest blast radius): if `item.style` is set and no row matches, fall back to `styleAdjustment = 0` *and* re-validate the client price against `basePrice + variantAdj` before rejecting. Net effect: deleted-style cart lines simply charge the base price instead of bricking checkout.
+### Audit trail (lightweight, no new tables)
+Stamp acceptance into existing records so we have proof if disputed:
+- **User signup** (`signUp` call in `useAuth`): pass `data: { terms_accepted_at: ISO, account_security_ack_at: ISO }` into Supabase auth `options.data` → lands in `auth.users.raw_user_meta_data`. Mirror into `profiles` via the existing upsert (add columns `terms_accepted_at timestamptz`, `account_security_ack_at timestamptz`) in a migration.
+- **Ambassador**: add columns `terms_accepted_at`, `account_security_ack_at` to `ambassador_applications`; populate on insert.
+- **Checkout**: stamp `payment_ack_at timestamptz` onto `orders` row (created in `create-checkout-session` edge function). Pass the timestamp in the request body; the function writes it during order insert. No Stripe-side change.
 
----
+### Migration (single file, all three tables)
+```
+ALTER TABLE public.profiles
+  ADD COLUMN IF NOT EXISTS terms_accepted_at timestamptz,
+  ADD COLUMN IF NOT EXISTS account_security_ack_at timestamptz;
 
-## Medium
+ALTER TABLE public.ambassador_applications
+  ADD COLUMN IF NOT EXISTS terms_accepted_at timestamptz,
+  ADD COLUMN IF NOT EXISTS account_security_ack_at timestamptz;
 
-### 4. Style-aware availability hides colors but never auto-recovers selection
-On PDP, when the user picks a style that doesn't include the currently-selected color, `ColorSwatchSelector` slashes the color out but `selectedColor` stays set. `canAddToBag` still considers a color selected, so the user can press Add to Bag with an invalid combination and `sizes` will silently be empty.
+ALTER TABLE public.orders
+  ADD COLUMN IF NOT EXISTS payment_ack_at timestamptz;
+```
+No new tables → no new GRANT/RLS needed.
 
-Fix in `ProductInfo.handleStyleChange`: if `selectedColor && colorsForActiveStyle && !colorsForActiveStyle.has(selectedColor.toLowerCase())` → `setSelectedColor(null)`.
+### Files to edit
+- new `src/components/legal/LiabilityAcknowledgements.tsx`
+- `src/components/auth/CreateAccountForm.tsx` — wire boxes + gate submit + pass metadata
+- `src/components/checkout/PostPurchaseSignup.tsx` — same
+- `src/components/ambassador/AmbassadorForm.tsx` — wire boxes + gate submit + insert columns
+- `src/pages/Checkout.tsx` — wire single checkout box, gate "Continue to Payment" CTA, pass `payment_ack_at` to `create-checkout-session`
+- `src/hooks/useAuth.tsx` — extend `signUp` signature to forward acknowledgement timestamps into `options.data`
+- `supabase/functions/create-checkout-session/index.ts` — accept `paymentAckAt` and persist on the order row
+- one new migration as above
 
-### 5. `StyleManager` allows duplicate names with different casing
-The dedupe check is case-insensitive but the DB `UNIQUE (product_id, name)` is case-sensitive, so "Hoodie" and "hoodie" both insert and then collide downstream (server lowercases). Either normalize on insert (`name.trim()`) and add a `lower(name)` unique index, or just store lowercased.
-
----
-
-## Low / polish
-
-### 6. PLP "+N styles" chip
-Confirm `ProductGrid` / `Catalogue` queries actually request `product_styles(count)` and that `ProductCard` renders the chip when `count >= 2`. Touch them up if missing.
-
-### 7. Stripe line description still says `(Style / Color / Size)`
-The Stripe Checkout line uses `item.name + (style / color / size)`. With a dedicated `variant_style` column, consider keeping the bracketed descriptor (it's the only place the customer sees style at checkout) but the Stripe Product `name` should remain just the product name — which it already is. No change needed; flagged only for confirmation.
-
----
-
-## Stress matrix walked
-
-| Scenario | Result |
-|---|---|
-| Product with 0 styles | Selector hidden, server sends no style, base price wins ✓ |
-| Product with 1 style | Auto-selected, selector hidden, delta applied ✓ |
-| Product with 3 styles, nonzero deltas | PDP price updates, server re-authorizes ✓ |
-| Style restricts colors via variant matrix | Slashed swatch ✓ but selection not cleared → bug #4 |
-| Add Hoodie + Tee of same product | Two cart lines created ✓ but remove/qty mutate both → bug #1 |
-| Admin renames "hoodie" → "Hoodie Heavyweight" with live cart open | Checkout 409 → bug #2 |
-| Admin deletes style with live cart open | Checkout 409 → bug #3 |
-| Anonymous checkout with style | RLS read passes (public SELECT on product_styles) ✓ |
-| Casing drift Hoodie vs hoodie | Server lowercases ✓ but admin can duplicate → bug #5 |
-| Bundle + style stacking | Server recomputes both independently ✓ |
-| Email "Style" column | Renders only when ≥1 item has style ✓ |
-| AccountOrderDetail / AdminOrderDetail | Renders `Style / Color / Size` from `variant_style` ✓ |
-
----
-
-## Technical execution order (after approval)
-
-1. `useCart.tsx` — refactor `removeItem` / `updateQuantity` to a composite line key (`buildLineKey(item) = ${id}|${size}|${color}|${style}`) and update every caller in `CartDrawer`, `CartItem`, `CartItemRow`, etc.
-2. `create-checkout-session/index.ts` — when `item.style` is set and no matching `product_styles` row exists, fall back to `styleAdjustment = 0` *and* accept either `basePrice + variantAdj` or `basePrice + variantAdj + 0` so deleted/renamed styles don't 409. Redeploy.
-3. `StyleManager.tsx` — cascade rename to `product_variants.style` on `patchStyle({ name })`. Normalize names to a single canonical casing on insert and update.
-4. `ProductInfo.handleStyleChange` — clear `selectedColor` when it falls outside `colorsForActiveStyle`.
-5. Verify PLP `+N styles` chip is actually rendering; add if missing.
-
-No new tables, no new RLS, no schema migrations required. All changes are surgical edits in existing files plus one edge-function redeploy.
+## Out of scope
+- Rewriting the actual Terms of Service / Privacy Policy text (already exists at `/terms-of-service` and `/privacy-policy`).
+- Server-side enforcement beyond storing timestamps (these are user-side acknowledgements, not access controls).
+- Admin UI to view acceptance timestamps (data is in DB if ever needed).

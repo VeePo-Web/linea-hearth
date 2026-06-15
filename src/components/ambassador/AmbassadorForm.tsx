@@ -28,6 +28,10 @@ import {
 } from "@/components/ui/select";
 import { ArrowRight, Instagram, Youtube } from "lucide-react";
 import { DrawCheckIcon } from "@/components/ui/draw-check-icon";
+import LiabilityAcknowledgements, {
+  areAllAccepted,
+  initialAckValues,
+} from "@/components/legal/LiabilityAcknowledgements";
 
 const formSchema = z.object({
   full_name: z.string().min(2, "Name must be at least 2 characters"),
@@ -77,6 +81,9 @@ const AmbassadorForm = () => {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const { toast } = useToast();
 
+  const [acks, setAcks] = useState<Record<string, boolean>>(() => initialAckValues("ambassador"));
+  const acksOk = areAllAccepted("ambassador", acks);
+
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -104,8 +111,10 @@ const AmbassadorForm = () => {
   });
 
   const onSubmit = async (data: FormData) => {
+    if (!acksOk) return;
     setIsSubmitting(true);
     try {
+      const nowIso = new Date().toISOString();
       const { error } = await supabase.from("ambassador_applications").insert({
         full_name: data.full_name,
         email: data.email,
@@ -120,6 +129,8 @@ const AmbassadorForm = () => {
         faith_in_content: data.faith_in_content,
         content_frequency: data.content_frequency,
         agreed_to_terms: data.agreed_to_terms,
+        terms_accepted_at: nowIso,
+        account_security_ack_at: nowIso,
       });
 
       if (error) throw error;
@@ -576,10 +587,20 @@ const AmbassadorForm = () => {
                 )}
               />
 
+              {/* Required legal acknowledgements */}
+              <div className="mb-8">
+                <LiabilityAcknowledgements
+                  variant="ambassador"
+                  values={acks}
+                  onChange={(k, v) => setAcks((prev) => ({ ...prev, [k]: v }))}
+                  inverted
+                />
+              </div>
+
               <Button
                 type="submit"
-                disabled={isSubmitting}
-                className="w-full md:w-auto bg-accent hover:bg-accent/90 text-accent-foreground px-12 py-6 text-sm tracking-[0.2em] uppercase font-medium group"
+                disabled={isSubmitting || !acksOk}
+                className="w-full md:w-auto bg-accent hover:bg-accent/90 text-accent-foreground px-12 py-6 text-sm tracking-[0.2em] uppercase font-medium group disabled:opacity-50"
               >
                 {isSubmitting ? (
                   "Submitting..."

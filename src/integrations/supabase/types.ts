@@ -124,6 +124,7 @@ export type Database = {
       }
       ambassador_applications: {
         Row: {
+          account_security_ack_at: string | null
           admin_notes: string | null
           agreed_to_terms: boolean
           content_frequency: string
@@ -139,12 +140,14 @@ export type Database = {
           reviewed_at: string | null
           reviewed_by: string | null
           status: string
+          terms_accepted_at: string | null
           tiktok_handle: string | null
           twitter_handle: string | null
           why_represent: string
           youtube_handle: string | null
         }
         Insert: {
+          account_security_ack_at?: string | null
           admin_notes?: string | null
           agreed_to_terms?: boolean
           content_frequency: string
@@ -160,12 +163,14 @@ export type Database = {
           reviewed_at?: string | null
           reviewed_by?: string | null
           status?: string
+          terms_accepted_at?: string | null
           tiktok_handle?: string | null
           twitter_handle?: string | null
           why_represent: string
           youtube_handle?: string | null
         }
         Update: {
+          account_security_ack_at?: string | null
           admin_notes?: string | null
           agreed_to_terms?: boolean
           content_frequency?: string
@@ -181,6 +186,7 @@ export type Database = {
           reviewed_at?: string | null
           reviewed_by?: string | null
           status?: string
+          terms_accepted_at?: string | null
           tiktok_handle?: string | null
           twitter_handle?: string | null
           why_represent?: string
@@ -792,6 +798,7 @@ export type Database = {
           id: string
           metadata: Json | null
           notes: string | null
+          payment_ack_at: string | null
           payment_status: string
           refund_email_sent_at: string | null
           retry_email_followup_sent_at: string | null
@@ -832,6 +839,7 @@ export type Database = {
           id?: string
           metadata?: Json | null
           notes?: string | null
+          payment_ack_at?: string | null
           payment_status?: string
           refund_email_sent_at?: string | null
           retry_email_followup_sent_at?: string | null
@@ -872,6 +880,7 @@ export type Database = {
           id?: string
           metadata?: Json | null
           notes?: string | null
+          payment_ack_at?: string | null
           payment_status?: string
           refund_email_sent_at?: string | null
           retry_email_followup_sent_at?: string | null
@@ -1371,26 +1380,32 @@ export type Database = {
       }
       profiles: {
         Row: {
+          account_security_ack_at: string | null
           created_at: string
           email: string | null
           full_name: string | null
           id: string
+          terms_accepted_at: string | null
           updated_at: string
           worn_invites_opted_out: boolean
         }
         Insert: {
+          account_security_ack_at?: string | null
           created_at?: string
           email?: string | null
           full_name?: string | null
           id: string
+          terms_accepted_at?: string | null
           updated_at?: string
           worn_invites_opted_out?: boolean
         }
         Update: {
+          account_security_ack_at?: string | null
           created_at?: string
           email?: string | null
           full_name?: string | null
           id?: string
+          terms_accepted_at?: string | null
           updated_at?: string
           worn_invites_opted_out?: boolean
         }
