@@ -28,6 +28,10 @@ import {
 } from "@/components/ui/select";
 import { ArrowRight, Instagram, Youtube } from "lucide-react";
 import { DrawCheckIcon } from "@/components/ui/draw-check-icon";
+import LiabilityAcknowledgements, {
+  areAllAccepted,
+  initialAckValues,
+} from "@/components/legal/LiabilityAcknowledgements";
 
 const formSchema = z.object({
   full_name: z.string().min(2, "Name must be at least 2 characters"),
