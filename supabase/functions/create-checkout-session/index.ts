@@ -538,6 +538,7 @@ Deno.serve(async (req) => {
         shipping_method: method,
         discount_code: discountCodeText ?? null,
         discount_id: body.discountCodeId ?? null,
+        payment_ack_at: body.paymentAckAt ?? new Date().toISOString(),
         metadata: { abandonedCartId: body.abandonedCartId ?? null },
       })
       .select("id")
