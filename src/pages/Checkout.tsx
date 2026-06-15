@@ -904,12 +904,19 @@ const Checkout = () => {
                         </div>
                       </div>
 
+                      {/* Required payment liability acknowledgement */}
+                      <LiabilityAcknowledgements
+                        variant="checkout"
+                        values={paymentAcks}
+                        onChange={(k, v) => setPaymentAcks((prev) => ({ ...prev, [k]: v }))}
+                      />
+
                       {/* Stripe Checkout Button - Primary */}
                       <div className="space-y-3">
                         <Button
                           onClick={handleStripeCheckout}
-                          disabled={isProcessing || isStripeLoading || !customerDetails.email || !customerDetails.firstName || !customerDetails.lastName || !shippingAddress.address}
-                          className="w-full rounded-none h-12 text-base bg-primary hover:bg-primary/90"
+                          disabled={isProcessing || isStripeLoading || !paymentAcksOk || !customerDetails.email || !customerDetails.firstName || !customerDetails.lastName || !shippingAddress.address}
+                          className="w-full rounded-none h-12 text-base bg-primary hover:bg-primary/90 disabled:opacity-50"
                         >
                           {isProcessing || isStripeLoading ? (
                             <>
