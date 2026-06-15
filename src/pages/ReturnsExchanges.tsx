@@ -24,7 +24,7 @@ const returnSteps = [
   {
     icon: Truck,
     title: "SHIP BACK",
-    description: "We'll email you a prepaid shipping label (US orders).",
+    description: "Ship the item back to the address provided in your return confirmation.",
   },
   {
     icon: CreditCard,
@@ -35,7 +35,6 @@ const returnSteps = [
 
 const heroValueProps = [
   { icon: Shield, text: "30-Day Window" },
-  { icon: Package, text: "Free Return Shipping (US)" },
   { icon: CheckCircle, text: "Full Refund Guarantee" },
   { icon: RotateCcw, text: "Easy Exchanges" },
 ];
@@ -62,7 +61,7 @@ const quickQuestions = [
   {
     icon: CheckCircle,
     title: "Is Return Shipping Free?",
-    description: "For US orders, yes. Prepaid label included. International customers cover return shipping.",
+    description: "Return shipping is covered by the customer. We refund the full product cost once your return arrives and passes inspection.",
     variant: "default" as const,
   },
 ];
@@ -200,7 +199,7 @@ const ReturnsExchanges = () => {
       {/* CTA */}
       <ActionCTA
         title="Start Your Return"
-        subtitle="Enter your order number and we'll email you a prepaid return label."
+        subtitle="Enter your order number and we'll email you return instructions."
         alignment="center"
         showInput
         inputPlaceholder="Order number (e.g., #LOJ-12345)"

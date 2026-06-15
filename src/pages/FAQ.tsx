@@ -58,14 +58,14 @@ const faqData: FAQItem[] = [
   {
     id: "ret-2",
     question: "How do I start a return?",
-    answer: "Visit our Returns page and enter your order number to generate a prepaid return label. Pack your items securely and drop off at any authorized shipping location.",
+    answer: "Visit our Returns page and enter your order number to start a return request. Once approved, pack your items securely and ship them back to the address we provide.",
     category: "returns",
     keywords: ["start", "begin", "initiate", "process"]
   },
   {
     id: "ret-3",
     question: "Are returns free?",
-    answer: "Yes, returns are free for US customers. We provide a prepaid shipping label. International returns require customers to cover return shipping costs.",
+    answer: "Return shipping is the customer's responsibility. Once we receive and inspect your return, we refund the product cost in full to the original payment method.",
     category: "returns",
     keywords: ["free", "cost", "pay", "charge"]
   },
