@@ -81,6 +81,9 @@ const AmbassadorForm = () => {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const { toast } = useToast();
 
+  const [acks, setAcks] = useState<Record<string, boolean>>(() => initialAckValues("ambassador"));
+  const acksOk = areAllAccepted("ambassador", acks);
+
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
