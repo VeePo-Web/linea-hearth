@@ -19,18 +19,30 @@ const GoogleIcon = () => (
 interface GoogleAuthButtonProps {
   onSuccess?: () => void;
   label?: string;
+  disabled?: boolean;
+  disabledHint?: string;
+  /** Called immediately before kicking off the OAuth redirect — use to stash acks. */
+  onBeforeRedirect?: () => void;
 }
 
 export default function GoogleAuthButton({ 
   onSuccess, 
-  label = "Continue with Google" 
+  label = "Continue with Google",
+  disabled = false,
+  disabledHint,
+  onBeforeRedirect,
 }: GoogleAuthButtonProps) {
   const { signInWithGoogle } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
 
   const handleClick = async () => {
+    if (disabled) {
+      if (disabledHint) toast.error(disabledHint);
+      return;
+    }
     setIsLoading(true);
     try {
+      if (onBeforeRedirect) onBeforeRedirect();
       const { error } = await signInWithGoogle();
       
       if (error) {
@@ -57,9 +69,11 @@ export default function GoogleAuthButton({
     <motion.button
       type="button"
       onClick={handleClick}
-      disabled={isLoading}
-      whileHover={{ scale: 1.01 }}
-      whileTap={{ scale: 0.99 }}
+      disabled={isLoading || disabled}
+      aria-disabled={isLoading || disabled}
+      title={disabled ? disabledHint : undefined}
+      whileHover={disabled ? undefined : { scale: 1.01 }}
+      whileTap={disabled ? undefined : { scale: 0.99 }}
       transition={{ duration: 0.15 }}
       className="w-full h-12 flex items-center justify-center gap-3 border border-border rounded-none bg-transparent hover:bg-muted/50 text-foreground font-normal tracking-wide transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
     >

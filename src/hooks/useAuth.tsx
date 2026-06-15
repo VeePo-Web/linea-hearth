@@ -24,6 +24,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [adminLoading, setAdminLoading] = useState(true);
   const [loading, setLoading] = useState(true);
 
+  const PENDING_ACKS_KEY = 'loj:pending-acks';
+
+  const drainPendingAcks = async (u: User) => {
+    try {
+      const raw = typeof window !== 'undefined' ? window.sessionStorage.getItem(PENDING_ACKS_KEY) : null;
+      if (!raw) return;
+      const parsed = JSON.parse(raw) as { termsAcceptedAt?: string; accountSecurityAckAt?: string };
+      const payload: Record<string, string> = {};
+      if (parsed.termsAcceptedAt) payload.terms_accepted_at = parsed.termsAcceptedAt;
+      if (parsed.accountSecurityAckAt) payload.account_security_ack_at = parsed.accountSecurityAckAt;
+      if (Object.keys(payload).length === 0) {
+        window.sessionStorage.removeItem(PENDING_ACKS_KEY);
+        return;
+      }
+      const { error } = await supabase
+        .from('profiles')
+        .upsert(
+          { id: u.id, email: u.email, full_name: u.user_metadata?.full_name || '', ...payload },
+          { onConflict: 'id' },
+        );
+      if (!error) {
+        window.sessionStorage.removeItem(PENDING_ACKS_KEY);
+      } else {
+        console.warn('drainPendingAcks upsert error:', error);
+      }
+    } catch (err) {
+      console.warn('drainPendingAcks error:', err);
+    }
+  };
+
   const ensureProfile = async (u: User) => {
     try {
       await supabase.from('profiles').upsert({
@@ -31,6 +61,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         email: u.email,
         full_name: u.user_metadata?.full_name || '',
       }, { onConflict: 'id', ignoreDuplicates: true });
+      // Best-effort: stamp any acknowledgements queued before OAuth redirect.
+      await drainPendingAcks(u);
     } catch (err) {
       console.error('ensureProfile error:', err);
     }

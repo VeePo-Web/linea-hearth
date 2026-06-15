@@ -1,85 +1,119 @@
 
-# Liability Acknowledgement Checkboxes — Signup, Ambassador, Checkout
+# Audit + Simplify Liability Acknowledgements
 
-## Goal
-Before any user can create an account, submit an ambassador application, or complete a payment, they must tick legally-worded acknowledgement boxes. They don't need to open or read the linked policies — just check the box. Submission is blocked until required boxes are ticked.
+## Audit findings (3 gaps, 1 UX issue)
 
-## Where boxes appear
+### Gap 1 — Race between `handle_new_user` trigger and client `.update()`
+`useAuth.signUp` calls Supabase auth, then immediately does
+`profiles.update({ terms_accepted_at, account_security_ack_at }).eq('id', userId)`.
+The trigger `public.handle_new_user` is what actually creates the `profiles` row from
+`raw_user_meta_data`. If the trigger hasn't fired yet when the client `UPDATE` runs,
+the update silently matches 0 rows and the acknowledgement timestamps are lost from
+`profiles` (they survive on `auth.users.raw_user_meta_data` only, which is harder to
+audit).
 
-1. **User signup** — `src/components/auth/CreateAccountForm.tsx` and `src/components/checkout/PostPurchaseSignup.tsx` (the 1-click post-purchase account create).
-2. **Ambassador application** — `src/components/ambassador/AmbassadorForm.tsx`.
-3. **Checkout / payment** — `src/pages/Checkout.tsx`, placed directly above the "Place Order / Continue to Payment" CTA (before the Stripe embedded checkout mounts).
+**Fix:** update `handle_new_user` to read `terms_accepted_at` and
+`account_security_ack_at` out of `NEW.raw_user_meta_data` and write them on INSERT.
+Keep the client `.update()` as a belt-and-suspenders backup for the
+unconfirmed-email-then-confirms case (still useful, no behavioural change).
 
-## Checkbox copy
+### Gap 2 — Google OAuth signups bypass the boxes entirely
+`GoogleAuthButton` triggers OAuth immediately. There is no gating, so a user can
+create an account via Google without ever ticking the boxes — defeating the audit
+trail.
 
-Editorial, plain-English, links open Terms / Privacy in a new tab. Two boxes for account flows, one for checkout.
+**Fix:**
+- In `CreateAccountForm` and `PostPurchaseSignup`, pass `disabled={!acksOk}` to
+  `GoogleAuthButton`. Show a one-line hint above it ("Check the boxes below to
+  continue with Google.") when disabled.
+- When the user does proceed via Google after checking boxes, stash the two
+  timestamps in `sessionStorage` under `loj:pending-acks` before
+  `signInWithOAuth`, and on the next auth state change in `useAuth` (when
+  `session?.user` first appears) drain that key and `UPSERT` the timestamps
+  onto `profiles`. This keeps Google signups recorded.
 
-### Account creation (User signup + Post-Purchase Signup)
-- [ ] **Account Security Acknowledgement** — I understand I am solely responsible for keeping my login credentials secure. **Line of Judah is not liable for any loss, damage, or unauthorized activity resulting from my account being accessed, compromised, or hacked.** ([Terms](/terms-of-service))
-- [ ] **Terms & Privacy** — I agree to the [Terms of Service](/terms-of-service) and [Privacy Policy](/privacy-policy).
+### Gap 3 — `payment_ack_at` only written at session create, not on Stripe webhook
+Order is created with `payment_ack_at` in `create-checkout-session`. The Stripe
+webhook later updates the order on payment success. Confirm the webhook UPDATE
+does not null/overwrite `payment_ack_at`. (Likely safe — webhook does targeted
+field updates — but worth a one-line check; no code change unless we find it
+clobbered.)
 
-### Ambassador application
-- [ ] **Account Security Acknowledgement** (same as above)
-- [ ] **Ambassador Terms** — I agree to the [Terms of Service](/terms-of-service), [Privacy Policy](/privacy-policy), and understand my application is subject to review and approval.
+### UX issue — boxes show dense legal paragraphs inline
+The user's directive: "make it insanely simple — nothing more than they just click
+a box, and they can click read more to read more."
 
-### Checkout (above payment CTA)
-- [ ] **Payment & Liability Acknowledgement** — I understand all payment and card information is processed and stored by **Stripe, Inc.** under its own terms. **Line of Judah does not collect, store, or have access to my card data and is not liable for issues arising from payment processing, fraud, or unauthorized card use.** I agree to the [Terms of Service](/terms-of-service) and [Privacy Policy](/privacy-policy).
+Current rows render the full legal sentence inline. New design (below) collapses
+each row to a 1-line label + a small "Read more" link.
 
-## UX rules
-- Boxes are required; submit button stays disabled until all are checked (visual + `disabled` attr).
-- Use existing shadcn `Checkbox` + `Label` components. Sharp edges (rounded-none per project core rules).
-- Forest green check accent, silver chrome hairline border — matches editorial system. No yellow.
-- Inline validation: if a user clicks the disabled button area, show a short helper line ("Please confirm the acknowledgements above to continue.") in muted destructive color.
-- Mobile-friendly tap target (min 24px box, 44px row).
-- Links use `target="_blank" rel="noopener noreferrer"`; `e.stopPropagation()` so clicking the link doesn't toggle the box.
+## UX simplification — final design
 
-## Implementation (technical)
+Each row becomes:
 
-### New shared component
-`src/components/legal/LiabilityAcknowledgements.tsx`
-- Props: `variant: "account" | "ambassador" | "checkout"`, `values: Record<string, boolean>`, `onChange(key, checked)`, optional `className`.
-- Renders the appropriate set of rows from a single config map (single source of truth for legal copy).
-- Exposes `getRequiredKeys(variant)` and `areAllAccepted(variant, values)` helpers for parent forms.
-
-### Form integrations
-For each form:
-- Add local state `const [acks, setAcks] = useState({ ... })`.
-- Render `<LiabilityAcknowledgements variant=... values={acks} onChange={...} />` above the submit button.
-- Gate submit: `disabled = submitting || !areAllAccepted(variant, acks)`.
-- On submit, double-check server-side gate is unnecessary (these are UI acknowledgements), BUT persist the acceptance for audit (see below).
-
-### Audit trail (lightweight, no new tables)
-Stamp acceptance into existing records so we have proof if disputed:
-- **User signup** (`signUp` call in `useAuth`): pass `data: { terms_accepted_at: ISO, account_security_ack_at: ISO }` into Supabase auth `options.data` → lands in `auth.users.raw_user_meta_data`. Mirror into `profiles` via the existing upsert (add columns `terms_accepted_at timestamptz`, `account_security_ack_at timestamptz`) in a migration.
-- **Ambassador**: add columns `terms_accepted_at`, `account_security_ack_at` to `ambassador_applications`; populate on insert.
-- **Checkout**: stamp `payment_ack_at timestamptz` onto `orders` row (created in `create-checkout-session` edge function). Pass the timestamp in the request body; the function writes it during order insert. No Stripe-side change.
-
-### Migration (single file, all three tables)
 ```
-ALTER TABLE public.profiles
-  ADD COLUMN IF NOT EXISTS terms_accepted_at timestamptz,
-  ADD COLUMN IF NOT EXISTS account_security_ack_at timestamptz;
-
-ALTER TABLE public.ambassador_applications
-  ADD COLUMN IF NOT EXISTS terms_accepted_at timestamptz,
-  ADD COLUMN IF NOT EXISTS account_security_ack_at timestamptz;
-
-ALTER TABLE public.orders
-  ADD COLUMN IF NOT EXISTS payment_ack_at timestamptz;
+[ ] I agree to the account security terms.   Read more
+[ ] I agree to the Terms & Privacy Policy.   Read more
 ```
-No new tables → no new GRANT/RLS needed.
 
-### Files to edit
-- new `src/components/legal/LiabilityAcknowledgements.tsx`
-- `src/components/auth/CreateAccountForm.tsx` — wire boxes + gate submit + pass metadata
-- `src/components/checkout/PostPurchaseSignup.tsx` — same
-- `src/components/ambassador/AmbassadorForm.tsx` — wire boxes + gate submit + insert columns
-- `src/pages/Checkout.tsx` — wire single checkout box, gate "Continue to Payment" CTA, pass `payment_ack_at` to `create-checkout-session`
-- `src/hooks/useAuth.tsx` — extend `signUp` signature to forward acknowledgement timestamps into `options.data`
-- `supabase/functions/create-checkout-session/index.ts` — accept `paymentAckAt` and persist on the order row
-- one new migration as above
+```
+[ ] I agree to the payment & liability terms. Read more
+```
+
+- **Checkbox + 1-line label** = the only thing the user must do.
+- **"Read more"** is a small underlined chrome-hairline link to the right of the
+  label. Clicking it expands the full legal paragraph inline (zero layout shift,
+  animated height via Framer Motion, per project animation standards) and the
+  link toggles to "Show less".
+- Inside the expanded text, "Terms of Service" and "Privacy Policy" are still
+  React Router `<Link>`s opening in a new tab.
+- No modal/sheet — keeps it native, fast, and accessible on mobile.
+- Sharp edges (`rounded-none`), Silver Chrome border, Forest Green check accent —
+  consistent with project memory.
+
+## Stress-test checklist (manual + automated)
+
+I'll verify each scenario after the build:
+
+1. **Email signup**: boxes unchecked → submit disabled. Check both → submit
+   enabled → after success, `profiles.terms_accepted_at` and
+   `account_security_ack_at` are non-null for the new user.
+2. **Email signup with email-confirm flow**: same row gets stamped once the user
+   confirms (trigger captures from `raw_user_meta_data`).
+3. **Google signup, boxes unchecked**: Google button is disabled.
+4. **Google signup, boxes checked**: OAuth completes → on auth state change,
+   `profiles` row is upserted with both timestamps drained from `sessionStorage`.
+5. **Ambassador application**: submit disabled until acks checked → on submit,
+   `ambassador_applications.terms_accepted_at` + `account_security_ack_at`
+   populated.
+6. **Checkout payment ack**: "Pay with Stripe" disabled until checked → on
+   click, `orders.payment_ack_at` populated.
+7. **Post-purchase signup**: same gating as email signup.
+8. **Read more toggle**: expands and collapses correctly; keyboard accessible
+   (Enter / Space on the link).
+9. **DB spot-checks via `supabase--read_query`** after a test submission of each
+   flow to confirm the columns actually hold timestamps.
+
+## Files to change
+
+- `src/components/legal/LiabilityAcknowledgements.tsx` — collapse to 1-line label
+  + "Read more" inline expand; introduce `shortLabel` and `fullLabel` per row.
+- `src/components/auth/CreateAccountForm.tsx` — pass `disabled={!acksOk}` to
+  `GoogleAuthButton`; add helper hint when disabled; stash pending acks in
+  `sessionStorage` before any Google path.
+- `src/components/checkout/PostPurchaseSignup.tsx` — same Google gating pattern.
+- `src/hooks/useAuth.tsx` — on auth state change, if `sessionStorage` has
+  `loj:pending-acks`, upsert onto `profiles` and clear the key. Keep existing
+  post-`signUp` `.update()` as backup.
+- `supabase/functions/.../` — no edge function changes needed (already records
+  `payment_ack_at`).
+- **Migration**: update `public.handle_new_user()` to read
+  `terms_accepted_at` / `account_security_ack_at` out of
+  `NEW.raw_user_meta_data` and INSERT them with the new profile.
 
 ## Out of scope
-- Rewriting the actual Terms of Service / Privacy Policy text (already exists at `/terms-of-service` and `/privacy-policy`).
-- Server-side enforcement beyond storing timestamps (these are user-side acknowledgements, not access controls).
-- Admin UI to view acceptance timestamps (data is in DB if ever needed).
+
+- No new tables, no new RLS, no new GRANTs (columns already added in prior
+  migration, profiles RLS already correct).
+- No rewriting of the actual legal copy at `/terms-of-service` and
+  `/privacy-policy`.
+- No admin UI to view acceptance timestamps (data is in DB; can be added later).
