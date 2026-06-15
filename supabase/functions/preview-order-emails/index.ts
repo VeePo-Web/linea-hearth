@@ -17,7 +17,7 @@ function escapeHtml(s: unknown): string {
     .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 function formatCurrency(cents: number, currency = "cad"): string {
-  const symbols: Record<string, string> = { eur: "€", usd: "$", gbp: "£", cad: "C$" };
+  const symbols: Record<string, string> = { eur: "€", usd: "US$", gbp: "£", cad: "$" };
   const symbol = symbols[(currency || "cad").toLowerCase()] || "$";
   return `${symbol}${(cents / 100).toFixed(2)}`;
 }
