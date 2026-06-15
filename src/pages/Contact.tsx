@@ -117,7 +117,7 @@ const quickFAQs = [
   {
     id: "returns",
     question: "What's your return and exchange policy?",
-    answer: "30-day satisfaction guarantee on unworn items with original tags attached. Free return shipping on US orders. Custom pieces and items marked Final Sale are non-returnable. Exchanges processed within 3-5 business days of receiving your return.",
+    answer: "30-day satisfaction guarantee on unworn items with original tags attached. Return shipping is the customer's responsibility; we refund the product cost in full once your return arrives and passes inspection. Custom pieces and items marked Final Sale are non-returnable. Exchanges processed within 3-5 business days of receiving your return.",
   },
   {
     id: "sizing",
