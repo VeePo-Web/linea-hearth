@@ -111,9 +111,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { error };
   };
 
-  const signUp = async (email: string, password: string, fullName?: string) => {
+  const signUp: AuthContextType['signUp'] = async (email, password, fullName, acks) => {
     const redirectUrl = `${window.location.origin}/`;
-    
+    const nowIso = new Date().toISOString();
+    const termsAcceptedAt = acks?.termsAcceptedAt ?? nowIso;
+    const accountSecurityAckAt = acks?.accountSecurityAckAt ?? nowIso;
+
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -121,9 +124,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         emailRedirectTo: redirectUrl,
         data: {
           full_name: fullName,
+          terms_accepted_at: termsAcceptedAt,
+          account_security_ack_at: accountSecurityAckAt,
         },
       },
     });
+
+    // Best-effort: mirror acknowledgement timestamps onto the profile row.
+    // Safe to ignore failures — these are audit-only fields and the row may
+    // not exist yet for unconfirmed-email signups.
+    const newUserId = data?.user?.id;
+    if (newUserId) {
+      try {
+        await supabase
+          .from('profiles')
+          .update({
+            terms_accepted_at: termsAcceptedAt,
+            account_security_ack_at: accountSecurityAckAt,
+          })
+          .eq('id', newUserId);
+      } catch (err) {
+        console.warn('Failed to stamp acknowledgement timestamps on profile:', err);
+      }
+    }
+
     return { data, error };
   };
 
