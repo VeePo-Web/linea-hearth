@@ -51,37 +51,37 @@ const faqData: FAQItem[] = [
   {
     id: "ret-1",
     question: "What is your return policy?",
-    answer: "We offer a 30-day return policy for all unworn items with original tags attached. Items must be in their original condition for a full refund.",
+    answer: "You may request a return or refund within 90 days of delivery. For misprinted, damaged, defective, or lost items, submit your claim within 3 days of delivery so we can investigate quickly. Items must be unused, unworn, unwashed, and in original condition.",
     category: "returns",
-    keywords: ["return", "policy", "refund", "money back"]
+    keywords: ["return", "policy", "refund", "money back", "90 days"]
   },
   {
     id: "ret-2",
     question: "How do I start a return?",
-    answer: "Visit our Returns page and enter your order number to start a return request. Once approved, pack your items securely and ship them back to the address we provide.",
+    answer: "Email us with your order number, a brief description of the issue, and photos or video where relevant. We review every request within 3 business days. Once approved, we'll send the correct return address and instructions — returns shipped without prior approval cannot be accepted.",
     category: "returns",
-    keywords: ["start", "begin", "initiate", "process"]
+    keywords: ["start", "begin", "initiate", "process", "approval"]
   },
   {
     id: "ret-3",
     question: "Are returns free?",
-    answer: "Return shipping is the customer's responsibility. Once we receive and inspect your return, we refund the product cost in full to the original payment method.",
+    answer: "Return shipping is the customer's responsibility. We do not provide freight-to-collect (FTC) service. Once your return arrives and passes inspection, we refund the full product cost to the original payment method in CAD.",
     category: "returns",
-    keywords: ["free", "cost", "pay", "charge"]
+    keywords: ["free", "cost", "pay", "charge", "shipping"]
   },
   {
     id: "ret-4",
     question: "When will I receive my refund?",
-    answer: "Refunds are processed within 5-7 business days after we receive your return. The refund will be credited to your original payment method.",
+    answer: "Once your return is received and approved, we issue the refund to your original payment method in the original purchase currency (CAD). Processing times after that depend on your payment provider.",
     category: "returns",
     keywords: ["refund", "money", "credit", "when", "time"]
   },
   {
     id: "ret-5",
     question: "Can I exchange an item?",
-    answer: "Yes! You can request an exchange for a different size or color. Simply select 'Exchange' when starting your return and choose your preferred option.",
+    answer: "Yes. Email us within the 90-day window with your order number and the size or colour you'd like instead. Once your original piece arrives back and passes inspection, we ship the replacement. Return shipping on the original item remains the customer's responsibility.",
     category: "returns",
-    keywords: ["exchange", "swap", "different", "size", "color"]
+    keywords: ["exchange", "swap", "different", "size", "color", "colour"]
   },
   // Products / ARMOR SPECS
   {

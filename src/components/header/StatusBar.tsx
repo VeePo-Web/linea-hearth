@@ -14,7 +14,7 @@ const StatusBar = () => {
   const usps: USP[] = [
     { text: "Free shipping over $250", icon: <Truck size={14} strokeWidth={1.5} /> },
     { text: "365 days warranty", icon: <Shield size={14} strokeWidth={1.5} /> },
-    { text: "30-day returns", icon: <RotateCcw size={14} strokeWidth={1.5} /> },
+    { text: "90-day returns", icon: <RotateCcw size={14} strokeWidth={1.5} /> },
   ];
 
   useEffect(() => {
