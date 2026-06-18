@@ -1,19 +1,28 @@
-# Change 90 days → 14 days (returns window only)
+# PDP Image Gallery — Horizontal & Half-Size
 
-Straight find-and-replace across the 5 files that mention 90 days. No other copy, structure, or behavior changes.
+Scope: `src/components/product/ProductImageGallery.tsx` only. No layout/grid changes to `ProductDetail.tsx`, no business logic.
 
-## Replacements
+## What changes
 
-- **`src/components/header/StatusBar.tsx:17`** — `"90-day returns"` → `"14-day returns"`
-- **`src/components/product/ShippingReturnsAccordion.tsx:56`** — `90-day returns` → `14-day returns`
-- **`src/pages/FAQ.tsx:54`** — `within 90 days of delivery` → `within 14 days of delivery`
-- **`src/pages/FAQ.tsx:56`** — keyword `"90 days"` → `"14 days"`
-- **`src/pages/FAQ.tsx:82`** — `within the 90-day window` → `within the 14-day window`
-- **`src/pages/ReturnsExchanges.tsx:45`** — `90 days from delivery` → `14 days from delivery`
-- **`src/pages/ReturnsExchanges.tsx:81`** — meta desc `within 90 days` → `within 14 days`
-- **`src/pages/ReturnsExchanges.tsx:86`** — hero subtitle `90 days from delivery` → `14 days from delivery`
-- **`src/pages/ReturnsExchanges.tsx:108`** — `within 90 days after the order has been delivered` → `within 14 days after the order has been delivered`
-- **`src/pages/ReturnsExchanges.tsx:190`** — `beyond the 90-day return window` → `beyond the 14-day return window`
+**Desktop (lg+):**
+- Replace the vertical stack of full-column images with a single-row horizontal scroller.
+- Each image sits at ~50% of the gallery column width (aspect 3/4 preserved), so two images are visible at once and a third peeks in — inviting horizontal scroll/drag for additional views.
+- `overflow-x-auto`, `snap-x snap-mandatory`, scrollbar hidden, soft right-edge fade as scroll affordance.
+- First image keeps eager loading + Ken Burns reveal; subsequent images keep the in-view fade-up but applied horizontally.
+- Click-to-zoom behavior unchanged.
 
-## Audit
-After edits, re-run `grep -rn "90-day\|90 day\|90 days"` across `src/`, `supabase/`, `public/`, `index.html` and confirm zero matches.
+**Tablet / Mobile (<lg):**
+- Already side-to-side. Keep the swipeable slider, AnimatePresence, dots, and "Tap to zoom" hint exactly as-is.
+- Apply a subtle size reduction by capping the slider with `max-w-[88%] mx-auto` on mobile and `max-w-[70%]` on sm/md so the frame reads as "half-size" relative to the viewport while staying centered. Aspect 3/4 preserved.
+
+**Reduced-motion branch:**
+- Mirror the same horizontal layout on desktop (no animations) and the same mobile cap, so the reduced-motion path matches.
+
+## Preserved
+- Sorting, zoom modal, dot indicators, swipe gestures, alt text, loading priorities, accessibility labels.
+- No changes to color selector, product info column, or page grid.
+
+## Technical notes
+- Add a small `.no-scrollbar` utility inline via `[&::-webkit-scrollbar]:hidden [scrollbar-width:none]` to avoid touching global CSS.
+- Each desktop slide: `className="snap-start shrink-0 basis-[calc(50%-0.5rem)] aspect-[3/4]"` inside a `flex gap-4` track.
+- Right-edge fade: absolute `bg-gradient-to-l from-background` overlay, `pointer-events-none`, `w-12`, only on lg+.
