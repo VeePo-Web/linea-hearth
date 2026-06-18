@@ -227,9 +227,9 @@ const ProductImageGallery = ({ images, selectedColor }: ProductImageGalleryProps
 
   return (
     <div className="w-full">
-      {/* Desktop: Vertical scrolling gallery with cinematic reveals */}
-      <div className="hidden lg:block">
-        <div className="space-y-4">
+      {/* Desktop: Horizontal scroller, half-size frames with cinematic reveals */}
+      <div className="hidden lg:block relative">
+        <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [scrollbar-width:none] -mx-1 px-1">
           {sortedImages.map((image, index) => (
             <DesktopImage
               key={image.id}
@@ -242,11 +242,15 @@ const ProductImageGallery = ({ images, selectedColor }: ProductImageGalleryProps
             />
           ))}
         </div>
+        {sortedImages.length > 2 && (
+          <div className="pointer-events-none absolute top-0 right-0 h-full w-12 bg-gradient-to-l from-background to-transparent" />
+        )}
       </div>
 
-      {/* Tablet/Mobile: Image slider with AnimatePresence */}
+      {/* Tablet/Mobile: Image slider with AnimatePresence, subtly capped width */}
       <div className="lg:hidden">
-        <div className="relative">
+        <div className="relative max-w-[88%] sm:max-w-[70%] mx-auto">
+
           <div 
             className="w-full aspect-[3/4] overflow-hidden cursor-pointer bg-muted touch-pan-y"
             onClick={() => handleImageClick(currentImageIndex)}
