@@ -102,7 +102,7 @@ const TermsOfService = () => {
       <LegalSection id="returns" title="Returns and Exchanges">
         <p>
           We want you to be completely satisfied with your purchase. Returns and exchanges 
-          are accepted within 30 days of delivery, subject to the following conditions:
+          are accepted within 14 days of delivery, subject to the following conditions:
         </p>
         <ul className="mt-4 space-y-1">
           <li>Items must be in original condition with tags attached</li>

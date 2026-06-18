@@ -13,7 +13,7 @@ const CheckoutTrustBadges = () => {
       </div>
       <div className="flex items-center gap-1.5">
         <RefreshCw className="h-3.5 w-3.5" />
-        <span className="text-xs">30-day returns</span>
+        <span className="text-xs">14-day returns</span>
       </div>
       
     </div>

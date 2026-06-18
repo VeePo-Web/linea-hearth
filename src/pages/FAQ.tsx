@@ -116,7 +116,7 @@ const faqData: FAQItem[] = [
   {
     id: "size-2",
     question: "What if something doesn't fit?",
-    answer: "No worries! You can return or exchange any item within 30 days. We recommend checking the size guide and fit notes before ordering.",
+    answer: "No worries! You can return or exchange any item within 14 days. We recommend checking the size guide and fit notes before ordering.",
     category: "sizing",
     keywords: ["fit", "wrong", "small", "large", "tight", "loose"]
   },

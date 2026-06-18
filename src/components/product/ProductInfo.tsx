@@ -240,7 +240,7 @@ const ProductInfo = ({ product, variants = [], onColorChange, onAuthRequired, on
 
   const trustSignals = [
     { icon: Truck, label: "Free shipping $250+" },
-    { icon: RotateCcw, label: "Easy 30-day returns" },
+    { icon: RotateCcw, label: "Easy 14-day returns" },
   ];
 
   if (prefersReducedMotion) {
