@@ -53,7 +53,7 @@ const ShippingReturnsAccordion = () => {
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-foreground">•</span>
-                90-day returns — return shipping covered by customer
+                14-day returns — return shipping covered by customer
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-foreground">•</span>

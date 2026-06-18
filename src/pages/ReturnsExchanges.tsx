@@ -42,7 +42,7 @@ const quickQuestions = [
   {
     icon: Clock,
     title: "How Long Do I Have?",
-    description: "90 days from delivery for returns and refunds. 3 days from delivery for misprint, damage, defect, or lost-package claims.",
+    description: "14 days from delivery for returns and refunds. 3 days from delivery for misprint, damage, defect, or lost-package claims.",
     variant: "default" as const,
   },
   {
@@ -78,12 +78,12 @@ const ReturnsExchanges = () => {
     <>
       <PageSEO
         title="Returns & Exchanges | Line of Judah"
-        description="Return or refund eligible pieces within 90 days of delivery. Read the Line of Judah returns policy and start a return."
+        description="Return or refund eligible pieces within 14 days of delivery. Read the Line of Judah returns policy and start a return."
         path="/returns"
       />
       <ServicePageLayout
         title="Returns Done Right."
-        subtitle="If something isn't right, we'll make it right. You have 90 days from delivery to request a return or refund."
+        subtitle="If something isn't right, we'll make it right. You have 14 days from delivery to request a return or refund."
         eyebrow="RETURNS & EXCHANGES"
         heroAlignment="center"
         heroValueProps={heroValueProps}
@@ -105,7 +105,7 @@ const ReturnsExchanges = () => {
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground font-light leading-relaxed pb-6">
                 <p className="mb-4">
-                  You may request a return or refund within <strong>90 days after the order has been delivered</strong>.
+                  You may request a return or refund within <strong>14 days after the order has been delivered</strong>.
                 </p>
                 <p className="mb-2">For issues related to:</p>
                 <ul className="space-y-2 mb-4">
@@ -187,7 +187,7 @@ const ReturnsExchanges = () => {
                   <li>• Tights, underwear, pajamas, swimsuits, socks, and masks (hygiene)</li>
                   <li>• Sample items</li>
                   <li>• Deliberately damaged items</li>
-                  <li>• Items returned beyond the 90-day return window</li>
+                  <li>• Items returned beyond the 14-day return window</li>
                   <li>• Items accurately produced to the customer's specifications but later deemed unwanted</li>
                   <li>• Orders delayed due to incorrect information provided by the customer (wrong shipping address, wrong phone number, customer-requested design or order modifications)</li>
                 </ul>
