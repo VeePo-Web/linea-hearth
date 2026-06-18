@@ -51,9 +51,9 @@ const faqData: FAQItem[] = [
   {
     id: "ret-1",
     question: "What is your return policy?",
-    answer: "You may request a return or refund within 90 days of delivery. For misprinted, damaged, defective, or lost items, submit your claim within 3 days of delivery so we can investigate quickly. Items must be unused, unworn, unwashed, and in original condition.",
+    answer: "You may request a return or refund within 14 days of delivery. For misprinted, damaged, defective, or lost items, submit your claim within 3 days of delivery so we can investigate quickly. Items must be unused, unworn, unwashed, and in original condition.",
     category: "returns",
-    keywords: ["return", "policy", "refund", "money back", "90 days"]
+    keywords: ["return", "policy", "refund", "money back", "14 days"]
   },
   {
     id: "ret-2",
@@ -79,7 +79,7 @@ const faqData: FAQItem[] = [
   {
     id: "ret-5",
     question: "Can I exchange an item?",
-    answer: "Yes. Email us within the 90-day window with your order number and the size or colour you'd like instead. Once your original piece arrives back and passes inspection, we ship the replacement. Return shipping on the original item remains the customer's responsibility.",
+    answer: "Yes. Email us within the 14-day window with your order number and the size or colour you'd like instead. Once your original piece arrives back and passes inspection, we ship the replacement. Return shipping on the original item remains the customer's responsibility.",
     category: "returns",
     keywords: ["exchange", "swap", "different", "size", "color", "colour"]
   },
