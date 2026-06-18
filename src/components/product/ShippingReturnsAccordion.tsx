@@ -49,7 +49,7 @@ const ShippingReturnsAccordion = () => {
             <ul className="space-y-2 text-sm font-light text-muted-foreground">
               <li className="flex items-start gap-2">
                 <span className="text-foreground">•</span>
-                30-day return window for unworn items
+                14-day return window for unworn items
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-foreground">•</span>

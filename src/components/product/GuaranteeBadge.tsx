@@ -51,7 +51,7 @@ const GuaranteeBadge = () => {
             </h2>
           </div>
           <p className="text-sm font-light text-muted-foreground max-w-xl mx-auto mb-8">
-            Not feeling called? No problem. Return any unworn item within 30 days for a full refund, no questions asked. 
+            Not feeling called? No problem. Return any unworn item within 14 days for a full refund, no questions asked. 
             Your faith journey is personal—we're here to support it.
           </p>
           <div className="flex items-center justify-center gap-8 lg:gap-12 flex-wrap">
@@ -93,7 +93,7 @@ const GuaranteeBadge = () => {
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           transition={{ delay: 0.4, duration: 0.5, ease: easing.editorial }}
         >
-          Not feeling called? No problem. Return any unworn item within 30 days for a full refund, no questions asked. 
+          Not feeling called? No problem. Return any unworn item within 14 days for a full refund, no questions asked. 
           Your faith journey is personal—we're here to support it.
         </motion.p>
 

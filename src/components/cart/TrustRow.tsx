@@ -9,7 +9,7 @@ const TrustRow = () => {
       </div>
       <div className="flex items-center gap-1.5 text-muted-foreground">
         <RotateCcw className="h-4 w-4" />
-        <span className="text-xs">30-day returns</span>
+        <span className="text-xs">14-day returns</span>
       </div>
       <div className="flex items-center gap-1.5 text-muted-foreground">
         <Lock className="h-4 w-4" />

@@ -1,28 +1,21 @@
-# PDP Image Gallery — Horizontal & Half-Size
+# 30-day → 14-day Return Audit
 
-Scope: `src/components/product/ProductImageGallery.tsx` only. No layout/grid changes to `ProductDetail.tsx`, no business logic.
+Replace every return-policy "30 day" reference with "14 day" to match the policy. Leave unrelated 30-day timers (cart recovery, abandoned-cart expiry, review-request window, discount code validity, recently-viewed cleanup, JWT expiries, DB defaults) untouched.
 
-## What changes
+## Edits (return-policy only)
 
-**Desktop (lg+):**
-- Replace the vertical stack of full-column images with a single-row horizontal scroller.
-- Each image sits at ~50% of the gallery column width (aspect 3/4 preserved), so two images are visible at once and a third peeks in — inviting horizontal scroll/drag for additional views.
-- `overflow-x-auto`, `snap-x snap-mandatory`, scrollbar hidden, soft right-edge fade as scroll affordance.
-- First image keeps eager loading + Ken Burns reveal; subsequent images keep the in-view fade-up but applied horizontally.
-- Click-to-zoom behavior unchanged.
+| File | Line | Change |
+|---|---|---|
+| `src/components/cart/TrustRow.tsx` | 12 | `30-day returns` → `14-day returns` |
+| `src/components/checkout/CheckoutTrustBadges.tsx` | 16 | `30-day returns` → `14-day returns` |
+| `src/components/product/ShippingReturnsAccordion.tsx` | 52 | `30-day return window` → `14-day return window` |
+| `src/components/product/ProductInfo.tsx` | 243 | `Easy 30-day returns` → `Easy 14-day returns` |
+| `src/components/product/GuaranteeBadge.tsx` | 54, 96 | `within 30 days` → `within 14 days` |
+| `src/pages/FAQ.tsx` | 119 | `within 30 days` → `within 14 days` |
+| `src/pages/Contact.tsx` | 120 | `30-day satisfaction guarantee` → `14-day satisfaction guarantee` |
+| `src/pages/TermsOfService.tsx` | 105 | `within 30 days of delivery` → `within 14 days of delivery` |
 
-**Tablet / Mobile (<lg):**
-- Already side-to-side. Keep the swipeable slider, AnimatePresence, dots, and "Tap to zoom" hint exactly as-is.
-- Apply a subtle size reduction by capping the slider with `max-w-[88%] mx-auto` on mobile and `max-w-[70%]` on sm/md so the frame reads as "half-size" relative to the viewport while staying centered. Aspect 3/4 preserved.
+## Untouched (not return-policy)
+- `RecoverCart.tsx`, `recover-cart`, `process-abandoned-carts`, `process-review-requests`, `process-worn-in-the-wild-invites`, migration default, `RecentlyViewedContext.tsx`, `PostPurchaseSignup.tsx` (discount code expiry).
 
-**Reduced-motion branch:**
-- Mirror the same horizontal layout on desktop (no animations) and the same mobile cap, so the reduced-motion path matches.
-
-## Preserved
-- Sorting, zoom modal, dot indicators, swipe gestures, alt text, loading priorities, accessibility labels.
-- No changes to color selector, product info column, or page grid.
-
-## Technical notes
-- Add a small `.no-scrollbar` utility inline via `[&::-webkit-scrollbar]:hidden [scrollbar-width:none]` to avoid touching global CSS.
-- Each desktop slide: `className="snap-start shrink-0 basis-[calc(50%-0.5rem)] aspect-[3/4]"` inside a `flex gap-4` track.
-- Right-edge fade: absolute `bg-gradient-to-l from-background` overlay, `pointer-events-none`, `w-12`, only on lg+.
+After edits, re-run `rg "30[- ]day|30 days"` and confirm only the non-return entries remain.
