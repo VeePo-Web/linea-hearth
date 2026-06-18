@@ -354,7 +354,8 @@ const DesktopImage = ({
     return (
       <motion.div
         ref={ref}
-        className="w-full aspect-[3/4] overflow-hidden cursor-pointer group bg-muted"
+        className="snap-start shrink-0 basis-[calc(50%-0.5rem)] aspect-[3/4] overflow-hidden cursor-pointer group bg-muted"
+
         onClick={() => onImageClick(index)}
         whileHover={{ scale: 1.005 }}
         transition={{ scale: { type: "spring", stiffness: 400, damping: 30 } }}
