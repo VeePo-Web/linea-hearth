@@ -60,6 +60,8 @@ interface QuickAddState {
   isOutOfStock: boolean;
   /** Whether stock is low (≤3) */
   hasLowStock: boolean;
+  /** Whether scarcity/OOS UI should be honored (true for sale items only) */
+  enforceStockLimits: boolean;
   /** Suggested fallback size if remembered is OOS */
   suggestedFallback: string | null;
   /** The display price (sale price if applicable) */
