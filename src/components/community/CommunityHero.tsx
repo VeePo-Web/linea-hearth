@@ -124,26 +124,6 @@ export default function CommunityHero() {
               </motion.p>
             </motion.div>
 
-            {/* Stats Row - grid for mobile stability */}
-            <motion.div 
-              variants={staggerContainer}
-              initial="hidden"
-              animate="visible"
-              className="grid grid-cols-3 gap-4 md:flex md:gap-16 pt-8 border-t border-white/10"
-            >
-              <motion.div variants={staggerItem} className="text-center">
-                <p className="text-2xl md:text-4xl font-light text-white">500+</p>
-                <p className="text-[10px] uppercase tracking-[0.2em] text-white/40 mt-1">Stories</p>
-              </motion.div>
-              <motion.div variants={staggerItem} className="text-center">
-                <p className="text-2xl md:text-4xl font-light text-white">45</p>
-                <p className="text-[10px] uppercase tracking-[0.2em] text-white/40 mt-1">Cities</p>
-              </motion.div>
-              <motion.div variants={staggerItem} className="text-center">
-                <p className="text-2xl md:text-4xl font-light text-white">10K+</p>
-                <p className="text-[10px] uppercase tracking-[0.2em] text-white/40 mt-1">Tribe Members</p>
-              </motion.div>
-            </motion.div>
           </div>
         </div>
 
