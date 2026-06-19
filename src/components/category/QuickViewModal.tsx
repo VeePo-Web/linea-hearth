@@ -299,7 +299,7 @@ const QuickViewModal = ({ product, open, onClose, onAuthRequired }: QuickViewMod
             <div className="flex flex-wrap gap-2">
               {uniqueColors.map((color) => {
                 const stockForColor = quickAdd.getStockForVariant(selectedSize || undefined, color);
-                const isAvailable = stockForColor > 0;
+                const isAvailable = !quickAdd.enforceStockLimits || stockForColor > 0;
 
                 return (
                   <button
