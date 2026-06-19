@@ -1,21 +1,25 @@
-# 30-day → 14-day Return Audit
+## Remove fake community stats
 
-Replace every return-policy "30 day" reference with "14 day" to match the policy. Leave unrelated 30-day timers (cart recovery, abandoned-cart expiry, review-request window, discount code validity, recently-viewed cleanup, JWT expiries, DB defaults) untouched.
+Audit found fabricated numbers in two places (no "15 cities / 40k stories" literal exists, but other fabricated stats do — removing all of them):
 
-## Edits (return-policy only)
+### 1. `src/components/community/CommunityHero.tsx` (lines 127–146)
+Remove the entire stats row showing:
+- `500+ Stories`
+- `45 Cities`
+- `10K+ Tribe Members`
 
-| File | Line | Change |
-|---|---|---|
-| `src/components/cart/TrustRow.tsx` | 12 | `30-day returns` → `14-day returns` |
-| `src/components/checkout/CheckoutTrustBadges.tsx` | 16 | `30-day returns` → `14-day returns` |
-| `src/components/product/ShippingReturnsAccordion.tsx` | 52 | `30-day return window` → `14-day return window` |
-| `src/components/product/ProductInfo.tsx` | 243 | `Easy 30-day returns` → `Easy 14-day returns` |
-| `src/components/product/GuaranteeBadge.tsx` | 54, 96 | `within 30 days` → `within 14 days` |
-| `src/pages/FAQ.tsx` | 119 | `within 30 days` → `within 14 days` |
-| `src/pages/Contact.tsx` | 120 | `30-day satisfaction guarantee` → `14-day satisfaction guarantee` |
-| `src/pages/TermsOfService.tsx` | 105 | `within 30 days of delivery` → `within 14 days of delivery` |
+Also remove the `pt-8 border-t border-white/10` divider since the row is gone. Keep the "You belong here." manifesto above and the scroll indicator below intact.
 
-## Untouched (not return-policy)
-- `RecoverCart.tsx`, `recover-cart`, `process-abandoned-carts`, `process-review-requests`, `process-worn-in-the-wild-invites`, migration default, `RecentlyViewedContext.tsx`, `PostPurchaseSignup.tsx` (discount code expiry).
+### 2. `src/components/about/ImpactMap.tsx` (lines 146–147)
+Remove the two `AnimatedCounter` stats:
+- `45+ Cities`
+- `20+ Campuses`
 
-After edits, re-run `rg "30[- ]day|30 days"` and confirm only the non-return entries remain.
+Replace with a single understated "Coming soon" line matching the tone of `StoryCommunityStats` (which already says "Coming soon..."). No other changes to the map visual or copy.
+
+### Already clean
+- `StoryCommunityStats.tsx` — already shows "Coming soon..."
+- No matches anywhere else in `src/`, `public/`, `index.html` for these numbers.
+
+### Verification after edit
+Re-run `rg -ni "500\+|45\+? cit|10K|20\+? camp|40k|15 cit"` across `src/` to confirm zero fabricated stat strings remain on Community/About surfaces.
