@@ -475,6 +475,7 @@ const ProductInfo = ({ product, variants = [], onColorChange, onAuthRequired, on
               sizes={sizes}
               selectedSize={selectedSize}
               onSizeChange={setSelectedSize}
+              enforceStockLimits={!!product?.is_on_sale}
             />
           </motion.div>
         )}
