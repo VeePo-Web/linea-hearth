@@ -329,6 +329,7 @@ const ProductCard = ({ product, onQuickView, index = 0, onAuthRequired }: Produc
                   onSelect={quickAdd.handleSizeSelect}
                   onClose={quickAdd.hideSizePicker}
                   getStockForSize={(size) => quickAdd.getStockForVariant(size)}
+                  enforceStockLimits={quickAdd.enforceStockLimits}
                   variant="dark"
                 />
               )}
