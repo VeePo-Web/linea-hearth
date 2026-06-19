@@ -178,12 +178,8 @@ const MissingProductCard = ({
     }, 50);
   }, [product, displayPrice, lookId, lookName, addItem, rememberSize, categorySlug, onAdd]);
 
-  // Check if item is low stock
-  const isLowStock = useMemo(() => {
-    if (!selectedSize) return false;
-    const stock = getStockForSize(selectedSize);
-    return stock > 0 && stock <= 3;
-  }, [selectedSize, getStockForSize]);
+  // Print-on-demand: no low-stock scarcity for non-sale items.
+  const isLowStock = false;
 
   return (
     <motion.div
