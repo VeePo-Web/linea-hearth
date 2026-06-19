@@ -195,7 +195,7 @@ const ThresholdUpsellCard = ({
                 <div className="flex flex-wrap gap-1">
                   {quickAdd.availableSizes.map(size => {
                     const stock = quickAdd.getStockForVariant(size);
-                    const isOOS = stock === 0;
+                    const isOOS = quickAdd.enforceStockLimits && stock === 0;
                     const isRemembered = size === quickAdd.rememberedSize;
                     
                     return (
