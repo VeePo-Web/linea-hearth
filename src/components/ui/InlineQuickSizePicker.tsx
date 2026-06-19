@@ -8,6 +8,8 @@ interface InlineQuickSizePickerProps {
   getStockForSize?: (size: string) => number;
   variant?: 'dark' | 'light';
   className?: string;
+  /** When true (sale items), sizes with 0 stock render as disabled. Default false. */
+  enforceStockLimits?: boolean;
 }
 
 /**
