@@ -184,7 +184,7 @@ const SizeSelector = ({
                       : "bg-background text-foreground border-border hover:border-foreground"
                 }
               `}
-              aria-label={`Size ${size}${isDisabled ? " - Out of stock" : state === "low" ? ` - Only ${stock} left` : ""}${isRemembered ? " - Your usual size" : ""}`}
+              aria-label={`Size ${size}${isDisabled ? " - Unavailable" : state === "low" ? ` - Only ${stock} left` : ""}${isRemembered ? " - Your usual size" : ""}`}
             >
               {size}
               
