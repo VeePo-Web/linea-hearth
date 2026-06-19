@@ -325,6 +325,7 @@ export default function SwipeCard({
                     onSelect={handleSizeSelect}
                     onClose={() => setIsPickerOpen(false)}
                     getStockForSize={getStockForSize}
+                    enforceStockLimits={!!product.is_on_sale}
                     variant="dark"
                   />
                 </motion.div>

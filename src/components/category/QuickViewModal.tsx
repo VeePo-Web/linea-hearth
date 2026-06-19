@@ -115,7 +115,7 @@ const QuickViewModal = ({ product, open, onClose, onAuthRequired }: QuickViewMod
     : product.price;
 
   const canAddToCart =
-    currentStock > 0 &&
+    (!quickAdd.enforceStockLimits || currentStock > 0) &&
     (uniqueSizes.length === 0 || selectedSize) &&
     (uniqueColors.length === 0 || selectedColor);
 
@@ -260,7 +260,7 @@ const QuickViewModal = ({ product, open, onClose, onAuthRequired }: QuickViewMod
             <div className="flex flex-wrap gap-2">
               {uniqueSizes.map((size) => {
                 const stockForSize = quickAdd.getStockForVariant(size, selectedColor || undefined);
-                const isAvailable = stockForSize > 0;
+                const isAvailable = !quickAdd.enforceStockLimits || stockForSize > 0;
                 const isRemembered = size === quickAdd.rememberedSize;
 
                 return (
@@ -299,7 +299,7 @@ const QuickViewModal = ({ product, open, onClose, onAuthRequired }: QuickViewMod
             <div className="flex flex-wrap gap-2">
               {uniqueColors.map((color) => {
                 const stockForColor = quickAdd.getStockForVariant(selectedSize || undefined, color);
-                const isAvailable = stockForColor > 0;
+                const isAvailable = !quickAdd.enforceStockLimits || stockForColor > 0;
 
                 return (
                   <button
@@ -357,16 +357,16 @@ const QuickViewModal = ({ product, open, onClose, onAuthRequired }: QuickViewMod
             </span>
             <button
               className="p-3 md:p-2 hover:bg-muted/50 transition-colors disabled:opacity-50 min-w-[44px] min-h-[44px] md:min-w-0 md:min-h-0 flex items-center justify-center"
-              onClick={() => setQuantity((q) => Math.min(currentStock, q + 1))}
-              disabled={quantity >= currentStock}
+              onClick={() => setQuantity((q) => Math.min(quickAdd.enforceStockLimits ? currentStock : 10, q + 1))}
+              disabled={quickAdd.enforceStockLimits ? quantity >= currentStock : quantity >= 10}
             >
               <Plus className="w-4 h-4" />
             </button>
           </div>
         </div>
 
-        {/* Stock status */}
-        {currentStock > 0 && currentStock < 5 && (
+        {/* Stock status (sale items only) */}
+        {quickAdd.enforceStockLimits && currentStock > 0 && currentStock < 5 && (
           <p className="text-sm text-champagne-600 mb-4">
             Only {currentStock} left in stock
           </p>

@@ -22,6 +22,8 @@ interface SizeSelectorProps {
   onSizeChange: (size: string) => void;
   categorySlug?: string;
   autoSelectRemembered?: boolean;
+  /** When true (sale items), zero-stock sizes render disabled and low-stock copy shows. Default false. */
+  enforceStockLimits?: boolean;
 }
 
 const SizeSelector = ({ 
@@ -29,7 +31,8 @@ const SizeSelector = ({
   selectedSize, 
   onSizeChange,
   categorySlug,
-  autoSelectRemembered = true
+  autoSelectRemembered = true,
+  enforceStockLimits = false,
 }: SizeSelectorProps) => {
   const [sizeGuideOpen, setSizeGuideOpen] = useState(false);
   const [hasAutoSelected, setHasAutoSelected] = useState(false);
@@ -55,6 +58,7 @@ const SizeSelector = ({
   }, [categorySlug, sizes, autoSelectRemembered, rememberedSize, selectedSize, onSizeChange, hasAutoSelected]);
 
   const getSizeState = (stock: number) => {
+    if (!enforceStockLimits) return "available";
     if (stock === 0) return "oos";
     if (stock <= 3) return "low";
     return "available";
@@ -213,7 +217,7 @@ const SizeSelector = ({
         })}
       </div>
 
-      {selectedSize && sizes.find(s => s.size === selectedSize)?.stock! <= 3 && sizes.find(s => s.size === selectedSize)?.stock! > 0 && (
+      {enforceStockLimits && selectedSize && sizes.find(s => s.size === selectedSize)?.stock! <= 3 && sizes.find(s => s.size === selectedSize)?.stock! > 0 && (
         <p className="text-xs font-light text-champagne-600">
           Only {sizes.find(s => s.size === selectedSize)?.stock} left in this size
         </p>

@@ -8,6 +8,8 @@ interface InlineQuickSizePickerProps {
   getStockForSize?: (size: string) => number;
   variant?: 'dark' | 'light';
   className?: string;
+  /** When true (sale items), sizes with 0 stock render as disabled. Default false. */
+  enforceStockLimits?: boolean;
 }
 
 /**
@@ -32,6 +34,7 @@ const InlineQuickSizePicker = ({
   getStockForSize,
   variant = 'dark',
   className = '',
+  enforceStockLimits = false,
 }: InlineQuickSizePickerProps) => {
   const prefersReducedMotion = useReducedMotion();
 
@@ -79,9 +82,9 @@ const InlineQuickSizePicker = ({
       >
         {sizes.map(size => {
           const stock = getStockForSize ? getStockForSize(size) : 999;
-          const isOutOfStock = stock === 0;
+          const isOutOfStock = enforceStockLimits && stock === 0;
           const isRemembered = size === rememberedSize;
-          const isLowStock = stock > 0 && stock <= 3;
+          const isLowStock = enforceStockLimits && stock > 0 && stock <= 3;
           
           return (
             <motion.button

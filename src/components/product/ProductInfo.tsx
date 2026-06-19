@@ -296,7 +296,7 @@ const ProductInfo = ({ product, variants = [], onColorChange, onAuthRequired, on
         <TestimonialSnippet productId={product?.id} />
         {styleOptions.length > 1 && <StyleSelector styles={styleOptions} selectedStyle={selectedStyle} onStyleChange={handleStyleChange} />}
         {colors.length > 0 && <ColorSwatchSelector colors={colors} selectedColor={selectedColor} onColorChange={handleColorChange} availableColorNames={colorsForActiveStyle} />}
-        {sizes.length > 0 && <SizeSelector sizes={sizes} selectedSize={selectedSize} onSizeChange={setSelectedSize} />}
+        {sizes.length > 0 && <SizeSelector sizes={sizes} selectedSize={selectedSize} onSizeChange={setSelectedSize} enforceStockLimits={!!product?.is_on_sale} />}
 
         <div className="space-y-4 pt-4">
           <div className="flex items-center gap-4">
@@ -475,6 +475,7 @@ const ProductInfo = ({ product, variants = [], onColorChange, onAuthRequired, on
               sizes={sizes}
               selectedSize={selectedSize}
               onSizeChange={setSelectedSize}
+              enforceStockLimits={!!product?.is_on_sale}
             />
           </motion.div>
         )}
