@@ -141,11 +141,10 @@ const ImpactMap = () => {
           </h2>
         </motion.div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-4 mb-24">
-          <AnimatedCounter value={10} suffix="K+" label="Believers" delay={0} isInView={isInView} />
-          <AnimatedCounter value={45} suffix="+" label="Cities" delay={200} isInView={isInView} />
-          <AnimatedCounter value={20} suffix="+" label="Campuses" delay={400} isInView={isInView} />
-          <AnimatedCounter value={5} suffix="" label="Countries" delay={600} isInView={isInView} />
+        <div className="flex items-center justify-center py-8 mb-24">
+          <p className="text-sm text-white/40 font-light tracking-wide">
+            Coming soon...
+          </p>
         </div>
 
         <motion.div
