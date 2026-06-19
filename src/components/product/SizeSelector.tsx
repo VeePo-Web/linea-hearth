@@ -22,6 +22,8 @@ interface SizeSelectorProps {
   onSizeChange: (size: string) => void;
   categorySlug?: string;
   autoSelectRemembered?: boolean;
+  /** When true (sale items), zero-stock sizes render disabled and low-stock copy shows. Default false. */
+  enforceStockLimits?: boolean;
 }
 
 const SizeSelector = ({ 
@@ -29,7 +31,8 @@ const SizeSelector = ({
   selectedSize, 
   onSizeChange,
   categorySlug,
-  autoSelectRemembered = true
+  autoSelectRemembered = true,
+  enforceStockLimits = false,
 }: SizeSelectorProps) => {
   const [sizeGuideOpen, setSizeGuideOpen] = useState(false);
   const [hasAutoSelected, setHasAutoSelected] = useState(false);
