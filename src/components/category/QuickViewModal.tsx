@@ -372,10 +372,6 @@ const QuickViewModal = ({ product, open, onClose, onAuthRequired }: QuickViewMod
           </p>
         )}
 
-        {currentStock === 0 && (
-          <p className="text-sm text-red-500 mb-4">Out of stock</p>
-        )}
-
         {/* Add to Cart */}
         <div className="mt-auto space-y-3">
           <Button
@@ -387,8 +383,6 @@ const QuickViewModal = ({ product, open, onClose, onAuthRequired }: QuickViewMod
               <span className="animate-pulse">Adding...</span>
             ) : canAddToCart ? (
               `Add to Bag — ${formatPrice(displayPrice * quantity)}`
-            ) : currentStock === 0 ? (
-              "Out of Stock"
             ) : (
               "Select Options"
             )}
