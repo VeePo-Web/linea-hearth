@@ -176,29 +176,23 @@ const CartDrawer = ({ onViewFavorites }: CartDrawerProps) => {
             exit="exit"
           >
             {/* Header */}
-            <div className="flex items-center justify-between px-6 py-3 border-b border-border">
+            <div className="flex items-center justify-between px-6 py-3 border-b border-border/60">
               <motion.h2 
                 id="cart-title" 
-                className="text-lg font-light text-foreground"
+                className="text-lg font-light text-foreground tabular-nums"
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.2 }}
               >
-                Your Bag ({itemCount})
+                Your Bag <span className="text-muted-foreground/70">· {itemCount}</span>
               </motion.h2>
-              <motion.button
+              <button
                 onClick={closeCart}
-                className="p-2 text-foreground hover:text-muted-foreground transition-colors -mr-2 relative group"
+                className="p-2 text-muted-foreground hover:text-foreground transition-colors -mr-2"
                 aria-label="Close cart"
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
               >
-                <motion.span 
-                  className="absolute inset-0 rounded-full bg-muted scale-0 group-hover:scale-100 transition-transform duration-200"
-                  initial={false}
-                />
-                <X size={20} className="relative z-10" />
-              </motion.button>
+                <X size={18} />
+              </button>
             </div>
 
             {/* Free Shipping Progress - Sticky */}
@@ -269,7 +263,7 @@ const CartDrawer = ({ onViewFavorites }: CartDrawerProps) => {
               ) : (
                 <>
                   {/* Cart items with stagger */}
-                  <div className="px-6 divide-y divide-border">
+                  <div className="px-6 pt-1">
                     <AnimatePresence mode="popLayout">
                       {items.map((item, index) => (
                         <motion.div
@@ -287,75 +281,58 @@ const CartDrawer = ({ onViewFavorites }: CartDrawerProps) => {
                     </AnimatePresence>
                   </div>
 
-                  {/* Save Your Selection Email Capture */}
+                  {/* Save Your Selection Email Capture — quiet inline row */}
                   <AnimatePresence>
                     {showEmailCapture && !savedEmail && !isSynced && (
                       <motion.div
-                        initial={prefersReducedMotion ? { opacity: 1 } : { opacity: 0, y: 10 }}
+                        initial={prefersReducedMotion ? { opacity: 1 } : { opacity: 0, y: 6 }}
                         animate={{ opacity: 1, y: 0 }}
-                        exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: -10 }}
+                        exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: -6 }}
                         transition={{ duration: 0.2, ease: "easeOut" }}
-                        className="mx-6 my-4"
+                        className="mx-6 mt-4 mb-2 border-t border-border/50 pt-4 space-y-2"
                       >
-                        <div className="border-t border-b border-border py-5 space-y-4">
-                          <div className="space-y-1">
-                            <h3 className="text-xs font-medium text-foreground uppercase tracking-[0.2em]">
-                              Save Your Selection
-                            </h3>
-                            <p className="text-xs text-muted-foreground">
-                              Get notified if items sell out.
-                            </p>
-                          </div>
-                          
-                          <div className="space-y-2">
-                            <div className="flex gap-2">
-                              <div className="flex-1 relative">
-                                <Input
-                                  type="email"
-                                  inputMode="email"
-                                  autoComplete="email"
-                                  placeholder="Email"
-                                  value={emailInput}
-                                  onChange={(e) => {
-                                    setEmailInput(e.target.value);
-                                    setEmailError("");
-                                  }}
-                                  className="rounded-none text-sm h-12 border-muted-foreground/30 focus:border-foreground transition-colors"
-                                  onKeyDown={(e) => e.key === 'Enter' && handleSaveCart()}
-                                  disabled={savingState !== 'idle'}
-                                />
-                              </div>
-                              <Button
-                                onClick={handleSaveCart}
-                                disabled={savingState !== 'idle'}
-                                size="sm"
-                                variant="outline"
-                                className="rounded-none h-12 px-5 text-xs uppercase tracking-[0.15em] border-foreground hover:bg-foreground hover:text-background transition-all"
-                              >
-                                {savingState === 'saving' ? (
-                                  <span className="flex items-center gap-1">
-                                    <span className="w-1 h-1 bg-current rounded-full animate-pulse" />
-                                    <span className="w-1 h-1 bg-current rounded-full animate-pulse delay-75" />
-                                    <span className="w-1 h-1 bg-current rounded-full animate-pulse delay-150" />
-                                  </span>
-                                ) : savingState === 'saved' ? (
-                                  <DrawCheckIcon size="xs" delay={0} />
-                                ) : (
-                                  "Secure"
-                                )}
-                              </Button>
-                            </div>
-                            
-                            {emailError && (
-                              <p className="text-xs text-destructive">{emailError}</p>
-                            )}
-                            
-                            <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
-                              <Lock className="w-3 h-3" />
-                              <span>Your data is encrypted and secure.</span>
-                            </div>
-                          </div>
+                        <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-[0.2em] text-muted-foreground/70">
+                          <Lock className="w-3 h-3" />
+                          <span>Save your selection</span>
                         </div>
+                        <div className="flex gap-2">
+                          <Input
+                            type="email"
+                            inputMode="email"
+                            autoComplete="email"
+                            placeholder="Email"
+                            value={emailInput}
+                            onChange={(e) => {
+                              setEmailInput(e.target.value);
+                              setEmailError("");
+                            }}
+                            className="rounded-none text-sm h-10 border-border focus:border-foreground transition-colors flex-1"
+                            onKeyDown={(e) => e.key === 'Enter' && handleSaveCart()}
+                            disabled={savingState !== 'idle'}
+                          />
+                          <Button
+                            onClick={handleSaveCart}
+                            disabled={savingState !== 'idle'}
+                            size="sm"
+                            variant="outline"
+                            className="rounded-none h-10 px-4 text-xs uppercase tracking-[0.15em] border-foreground hover:bg-foreground hover:text-background transition-all"
+                          >
+                            {savingState === 'saving' ? (
+                              <span className="flex items-center gap-1">
+                                <span className="w-1 h-1 bg-current rounded-full animate-pulse" />
+                                <span className="w-1 h-1 bg-current rounded-full animate-pulse delay-75" />
+                                <span className="w-1 h-1 bg-current rounded-full animate-pulse delay-150" />
+                              </span>
+                            ) : savingState === 'saved' ? (
+                              <DrawCheckIcon size="xs" delay={0} />
+                            ) : (
+                              "Secure"
+                            )}
+                          </Button>
+                        </div>
+                        {emailError && (
+                          <p className="text-xs text-destructive">{emailError}</p>
+                        )}
                       </motion.div>
                     )}
                   </AnimatePresence>
@@ -422,7 +399,7 @@ const CartDrawer = ({ onViewFavorites }: CartDrawerProps) => {
             {/* Footer - Sticky at bottom when cart has items */}
             {items.length > 0 && (
               <motion.div 
-                className="border-t border-border bg-background"
+                className="border-t border-border/60 bg-background"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
@@ -431,13 +408,16 @@ const CartDrawer = ({ onViewFavorites }: CartDrawerProps) => {
                 <AffirmationStrip />
 
                 {/* Subtotal + CTA */}
-                <div className="px-6 py-4 space-y-4">
+                <div className="px-6 py-4 space-y-3">
                   {/* Bundle Savings Row */}
                   <BundleSavingsRow />
                   
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">Subtotal</span>
-                    <div className="text-right">
+                  <div className="flex justify-between items-baseline">
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-sm text-muted-foreground">Subtotal</span>
+                      <span className="text-[10px] text-muted-foreground/60">Shipping &amp; tax at checkout</span>
+                    </div>
+                    <div className="text-right tabular-nums">
                       {hasActiveBundles && (
                         <span className="text-sm text-muted-foreground line-through mr-2">
                           ${subtotal.toLocaleString('en-CA', { minimumFractionDigits: 2 })}
@@ -449,14 +429,10 @@ const CartDrawer = ({ onViewFavorites }: CartDrawerProps) => {
                     </div>
                   </div>
 
-                  <p className="text-xs text-muted-foreground">
-                    Shipping and taxes calculated at checkout
-                  </p>
-
-
                   <motion.div
                     whileHover={{ scale: 1.01 }}
                     whileTap={{ scale: 0.99 }}
+                    className="pt-1"
                   >
                     <Button
                       asChild
@@ -469,15 +445,15 @@ const CartDrawer = ({ onViewFavorites }: CartDrawerProps) => {
                     </Button>
                   </motion.div>
 
-                  <Button
-                    variant="ghost"
-                    className="w-full rounded-none text-sm"
-                    asChild
-                  >
-                    <Link to="/category/shop" onClick={closeCart}>
+                  <div className="text-center">
+                    <Link
+                      to="/category/shop"
+                      onClick={closeCart}
+                      className="text-xs text-muted-foreground hover:text-foreground underline-offset-4 hover:underline transition-colors"
+                    >
                       Continue Shopping
                     </Link>
-                  </Button>
+                  </div>
                 </div>
 
                 {/* Trust row */}
