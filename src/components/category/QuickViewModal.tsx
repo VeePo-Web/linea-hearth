@@ -115,7 +115,7 @@ const QuickViewModal = ({ product, open, onClose, onAuthRequired }: QuickViewMod
     : product.price;
 
   const canAddToCart =
-    currentStock > 0 &&
+    (!quickAdd.enforceStockLimits || currentStock > 0) &&
     (uniqueSizes.length === 0 || selectedSize) &&
     (uniqueColors.length === 0 || selectedColor);
 
