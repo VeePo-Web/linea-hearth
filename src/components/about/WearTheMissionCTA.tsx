@@ -82,7 +82,7 @@ const WearTheMissionCTA = () => {
             >
               <Users className="h-5 w-5 text-white/70" />
               <span className="text-lg font-light text-white/80">
-                Join <span className="font-medium text-white">10K+ believers</span> wearing their faith
+                Wear your faith with the tribe
               </span>
             </motion.div>
 
