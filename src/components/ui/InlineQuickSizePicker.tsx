@@ -34,6 +34,7 @@ const InlineQuickSizePicker = ({
   getStockForSize,
   variant = 'dark',
   className = '',
+  enforceStockLimits = false,
 }: InlineQuickSizePickerProps) => {
   const prefersReducedMotion = useReducedMotion();
 
