@@ -325,7 +325,7 @@ const ProductDetail = () => {
         salePrice={product.sale_price}
         quantity={1}
         onAddToBag={() => quickAdd.handleQuickAdd({ preventDefault: () => {}, stopPropagation: () => {} } as React.MouseEvent)}
-        disabled={quickAdd.isAdding || quickAdd.isAdded || quickAdd.isOutOfStock}
+        disabled={quickAdd.isAdding || quickAdd.isAdded}
       />
     </Layout>
   );
