@@ -217,7 +217,7 @@ const SizeSelector = ({
         })}
       </div>
 
-      {selectedSize && sizes.find(s => s.size === selectedSize)?.stock! <= 3 && sizes.find(s => s.size === selectedSize)?.stock! > 0 && (
+      {enforceStockLimits && selectedSize && sizes.find(s => s.size === selectedSize)?.stock! <= 3 && sizes.find(s => s.size === selectedSize)?.stock! > 0 && (
         <p className="text-xs font-light text-champagne-600">
           Only {sizes.find(s => s.size === selectedSize)?.stock} left in this size
         </p>
