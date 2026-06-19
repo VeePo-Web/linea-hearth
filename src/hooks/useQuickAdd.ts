@@ -420,6 +420,7 @@ export function useQuickAdd(
     totalStock,
     isOutOfStock: false, // Print-on-demand: never out of stock
     hasLowStock: false,
+    enforceStockLimits: !!product?.is_on_sale, // Only sale items honor scarcity UI
     suggestedFallback,
     displayPrice,
 
