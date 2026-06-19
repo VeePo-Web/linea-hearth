@@ -103,7 +103,7 @@ const InlineQuickSizePicker = ({
               `}
               whileTap={isOutOfStock || prefersReducedMotion ? {} : { scale: 0.9 }}
               transition={springConfig}
-              aria-label={`Size ${size}${isOutOfStock ? ' - Out of stock' : ''}${isRemembered ? ' - Your size' : ''}`}
+              aria-label={`Size ${size}${isOutOfStock ? ' - Unavailable' : ''}${isRemembered ? ' - Your size' : ''}`}
             >
               {size}
               {isRemembered && !isOutOfStock && (
