@@ -145,7 +145,7 @@ const ProductDetail = () => {
     (sum: number, v: { stock_quantity?: number }) => sum + (v.stock_quantity || 0),
     0,
   );
-  const availability = totalStock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock";
+  const availability = "https://schema.org/InStock"; // Print-on-demand: never out of stock
 
   const productJsonLd = {
     "@context": "https://schema.org",
