@@ -82,9 +82,9 @@ const InlineQuickSizePicker = ({
       >
         {sizes.map(size => {
           const stock = getStockForSize ? getStockForSize(size) : 999;
-          const isOutOfStock = stock === 0;
+          const isOutOfStock = enforceStockLimits && stock === 0;
           const isRemembered = size === rememberedSize;
-          const isLowStock = stock > 0 && stock <= 3;
+          const isLowStock = enforceStockLimits && stock > 0 && stock <= 3;
           
           return (
             <motion.button
