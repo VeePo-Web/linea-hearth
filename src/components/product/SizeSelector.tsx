@@ -58,6 +58,7 @@ const SizeSelector = ({
   }, [categorySlug, sizes, autoSelectRemembered, rememberedSize, selectedSize, onSizeChange, hasAutoSelected]);
 
   const getSizeState = (stock: number) => {
+    if (!enforceStockLimits) return "available";
     if (stock === 0) return "oos";
     if (stock <= 3) return "low";
     return "available";
