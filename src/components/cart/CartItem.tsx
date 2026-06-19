@@ -84,12 +84,14 @@ const CartItem = ({ item }: CartItemProps) => {
     }
   };
 
+  const variantParts = [item.style, item.color, item.size ? `Size ${item.size}` : null].filter(Boolean);
+
   return (
     <div 
       className={cn(
-        "relative flex gap-4 py-4 transition-all duration-200",
+        "relative flex gap-4 py-5 transition-all duration-200",
         isRemoving && "opacity-0 -translate-x-4",
-        isJustAdded && "border-l-2 border-foreground/30"
+        isJustAdded && "bg-muted/20"
       )}
     >
       {/* Main content */}
@@ -113,17 +115,13 @@ const CartItem = ({ item }: CartItemProps) => {
         <div className="flex-1 min-w-0">
           <div className="flex justify-between items-start gap-2">
             <div className="min-w-0">
-              <p className="text-xs text-muted-foreground uppercase tracking-wide">{item.category}</p>
-              <h3 className="text-sm font-medium text-foreground truncate">{item.name}</h3>
+              <p className="text-[10px] text-muted-foreground/70 uppercase tracking-[0.15em]">{item.category}</p>
+              <h3 className="text-sm font-medium text-foreground truncate mt-0.5">{item.name}</h3>
               
               {/* Variant info */}
-              {(item.size || item.color || item.style) && (
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  {item.style && <span>{item.style}</span>}
-                  {item.style && item.color && <span> / </span>}
-                  {item.color && <span>{item.color}</span>}
-                  {(item.style || item.color) && item.size && <span> / </span>}
-                  {item.size && <span>Size {item.size}</span>}
+              {variantParts.length > 0 && (
+                <p className="text-xs text-muted-foreground mt-1">
+                  {variantParts.join(' · ')}
                 </p>
               )}
               
@@ -138,30 +136,30 @@ const CartItem = ({ item }: CartItemProps) => {
             {/* Remove button - triggers confirmation */}
             <button
               onClick={handleRemoveClick}
-              className="p-1 text-muted-foreground hover:text-foreground transition-colors"
+              className="p-1 text-muted-foreground/50 hover:text-foreground transition-colors"
               aria-label="Remove item"
             >
-              <X className="h-4 w-4" />
+              <X className="h-3.5 w-3.5" />
             </button>
           </div>
 
           {/* Quantity + Price row */}
           <div className="flex items-center justify-between mt-3">
-            {/* Quantity controls */}
-            <div className="flex items-center border border-border">
+            {/* Quantity controls — borderless */}
+            <div className="flex items-center -ml-1.5">
               <button
                 onClick={handleDecrease}
-                className="p-2 hover:bg-muted/50 transition-colors"
+                className="p-1.5 text-muted-foreground hover:text-foreground transition-colors"
                 aria-label="Decrease quantity"
               >
                 <Minus className="h-3 w-3" />
               </button>
-              <span className="px-3 py-1.5 text-sm font-medium min-w-[32px] text-center">
+              <span className="px-2 text-sm font-medium min-w-[24px] text-center tabular-nums">
                 {item.quantity}
               </span>
               <button
                 onClick={() => updateQuantity(lineKey, item.quantity + 1)}
-                className="p-2 hover:bg-muted/50 transition-colors"
+                className="p-1.5 text-muted-foreground hover:text-foreground transition-colors"
                 aria-label="Increase quantity"
               >
                 <Plus className="h-3 w-3" />
@@ -169,7 +167,7 @@ const CartItem = ({ item }: CartItemProps) => {
             </div>
 
             {/* Price */}
-            <span className="text-sm font-medium text-foreground">
+            <span className="text-sm font-medium text-foreground tabular-nums">
               {item.priceFormatted}
             </span>
           </div>
