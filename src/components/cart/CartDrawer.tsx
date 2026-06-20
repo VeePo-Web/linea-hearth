@@ -154,7 +154,7 @@ const CartDrawer = ({ onViewFavorites }: CartDrawerProps) => {
         <div className="fixed inset-0 z-drawer h-[100dvh]">
           {/* Backdrop — blurred page behind */}
           <motion.div
-            className="absolute inset-0 bg-black/60 backdrop-blur-xl h-[100dvh] touch-none"
+            className="absolute inset-0 bg-black/70 backdrop-blur-2xl h-[100dvh] touch-none"
             variants={backdropVariants}
             initial="hidden"
             animate="visible"
@@ -170,7 +170,7 @@ const CartDrawer = ({ onViewFavorites }: CartDrawerProps) => {
             aria-hidden="true"
           >
             <img
-              src="/favicon-512.png"
+              src="/lion-mark.png"
               alt=""
               width={512}
               height={512}
