@@ -152,9 +152,9 @@ const CartDrawer = ({ onViewFavorites }: CartDrawerProps) => {
     <AnimatePresence>
       {isCartOpen && (
         <div className="fixed inset-0 z-drawer h-[100dvh]">
-          {/* Backdrop */}
+          {/* Backdrop — blurred page behind */}
           <motion.div
-            className="absolute inset-0 bg-black/50 h-[100dvh] touch-none"
+            className="absolute inset-0 bg-black/60 backdrop-blur-xl h-[100dvh] touch-none"
             variants={backdropVariants}
             initial="hidden"
             animate="visible"
@@ -162,6 +162,34 @@ const CartDrawer = ({ onViewFavorites }: CartDrawerProps) => {
             onClick={closeCart}
             aria-hidden="true"
           />
+
+          {/* Brand identity stack — desktop only, instant on open */}
+          <div
+            className="hidden lg:flex absolute left-0 top-0 h-full flex-col items-center justify-center pointer-events-none px-12"
+            style={{ width: "calc(100% - 28rem)" }}
+            aria-hidden="true"
+          >
+            <img
+              src="/favicon-512.png"
+              alt=""
+              width={512}
+              height={512}
+              loading="eager"
+              decoding="async"
+              className="h-[48vh] max-h-[560px] w-auto object-contain"
+              style={{
+                filter:
+                  "brightness(0) invert(1) drop-shadow(0 0 32px rgba(201,169,97,0.18))",
+              }}
+            />
+            <div className="w-24 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent mt-10 mb-6" />
+            <p className="text-[10px] uppercase tracking-[0.35em] text-white/55">
+              Exodus 28:2
+            </p>
+            <p className="mt-4 max-w-[480px] text-center font-light text-white/65 leading-relaxed text-sm">
+              "And thou shalt make holy garments for Aaron thy brother, for glory and for beauty."
+            </p>
+          </div>
 
           {/* Drawer panel */}
           <motion.div
