@@ -202,23 +202,7 @@ const CartDrawer = ({ onViewFavorites }: CartDrawerProps) => {
             </p>
           </div>
 
-            <div className="w-24 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent mt-10 mb-6" />
-            <p
-              className="text-[10px] uppercase tracking-[0.35em]"
-              style={{ color: "rgba(217, 207, 184, 0.7)" }}
-            >
-              Exodus 28:2
-            </p>
-            <p
-              className="mt-4 max-w-[480px] text-center font-normal leading-relaxed text-sm"
-              style={{
-                color: "rgba(217, 207, 184, 0.92)",
-                textShadow: "0 0 24px rgba(217, 207, 184, 0.25)",
-              }}
-            >
-              "And thou shalt make holy garments for Aaron thy brother, for glory and for beauty."
-            </p>
-          </div>
+
 
           {/* Drawer panel */}
           <motion.div
