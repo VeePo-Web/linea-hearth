@@ -28,7 +28,7 @@ interface CartDrawerProps {
 const backdropVariants = {
   hidden: { opacity: 0 },
   visible: { opacity: 1, transition: { duration: 0.3 } },
-  exit: { opacity: 0, transition: { duration: 0.2, delay: 0.1 } },
+  exit: { opacity: 0, transition: { duration: 0.35, ease: [0.4, 0, 0.2, 1] as const } },
 };
 
 const editorialEase = [0.25, 0.46, 0.45, 0.94] as const;
@@ -46,10 +46,11 @@ const drawerVariants = {
   },
   exit: {
     x: "100%",
+    opacity: 0.85,
     transition: {
       type: "tween" as const,
-      duration: 0.3,
-      ease: exitEase,
+      duration: 0.4,
+      ease: editorialEase,
     },
   },
 };
@@ -178,15 +179,23 @@ const CartDrawer = ({ onViewFavorites }: CartDrawerProps) => {
               decoding="async"
               className="h-[48vh] max-h-[560px] w-auto object-contain"
               style={{
-                filter:
-                  "brightness(0) invert(1) drop-shadow(0 0 32px rgba(201,169,97,0.18))",
+                filter: "drop-shadow(0 0 32px rgba(201,169,97,0.18))",
               }}
             />
             <div className="w-24 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent mt-10 mb-6" />
-            <p className="text-[10px] uppercase tracking-[0.35em] text-white/55">
+            <p
+              className="text-[10px] uppercase tracking-[0.35em]"
+              style={{ color: "rgba(217, 207, 184, 0.7)" }}
+            >
               Exodus 28:2
             </p>
-            <p className="mt-4 max-w-[480px] text-center font-light text-white/65 leading-relaxed text-sm">
+            <p
+              className="mt-4 max-w-[480px] text-center font-normal leading-relaxed text-sm"
+              style={{
+                color: "rgba(217, 207, 184, 0.92)",
+                textShadow: "0 0 24px rgba(217, 207, 184, 0.25)",
+              }}
+            >
               "And thou shalt make holy garments for Aaron thy brother, for glory and for beauty."
             </p>
           </div>
