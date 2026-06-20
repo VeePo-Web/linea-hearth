@@ -1,42 +1,35 @@
-## Goal
+# Cart Drawer Polish
 
-Three small polish passes on the cart-open scene:
-1. Lion shows its eyes again (currently invisible — the white-tint filter erased the black dots).
-2. Verse pops against the blurred backdrop with a warm luminous tone.
-3. Drawer **close** feels a touch more polished, while **open** stays exactly as fast as it is now.
+Four targeted tweaks to `src/components/cart/CartDrawer.tsx` plus one new lion asset. Open speed stays instant; nothing else changes.
 
-## Changes
+## 1. Synced, smooth close
+Backdrop and panel exit on the same curve and duration so they fade together — no panel-then-backdrop staggering, no abrupt cutoff.
 
-### 1. Lion eyes — regenerate the asset, drop the destructive filter
+- `backdropVariants.exit`: `duration: 0.45`, `ease: editorialEase`
+- `drawerVariants.exit`: `x: "100%"`, `opacity: 0`, `duration: 0.45`, `ease: editorialEase` (drop the `0.85` opacity floor so it fully dissolves with the backdrop)
+- Open variants untouched (still 0.3s/0.35s, instant feel)
 
-The current `public/lion-mark.png` has black dot eyes, but `CartDrawer.tsx` applies `filter: brightness(0) invert(1)` which forces every pixel to pure white, erasing the eyes.
+## 2. Stronger background blur
+- Backdrop: `bg-black/75 backdrop-blur-[40px]` (was `bg-black/70 backdrop-blur-2xl` ≈ 24px). Page behind reads as a dark frosted plate so the lion + verse pop harder.
 
-- **Regenerate `public/lion-mark.png`** via `imagegen--edit_image` from `public/favicon-512.png`: a **white lion silhouette on transparent background** with **two small dark charcoal eye dots baked in** (so eyes survive without CSS tricks). Prompt locks silhouette/mane shape and only changes color + adds eyes.
-- **`CartDrawer.tsx`** (line 180-183): remove `brightness(0) invert(1)` from the filter. Keep the warm halo `drop-shadow(0 0 32px rgba(201,169,97,0.18))` so the lion still glows.
+## 3. Better lion + eyes
+Regenerate `public/lion-mark.png` as a refined heraldic Lion of Judah mark:
+- Soft warm-white silhouette (#F5F0E6), cleaner mane geometry, slightly more regal/symmetrical face — same favicon DNA, just sharper craft
+- Eyes: two small **warm amber-gold** dots (#C9A961) — not black, not white — so they read as "lit from within" against the white face and tie to the verse glow
+- Transparent background, 1024x1024
+- CartDrawer keeps the existing warm halo `drop-shadow(0 0 32px rgba(201,169,97,0.18))`, no destructive filter
 
-### 2. Verse tone — warm champagne-chrome (in-palette)
+## 4. Verse styled like homepage "glory / beauty"
+The homepage uses warm champagne color `hsla(45, 55%, 82%, 0.95)` with layered gold text-shadow for the illuminated glow (from `src/index.css` `.glory-word` / `.beauty-word`). Apply the same to the cart verse:
 
-Project memory forbids yellow/gold. Default to **champagne-chrome** `#D9CFB8` at 85% opacity with a soft white text-shadow for the verse line — reads luminous-warm against the dark blur, still Silver Chrome family, no gold.
+- Verse line: bump from `text-sm` to `text-lg md:text-xl`, `font-medium` (bold-ish but still editorial, not heavy), `tracking-[0.01em]`, `leading-[1.6]`, `max-w-[520px]`
+- Color: `hsla(45, 55%, 82%, 0.95)`
+- `textShadow`: `0 0 15px hsla(45, 70%, 65%, 0.35), 0 0 30px hsla(45, 60%, 60%, 0.2), 0 0 45px hsla(45, 50%, 55%, 0.12)` — same 3-layer warm glow as homepage
+- "EXODUS 28:2" eyebrow: keep small/uppercase, same champagne tone `hsla(45, 55%, 82%, 0.7)` so it harmonizes
+- Hairline divider unchanged
 
-- **`CartDrawer.tsx`** (line 189-191): swap `text-white/65` for an inline `style={{ color: "rgba(217, 207, 184, 0.92)", textShadow: "0 0 24px rgba(217, 207, 184, 0.25)" }}` and bump font weight from `font-light` to `font-normal` for a hair more presence. Also brighten the "EXODUS 28:2" eyebrow from `text-white/55` to the same champagne tone at lower opacity.
-- **Override option**: if you'd rather break the no-gold rule for this single touchpoint, say "true gold" in your reply and I'll swap to `#C9A961` (the warm halo color already in the lion drop-shadow) and update the brand-voice memory to note the exception.
-
-### 3. Polished close transition (open unchanged)
-
-Only the `exit` variants are touched — `visible` (open) values stay identical, so open speed is unchanged.
-
-- **`backdropVariants.exit`** (line 31): drop the `delay: 0.1`, lengthen to `duration: 0.35`, ease `[0.4, 0, 0.2, 1]`. Backdrop and panel now fade in sync instead of the backdrop lingering.
-- **`drawerVariants.exit`** (lines 47-54): lengthen from `0.3s` to `0.4s`, switch ease to `editorialEase` (matches open), and add a subtle `opacity: 0.85` at the end so the panel softens as it slides — currently it slides at full opacity which feels abrupt.
-
-## What does NOT change
-
-- Open timing (backdrop fade-in, drawer slide-in, item stagger) — untouched.
-- Lion size/position, verse copy, hairline divider, layout, mobile behavior.
-- Drawer panel structure, header, items, footer, hooks, scroll lock.
-- No new dependencies.
+## What stays the same
+Open timing, lion size/position, layout, mobile (lion stack still `hidden lg:flex`), drawer panel, header, items, footer, hooks, scroll lock, copy ("And thou shalt make holy garments…"). No new dependencies.
 
 ## Verification
-
-- Open cart → identical speed and feel as today, but lion now has two visible dark eyes and the verse glows warm-champagne.
-- Close cart (X, Esc, or backdrop click) → backdrop and panel fade out together over ~0.4s with the editorial easing, no abrupt cutoff.
-- Mobile/tablet → unchanged.
+Open cart: same instant slide-in, deeper blur, refined lion with subtle amber eyes, verse glows warm-champagne like homepage glory/beauty, larger and bolder. Close cart: backdrop and panel fade out together over ~0.45s on editorial easing — no flicker, no stagger.

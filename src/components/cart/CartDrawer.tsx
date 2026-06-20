@@ -25,14 +25,13 @@ interface CartDrawerProps {
   onViewFavorites?: () => void;
 }
 
+const editorialEase = [0.25, 0.46, 0.45, 0.94] as const;
+
 const backdropVariants = {
   hidden: { opacity: 0 },
   visible: { opacity: 1, transition: { duration: 0.3 } },
-  exit: { opacity: 0, transition: { duration: 0.35, ease: [0.4, 0, 0.2, 1] as const } },
+  exit: { opacity: 0, transition: { duration: 0.45, ease: editorialEase } },
 };
-
-const editorialEase = [0.25, 0.46, 0.45, 0.94] as const;
-const exitEase = [0.4, 0, 1, 1] as const;
 
 const drawerVariants = {
   hidden: { x: "100%" },
@@ -46,14 +45,15 @@ const drawerVariants = {
   },
   exit: {
     x: "100%",
-    opacity: 0.85,
+    opacity: 0,
     transition: {
       type: "tween" as const,
-      duration: 0.4,
+      duration: 0.45,
       ease: editorialEase,
     },
   },
 };
+
 
 const itemVariants = {
   hidden: { opacity: 0, x: 20 },
@@ -155,7 +155,7 @@ const CartDrawer = ({ onViewFavorites }: CartDrawerProps) => {
         <div className="fixed inset-0 z-drawer h-[100dvh]">
           {/* Backdrop — blurred page behind */}
           <motion.div
-            className="absolute inset-0 bg-black/70 backdrop-blur-2xl h-[100dvh] touch-none"
+            className="absolute inset-0 bg-black/75 backdrop-blur-[40px] h-[100dvh] touch-none"
             variants={backdropVariants}
             initial="hidden"
             animate="visible"
@@ -182,6 +182,26 @@ const CartDrawer = ({ onViewFavorites }: CartDrawerProps) => {
                 filter: "drop-shadow(0 0 32px rgba(201,169,97,0.18))",
               }}
             />
+            <div className="w-24 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent mt-10 mb-6" />
+            <p
+              className="text-[10px] uppercase tracking-[0.35em]"
+              style={{ color: "hsla(45, 55%, 82%, 0.7)" }}
+            >
+              Exodus 28:2
+            </p>
+            <p
+              className="mt-4 max-w-[520px] text-center font-medium text-lg md:text-xl leading-[1.6]"
+              style={{
+                color: "hsla(45, 55%, 82%, 0.95)",
+                letterSpacing: "0.01em",
+                textShadow:
+                  "0 0 15px hsla(45, 70%, 65%, 0.35), 0 0 30px hsla(45, 60%, 60%, 0.2), 0 0 45px hsla(45, 50%, 55%, 0.12)",
+              }}
+            >
+              "And thou shalt make holy garments for Aaron thy brother, for glory and for beauty."
+            </p>
+          </div>
+
             <div className="w-24 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent mt-10 mb-6" />
             <p
               className="text-[10px] uppercase tracking-[0.35em]"
