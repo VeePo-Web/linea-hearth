@@ -19,6 +19,7 @@ import {
 } from 'recharts';
 import { format, subDays, startOfDay, eachDayOfInterval } from 'date-fns';
 import { toast } from 'sonner';
+import { formatAdminMoney, formatAdminMoneyShort } from '@/lib/adminCurrency';
 
 type RangeKey = '7D' | '30D' | '90D' | '12M' | 'ALL';
 
@@ -43,8 +44,7 @@ const RANGE_DAYS: Record<RangeKey, number | null> = {
   '7D': 7, '30D': 30, '90D': 90, '12M': 365, 'ALL': null,
 };
 
-const fmt = (cents: number) =>
-  `$${(cents / 100).toLocaleString('en-CA', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+const fmt = (cents: number) => formatAdminMoney(cents);
 
 const AdminFinancials = () => {
   const [range, setRange] = useState<RangeKey>('30D');
@@ -106,7 +106,7 @@ const AdminFinancials = () => {
 
   const kpis = [
     { title: 'Gross Volume', value: fmt(gross), delta: pctDelta(gross, prevGross), icon: DollarSign, sub: `${count} payments` },
-    { title: 'Net Volume', value: fmt(gross), delta: pctDelta(gross, prevGross), icon: TrendingUp, sub: 'Refunds: $0.00' },
+    { title: 'Net Volume', value: fmt(gross), delta: pctDelta(gross, prevGross), icon: TrendingUp, sub: 'Refunds: $0.00 CAD' },
     { title: 'Successful Payments', value: count.toString(), delta: pctDelta(count, prevCount), icon: CreditCard, sub: 'Stripe-settled' },
     { title: 'Average Order Value', value: fmt(aov), delta: pctDelta(aov, prevAov), icon: Users, sub: 'Per payment' },
   ];
@@ -303,10 +303,10 @@ const AdminFinancials = () => {
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
                   <XAxis dataKey="date" tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
-                  <YAxis tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${v}`} />
+                  <YAxis tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} tickFormatter={(v) => formatAdminMoneyShort(Number(v) * 100)} />
                   <Tooltip
                     contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 0, fontSize: 12 }}
-                    formatter={(v: number) => [`$${v.toFixed(2)}`, 'Gross']}
+                    formatter={(v: number) => [formatAdminMoney(v * 100), 'Gross']}
                   />
                   <Area type="monotone" dataKey="gross" stroke="hsl(var(--primary))" fill="url(#grossFill)" strokeWidth={2} />
                 </AreaChart>
@@ -326,11 +326,11 @@ const AdminFinancials = () => {
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={composition} layout="vertical" margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" horizontal={false} />
-                    <XAxis type="number" tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} tickFormatter={(v) => `$${v}`} />
+                    <XAxis type="number" tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} tickFormatter={(v) => formatAdminMoneyShort(Number(v) * 100)} />
                     <YAxis type="category" dataKey="name" tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} />
                     <Tooltip
                       contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 0, fontSize: 12 }}
-                      formatter={(v: number) => `$${v.toFixed(2)}`}
+                      formatter={(v: number) => formatAdminMoney(v * 100)}
                     />
                     <Legend wrapperStyle={{ fontSize: 11 }} />
                     <Bar dataKey="Subtotal" stackId="a" fill="hsl(var(--primary))" />

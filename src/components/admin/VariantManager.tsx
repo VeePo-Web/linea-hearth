@@ -776,7 +776,7 @@ const VariantManager = ({ productId, productSlug }: VariantManagerProps) => {
                         }}
                       />
                     </TableCell>
-                    <TableCell>{v.price_adjustment ? `+$${v.price_adjustment}` : '—'}</TableCell>
+                    <TableCell>{v.price_adjustment ? `+$${v.price_adjustment} CAD` : '—'}</TableCell>
                     <TableCell>
                       <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setDeleteConfirmId(v.id)}>
                         <Trash2 className="h-3.5 w-3.5 text-destructive" />

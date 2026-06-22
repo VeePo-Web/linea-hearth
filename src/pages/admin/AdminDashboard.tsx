@@ -11,6 +11,8 @@ import {
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { format, formatDistanceToNow, startOfDay, startOfWeek, startOfMonth } from 'date-fns';
+import { formatAdminMoney, STORE_CURRENCY } from '@/lib/adminCurrency';
+import { Lock } from 'lucide-react';
 
 interface Stats {
   totalProducts: number;
@@ -123,7 +125,7 @@ const AdminDashboard = () => {
     fetchAll();
   }, [fetchAll]);
 
-  const formatCurrency = (cents: number) => `$${(cents / 100).toFixed(2)}`;
+  const formatCurrency = (cents: number) => formatAdminMoney(cents);
 
   const dismissChecklist = () => {
     localStorage.setItem('admin_checklist_dismissed', 'true');
@@ -222,6 +224,35 @@ const AdminDashboard = () => {
             </Link>
           ))}
         </div>
+
+        {/* Store Currency (locked to CAD) */}
+        <Card className="rounded-none border-border/60">
+          <CardContent className="pt-5 pb-5 flex flex-wrap items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <Lock className="h-4 w-4 text-muted-foreground" />
+              <div>
+                <div className="text-xs uppercase tracking-wider text-muted-foreground">Store Currency</div>
+                <div className="text-sm font-medium mt-0.5">
+                  {STORE_CURRENCY.code} — {STORE_CURRENCY.label}
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  All prices, checkouts, refunds and payouts are processed in CAD.
+                </p>
+              </div>
+            </div>
+            <div title="Store currency is locked to CAD.">
+              <select
+                disabled
+                value="CAD"
+                className="h-9 px-3 text-sm bg-secondary/40 border border-border text-foreground cursor-not-allowed opacity-90 tracking-wider"
+                aria-label="Store currency (locked)"
+              >
+                <option value="CAD">CAD ($)</option>
+              </select>
+            </div>
+          </CardContent>
+        </Card>
+
 
         {/* Product Stats + Action Stats */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
