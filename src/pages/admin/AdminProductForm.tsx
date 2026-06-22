@@ -24,6 +24,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useImageUpload } from '@/hooks/useImageUpload';
 import type { Database } from '@/integrations/supabase/types';
+import { PROFILE_LABEL, SHIPPING_PROFILES } from '@/lib/shipping';
 
 type ProductStatus = Database['public']['Enums']['product_status'];
 
@@ -55,6 +56,7 @@ const AdminProductForm = () => {
   const [ministryStatement, setMinistryStatement] = useState('');
   const [status, setStatus] = useState<ProductStatus>('draft');
   const [categoryId, setCategoryId] = useState<string>('');
+  const [shippingProfileOverride, setShippingProfileOverride] = useState<string>('inherit');
   const [price, setPrice] = useState('');
   const [salePrice, setSalePrice] = useState('');
   const [isOnSale, setIsOnSale] = useState(false);
@@ -114,6 +116,7 @@ const AdminProductForm = () => {
         setMinistryStatement(data.ministry_statement || '');
         setStatus(data.status);
         setCategoryId(data.category_id || '');
+        setShippingProfileOverride(((data as any).shipping_profile_override as string) || 'inherit');
         setPrice(String(data.price));
         setSalePrice(data.sale_price ? String(data.sale_price) : '');
         setIsOnSale(data.is_on_sale);
@@ -164,6 +167,7 @@ const AdminProductForm = () => {
         ministry_statement: ministryStatement.trim() || null,
         status: publishStatus,
         category_id: categoryId || null,
+        shipping_profile_override: shippingProfileOverride === 'inherit' ? null : shippingProfileOverride,
         price: parseFloat(price),
         sale_price: salePrice ? parseFloat(salePrice) : null,
         is_on_sale: isOnSale && !!salePrice,
@@ -306,6 +310,23 @@ const AdminProductForm = () => {
                     </SelectContent>
                   </Select>
                 </div>
+
+                <div className="space-y-2">
+                  <Label className="text-xs uppercase tracking-wider">Shipping Profile Override</Label>
+                  <Select value={shippingProfileOverride} onValueChange={setShippingProfileOverride}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Inherit from category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="inherit">— Inherit from category —</SelectItem>
+                      {SHIPPING_PROFILES.map((p) => (
+                        <SelectItem key={p} value={p}>{PROFILE_LABEL[p]}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-muted-foreground">Optional. Only set this when the product needs a different shipping bucket than its category default.</p>
+                </div>
+
 
                 <div className="space-y-2">
                   <Label className="text-xs uppercase tracking-wider">Description</Label>

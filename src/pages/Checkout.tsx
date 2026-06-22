@@ -114,13 +114,17 @@ const Checkout = () => {
   }, [subtotal, appliedDiscount, customerDetails.email, validateCode]);
 
 
-  // Single flat-rate shipping: $15 Canada / $40 International / FREE on $250+
-  // Sourced from @/lib/currency so cart, checkout, and edge function stay aligned.
+  // Per-product-type shipping. Hat / Tee / Hoodie buckets are summed with
+  // first-item + additional rates; free over $250 CAD. Sourced from
+  // @/lib/shipping so cart, checkout, and edge function stay aligned.
   const normalizedCountry = (shippingAddress.country || '').trim().toLowerCase() === 'canada'
     ? 'CA'
     : (shippingAddress.country || 'CA');
   const isCanadianShip = isCanada(normalizedCountry);
-  const shipping = getShippingCost(normalizedCountry, subtotal);
+  const shipping = getShippingCost(normalizedCountry, subtotal, items.map((it) => ({
+    quantity: it.quantity,
+    category: it.category,
+  })));
   const total = subtotal - discountAmount + shipping;
 
   // Mirror the destination country into the cart context so the drawer's
@@ -864,7 +868,7 @@ const Checkout = () => {
                     </div>
 
                     <p className="text-xs text-muted-foreground mt-3">
-                      Flat $15 CAD across Canada · Flat $40 CAD international · Free shipping on orders $250+
+                      Calculated by item · Free shipping on orders $250+ CAD
                     </p>
                   </div>
 

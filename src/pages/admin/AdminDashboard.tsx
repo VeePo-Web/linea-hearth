@@ -12,7 +12,8 @@ import {
 import { supabase } from '@/integrations/supabase/client';
 import { format, formatDistanceToNow, startOfDay, startOfWeek, startOfMonth } from 'date-fns';
 import { formatAdminMoney, STORE_CURRENCY } from '@/lib/adminCurrency';
-import { Lock } from 'lucide-react';
+import { Lock, Truck } from 'lucide-react';
+import { SHIPPING_RATES, PROFILE_LABEL, SHIPPING_PROFILES, FREE_SHIPPING_THRESHOLD } from '@/lib/shipping';
 
 interface Stats {
   totalProducts: number;
@@ -252,6 +253,54 @@ const AdminDashboard = () => {
             </div>
           </CardContent>
         </Card>
+
+        {/* Shipping rate matrix (read-only — edit per category/product) */}
+        <Card className="rounded-none border-border/60">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium flex items-center gap-2">
+              <Truck className="h-4 w-4 text-muted-foreground" />
+              Shipping Rates · CAD
+            </CardTitle>
+            <p className="text-xs text-muted-foreground mt-1">
+              Per-item rates by product type. Free shipping on orders ≥ ${FREE_SHIPPING_THRESHOLD} CAD.
+              Categories assign the bucket; individual products can override.
+            </p>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="text-xs uppercase tracking-wider text-muted-foreground border-b border-border/60">
+                    <th className="text-left font-medium py-2 pr-3">Profile</th>
+                    <th className="text-right font-medium py-2 px-3">Canada · 1st</th>
+                    <th className="text-right font-medium py-2 px-3">Canada · +add'l</th>
+                    <th className="text-right font-medium py-2 px-3">Intl · 1st</th>
+                    <th className="text-right font-medium py-2 pl-3">Intl · +add'l</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {SHIPPING_PROFILES.map((p) => {
+                    const r = SHIPPING_RATES[p];
+                    return (
+                      <tr key={p} className="border-b border-border/30 last:border-0">
+                        <td className="py-2 pr-3 font-medium">{PROFILE_LABEL[p]}</td>
+                        <td className="py-2 px-3 text-right">{formatAdminMoney(r.ca.first)}</td>
+                        <td className="py-2 px-3 text-right">{formatAdminMoney(r.ca.additional)}</td>
+                        <td className="py-2 px-3 text-right">{formatAdminMoney(r.intl.first)}</td>
+                        <td className="py-2 pl-3 text-right">{formatAdminMoney(r.intl.additional)}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+            <p className="text-xs text-muted-foreground mt-3">
+              To change rates, edit <code className="text-[10px] bg-secondary/40 px-1 py-0.5">src/lib/shipping.ts</code> and the matching <code className="text-[10px] bg-secondary/40 px-1 py-0.5">supabase/functions/_shared/shipping.ts</code>.
+            </p>
+          </CardContent>
+        </Card>
+
+
 
 
         {/* Product Stats + Action Stats */}

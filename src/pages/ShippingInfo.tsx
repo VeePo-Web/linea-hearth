@@ -49,23 +49,23 @@ const shippingOptions = [
   {
     icon: Truck,
     title: "CANADA — STANDARD",
-    description: "Flat $15 CAD across Canada. 5-9 business days total (includes 2-5 days production + 3-4 days shipping). Full tracking.",
+    description: "Calculated by item type. Hats from $6.50, tees from $7, hoodies from $12 CAD — with a small additional charge per extra unit. 5-9 business days total (2-5 production + 3-4 shipping). Full tracking.",
     variant: "default" as const,
-    badge: "$15 FLAT"
+    badge: "BY ITEM",
   },
   {
     icon: Globe,
     title: "INTERNATIONAL — STANDARD",
-    description: "Flat $40 CAD anywhere outside Canada. 10-21 business days total (includes 2-5 days production + international transit). Full tracking.",
+    description: "Calculated by item type. Hats from $12, tees from $13, hoodies from $22 CAD — with a small additional charge per extra unit. 10-21 business days total (2-5 production + intl transit). Full tracking.",
     variant: "default" as const,
-    badge: "$40 FLAT"
+    badge: "BY ITEM",
   },
   {
     icon: Rocket,
     title: "FREE SHIPPING",
     description: "Any order with a subtotal over $250 CAD ships free — Canada or international, no code needed.",
     variant: "accent" as const,
-    badge: "OVER $250"
+    badge: "OVER $250",
   },
 ];
 
@@ -107,12 +107,12 @@ const ShippingInfo = () => {
     <>
       <PageSEO
         title="Shipping Info | Line of Judah"
-        description="Flat $15 CAD shipping across Canada. Flat $40 CAD international. Free shipping on orders over $250 CAD. Full tracking on every order."
+        description="Shipping calculated by item type — hats, tees, and hoodies each have their own rate. Free shipping on orders over $250 CAD. Full tracking on every order."
         path="/shipping"
       />
       <ServicePageLayout
       title="Reliable Delivery. Every Order."
-      subtitle="Flat $15 across Canada · Flat $40 international · Free shipping over $250. Full tracking. Designed in Calgary, delivered worldwide."
+      subtitle="Shipping calculated by item · Free over $250 CAD · Full tracking · Designed in Calgary, delivered worldwide."
       eyebrow="SHIPPING & DELIVERY"
       heroAlignment="center"
       heroValueProps={heroValueProps}

@@ -20,7 +20,9 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Plus, Pencil, Trash2, Loader2 } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
+import { PROFILE_LABEL, SHIPPING_PROFILES, type ShippingProfile } from '@/lib/shipping';
 import { useToast } from '@/hooks/use-toast';
 import {
   AlertDialog,
@@ -39,6 +41,7 @@ interface Category {
   slug: string;
   description: string | null;
   display_order: number;
+  shipping_profile: ShippingProfile | null;
   created_at: string;
   products?: { id: string }[];
 }
@@ -58,6 +61,7 @@ const AdminCategories = () => {
   const [name, setName] = useState('');
   const [slug, setSlug] = useState('');
   const [description, setDescription] = useState('');
+  const [shippingProfile, setShippingProfile] = useState<ShippingProfile | 'none'>('none');
 
   const { toast } = useToast();
 
@@ -68,7 +72,7 @@ const AdminCategories = () => {
         .select('*, products(id)')
         .order('display_order', { ascending: true });
       if (error) throw error;
-      setCategories(data || []);
+      setCategories((data || []) as Category[]);
     } catch {
       toast({ title: 'Error', description: 'Failed to load categories', variant: 'destructive' });
     } finally {
@@ -84,11 +88,13 @@ const AdminCategories = () => {
       setName(category.name);
       setSlug(category.slug);
       setDescription(category.description || '');
+      setShippingProfile(category.shipping_profile ?? 'none');
     } else {
       setEditingCategory(null);
       setName('');
       setSlug('');
       setDescription('');
+      setShippingProfile('none');
     }
     setDialogOpen(true);
   };
@@ -106,23 +112,24 @@ const AdminCategories = () => {
 
     setSaving(true);
     try {
+      const profileValue = shippingProfile === 'none' ? null : shippingProfile;
       if (editingCategory) {
         const { error } = await supabase
           .from('categories')
-          .update({ name: name.trim(), slug: slug.trim(), description: description.trim() || null })
+          .update({ name: name.trim(), slug: slug.trim(), description: description.trim() || null, shipping_profile: profileValue })
           .eq('id', editingCategory.id);
         if (error) throw error;
-        setCategories(categories.map(c => c.id === editingCategory.id ? { ...c, name: name.trim(), slug: slug.trim(), description: description.trim() || null } : c));
+        setCategories(categories.map(c => c.id === editingCategory.id ? { ...c, name: name.trim(), slug: slug.trim(), description: description.trim() || null, shipping_profile: profileValue } : c));
         toast({ title: 'Category updated' });
       } else {
         const maxOrder = Math.max(...categories.map(c => c.display_order), -1);
         const { data, error } = await supabase
           .from('categories')
-          .insert({ name: name.trim(), slug: slug.trim(), description: description.trim() || null, display_order: maxOrder + 1 })
+          .insert({ name: name.trim(), slug: slug.trim(), description: description.trim() || null, display_order: maxOrder + 1, shipping_profile: profileValue })
           .select()
           .single();
         if (error) throw error;
-        setCategories([...categories, data]);
+        setCategories([...categories, data as Category]);
         toast({ title: 'Category created' });
       }
       setDialogOpen(false);
@@ -170,6 +177,7 @@ const AdminCategories = () => {
                 <TableHead className="text-xs uppercase tracking-wider">Name</TableHead>
                 <TableHead className="text-xs uppercase tracking-wider">Slug</TableHead>
                 <TableHead className="text-xs uppercase tracking-wider text-center">Products</TableHead>
+                <TableHead className="text-xs uppercase tracking-wider">Shipping</TableHead>
                 <TableHead className="text-xs uppercase tracking-wider">Description</TableHead>
                 <TableHead className="text-xs uppercase tracking-wider text-right">Actions</TableHead>
               </TableRow>
@@ -177,13 +185,13 @@ const AdminCategories = () => {
             <TableBody>
               {loading ? (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center py-8">
+                  <TableCell colSpan={6} className="text-center py-8">
                     <Loader2 className="h-6 w-6 animate-spin mx-auto text-muted-foreground" />
                   </TableCell>
                 </TableRow>
               ) : categories.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                  <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
                     No categories yet. Add your first category!
                   </TableCell>
                 </TableRow>
@@ -193,6 +201,7 @@ const AdminCategories = () => {
                     <TableCell className="font-medium">{category.name}</TableCell>
                     <TableCell className="text-muted-foreground">{category.slug}</TableCell>
                     <TableCell className="text-center text-muted-foreground">{category.products?.length || 0}</TableCell>
+                    <TableCell className="text-muted-foreground">{category.shipping_profile ? PROFILE_LABEL[category.shipping_profile] : '—'}</TableCell>
                     <TableCell className="text-muted-foreground max-w-xs truncate">{category.description || '—'}</TableCell>
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-2">
@@ -232,6 +241,19 @@ const AdminCategories = () => {
             <div className="space-y-2">
               <Label className="text-xs uppercase tracking-wider">Description (Optional)</Label>
               <Textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Brief description" rows={3} />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-xs uppercase tracking-wider">Shipping Profile</Label>
+              <Select value={shippingProfile} onValueChange={(v) => setShippingProfile(v as ShippingProfile | 'none')}>
+                <SelectTrigger><SelectValue placeholder="Select shipping bucket" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">— Inherit / use default (Tee) —</SelectItem>
+                  {SHIPPING_PROFILES.map(p => (
+                    <SelectItem key={p} value={p}>{PROFILE_LABEL[p]}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">Drives per-item shipping at checkout. Individual products can override this.</p>
             </div>
           </div>
           <DialogFooter>

@@ -260,6 +260,7 @@ export type Database = {
           image_url: string | null
           name: string
           parent_id: string | null
+          shipping_profile: string | null
           slug: string
           updated_at: string
         }
@@ -271,6 +272,7 @@ export type Database = {
           image_url?: string | null
           name: string
           parent_id?: string | null
+          shipping_profile?: string | null
           slug: string
           updated_at?: string
         }
@@ -282,6 +284,7 @@ export type Database = {
           image_url?: string | null
           name?: string
           parent_id?: string | null
+          shipping_profile?: string | null
           slug?: string
           updated_at?: string
         }
@@ -1314,6 +1317,7 @@ export type Database = {
           name: string
           price: number
           sale_price: number | null
+          shipping_profile_override: string | null
           slug: string
           status: Database["public"]["Enums"]["product_status"]
           stripe_price_id: string | null
@@ -1338,6 +1342,7 @@ export type Database = {
           name: string
           price: number
           sale_price?: number | null
+          shipping_profile_override?: string | null
           slug: string
           status?: Database["public"]["Enums"]["product_status"]
           stripe_price_id?: string | null
@@ -1362,6 +1367,7 @@ export type Database = {
           name?: string
           price?: number
           sale_price?: number | null
+          shipping_profile_override?: string | null
           slug?: string
           status?: Database["public"]["Enums"]["product_status"]
           stripe_price_id?: string | null

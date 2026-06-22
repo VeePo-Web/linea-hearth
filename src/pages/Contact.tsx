@@ -112,7 +112,7 @@ const quickFAQs = [
   {
     id: "shipping",
     question: "What are your shipping options and timeframes?",
-    answer: "Flat $15 CAD across Canada (5-9 business days) · Flat $40 CAD international (10-21 business days) · FREE shipping on any order over $250 CAD. Designed in Calgary, shipped worldwide. Every order includes full tracking.",
+    answer: "Shipping is calculated by item type — hats, tees, and hoodies each have their own rate. Canada delivers in 5-9 business days; international in 10-21 business days. FREE shipping on any order over $250 CAD. Designed in Calgary, shipped worldwide. Every order includes full tracking.",
   },
   {
     id: "returns",
