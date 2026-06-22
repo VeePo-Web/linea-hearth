@@ -184,7 +184,7 @@ const AdminOrders = () => {
                       </div>
                     </TableCell>
                     <TableCell className="font-medium">
-                      ${(order.total_cents / 100).toFixed(2)}
+                      {formatAdminMoney(order.total_cents)}
                     </TableCell>
                     <TableCell>{paymentBadge(order.payment_status)}</TableCell>
                     <TableCell>{fulfillmentBadge(order.fulfillment_status)}</TableCell>

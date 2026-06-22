@@ -303,10 +303,10 @@ const AdminFinancials = () => {
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
                   <XAxis dataKey="date" tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
-                  <YAxis tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${v}`} />
+                  <YAxis tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} tickFormatter={(v) => formatAdminMoneyShort(Number(v) * 100)} />
                   <Tooltip
                     contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 0, fontSize: 12 }}
-                    formatter={(v: number) => [`$${v.toFixed(2)}`, 'Gross']}
+                    formatter={(v: number) => [formatAdminMoney(v * 100), 'Gross']}
                   />
                   <Area type="monotone" dataKey="gross" stroke="hsl(var(--primary))" fill="url(#grossFill)" strokeWidth={2} />
                 </AreaChart>
@@ -326,11 +326,11 @@ const AdminFinancials = () => {
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={composition} layout="vertical" margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" horizontal={false} />
-                    <XAxis type="number" tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} tickFormatter={(v) => `$${v}`} />
+                    <XAxis type="number" tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} tickFormatter={(v) => formatAdminMoneyShort(Number(v) * 100)} />
                     <YAxis type="category" dataKey="name" tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} />
                     <Tooltip
                       contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 0, fontSize: 12 }}
-                      formatter={(v: number) => `$${v.toFixed(2)}`}
+                      formatter={(v: number) => formatAdminMoney(v * 100)}
                     />
                     <Legend wrapperStyle={{ fontSize: 11 }} />
                     <Bar dataKey="Subtotal" stackId="a" fill="hsl(var(--primary))" />

@@ -199,32 +199,32 @@ const AdminOrderDetail = () => {
                         {' · Qty: '}{item.quantity}
                       </p>
                     </div>
-                    <p className="text-sm font-medium">${(item.total_cents / 100).toFixed(2)}</p>
+                    <p className="text-sm font-medium">{formatAdminMoney(item.total_cents)}</p>
                   </div>
                 ))}
 
                 <div className="pt-3 space-y-1 text-sm">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Subtotal</span>
-                    <span>${(order.subtotal_cents / 100).toFixed(2)}</span>
+                    <span>{formatAdminMoney(order.subtotal_cents)}</span>
                   </div>
                   {order.discount_cents > 0 && (
                     <div className="flex justify-between text-foreground">
                       <span>Discount{order.discount_code ? ` (${order.discount_code})` : ''}</span>
-                      <span>-${(order.discount_cents / 100).toFixed(2)}</span>
+                      <span>-{formatAdminMoney(order.discount_cents)}</span>
                     </div>
                   )}
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Shipping</span>
-                    <span>${(order.shipping_cents / 100).toFixed(2)}</span>
+                    <span>{formatAdminMoney(order.shipping_cents)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Tax</span>
-                    <span>${(order.tax_cents / 100).toFixed(2)}</span>
+                    <span>{formatAdminMoney(order.tax_cents)}</span>
                   </div>
                   <div className="flex justify-between font-medium text-base pt-2 border-t border-border">
                     <span>Total</span>
-                    <span>${(order.total_cents / 100).toFixed(2)}</span>
+                    <span>{formatAdminMoney(order.total_cents)}</span>
                   </div>
                 </div>
               </CardContent>
