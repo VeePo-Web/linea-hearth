@@ -1,6 +1,13 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { createStripeClient, type StripeEnv } from "../_shared/stripe.ts";
 import { resolveImageUrl } from "../_shared/imageUrl.ts";
+import {
+  computeShippingCents,
+  FREE_SHIPPING_THRESHOLD_CENTS,
+  normalizeProfile,
+  type ShippingProfile,
+} from "../_shared/shipping.ts";
+
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -48,13 +55,8 @@ interface RequestBody {
 }
 
 
-// Flat-rate shipping in cents (CAD).
-// - Canada: $15
-// - Anywhere else (international): $40
-// - Free on subtotal >= $250
-const SHIPPING_RATE_CA_CENTS = 1500;
-const SHIPPING_RATE_INTL_CENTS = 4000;
-const FREE_SHIPPING_THRESHOLD_CENTS = 25000;
+// Shipping rates live in supabase/functions/_shared/shipping.ts (per-profile
+// matrix). Free-shipping threshold imported from the same module.
 // Stripe tax_code for general clothing (apparel). See https://docs.stripe.com/tax/tax-codes
 const APPAREL_TAX_CODE = "txcd_30060001";
 
@@ -174,7 +176,7 @@ Deno.serve(async (req) => {
 
     const { data: dbProducts, error: prodErr } = await sbAdmin
       .from("products")
-      .select("id, name, price, sale_price, is_on_sale, status")
+      .select("id, name, price, sale_price, is_on_sale, status, shipping_profile_override, categories(shipping_profile)")
       .in("id", productIds);
     if (prodErr || !dbProducts) {
       console.error("Failed to load products for price authority", prodErr);
