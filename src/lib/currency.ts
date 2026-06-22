@@ -4,6 +4,13 @@
  * Store currency is locked to CAD — every formatted price is suffixed
  * with " CAD" so customers and ops staff can never misread it as USD.
  */
+import {
+  computeShippingDollars,
+  FREE_SHIPPING_THRESHOLD,
+  profileFromCategory,
+  type ShippingLine,
+  type ShippingProfile,
+} from "@/lib/shipping";
 
 export const CURRENCY = {
   /** ISO 4217 currency code */
@@ -13,23 +20,24 @@ export const CURRENCY = {
   /** Locale for formatting */
   locale: 'en-CA',
   /** Free shipping threshold in dollars (applies in CAD to both domestic and international) */
-  freeShippingThreshold: 250,
-  /** Flat shipping cost for Canada (CAD) */
-  domesticShippingCost: 15,
-  /** Flat shipping cost for any non-Canada destination (CAD) */
-  intlShippingCost: 40,
+  freeShippingThreshold: FREE_SHIPPING_THRESHOLD,
 };
 
 /**
- * Returns the flat shipping cost in dollars for a given country code and subtotal.
- * - Canada: $15 flat
- * - Everywhere else: $40 flat
- * - Any order ≥ $250 CAD subtotal ships free
+ * Per-product-type shipping. Pass cart lines so we can bucket by profile.
+ * Falls back to a tee-bucket single-item charge if items are omitted (legacy
+ * callers) — keeps the free-shipping threshold authoritative either way.
  */
-export function getShippingCost(country: string | undefined, subtotal: number): number {
-  if (subtotal >= CURRENCY.freeShippingThreshold) return 0;
-  const isCanada = (country || 'CA').trim().toUpperCase() === 'CA';
-  return isCanada ? CURRENCY.domesticShippingCost : CURRENCY.intlShippingCost;
+export function getShippingCost(
+  country: string | undefined,
+  subtotal: number,
+  items?: Array<{ quantity: number; shippingProfile?: ShippingProfile; category?: string }>,
+): number {
+  const lines: ShippingLine[] = (items ?? [{ quantity: 1 }]).map((it) => ({
+    profile: it.shippingProfile ?? profileFromCategory(it.category),
+    quantity: it.quantity,
+  }));
+  return computeShippingDollars(lines, country, subtotal);
 }
 
 /**
