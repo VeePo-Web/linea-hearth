@@ -11,6 +11,7 @@ import StaggerContainer from "@/components/motion/StaggerContainer";
 import InlineQuickSizePicker from "@/components/ui/InlineQuickSizePicker";
 import { DrawCheckIcon } from "@/components/ui/draw-check-icon";
 import { productIdToCartId } from "@/lib/cartUtils";
+import { formatPrice } from "@/lib/currency";
 import SwipeLookbook from "./SwipeLookbook";
 
 interface LookProduct {

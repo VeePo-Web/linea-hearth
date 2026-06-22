@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { format } from 'date-fns';
 import OrderReorderButton from '@/components/account/OrderReorderButton';
+import { formatPriceCents } from '@/lib/currency';
 
 export default function AccountOrders() {
   const { orders, isLoading } = useOrders();

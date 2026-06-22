@@ -8,6 +8,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
 import OrderReorderButton from '@/components/account/OrderReorderButton';
+import { formatPriceCents } from '@/lib/currency';
 
 export default function AccountOrderDetail() {
   const { orderId } = useParams<{ orderId: string }>();

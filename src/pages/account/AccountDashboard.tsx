@@ -6,6 +6,7 @@ import { useOrders } from '@/hooks/useOrders';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { format } from 'date-fns';
+import { formatPrice, formatPriceCents } from '@/lib/currency';
 
 export default function AccountDashboard() {
   const { profile, isLoading: profileLoading } = useProfile();
