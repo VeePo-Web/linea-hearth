@@ -103,7 +103,7 @@ export const OutfitSummary = () => {
                   </div>
                 </div>
                 <div className="text-sm font-medium">
-                  ${item?.price.toLocaleString()}
+                  ${item?.price.toLocaleString()} CAD
                 </div>
               </motion.div>
             ))}

@@ -225,7 +225,7 @@ export const ProductDrawer = ({ isOpen, onClose, slot }: ProductDrawerProps) => 
                       </AnimatePresence>
                     </div>
                     <div className="text-sm font-light truncate">{product.name}</div>
-                    <div className="text-sm font-medium">${product.price?.toLocaleString()}</div>
+                    <div className="text-sm font-medium">${product.price?.toLocaleString()} CAD</div>
                   </motion.button>
                 );
               })}

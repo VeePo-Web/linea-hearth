@@ -147,7 +147,7 @@ export const MobileTryOnBar = ({ onOpenSlot }: MobileTryOnBarProps) => {
                           <div className="text-sm font-light">{item.name}</div>
                           <div className="text-xs text-muted-foreground">Size {item.size}</div>
                         </div>
-                        <div className="text-sm font-medium">${item.price.toLocaleString()}</div>
+                        <div className="text-sm font-medium">${item.price.toLocaleString()} CAD</div>
                       </div>
                     );
                   })}
