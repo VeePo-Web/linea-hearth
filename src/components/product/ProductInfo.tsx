@@ -283,11 +283,11 @@ const ProductInfo = ({ product, variants = [], onColorChange, onAuthRequired, on
             <div className="text-right flex-shrink-0">
               {product?.is_on_sale && product?.sale_price ? (
                 <div className="space-y-0.5">
-                  <p className="text-xl font-light text-foreground">${displayPrice.toFixed(2)}</p>
-                  <p className="text-sm font-light text-muted-foreground line-through">${(product.price + activeStyleDelta).toFixed(2)}</p>
+                  <p className="text-xl font-light text-foreground">{formatPrice(displayPrice)}</p>
+                  <p className="text-sm font-light text-muted-foreground line-through">{formatPrice(product.price + activeStyleDelta)}</p>
                 </div>
               ) : (
-                <p className="text-xl font-light text-foreground">${displayPrice.toFixed(2)}</p>
+                <p className="text-xl font-light text-foreground">{formatPrice(displayPrice)}</p>
               )}
             </div>
           </div>
@@ -315,7 +315,7 @@ const ProductInfo = ({ product, variants = [], onColorChange, onAuthRequired, on
           <ScarcityBadge productId={product?.id} size={selectedSize} />
 
           <Button id="main-add-to-bag" disabled={!canAddToBag} onClick={() => onAddToBag?.({ size: selectedSize, color: selectedColor, style: selectedStyle, priceDelta: activeStyleDelta, quantity })} className="w-full h-12 bg-foreground text-background hover:bg-foreground/90 font-light rounded-none disabled:opacity-50 disabled:cursor-not-allowed">
-            Add to Bag — ${totalPrice.toFixed(2)}
+            Add to Bag — {formatPrice(totalPrice)}
           </Button>
 
           <FavoriteButton
@@ -403,15 +403,15 @@ const ProductInfo = ({ product, variants = [], onColorChange, onAuthRequired, on
             {product?.is_on_sale && product?.sale_price ? (
               <div className="space-y-0.5">
                 <p className="text-xl font-light text-foreground">
-                  ${displayPrice.toFixed(2)}
+                  {formatPrice(displayPrice)}
                 </p>
                 <p className="text-sm font-light text-muted-foreground line-through">
-                  ${(product.price + activeStyleDelta).toFixed(2)}
+                  {formatPrice(product.price + activeStyleDelta)}
                 </p>
               </div>
             ) : (
               <p className="text-xl font-light text-foreground">
-                ${displayPrice.toFixed(2)}
+                {formatPrice(displayPrice)}
               </p>
             )}
           </motion.div>
@@ -536,7 +536,7 @@ const ProductInfo = ({ product, variants = [], onColorChange, onAuthRequired, on
             className="w-full h-12 bg-foreground text-background hover:bg-foreground/90 font-light rounded-none disabled:opacity-50 disabled:cursor-not-allowed transition-all hover:shadow-lg"
             onClick={() => onAddToBag?.({ size: selectedSize, color: selectedColor, style: selectedStyle, priceDelta: activeStyleDelta, quantity })}
           >
-            Add to Bag — ${totalPrice.toFixed(2)}
+            Add to Bag — {formatPrice(totalPrice)}
           </Button>
         </motion.div>
 
