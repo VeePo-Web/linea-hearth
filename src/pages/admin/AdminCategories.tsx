@@ -72,7 +72,7 @@ const AdminCategories = () => {
         .select('*, products(id)')
         .order('display_order', { ascending: true });
       if (error) throw error;
-      setCategories(data || []);
+      setCategories((data || []) as Category[]);
     } catch {
       toast({ title: 'Error', description: 'Failed to load categories', variant: 'destructive' });
     } finally {
