@@ -8,6 +8,7 @@ import { ShoppingBag, CreditCard, Bookmark, Share2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { SaveLookModal } from './SaveLookModal';
 import { motion, AnimatePresence } from 'framer-motion';
+import { formatPrice } from '@/lib/currency';
 
 export const OutfitSummary = () => {
   const navigate = useNavigate();

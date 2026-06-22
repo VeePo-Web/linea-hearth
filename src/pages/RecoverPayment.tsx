@@ -6,6 +6,7 @@ import { useCart } from "@/hooks/useCart";
 import { useToast } from "@/hooks/use-toast";
 import Layout from "@/components/layout/Layout";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
+import { formatPrice } from "@/lib/currency";
 
 interface RecoveredItem {
   product_id: string | null;

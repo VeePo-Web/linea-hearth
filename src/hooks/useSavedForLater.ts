@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useCart, CartItem } from '@/hooks/useCart';
 import { useToast } from '@/hooks/use-toast';
+import { formatPrice } from '@/lib/currency';
 
 const STORAGE_KEY = 'loj-saved-for-later';
 const MAX_SAVED_ITEMS = 20;

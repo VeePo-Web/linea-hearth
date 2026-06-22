@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { SaveLookModal } from './SaveLookModal';
 import { motion, AnimatePresence } from 'framer-motion';
+import { formatPrice } from '@/lib/currency';
 
 // Custom pants icon
 const PantsIcon = () => (
