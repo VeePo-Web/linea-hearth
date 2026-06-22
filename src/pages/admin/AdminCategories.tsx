@@ -240,6 +240,19 @@ const AdminCategories = () => {
               <Label className="text-xs uppercase tracking-wider">Description (Optional)</Label>
               <Textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Brief description" rows={3} />
             </div>
+            <div className="space-y-2">
+              <Label className="text-xs uppercase tracking-wider">Shipping Profile</Label>
+              <Select value={shippingProfile} onValueChange={(v) => setShippingProfile(v as ShippingProfile | 'none')}>
+                <SelectTrigger><SelectValue placeholder="Select shipping bucket" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">— Inherit / use default (Tee) —</SelectItem>
+                  {SHIPPING_PROFILES.map(p => (
+                    <SelectItem key={p} value={p}>{PROFILE_LABEL[p]}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">Drives per-item shipping at checkout. Individual products can override this.</p>
+            </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDialogOpen(false)} disabled={saving}>Cancel</Button>
