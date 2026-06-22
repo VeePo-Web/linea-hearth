@@ -54,7 +54,7 @@ const PostPurchaseOffer = ({ isOpen, offer, customerEmail, onClose, onAccepted }
     return () => clearInterval(id);
   }, [isOpen, offer.expiresAt, state]);
 
-  const price = (cents: number) => `$${(cents / 100).toFixed(2)}`;
+  const price = (cents: number) => formatPriceCents(cents);
 
   const handleAccept = async () => {
     if (state !== "idle") return;

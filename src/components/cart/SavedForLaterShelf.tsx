@@ -169,7 +169,7 @@ const SavedForLaterShelf = ({ defaultOpen = false }: SavedForLaterShelfProps) =>
                         exit={prefersReducedMotion ? {} : { opacity: 0 }}
                         transition={{ duration: 0.15 }}
                       >
-                        {savedCount === 1 ? 'Add to Bag' : 'Add All to Bag'} • ${totalSavedValue.toFixed(2)}
+                        {savedCount === 1 ? 'Add to Bag' : 'Add All to Bag'} • {formatPrice(totalSavedValue)}
                       </motion.span>
                     )}
                   </AnimatePresence>

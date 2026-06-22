@@ -36,7 +36,7 @@ const StyleSelector = ({ styles, selectedStyle, onStyleChange }: StyleSelectorPr
       <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="Garment style options">
         {styles.map(({ name, label, iconUrl, priceDelta, available }) => {
           const isSelected = selectedStyle === name;
-          const delta = priceDelta > 0 ? `+$${priceDelta.toFixed(0)}` : priceDelta < 0 ? `-$${Math.abs(priceDelta).toFixed(0)}` : '';
+          const delta = priceDelta > 0 ? `+$${priceDelta.toFixed(0)} CAD` : priceDelta < 0 ? `-$${Math.abs(priceDelta).toFixed(0)} CAD` : '';
 
           return (
             <button

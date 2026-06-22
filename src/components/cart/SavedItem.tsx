@@ -79,7 +79,7 @@ const SavedItem = ({ item, onMoveToCart, onRemove }: SavedItemProps) => {
         {/* Price + Actions */}
         <div className="flex items-center justify-between mt-1">
           <span className="text-xs font-medium text-foreground">
-            ${displayPrice.toFixed(2)}
+            {formatPrice(displayPrice)}
           </span>
           
           <div className="flex items-center gap-1">

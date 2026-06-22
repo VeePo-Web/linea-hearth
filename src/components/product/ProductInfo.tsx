@@ -26,6 +26,7 @@ import { easing } from "@/lib/animations";
 import { useProductColors } from "@/hooks/useProductColors";
 import { useProductStyles } from "@/hooks/useProductStyles";
 import { getColorHex } from "@/lib/cartUtils";
+import { formatPrice } from "@/lib/currency";
 
 interface ProductVariant {
   id: string;
