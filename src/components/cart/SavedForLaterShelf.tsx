@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import SavedItem from "./SavedItem";
 import { cn } from "@/lib/utils";
+import { formatPrice } from "@/lib/currency";
 import { DrawCheckIcon } from "@/components/ui/draw-check-icon";
 
 interface SavedForLaterShelfProps {

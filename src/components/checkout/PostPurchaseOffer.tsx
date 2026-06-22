@@ -8,6 +8,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
+import { formatPriceCents } from "@/lib/currency";
 
 export interface UpsellOffer {
   token: string;

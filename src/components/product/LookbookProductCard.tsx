@@ -5,6 +5,7 @@ import { useQuickAdd, ProductForQuickAdd } from "@/hooks/useQuickAdd";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import InlineQuickSizePicker from "@/components/ui/InlineQuickSizePicker";
 import { easing } from "@/lib/animations";
+import { formatPrice } from "@/lib/currency";
 
 interface ProductImage {
   image_url: string;

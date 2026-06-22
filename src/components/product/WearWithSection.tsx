@@ -7,6 +7,7 @@ import { ShoppingBag } from "lucide-react";
 import TextReveal from "@/components/motion/TextReveal";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { easing } from "@/lib/animations";
+import { formatPrice } from "@/lib/currency";
 
 interface WearWithSectionProps {
   currentProductId?: string;

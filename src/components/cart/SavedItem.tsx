@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { SavedItem as SavedItemType } from "@/hooks/useSavedForLater";
 import { cn } from "@/lib/utils";
+import { formatPrice } from "@/lib/currency";
 import { useState } from "react";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 

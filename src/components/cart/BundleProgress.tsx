@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { BundleMatch } from "@/hooks/useBundleDiscounts";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { cn } from "@/lib/utils";
+import { formatPrice } from "@/lib/currency";
 import MissingProductCard from "./MissingProductCard";
 
 interface BundleProgressProps {
