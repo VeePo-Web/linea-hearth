@@ -1,6 +1,8 @@
 /**
  * Centralized currency configuration for Line of Judah
- * All pricing display must use these utilities for consistency
+ * All pricing display must use these utilities for consistency.
+ * Store currency is locked to CAD — every formatted price is suffixed
+ * with " CAD" so customers and ops staff can never misread it as USD.
  */
 
 export const CURRENCY = {
@@ -38,26 +40,23 @@ export function isCanada(country: string | undefined): boolean {
 }
 
 /**
- * Formats a numeric price as a CAD currency string
+ * Formats a numeric price as a CAD currency string with explicit "CAD" suffix.
  * @param price - Price in dollars (not cents)
- * @returns Formatted string like "$69.99"
+ * @returns Formatted string like "$69.99 CAD"
  */
 export function formatPrice(price: number): string {
-  return new Intl.NumberFormat(CURRENCY.locale, {
-    style: 'currency',
-    currency: CURRENCY.code,
+  const v = (price ?? 0).toLocaleString(CURRENCY.locale, {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
-  }).format(price);
+  });
+  return `$${v} CAD`;
 }
 
 /**
- * Formats a price from cents to CAD string
- * @param cents - Price in cents
- * @returns Formatted string like "$69.99"
+ * Formats a price from cents to CAD string ("$69.99 CAD")
  */
 export function formatPriceCents(cents: number): string {
-  return formatPrice(cents / 100);
+  return formatPrice((cents ?? 0) / 100);
 }
 
 /**
@@ -70,10 +69,20 @@ export function formatPriceNumeric(price: number): string {
 }
 
 /**
- * Formats a price as a simple display string (with $ symbol, no locale formatting)
- * @param price - Price in dollars
- * @returns Formatted string like "$69.99"
+ * Formats a price as a simple display string with CAD suffix.
+ * @returns Formatted string like "$69.99 CAD"
  */
 export function formatPriceSimple(price: number): string {
-  return `$${price.toFixed(2)}`;
+  return `$${(price ?? 0).toFixed(2)} CAD`;
+}
+
+/**
+ * Formats a signed price delta (e.g. style upcharge chips). Returns
+ * "+$15 CAD", "-$15 CAD", or "" when zero. Pass `fractionDigits` for cents.
+ */
+export function formatPriceDelta(delta: number, fractionDigits = 0): string {
+  if (!delta) return '';
+  const abs = Math.abs(delta).toFixed(fractionDigits);
+  const sign = delta > 0 ? '+' : '-';
+  return `${sign}$${abs} CAD`;
 }
