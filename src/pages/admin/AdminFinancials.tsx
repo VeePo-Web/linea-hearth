@@ -19,6 +19,7 @@ import {
 } from 'recharts';
 import { format, subDays, startOfDay, eachDayOfInterval } from 'date-fns';
 import { toast } from 'sonner';
+import { formatAdminMoney, formatAdminMoneyShort } from '@/lib/adminCurrency';
 
 type RangeKey = '7D' | '30D' | '90D' | '12M' | 'ALL';
 
@@ -43,8 +44,7 @@ const RANGE_DAYS: Record<RangeKey, number | null> = {
   '7D': 7, '30D': 30, '90D': 90, '12M': 365, 'ALL': null,
 };
 
-const fmt = (cents: number) =>
-  `$${(cents / 100).toLocaleString('en-CA', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+const fmt = (cents: number) => formatAdminMoney(cents);
 
 const AdminFinancials = () => {
   const [range, setRange] = useState<RangeKey>('30D');
@@ -106,7 +106,7 @@ const AdminFinancials = () => {
 
   const kpis = [
     { title: 'Gross Volume', value: fmt(gross), delta: pctDelta(gross, prevGross), icon: DollarSign, sub: `${count} payments` },
-    { title: 'Net Volume', value: fmt(gross), delta: pctDelta(gross, prevGross), icon: TrendingUp, sub: 'Refunds: $0.00' },
+    { title: 'Net Volume', value: fmt(gross), delta: pctDelta(gross, prevGross), icon: TrendingUp, sub: 'Refunds: $0.00 CAD' },
     { title: 'Successful Payments', value: count.toString(), delta: pctDelta(count, prevCount), icon: CreditCard, sub: 'Stripe-settled' },
     { title: 'Average Order Value', value: fmt(aov), delta: pctDelta(aov, prevAov), icon: Users, sub: 'Per payment' },
   ];
