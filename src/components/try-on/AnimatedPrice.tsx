@@ -59,7 +59,7 @@ export const AnimatedPrice = ({ value, className = '', prefix = '$' }: AnimatedP
         animate={{ opacity: 1, scale: 1 }}
         className={className}
       >
-        {prefix}{displayValue.toLocaleString()}
+        {prefix}{displayValue.toLocaleString()} CAD
       </motion.span>
     </AnimatePresence>
   );
