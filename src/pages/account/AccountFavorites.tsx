@@ -3,6 +3,7 @@ import { Heart, ShoppingBag, Trash2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useFavorites } from '@/hooks/useFavorites';
 import { useCart } from '@/hooks/useCart';
+import { formatPrice } from '@/lib/currency';
 
 export default function AccountFavorites() {
   const { favorites, isLoading, removeFavorite } = useFavorites();
