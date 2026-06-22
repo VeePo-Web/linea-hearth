@@ -1,5 +1,6 @@
 import { Sparkles } from "lucide-react";
 import { useCart } from "@/hooks/useCart";
+import { formatPrice } from "@/lib/currency";
 
 interface SavingsSummaryProps {
   discountAmount?: number;
@@ -21,7 +22,7 @@ const SavingsSummary = ({ discountAmount = 0 }: SavingsSummaryProps) => {
           <Sparkles className="h-3 w-3 text-background" />
         </div>
         <span className="text-sm font-medium text-champagne-700 dark:text-champagne-400">
-          You're saving ${totalSavings.toLocaleString()} on this order!
+          You're saving {formatPrice(totalSavings)} on this order!
         </span>
       </div>
       
@@ -30,13 +31,13 @@ const SavingsSummary = ({ discountAmount = 0 }: SavingsSummaryProps) => {
         {discountAmount > 0 && (
           <div className="flex justify-between">
             <span>Discount applied</span>
-            <span>-${discountAmount.toLocaleString()}</span>
+            <span>-{formatPrice(discountAmount)}</span>
           </div>
         )}
         {hasFreeShipping && (
           <div className="flex justify-between">
-            <span>Free shipping (orders over ${freeShippingThreshold})</span>
-            <span>-${shippingValue}</span>
+            <span>Free shipping (orders over {formatPrice(freeShippingThreshold)})</span>
+            <span>-{formatPrice(shippingValue)}</span>
           </div>
         )}
       </div>

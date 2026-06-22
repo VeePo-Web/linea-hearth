@@ -2,6 +2,7 @@ import { useState, useCallback, useRef, useMemo } from 'react';
 import { useQuickAdd, ProductForQuickAdd } from './useQuickAdd';
 import { useCart } from './useCart';
 import { triggerHapticFeedback, productIdToCartId } from '@/lib/cartUtils';
+import { formatPrice } from '@/lib/currency';
 
 export interface SwipeLookProduct {
   id: string;
@@ -117,7 +118,7 @@ export function useSwipeSession(
       id: productIdToCartId(currentProduct.id),
       name: currentProduct.name,
       price: price,
-      priceFormatted: `$${price}`,
+      priceFormatted: formatPrice(price),
       image: primaryImage?.image_url || '',
       category: currentProduct.position || 'Lookbook',
       size: selectedSize,

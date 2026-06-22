@@ -8,6 +8,7 @@ import { ShoppingBag, CreditCard, Bookmark, Share2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { SaveLookModal } from './SaveLookModal';
 import { motion, AnimatePresence } from 'framer-motion';
+import { formatPrice } from '@/lib/currency';
 
 export const OutfitSummary = () => {
   const navigate = useNavigate();
@@ -26,7 +27,7 @@ export const OutfitSummary = () => {
           id: item.productId.charCodeAt(0) + Date.now() + Math.random(),
           name: item.name,
           price: Number(item.price),
-          priceFormatted: `$${Number(item.price).toLocaleString()}`,
+          priceFormatted: formatPrice(Number(item.price)),
           image: item.imageUrl || '/placeholder.svg',
           category: slot,
           size: item.size,
@@ -102,7 +103,7 @@ export const OutfitSummary = () => {
                   </div>
                 </div>
                 <div className="text-sm font-medium">
-                  ${item?.price.toLocaleString()}
+                  ${item?.price.toLocaleString()} CAD
                 </div>
               </motion.div>
             ))}

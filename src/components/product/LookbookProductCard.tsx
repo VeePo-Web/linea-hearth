@@ -5,6 +5,7 @@ import { useQuickAdd, ProductForQuickAdd } from "@/hooks/useQuickAdd";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import InlineQuickSizePicker from "@/components/ui/InlineQuickSizePicker";
 import { easing } from "@/lib/animations";
+import { formatPrice } from "@/lib/currency";
 
 interface ProductImage {
   image_url: string;
@@ -170,15 +171,15 @@ const LookbookProductCard = ({ product, position }: LookbookProductCardProps) =>
             {product.is_on_sale && product.sale_price ? (
               <>
                 <span className="text-sm font-light text-foreground">
-                  ${product.sale_price.toFixed(2)}
+                  {formatPrice(product.sale_price)}
                 </span>
                 <span className="text-xs font-light text-muted-foreground line-through">
-                  ${product.price.toFixed(2)}
+                  {formatPrice(product.price)}
                 </span>
               </>
             ) : (
               <span className="text-sm font-light text-muted-foreground">
-                ${product.price.toFixed(2)}
+                {formatPrice(product.price)}
               </span>
             )}
             {/* Size memory indicator */}

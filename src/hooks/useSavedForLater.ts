@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useCart, CartItem } from '@/hooks/useCart';
 import { useToast } from '@/hooks/use-toast';
+import { formatPrice } from '@/lib/currency';
 
 const STORAGE_KEY = 'loj-saved-for-later';
 const MAX_SAVED_ITEMS = 20;
@@ -367,7 +368,7 @@ export function useSavedForLater(): UseSavedForLaterReturn {
       id: Number(item.productId) || Math.random(),
       name: item.product.name,
       price: item.product.sale_price ?? item.product.price,
-      priceFormatted: `$${(item.product.sale_price ?? item.product.price).toFixed(2)}`,
+      priceFormatted: formatPrice(item.product.sale_price ?? item.product.price),
       image: item.product.image_url,
       category: item.product.category_slug || 'Shop',
       size: item.savedSize,
@@ -396,7 +397,7 @@ export function useSavedForLater(): UseSavedForLaterReturn {
         id: Number(item.productId) || Math.random(),
         name: item.product.name,
         price: item.product.sale_price ?? item.product.price,
-        priceFormatted: `$${(item.product.sale_price ?? item.product.price).toFixed(2)}`,
+        priceFormatted: formatPrice(item.product.sale_price ?? item.product.price),
         image: item.product.image_url,
         category: item.product.category_slug || 'Shop',
         size: item.savedSize,

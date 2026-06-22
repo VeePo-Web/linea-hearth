@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { SaveLookModal } from './SaveLookModal';
 import { motion, AnimatePresence } from 'framer-motion';
+import { formatPrice } from '@/lib/currency';
 
 // Custom pants icon
 const PantsIcon = () => (
@@ -47,7 +48,7 @@ export const MobileTryOnBar = ({ onOpenSlot }: MobileTryOnBarProps) => {
           id: item.productId.charCodeAt(0) + Date.now() + Math.random(),
           name: item.name,
           price: Number(item.price),
-          priceFormatted: `$${Number(item.price).toLocaleString()}`,
+          priceFormatted: formatPrice(Number(item.price)),
           image: item.imageUrl || '/placeholder.svg',
           category: slot,
           size: item.size,
@@ -146,7 +147,7 @@ export const MobileTryOnBar = ({ onOpenSlot }: MobileTryOnBarProps) => {
                           <div className="text-sm font-light">{item.name}</div>
                           <div className="text-xs text-muted-foreground">Size {item.size}</div>
                         </div>
-                        <div className="text-sm font-medium">${item.price.toLocaleString()}</div>
+                        <div className="text-sm font-medium">${item.price.toLocaleString()} CAD</div>
                       </div>
                     );
                   })}

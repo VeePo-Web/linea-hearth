@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import SavedItem from "./SavedItem";
 import { cn } from "@/lib/utils";
+import { formatPrice } from "@/lib/currency";
 import { DrawCheckIcon } from "@/components/ui/draw-check-icon";
 
 interface SavedForLaterShelfProps {
@@ -169,7 +170,7 @@ const SavedForLaterShelf = ({ defaultOpen = false }: SavedForLaterShelfProps) =>
                         exit={prefersReducedMotion ? {} : { opacity: 0 }}
                         transition={{ duration: 0.15 }}
                       >
-                        {savedCount === 1 ? 'Add to Bag' : 'Add All to Bag'} • ${totalSavedValue.toFixed(2)}
+                        {savedCount === 1 ? 'Add to Bag' : 'Add All to Bag'} • {formatPrice(totalSavedValue)}
                       </motion.span>
                     )}
                   </AnimatePresence>

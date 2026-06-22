@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { format } from 'date-fns';
 import OrderReorderButton from '@/components/account/OrderReorderButton';
+import { formatPriceCents } from '@/lib/currency';
 
 export default function AccountOrders() {
   const { orders, isLoading } = useOrders();
@@ -127,7 +128,7 @@ export default function AccountOrders() {
               {/* Footer */}
               <div className="flex items-center justify-between pt-4 border-t border-border">
                 <p className="text-sm font-medium text-foreground">
-                  ${(order.total_cents / 100).toFixed(2)}
+                  {formatPriceCents(order.total_cents)}
                 </p>
                 <div className="flex items-center gap-3">
                   {order.order_items && order.order_items.length > 0 && (

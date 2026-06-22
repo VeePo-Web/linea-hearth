@@ -2,6 +2,7 @@ import { useState, useCallback, useMemo, useEffect } from 'react';
 import { useCart } from './useCart';
 import { useSizeMemory } from './useSizeMemory';
 import { productIdToCartId, triggerHapticFeedback } from '@/lib/cartUtils';
+import { formatPrice } from '@/lib/currency';
 
 const SWIPE_HINT_KEY = 'lookbook-swipe-hint-shown';
 
@@ -132,7 +133,7 @@ export function useLookSwipe({
         id: cartId,
         name: product.name,
         price: price,
-        priceFormatted: `$${price}`,
+        priceFormatted: formatPrice(price),
         image: primaryImage?.image_url || '',
         category: product.position || 'Lookbook',
         size: size,

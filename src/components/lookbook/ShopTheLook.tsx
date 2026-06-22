@@ -11,6 +11,7 @@ import StaggerContainer from "@/components/motion/StaggerContainer";
 import InlineQuickSizePicker from "@/components/ui/InlineQuickSizePicker";
 import { DrawCheckIcon } from "@/components/ui/draw-check-icon";
 import { productIdToCartId } from "@/lib/cartUtils";
+import { formatPrice } from "@/lib/currency";
 import SwipeLookbook from "./SwipeLookbook";
 
 interface LookProduct {
@@ -183,11 +184,11 @@ function LookProductCard({
           <p className="text-sm md:text-xs text-white/50 font-light">
             {product.is_on_sale && product.sale_price ? (
               <>
-                <span className="text-champagne-500">${product.sale_price}</span>
-                <span className="line-through ml-1.5 text-white/30">${product.price}</span>
+                <span className="text-champagne-500">{formatPrice(product.sale_price)}</span>
+                <span className="line-through ml-1.5 text-white/30">{formatPrice(product.price)}</span>
               </>
             ) : (
-              `$${product.price}`
+              formatPrice(product.price)
             )}
           </p>
           {/* Show remembered size hint */}
@@ -262,7 +263,7 @@ const ShopTheLook = ({ products, lookName, lookId }: ShopTheLookProps) => {
         id: cartId,
         name: product.name,
         price: price,
-        priceFormatted: `$${price}`,
+        priceFormatted: formatPrice(price),
         image: primaryImage?.image_url || '',
         category: product.position || 'Lookbook',
         size: 'M',

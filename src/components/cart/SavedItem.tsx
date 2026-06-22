@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { SavedItem as SavedItemType } from "@/hooks/useSavedForLater";
 import { cn } from "@/lib/utils";
+import { formatPrice } from "@/lib/currency";
 import { useState } from "react";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 
@@ -79,7 +80,7 @@ const SavedItem = ({ item, onMoveToCart, onRemove }: SavedItemProps) => {
         {/* Price + Actions */}
         <div className="flex items-center justify-between mt-1">
           <span className="text-xs font-medium text-foreground">
-            ${displayPrice.toFixed(2)}
+            {formatPrice(displayPrice)}
           </span>
           
           <div className="flex items-center gap-1">

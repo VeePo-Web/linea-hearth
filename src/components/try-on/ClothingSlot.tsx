@@ -66,7 +66,7 @@ export const ClothingSlot = ({ slot, label, icon, onOpenDrawer }: ClothingSlotPr
               className="flex items-center justify-between"
             >
               <div className="truncate text-sm font-light">{equippedItem.name}</div>
-              <div className="text-sm font-medium ml-2">${equippedItem.price.toLocaleString()}</div>
+              <div className="text-sm font-medium ml-2">${equippedItem.price.toLocaleString()} CAD</div>
             </motion.div>
           ) : (
             <motion.div 

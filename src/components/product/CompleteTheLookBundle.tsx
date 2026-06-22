@@ -29,7 +29,7 @@ interface Props {
   currentProductId: string;
 }
 
-const PRICE_FALLBACK = (n: number) => `$${n.toFixed(2)}`;
+const PRICE_FALLBACK = (n: number) => `$${n.toFixed(2)} CAD`;
 const fmt = (n: number) => {
   try { return formatPrice(n); } catch { return PRICE_FALLBACK(n); }
 };

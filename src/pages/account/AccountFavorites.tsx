@@ -3,6 +3,7 @@ import { Heart, ShoppingBag, Trash2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useFavorites } from '@/hooks/useFavorites';
 import { useCart } from '@/hooks/useCart';
+import { formatPrice } from '@/lib/currency';
 
 export default function AccountFavorites() {
   const { favorites, isLoading, removeFavorite } = useFavorites();
@@ -17,15 +18,15 @@ export default function AccountFavorites() {
       price: favorite.product.is_on_sale && favorite.product.sale_price 
         ? favorite.product.sale_price 
         : favorite.product.price,
-      priceFormatted: `$${(favorite.product.is_on_sale && favorite.product.sale_price 
+      priceFormatted: formatPrice(favorite.product.is_on_sale && favorite.product.sale_price 
         ? favorite.product.sale_price 
-        : favorite.product.price).toFixed(2)}`,
+        : favorite.product.price),
       image: primaryImage?.image_url || '/placeholder.svg',
       category: favorite.product.category?.name || 'Apparel',
     });
   };
 
-  const formatPrice = (price: number) => `$${price.toFixed(2)}`;
+  // Reuse the centralized CAD formatter so all favorite prices show " CAD".
 
   const containerVariants = {
     hidden: { opacity: 0 },

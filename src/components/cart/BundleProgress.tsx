@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { BundleMatch } from "@/hooks/useBundleDiscounts";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { cn } from "@/lib/utils";
+import { formatPrice } from "@/lib/currency";
 import MissingProductCard from "./MissingProductCard";
 
 interface BundleProgressProps {
@@ -20,7 +21,7 @@ const getContextualMessage = (bundle: BundleMatch): { headline: string; subtext:
   
   if (isComplete) {
     return {
-      headline: `Look Complete! Saving $${savingsAmount.toFixed(2)}`,
+      headline: `Look Complete! Saving ${formatPrice(savingsAmount)}`,
       subtext: `You're getting ${discountPercent}% off this bundle`,
     };
   }
@@ -28,7 +29,7 @@ const getContextualMessage = (bundle: BundleMatch): { headline: string; subtext:
   if (completionPercent >= 75 || missingCount === 1) {
     return {
       headline: `Almost Complete! Just ${missingCount} item${missingCount > 1 ? 's' : ''} away`,
-      subtext: `Add to save $${potentialSavings.toFixed(2)} (${nextTierDiscountPercent || discountPercent}% off)`,
+      subtext: `Add to save ${formatPrice(potentialSavings)} (${nextTierDiscountPercent || discountPercent}% off)`,
     };
   }
   
@@ -41,7 +42,7 @@ const getContextualMessage = (bundle: BundleMatch): { headline: string; subtext:
   
   return {
     headline: savingsAmount > 0 
-      ? `Bundle Discount Applied — Save $${savingsAmount.toFixed(2)}`
+      ? `Bundle Discount Applied — Save ${formatPrice(savingsAmount)}`
       : `Complete Look & Save ${nextTierDiscountPercent || discountPercent}%`,
     subtext: `"${bundle.lookName}" — ${bundle.itemsInCart.length} of ${bundle.totalItemsInLook} items`,
   };
@@ -271,12 +272,12 @@ const BundleProgress = ({ bundle, variant = "drawer" }: BundleProgressProps) => 
                   <div className="flex justify-between text-xs">
                     <span className="text-muted-foreground">Bundle items subtotal</span>
                     <span className="text-foreground">
-                      ${bundle.itemsInCart.reduce((sum, item) => sum + item.price * item.quantity, 0).toFixed(2)}
+                      {formatPrice(bundle.itemsInCart.reduce((sum, item) => sum + item.price * item.quantity, 0))}
                     </span>
                   </div>
                   <div className="flex justify-between text-xs mt-1">
                     <span className="text-champagne-700 dark:text-champagne-400 font-medium">{bundle.discountPercent}% bundle discount</span>
-                    <span className="text-champagne-700 dark:text-champagne-400 font-medium">-${bundle.savingsAmount.toFixed(2)}</span>
+                    <span className="text-champagne-700 dark:text-champagne-400 font-medium">-{formatPrice(bundle.savingsAmount)}</span>
                   </div>
                 </div>
               )}

@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { Plus, Check } from "lucide-react";
 import { useQuickAdd, ProductForQuickAdd } from "@/hooks/useQuickAdd";
 import { cn } from "@/lib/utils";
+import { formatPrice } from "@/lib/currency";
 
 interface SearchQuickAddProps {
   product: ProductForQuickAdd & { image_url: string };
@@ -42,7 +43,7 @@ const SearchQuickAdd = ({ product, onNavigate }: SearchQuickAddProps) => {
           </p>
           <div className="flex items-center gap-2 mt-0.5">
             <span className="text-xs text-muted-foreground">
-              ${displayPrice.toLocaleString()}
+              {formatPrice(displayPrice)}
             </span>
             {quickAdd.canOneTap && (
               <span className="text-[10px] text-champagne-600 font-medium px-1.5 py-0.5 bg-champagne-500/10 rounded-sm">

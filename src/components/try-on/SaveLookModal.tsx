@@ -145,13 +145,13 @@ export const SaveLookModal = ({ open, onOpenChange }: SaveLookModalProps) => {
                         <div className="text-sm font-light">{item?.name}</div>
                         <div className="text-xs text-muted-foreground">Size {item?.size}</div>
                       </div>
-                      <div className="text-sm">${item?.price.toLocaleString()}</div>
+                      <div className="text-sm">${item?.price.toLocaleString()} CAD</div>
                     </div>
                   ))}
                 </div>
                 <div className="flex items-center justify-between pt-2">
                   <span className="text-sm font-light">Total</span>
-                  <span className="text-lg font-medium">${totalPrice.toLocaleString()}</span>
+                  <span className="text-lg font-medium">${totalPrice.toLocaleString()} CAD</span>
                 </div>
               </div>
 

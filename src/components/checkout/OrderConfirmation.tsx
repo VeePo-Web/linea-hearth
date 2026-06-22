@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { DrawCheckIcon } from "@/components/ui/draw-check-icon";
 import { useCart } from "@/hooks/useCart";
 import { useEffect, useState } from "react";
+import { formatPrice } from "@/lib/currency";
 
 interface OrderConfirmationProps {
   orderNumber: string;
@@ -65,7 +66,7 @@ const OrderConfirmation = ({
         </div>
         <div className="flex justify-between text-sm">
           <span className="text-muted-foreground">Total</span>
-          <span className="text-foreground font-medium">${subtotal.toLocaleString()}</span>
+          <span className="text-foreground font-medium">{formatPrice(subtotal)}</span>
         </div>
         <div className="flex justify-between text-sm">
           <span className="text-muted-foreground">Shipping</span>

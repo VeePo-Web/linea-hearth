@@ -9,6 +9,7 @@ import { getStripeEnvironment } from "@/lib/stripe";
 import Layout from "@/components/layout/Layout";
 import PostPurchaseSignup from "@/components/checkout/PostPurchaseSignup";
 import PostPurchaseOffer, { type UpsellOffer } from "@/components/checkout/PostPurchaseOffer";
+import { formatPriceCents } from "@/lib/currency";
 
 interface ShippingAddress {
   address?: string;
@@ -264,7 +265,7 @@ const CheckoutSuccess = () => {
     return `${formatDate(start)} - ${formatDate(end)}`;
   };
 
-  const formatCents = (cents: number) => `$${(cents / 100).toFixed(2)}`;
+  const formatCents = (cents: number) => formatPriceCents(cents);
 
   if (loading) {
     return (

@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useCart } from "@/hooks/useCart";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { formatPrice } from "@/lib/currency";
 
 interface MobileStickyCheckoutProps {
   total: number;
@@ -60,7 +61,7 @@ const MobileStickyCheckout = ({ total, onPayNow, isProcessing }: MobileStickyChe
         </button>
 
         <div className="flex items-center gap-4">
-          <span className="font-medium text-foreground">${total.toLocaleString()}</span>
+          <span className="font-medium text-foreground">{formatPrice(total)}</span>
           <Button
             onClick={onPayNow}
             disabled={isProcessing}

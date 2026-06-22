@@ -6,6 +6,7 @@ import { useCart } from "@/hooks/useCart";
 import { useToast } from "@/hooks/use-toast";
 import Layout from "@/components/layout/Layout";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
+import { formatPrice } from "@/lib/currency";
 
 interface RecoveredItem {
   product_id: string | null;
@@ -74,7 +75,7 @@ const RecoverPayment = () => {
             id: hashId(`${it.product_id || it.product_name}|${it.variant_id || ""}`),
             name: it.product_name,
             price,
-            priceFormatted: `$${price.toFixed(2)}`,
+            priceFormatted: formatPrice(price),
             image: it.product_image_url || "/placeholder.svg",
             category: "shop",
             size: it.variant_size ?? undefined,
