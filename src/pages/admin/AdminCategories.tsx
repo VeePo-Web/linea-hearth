@@ -20,7 +20,9 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Plus, Pencil, Trash2, Loader2 } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
+import { PROFILE_LABEL, SHIPPING_PROFILES, type ShippingProfile } from '@/lib/shipping';
 import { useToast } from '@/hooks/use-toast';
 import {
   AlertDialog,
@@ -39,6 +41,7 @@ interface Category {
   slug: string;
   description: string | null;
   display_order: number;
+  shipping_profile: ShippingProfile | null;
   created_at: string;
   products?: { id: string }[];
 }
@@ -58,6 +61,7 @@ const AdminCategories = () => {
   const [name, setName] = useState('');
   const [slug, setSlug] = useState('');
   const [description, setDescription] = useState('');
+  const [shippingProfile, setShippingProfile] = useState<ShippingProfile | 'none'>('none');
 
   const { toast } = useToast();
 
@@ -84,11 +88,13 @@ const AdminCategories = () => {
       setName(category.name);
       setSlug(category.slug);
       setDescription(category.description || '');
+      setShippingProfile(category.shipping_profile ?? 'none');
     } else {
       setEditingCategory(null);
       setName('');
       setSlug('');
       setDescription('');
+      setShippingProfile('none');
     }
     setDialogOpen(true);
   };
@@ -106,23 +112,24 @@ const AdminCategories = () => {
 
     setSaving(true);
     try {
+      const profileValue = shippingProfile === 'none' ? null : shippingProfile;
       if (editingCategory) {
         const { error } = await supabase
           .from('categories')
-          .update({ name: name.trim(), slug: slug.trim(), description: description.trim() || null })
+          .update({ name: name.trim(), slug: slug.trim(), description: description.trim() || null, shipping_profile: profileValue })
           .eq('id', editingCategory.id);
         if (error) throw error;
-        setCategories(categories.map(c => c.id === editingCategory.id ? { ...c, name: name.trim(), slug: slug.trim(), description: description.trim() || null } : c));
+        setCategories(categories.map(c => c.id === editingCategory.id ? { ...c, name: name.trim(), slug: slug.trim(), description: description.trim() || null, shipping_profile: profileValue } : c));
         toast({ title: 'Category updated' });
       } else {
         const maxOrder = Math.max(...categories.map(c => c.display_order), -1);
         const { data, error } = await supabase
           .from('categories')
-          .insert({ name: name.trim(), slug: slug.trim(), description: description.trim() || null, display_order: maxOrder + 1 })
+          .insert({ name: name.trim(), slug: slug.trim(), description: description.trim() || null, display_order: maxOrder + 1, shipping_profile: profileValue })
           .select()
           .single();
         if (error) throw error;
-        setCategories([...categories, data]);
+        setCategories([...categories, data as Category]);
         toast({ title: 'Category created' });
       }
       setDialogOpen(false);
