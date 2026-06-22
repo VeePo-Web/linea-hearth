@@ -17,16 +17,7 @@ const FALLBACK_IMAGES = [
   IMG.namesOfGod,
 ];
 
-const TRIBE_META = [
-  { username: "@marcus_faith", location: "Atlanta, USA" },
-  { username: "@aaliyah.believes", location: "Toronto, Canada" },
-  { username: "@devon.warrior", location: "Calgary, Canada" },
-  { username: "@sarah.crowned", location: "Houston, USA" },
-  { username: "@priya.kingdom", location: "Vancouver, Canada" },
-  { username: "@james.lion", location: "London, UK" },
-  { username: "@lineofjudah", location: "Calgary, Canada" },
-  { username: "@testimony.daily", location: "Miami, USA" },
-];
+const TRIBE_SLOTS = Array.from({ length: 8 });
 
 const StoryWorldwideTribe = () => {
   const sectionRef = useRef<HTMLElement>(null);
@@ -38,10 +29,10 @@ const StoryWorldwideTribe = () => {
   const hoodieImages = useCategoryImages("hoodies", 4, FALLBACK_IMAGES.slice(0, 4));
   const topsImages = useCategoryImages("tops", 4, FALLBACK_IMAGES.slice(4, 8));
 
-  const tribeMembers = TRIBE_META.map((meta, i) => ({
-    ...meta,
+  const tribeMembers = TRIBE_SLOTS.map((_, i) => ({
     image: i % 2 === 0 ? hoodieImages[Math.floor(i / 2)] : topsImages[Math.floor(i / 2)],
   }));
+
 
   return (
     <section
@@ -120,7 +111,7 @@ const StoryWorldwideTribe = () => {
                   {/* Image with grayscale → color on hover */}
                   <img
                     src={member.image}
-                    alt={`${member.username} wearing Line of Judah`}
+                    alt="Line of Judah community"
                     className={`w-full h-full object-cover transition-all duration-500 ${
                       isMobile ? "scale-100" : hoveredIndex === index ? "grayscale-0 scale-105" : "grayscale"
                     }`}
@@ -138,17 +129,6 @@ const StoryWorldwideTribe = () => {
                     <Instagram className="w-3 h-3 text-white" />
                   </div>
 
-                  {/* Username + location reveal */}
-                  <motion.div
-                    className={`absolute bottom-0 left-0 right-0 p-4 transition-all duration-300 ${
-                      hoveredIndex === index
-                        ? "opacity-100 translate-y-0"
-                        : "opacity-0 translate-y-4"
-                    }`}
-                  >
-                    <p className="text-white text-sm font-medium">{member.username}</p>
-                    <p className="text-white/60 text-xs">{member.location}</p>
-                  </motion.div>
                 </div>
               </motion.div>
             );
