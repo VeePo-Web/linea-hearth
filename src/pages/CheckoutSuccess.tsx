@@ -264,7 +264,7 @@ const CheckoutSuccess = () => {
     return `${formatDate(start)} - ${formatDate(end)}`;
   };
 
-  const formatCents = (cents: number) => `$${(cents / 100).toFixed(2)}`;
+  const formatCents = (cents: number) => formatPriceCents(cents);
 
   if (loading) {
     return (

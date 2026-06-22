@@ -222,7 +222,7 @@ export default function AccountOrderDetail() {
                   </div>
                 </div>
                 <p className="text-sm font-medium text-foreground">
-                  ${(item.total_cents / 100).toFixed(2)}
+                  {formatPriceCents(item.total_cents)}
                 </p>
               </div>
             ))}
@@ -281,31 +281,31 @@ export default function AccountOrderDetail() {
             <div className="p-4 border border-border space-y-2 text-sm">
               <div className="flex justify-between text-muted-foreground">
                 <span>Subtotal</span>
-                <span>${(order.subtotal_cents / 100).toFixed(2)}</span>
+                <span>{formatPriceCents(order.subtotal_cents)}</span>
               </div>
               <div className="flex justify-between text-muted-foreground">
                 <span>Shipping</span>
                 <span>
                   {order.shipping_cents === 0
                     ? 'Free'
-                    : `$${(order.shipping_cents / 100).toFixed(2)}`}
+                    : formatPriceCents(order.shipping_cents)}
                 </span>
               </div>
               {order.discount_cents > 0 && (
                 <div className="flex justify-between text-foreground">
                   <span>Discount</span>
-                  <span>-${(order.discount_cents / 100).toFixed(2)}</span>
+                  <span>-{formatPriceCents(order.discount_cents)}</span>
                 </div>
               )}
               {order.tax_cents > 0 && (
                 <div className="flex justify-between text-muted-foreground">
                   <span>Tax</span>
-                  <span>${(order.tax_cents / 100).toFixed(2)}</span>
+                  <span>{formatPriceCents(order.tax_cents)}</span>
                 </div>
               )}
               <div className="flex justify-between font-medium text-foreground pt-2 border-t border-border">
                 <span>Total</span>
-                <span>${(order.total_cents / 100).toFixed(2)}</span>
+                <span>{formatPriceCents(order.total_cents)}</span>
               </div>
             </div>
           </div>
