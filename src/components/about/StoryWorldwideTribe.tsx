@@ -111,7 +111,7 @@ const StoryWorldwideTribe = () => {
                   {/* Image with grayscale → color on hover */}
                   <img
                     src={member.image}
-                    alt={`${member.username} wearing Line of Judah`}
+                    alt="Line of Judah community"
                     className={`w-full h-full object-cover transition-all duration-500 ${
                       isMobile ? "scale-100" : hoveredIndex === index ? "grayscale-0 scale-105" : "grayscale"
                     }`}
@@ -129,17 +129,6 @@ const StoryWorldwideTribe = () => {
                     <Instagram className="w-3 h-3 text-white" />
                   </div>
 
-                  {/* Username + location reveal */}
-                  <motion.div
-                    className={`absolute bottom-0 left-0 right-0 p-4 transition-all duration-300 ${
-                      hoveredIndex === index
-                        ? "opacity-100 translate-y-0"
-                        : "opacity-0 translate-y-4"
-                    }`}
-                  >
-                    <p className="text-white text-sm font-medium">{member.username}</p>
-                    <p className="text-white/60 text-xs">{member.location}</p>
-                  </motion.div>
                 </div>
               </motion.div>
             );
