@@ -321,13 +321,19 @@ Deno.serve(async (req) => {
       (sum, { item, unitAmountCents }) => sum + unitAmountCents * item.quantity,
       0,
     );
-    // Single flat-rate shipping option driven by destination country.
-    // Force the method label server-side so stale clients can't game it.
+    // Per-product-type shipping. Each line resolves to a shipping profile
+    // (hat / tee / hoodie) — product override wins, else category default,
+    // else 'tee'. Fees compound: first item + additional × (qty-1) per bucket.
     const destCountry = (body.shippingAddress?.country || "CA").trim().toUpperCase();
     const isCanada = destCountry === "CA" || destCountry === "CANADA";
-    const baseShippingCents = isCanada ? SHIPPING_RATE_CA_CENTS : SHIPPING_RATE_INTL_CENTS;
+    const shippingLines = authorized.map(({ item }) => {
+      const prod = productsById[item.productId!] as any;
+      const override = prod?.shipping_profile_override as ShippingProfile | null | undefined;
+      const catProfile = prod?.categories?.shipping_profile as ShippingProfile | null | undefined;
+      return { profile: normalizeProfile(override ?? catProfile), quantity: item.quantity };
+    });
+    const shippingAmount = computeShippingCents(shippingLines, destCountry, subtotalCents);
     const isFreeShipping = subtotalCents >= FREE_SHIPPING_THRESHOLD_CENTS;
-    const shippingAmount = isFreeShipping ? 0 : baseShippingCents;
     const method: "standard" = "standard";
     const shippingDisplayName = isFreeShipping
       ? "Free shipping"
