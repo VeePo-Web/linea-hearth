@@ -884,7 +884,7 @@ const Checkout = () => {
                       <div className="bg-muted/10 p-6 rounded-none border border-muted-foreground/20 space-y-3">
                         <div className="flex justify-between text-sm">
                           <span className="text-muted-foreground">Subtotal</span>
-                          <span className="text-foreground">${subtotal.toLocaleString()}</span>
+                          <span className="text-foreground">{formatPrice(subtotal)}</span>
                         </div>
                         {discountAmount > 0 && (
                           <div className="flex justify-between text-sm">
@@ -926,7 +926,7 @@ const Checkout = () => {
                           ) : (
                             <>
                               <ExternalLink className="w-4 h-4 mr-2" />
-                              Pay with Stripe • ${total.toLocaleString()}
+                              Pay with Stripe • {formatPrice(total)}
                             </>
                           )}
                         </Button>

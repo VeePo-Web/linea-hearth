@@ -6,6 +6,7 @@ import { useQuickAdd, ProductForQuickAdd } from "@/hooks/useQuickAdd";
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { formatPrice } from "@/lib/currency";
 
 interface RecentProductCardProps {
   product: ProductForQuickAdd & { image_url: string };
@@ -70,11 +71,11 @@ const RecentProductCard = ({ product }: RecentProductCardProps) => {
         </h3>
         <div className="flex items-center gap-2 mt-1">
           <span className="text-xs font-medium text-foreground">
-            ${displayPrice.toLocaleString()}
+            {formatPrice(displayPrice)}
           </span>
           {product.is_on_sale && product.sale_price && (
             <span className="text-xs text-muted-foreground line-through">
-              ${product.price.toLocaleString()}
+              {formatPrice(product.price)}
             </span>
           )}
         </div>

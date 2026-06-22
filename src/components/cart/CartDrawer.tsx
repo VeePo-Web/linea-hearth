@@ -17,6 +17,7 @@ import BundleProgress from "./BundleProgress";
 import BundleSavingsRow from "./BundleSavingsRow";
 import SavedForLaterShelf from "./SavedForLaterShelf";
 import ContinueShopping from "./ContinueShopping";
+import { formatPrice } from "@/lib/currency";
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
@@ -461,11 +462,11 @@ const CartDrawer = ({ onViewFavorites }: CartDrawerProps) => {
                     <div className="text-right tabular-nums">
                       {hasActiveBundles && (
                         <span className="text-sm text-muted-foreground line-through mr-2">
-                          ${subtotal.toLocaleString('en-CA', { minimumFractionDigits: 2 })}
+                          {formatPrice(subtotal)}
                         </span>
                       )}
                       <span className="text-lg font-medium text-foreground">
-                        ${(subtotal - totalBundleSavings).toLocaleString('en-CA', { minimumFractionDigits: 2 })}
+                        {formatPrice(subtotal - totalBundleSavings)}
                       </span>
                     </div>
                   </div>
