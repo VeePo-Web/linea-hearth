@@ -107,12 +107,12 @@ const ShippingInfo = () => {
     <>
       <PageSEO
         title="Shipping Info | Line of Judah"
-        description="Flat $15 CAD shipping across Canada. Flat $40 CAD international. Free shipping on orders over $250 CAD. Full tracking on every order."
+        description="Shipping calculated by item type — hats, tees, and hoodies each have their own rate. Free shipping on orders over $250 CAD. Full tracking on every order."
         path="/shipping"
       />
       <ServicePageLayout
       title="Reliable Delivery. Every Order."
-      subtitle="Flat $15 across Canada · Flat $40 international · Free shipping over $250. Full tracking. Designed in Calgary, delivered worldwide."
+      subtitle="Shipping calculated by item · Free over $250 CAD · Full tracking · Designed in Calgary, delivered worldwide."
       eyebrow="SHIPPING & DELIVERY"
       heroAlignment="center"
       heroValueProps={heroValueProps}
