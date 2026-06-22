@@ -18,7 +18,7 @@ const Index = () => {
     <Layout immersiveHero>
       <PageSEO
         title="Line of Judah — Premium Faith-Based Streetwear"
-        description="Shop premium faith-based streetwear designed for those who walk different. Hoodies, tees and more. Flat $15 CAD shipping across Canada · $40 international · Free shipping on orders over $250 CAD."
+        description="Shop premium faith-based streetwear designed for those who walk different. Hoodies, tees and more. Shipping calculated by item · Free on orders over $250 CAD."
         path="/home"
       />
       {/* Editorial Hero - Asymmetric split layout */}

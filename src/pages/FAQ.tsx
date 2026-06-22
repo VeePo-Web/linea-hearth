@@ -29,14 +29,14 @@ const faqData: FAQItem[] = [
   {
     id: "ship-2",
     question: "How much is shipping?",
-    answer: "Flat $15 CAD across Canada. Flat $40 CAD anywhere outside Canada. Any order with a subtotal over $250 CAD ships FREE — Canada or international, no code needed.",
+    answer: "Shipping is calculated by item type. Canada — hats from $6.50, tees from $7, hoodies from $12 CAD, with a small per-extra-unit charge. International — hats from $12, tees from $13, hoodies from $22 CAD. Any order with a subtotal over $250 CAD ships FREE — Canada or international, no code needed.",
     category: "shipping",
     keywords: ["free", "cost", "price", "charge", "flat", "rate"]
   },
   {
     id: "ship-3",
     question: "Do you ship internationally?",
-    answer: "Yes — designed in Calgary, shipped worldwide. International shipping is a flat $40 CAD anywhere outside Canada and typically arrives in 10-21 business days. Duties and taxes are the responsibility of the recipient.",
+    answer: "Yes — designed in Calgary, shipped worldwide. International shipping is calculated per item (hats from $12, tees from $13, hoodies from $22 CAD, plus a small charge per extra item) and typically arrives in 10-21 business days. Duties and taxes are the responsibility of the recipient.",
     category: "shipping",
     keywords: ["international", "calgary", "canada", "overseas", "country"]
   },
