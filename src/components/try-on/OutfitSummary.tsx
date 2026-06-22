@@ -26,7 +26,7 @@ export const OutfitSummary = () => {
           id: item.productId.charCodeAt(0) + Date.now() + Math.random(),
           name: item.name,
           price: Number(item.price),
-          priceFormatted: `$${Number(item.price).toLocaleString()}`,
+          priceFormatted: formatPrice(Number(item.price)),
           image: item.imageUrl || '/placeholder.svg',
           category: slot,
           size: item.size,
