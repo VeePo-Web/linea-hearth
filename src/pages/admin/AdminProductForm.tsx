@@ -24,6 +24,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useImageUpload } from '@/hooks/useImageUpload';
 import type { Database } from '@/integrations/supabase/types';
+import { PROFILE_LABEL, SHIPPING_PROFILES } from '@/lib/shipping';
 
 type ProductStatus = Database['public']['Enums']['product_status'];
 
@@ -309,6 +310,23 @@ const AdminProductForm = () => {
                     </SelectContent>
                   </Select>
                 </div>
+
+                <div className="space-y-2">
+                  <Label className="text-xs uppercase tracking-wider">Shipping Profile Override</Label>
+                  <Select value={shippingProfileOverride} onValueChange={setShippingProfileOverride}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Inherit from category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="inherit">— Inherit from category —</SelectItem>
+                      {SHIPPING_PROFILES.map((p) => (
+                        <SelectItem key={p} value={p}>{PROFILE_LABEL[p]}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-muted-foreground">Optional. Only set this when the product needs a different shipping bucket than its category default.</p>
+                </div>
+
 
                 <div className="space-y-2">
                   <Label className="text-xs uppercase tracking-wider">Description</Label>
