@@ -390,7 +390,7 @@ const Checkout = () => {
                             <p className="text-xs text-muted-foreground">
                               {appliedDiscount.discountType === "percentage"
                                 ? `${appliedDiscount.discountValue}% off`
-                                : `$${(appliedDiscount.discountValue / 100).toFixed(2)} off`}
+                                : `${formatPriceCents(appliedDiscount.discountValue)} off`}
                             </p>
                           </div>
                         </div>
@@ -465,23 +465,23 @@ const Checkout = () => {
                 <div className="border-t border-muted-foreground/20 pt-4 space-y-2">
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Subtotal ({itemCount} items)</span>
-                    <span className="text-foreground">${subtotal.toLocaleString()}</span>
+                    <span className="text-foreground">{formatPrice(subtotal)}</span>
                   </div>
                   {discountAmount > 0 && (
                     <div className="flex justify-between text-sm">
                       <span className="text-champagne-600">Discount</span>
-                      <span className="text-champagne-600">-${discountAmount.toLocaleString()}</span>
+                      <span className="text-champagne-600">-{formatPrice(discountAmount)}</span>
                     </div>
                   )}
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Shipping</span>
                     <span className={shipping === 0 ? "text-champagne-600" : "text-foreground"}>
-                      {shipping === 0 ? "FREE" : `$${shipping}`}
+                      {shipping === 0 ? "FREE" : formatPrice(shipping)}
                     </span>
                   </div>
                   <div className="flex justify-between text-lg font-medium pt-2 border-t border-muted-foreground/20">
                     <span className="text-foreground">Total</span>
-                    <span className="text-foreground">${total.toLocaleString()}</span>
+                    <span className="text-foreground">{formatPrice(total)}</span>
                   </div>
                 </div>
               </div>
@@ -889,18 +889,18 @@ const Checkout = () => {
                         {discountAmount > 0 && (
                           <div className="flex justify-between text-sm">
                             <span className="text-champagne-600">Discount</span>
-                            <span className="text-champagne-600">-${discountAmount.toLocaleString()}</span>
+                            <span className="text-champagne-600">-{formatPrice(discountAmount)}</span>
                           </div>
                         )}
                         <div className="flex justify-between text-sm">
                           <span className="text-muted-foreground">Shipping</span>
                           <span className={shipping === 0 ? "text-champagne-600" : "text-foreground"}>
-                            {shipping === 0 ? "FREE" : `$${shipping}`}
+                            {shipping === 0 ? "FREE" : formatPrice(shipping)}
                           </span>
                         </div>
                         <div className="flex justify-between text-lg font-medium border-t border-muted-foreground/20 pt-3">
                           <span className="text-foreground">Total</span>
-                          <span className="text-foreground">${total.toLocaleString()}</span>
+                          <span className="text-foreground">{formatPrice(total)}</span>
                         </div>
                       </div>
 
