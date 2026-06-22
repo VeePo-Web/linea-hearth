@@ -17,16 +17,7 @@ const FALLBACK_IMAGES = [
   IMG.namesOfGod,
 ];
 
-const TRIBE_META = [
-  { username: "@marcus_faith", location: "Atlanta, USA" },
-  { username: "@aaliyah.believes", location: "Toronto, Canada" },
-  { username: "@devon.warrior", location: "Calgary, Canada" },
-  { username: "@sarah.crowned", location: "Houston, USA" },
-  { username: "@priya.kingdom", location: "Vancouver, Canada" },
-  { username: "@james.lion", location: "London, UK" },
-  { username: "@lineofjudah", location: "Calgary, Canada" },
-  { username: "@testimony.daily", location: "Miami, USA" },
-];
+const TRIBE_SLOTS = Array.from({ length: 8 });
 
 const StoryWorldwideTribe = () => {
   const sectionRef = useRef<HTMLElement>(null);
@@ -38,10 +29,10 @@ const StoryWorldwideTribe = () => {
   const hoodieImages = useCategoryImages("hoodies", 4, FALLBACK_IMAGES.slice(0, 4));
   const topsImages = useCategoryImages("tops", 4, FALLBACK_IMAGES.slice(4, 8));
 
-  const tribeMembers = TRIBE_META.map((meta, i) => ({
-    ...meta,
+  const tribeMembers = TRIBE_SLOTS.map((_, i) => ({
     image: i % 2 === 0 ? hoodieImages[Math.floor(i / 2)] : topsImages[Math.floor(i / 2)],
   }));
+
 
   return (
     <section
