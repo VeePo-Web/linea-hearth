@@ -41,7 +41,7 @@ const ShippingCalculator = () => {
         method: "Canada — Standard",
         minDays: productionMin + standardShipping.min,
         maxDays: productionMax + standardShipping.max,
-        price: "$15 flat · FREE over $250",
+        price: "Calculated by item · FREE over $250",
         carrier: "Canada Post / USPS Priority",
         includesProduction: true
       },
@@ -49,7 +49,7 @@ const ShippingCalculator = () => {
         method: "International — Standard",
         minDays: productionMin + 7,
         maxDays: productionMax + 14,
-        price: "$40 flat · FREE over $250",
+        price: "Calculated by item · FREE over $250",
         carrier: "International tracked",
         includesProduction: true
       },
