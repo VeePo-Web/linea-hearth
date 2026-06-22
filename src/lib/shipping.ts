@@ -37,6 +37,20 @@ export function normalizeProfile(value: unknown): ShippingProfile {
   return value === "hat" || value === "tee" || value === "hoodie" ? value : DEFAULT_PROFILE;
 }
 
+/**
+ * Best-effort derivation of a shipping profile from a category slug/label
+ * when a product/category row hasn't supplied an explicit profile. Lets the
+ * cart UI render a credible shipping estimate before checkout. The edge
+ * function is still the authority at payment time.
+ */
+export function profileFromCategory(category: string | undefined | null): ShippingProfile {
+  const c = (category || "").trim().toLowerCase();
+  if (!c) return DEFAULT_PROFILE;
+  if (c.includes("hat") || c.includes("cap") || c.includes("beanie") || c.includes("visor")) return "hat";
+  if (c.includes("hoodie") || c.includes("sweater") || c.includes("sweatshirt") || c.includes("quarter-zip") || c.includes("quarter zip") || c.includes("zip-up") || c.includes("zip up") || c.includes("pullover")) return "hoodie";
+  return "tee";
+}
+
 export function isCanadaCountry(country: string | undefined | null): boolean {
   const c = (country || "CA").trim().toUpperCase();
   return c === "CA" || c === "CANADA";
