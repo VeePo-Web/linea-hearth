@@ -11,6 +11,8 @@ import {
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { format, formatDistanceToNow, startOfDay, startOfWeek, startOfMonth } from 'date-fns';
+import { formatAdminMoney, STORE_CURRENCY } from '@/lib/adminCurrency';
+import { Lock } from 'lucide-react';
 
 interface Stats {
   totalProducts: number;
@@ -123,7 +125,7 @@ const AdminDashboard = () => {
     fetchAll();
   }, [fetchAll]);
 
-  const formatCurrency = (cents: number) => `$${(cents / 100).toFixed(2)}`;
+  const formatCurrency = (cents: number) => formatAdminMoney(cents);
 
   const dismissChecklist = () => {
     localStorage.setItem('admin_checklist_dismissed', 'true');

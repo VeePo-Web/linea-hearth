@@ -171,7 +171,7 @@ const AdminDiscounts = () => {
   };
 
   const formatValue = (type: string, value: number) =>
-    type === 'percentage' ? `${value}%` : `$${(value / 100).toFixed(2)}`;
+    type === 'percentage' ? `${value}%` : `$${(value / 100).toFixed(2)} CAD`;
 
   return (
     <AdminLayout>

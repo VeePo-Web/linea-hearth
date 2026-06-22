@@ -211,11 +211,11 @@ const AdminProducts = () => {
                     <TableCell>
                       {product.is_on_sale && product.sale_price ? (
                         <div>
-                          <span className="line-through text-muted-foreground mr-2">${product.price}</span>
-                          <span className="text-destructive">${product.sale_price}</span>
+                          <span className="line-through text-muted-foreground mr-2">${product.price} CAD</span>
+                          <span className="text-destructive">${product.sale_price} CAD</span>
                         </div>
                       ) : (
-                        `$${product.price}`
+                        `$${product.price} CAD`
                       )}
                     </TableCell>
                     <TableCell>{getStatusBadge(product.status)}</TableCell>
