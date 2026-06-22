@@ -55,6 +55,7 @@ const AdminProductForm = () => {
   const [ministryStatement, setMinistryStatement] = useState('');
   const [status, setStatus] = useState<ProductStatus>('draft');
   const [categoryId, setCategoryId] = useState<string>('');
+  const [shippingProfileOverride, setShippingProfileOverride] = useState<string>('inherit');
   const [price, setPrice] = useState('');
   const [salePrice, setSalePrice] = useState('');
   const [isOnSale, setIsOnSale] = useState(false);
@@ -114,6 +115,7 @@ const AdminProductForm = () => {
         setMinistryStatement(data.ministry_statement || '');
         setStatus(data.status);
         setCategoryId(data.category_id || '');
+        setShippingProfileOverride(((data as any).shipping_profile_override as string) || 'inherit');
         setPrice(String(data.price));
         setSalePrice(data.sale_price ? String(data.sale_price) : '');
         setIsOnSale(data.is_on_sale);
@@ -164,6 +166,7 @@ const AdminProductForm = () => {
         ministry_statement: ministryStatement.trim() || null,
         status: publishStatus,
         category_id: categoryId || null,
+        shipping_profile_override: shippingProfileOverride === 'inherit' ? null : shippingProfileOverride,
         price: parseFloat(price),
         sale_price: salePrice ? parseFloat(salePrice) : null,
         is_on_sale: isOnSale && !!salePrice,
