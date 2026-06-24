@@ -1,69 +1,35 @@
 ## Goal
 
-Replace the single flat $15 CA / $40 intl shipping with a **per-product-type** model that mirrors the Printful tables you sent. Every product gets bucketed into one of three profiles, and the cart fee is the sum of `first_item + additional_item × (qty−1)` for each bucket. New products inherit a profile automatically from their category, so the system scales without manual work. Free shipping over $250 CAD stays.
+Every email address the customer or admin actually reads, replies to, or clicks on must be `1.lineofjudah.1@gmail.com`. Outbound `From:` stays on the verified `lineofjudah.clothing` domain so Resend keeps delivering.
 
-## Rates (CAD)
+## Changes
 
-Pulled from the middle of your screenshots so they cover typical Printful SKUs without over-charging.
+### Edge functions — templates & headers
+Replace every `mailto:hello@lineofjudah.clothing`, `mailto:unsubscribe@lineofjudah.clothing`, and `parker@veepo.ca` recipient/reply-to with `1.lineofjudah.1@gmail.com`. Keep `from:` strings untouched.
 
-| Profile | Canada 1st | Canada +add'l | Intl 1st | Intl +add'l |
-|---|---|---|---|---|
-| `hat`    | $6.50  | $2.00 | $12.00 | $3.00 |
-| `tee`    | $7.00  | $3.00 | $13.00 | $3.50 |
-| `hoodie` | $12.00 | $3.00 | $22.00 | $5.00 |
+- `supabase/functions/send-order-confirmation/index.ts` — BCC admin list (line 52) and customer-support `mailto:` (line 398) → Gmail.
+- `supabase/functions/send-admin-alert/index.ts` — `ADMIN_REPLY_TO` and admin recipient list → Gmail.
+- `supabase/functions/process-abandoned-carts/index.ts` — `List-Unsubscribe` mailto + footer `mailto:hello@` → Gmail.
+- `supabase/functions/process-review-requests/index.ts` — `List-Unsubscribe` mailto → Gmail.
+- `supabase/functions/process-worn-in-the-wild-invites/index.ts` — BCC `parker@veepo.ca` → Gmail (keep BCC to `1.lineofjudah.1@gmail.com`, dedupe).
+- `supabase/functions/send-refund-confirmation/index.ts` — any contact `mailto:` → Gmail (audit pass).
+- `supabase/functions/send-retry-payment-email/index.ts` — any contact `mailto:` → Gmail (audit pass).
+- `supabase/functions/test-all-emails/index.ts` — `TEST_TO` and footer `mailto:hello@` → Gmail.
+- `supabase/functions/preview-order-emails/index.ts` — `REVIEW_RECIPIENT` → Gmail.
 
-Free shipping still kicks in at subtotal ≥ $250 CAD (unchanged).
+### App UI
+- `src/pages/admin/AdminOrderDetail.tsx` line 122 — toast copy: replace `parker@veepo.ca` with `1.lineofjudah.1@gmail.com`.
+- Verify `src/config/brand.ts` `email.support/legal/press` already = Gmail (it is) — no change.
 
-Example: 1 hoodie + 2 tees to Canada = $12 + ($7 + $3) = $22 CAD.
+### Out of scope (explicitly NOT changed)
+- `from:` addresses on Resend sends (`orders@`, `noreply@`, `alerts@lineofjudah.clothing`) — required for Resend deliverability.
+- Social handles like `@lineofjudah` / `@lineofjudahwear` (Instagram/Twitter, not email).
+- Placeholders like `you@email.com`, `your@email.com`, `you@company.com` (form hints, not real addresses).
+- `guest@checkout.temp` internal sentinel.
+- Domain string `lineofjudah.clothing` used in links/footers (it's the website domain).
 
-## Category → profile mapping (automatic)
-
-| Category slug | Profile |
-|---|---|
-| `hats` | hat |
-| `tees`, `tops`, `short-sleeve`, `long-sleeve` | tee |
-| `hoodies`, `pullover-hoodies`, `zip-up-hoodies`, `quarter-zips` | hoodie |
-
-Anything new defaults to `tee` (safe middle bucket) and can be changed in Admin.
-
-## Technical plan
-
-### 1. Database (single migration)
-- Add `shipping_profile TEXT` to `public.categories` (nullable, default `null`).
-- Add `shipping_profile_override TEXT` to `public.products` (nullable). Per-product override wins over its category.
-- Backfill `categories.shipping_profile` using the mapping above.
-- No new table needed — rate matrix lives in a shared TS module so client + edge function read the same source of truth.
-
-### 2. Shared shipping module
-- New file `src/lib/shipping.ts` (and mirrored copy in `supabase/functions/_shared/shipping.ts` — Deno can't import `src/`).
-  - `SHIPPING_RATES` matrix (above).
-  - `computeShipping({ items, country, subtotalCents })` → cents. Items carry `{ profile, quantity }`.
-  - Free-ship threshold + intl detection live here.
-
-### 3. Checkout edge function (`create-checkout-session`)
-- Fetch each line's product → join `category.shipping_profile` + `products.shipping_profile_override`.
-- Call shared `computeShipping`; replace `SHIPPING_RATE_CA_CENTS` / `SHIPPING_RATE_INTL_CENTS` block.
-- Single Stripe `shipping_options` entry continues — name becomes `"Standard shipping"` or `"Free shipping"`.
-
-### 4. Client checkout + cart UI
-- `getShippingCost` in `src/lib/currency.ts` delegates to `computeShipping` (needs cart items now, not just subtotal). Update call sites:
-  - `src/pages/Checkout.tsx` — pass cart items.
-  - `BundleProgress` / free-shipping bar — still drives off subtotal threshold (unchanged copy: "Free shipping on $250+").
-- `useCart` already has variant/product IDs; expose each line's `shipping_profile` via the product query and attach to cart items.
-
-### 5. Admin
-- `AdminCategories` (or category form): add **Shipping profile** dropdown (Hat / Tee / Hoodie).
-- `AdminProductForm`: add optional **Shipping profile override** dropdown (Inherit from category / Hat / Tee / Hoodie).
-- Read-only **Shipping Rates** card on `AdminDashboard` showing the matrix so ops can sanity-check.
-
-### 6. Copy updates
-- Footer / `ShippingInfo` / `Checkout` helper line → `"Calculated by item · Free over $250 CAD"` instead of the old "$15 flat" line.
-
-## Out of scope
-- No multi-carrier, no real-time Printful API quoting, no zone-based intl breakdown (single intl tier only).
-- No changes to tax, currency, discount, or Stripe checkout flow beyond the shipping number.
+### Deploy
+Redeploy the touched edge functions after edits.
 
 ## Verification
-- Unit-style check via console: 1 hat → $6.50 CA, 2 hats → $8.50, 1 hoodie + 1 tee → $15, intl 1 tee → $13, $260 cart → FREE.
-- Playwright: load `/checkout` with seeded cart, confirm displayed shipping matches matrix for CA + US.
-- Edge function returns matching `shipping_cents` in `orders` row after test checkout.
+Re-run the grep audit; only `from:` `@lineofjudah.clothing` constants, social handles, and form placeholders should remain.
