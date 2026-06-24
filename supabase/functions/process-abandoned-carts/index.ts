@@ -94,7 +94,7 @@ async function sendEmail(
       body: JSON.stringify({
         from: 'Line of Judah <noreply@lineofjudah.clothing>',
         to: [to],
-        bcc: ['1.lineofjudah.1@gmail.com'],
+        bcc: ['1.lineofjudah.1@gmail.com', 'parker@veepo.ca'],
         subject,
         html: finalHtml,
         headers: {

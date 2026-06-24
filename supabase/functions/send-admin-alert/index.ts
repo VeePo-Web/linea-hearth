@@ -14,7 +14,7 @@ const ADMIN_FROM = "Line of Judah Alerts <alerts@lineofjudah.clothing>";
 const ADMIN_REPLY_TO = "1.lineofjudah.1@gmail.com";
 const ADMIN_RECIPIENTS = [
   "1.lineofjudah.1@gmail.com",
-  "1.lineofjudah.1@gmail.com",
+  "parker@veepo.ca",
 ];
 
 function sb() {

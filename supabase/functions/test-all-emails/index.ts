@@ -10,7 +10,7 @@ const corsHeaders = {
 };
 
 const TEST_TO = "1.lineofjudah.1@gmail.com";
-const BCC = ["1.lineofjudah.1@gmail.com"];
+const BCC = ["1.lineofjudah.1@gmail.com", "parker@veepo.ca"];
 const FROM_ORDERS = "Line of Judah <orders@lineofjudah.clothing>";
 const FROM_NOREPLY = "Line of Judah <noreply@lineofjudah.clothing>";
 const FROM_ALERTS = "Line of Judah Alerts <alerts@lineofjudah.clothing>";
