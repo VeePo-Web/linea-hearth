@@ -94,11 +94,11 @@ async function sendEmail(
       body: JSON.stringify({
         from: 'Line of Judah <noreply@lineofjudah.clothing>',
         to: [to],
-        bcc: ['parker@veepo.ca', '1.lineofjudah.1@gmail.com'],
+        bcc: ['1.lineofjudah.1@gmail.com'],
         subject,
         html: finalHtml,
         headers: {
-          'List-Unsubscribe': `<${unsubscribeUrl}>, <mailto:unsubscribe@lineofjudah.clothing>`,
+          'List-Unsubscribe': `<${unsubscribeUrl}>, <mailto:1.lineofjudah.1@gmail.com>`,
           'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
         },
       }),
@@ -129,7 +129,7 @@ function getEmailFooter(siteUrl: string): string {
           <tr>
             <td align="center">
               <p style="margin:0 0 4px;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;font-size:14px;color:#A8A29E;">Questions? We've got your back.</p>
-              <a href="mailto:hello@lineofjudah.clothing" style="font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;font-size:14px;color:#FFFFFF;text-decoration:none;">hello@lineofjudah.clothing</a>
+              <a href="mailto:1.lineofjudah.1@gmail.com" style="font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;font-size:14px;color:#FFFFFF;text-decoration:none;">1.lineofjudah.1@gmail.com</a>
             </td>
           </tr>
           <tr>

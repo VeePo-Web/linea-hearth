@@ -118,11 +118,11 @@ async function sendViaResend(
       body: JSON.stringify({
         from: 'Line of Judah <noreply@lineofjudah.clothing>',
         to: [to],
-        bcc: ['parker@veepo.ca', '1.lineofjudah.1@gmail.com'],
+        bcc: ['1.lineofjudah.1@gmail.com'],
         subject,
         html: finalHtml,
         headers: {
-          'List-Unsubscribe': `<${unsubscribeUrl}>, <mailto:unsubscribe@lineofjudah.clothing>`,
+          'List-Unsubscribe': `<${unsubscribeUrl}>, <mailto:1.lineofjudah.1@gmail.com>`,
           'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
         },
       }),

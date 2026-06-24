@@ -217,7 +217,7 @@ Deno.serve(async (req) => {
         body: JSON.stringify({
           from: FROM_EMAIL,
           to: [order.customer_email],
-          bcc: ["parker@veepo.ca", "1.lineofjudah.1@gmail.com"],
+          bcc: ["1.lineofjudah.1@gmail.com"],
           subject: "Show us how you wear it.",
           html,
         }),

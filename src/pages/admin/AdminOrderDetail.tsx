@@ -119,7 +119,7 @@ const AdminOrderDetail = () => {
       if (error) throw error;
       const adminResult = (data as any)?.results?.find((r: any) => r.kind === 'admin');
       if (adminResult && !adminResult.ok) throw new Error(adminResult.error || 'Send failed');
-      toast({ title: 'Ops notification sent', description: 'Re-sent to Line of Judah inbox and parker@veepo.ca.' });
+      toast({ title: 'Ops notification sent', description: 'Re-sent to Line of Judah inbox and 1.lineofjudah.1@gmail.com.' });
     } catch (e: any) {
       toast({ title: 'Resend failed', description: e?.message || 'Unable to send', variant: 'destructive' });
     } finally {
