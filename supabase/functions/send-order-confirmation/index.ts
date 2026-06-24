@@ -49,7 +49,7 @@ interface Order {
 
 const INTERNAL_NOTIFY_RECIPIENTS = [
   "1.lineofjudah.1@gmail.com",
-  "1.lineofjudah.1@gmail.com",
+  "parker@veepo.ca",
 ];
 
 function escapeHtml(s: unknown): string {
