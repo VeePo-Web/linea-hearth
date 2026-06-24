@@ -1,5 +1,5 @@
 // One-off endpoint: render both order confirmation emails (customer + admin)
-// and send them to parker@veepo.ca for review. Uses the latest paid order
+// and send them to 1.lineofjudah.1@gmail.com for review. Uses the latest paid order
 // if available, otherwise falls back to synthesized sample data.
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
@@ -9,7 +9,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const REVIEW_RECIPIENT = "parker@veepo.ca";
+const REVIEW_RECIPIENT = "1.lineofjudah.1@gmail.com";
 
 // --- Inlined template builders (kept in sync with send-order-confirmation) ---
 function escapeHtml(s: unknown): string {

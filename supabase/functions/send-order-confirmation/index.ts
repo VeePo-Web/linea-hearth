@@ -49,7 +49,7 @@ interface Order {
 
 const INTERNAL_NOTIFY_RECIPIENTS = [
   "1.lineofjudah.1@gmail.com",
-  "parker@veepo.ca",
+  "1.lineofjudah.1@gmail.com",
 ];
 
 function escapeHtml(s: unknown): string {
@@ -395,7 +395,7 @@ function buildOrderConfirmationHtml(order: Order, items: OrderItem[], siteUrl: s
                 <tr>
                   <td align="center">
                     <p style="margin:0 0 4px;font-size:14px;color:#A8A29E;">Questions? We've got your back.</p>
-                    <a href="mailto:hello@lineofjudah.clothing" style="font-size:14px;color:#FFFFFF;text-decoration:none;">hello@lineofjudah.clothing</a>
+                    <a href="mailto:1.lineofjudah.1@gmail.com" style="font-size:14px;color:#FFFFFF;text-decoration:none;">1.lineofjudah.1@gmail.com</a>
                   </td>
                 </tr>
                 <tr>
